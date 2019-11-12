@@ -1,0 +1,13 @@
+.animationContainer {
+    position: absolute;
+    bottom: 0;
+    width: 95%;
+    z-index: 11;
+}
+
+#slidesnav-trigger {    
+    position: relative;
+    color: orange;
+    right: -100%;
+    bottom: -150px;
+}

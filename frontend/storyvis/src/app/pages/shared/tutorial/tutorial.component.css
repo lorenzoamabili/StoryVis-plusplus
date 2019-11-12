@@ -1,0 +1,12 @@
+video{
+    position: absolute;
+    width: 80%;
+    height: 70%;
+    bottom: 5%;
+}
+
+div.buttonLink{
+    position: absolute;
+    left: 95%;
+    bottom: 5%;
+}

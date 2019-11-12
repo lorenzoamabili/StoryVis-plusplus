@@ -1,0 +1,55 @@
+﻿<div style="margin: 5%;">
+
+    <div *ngIf="isAdmin || isAuthor">
+        <p>Complete the following questionnaire to give us your feedback about the StoryVis tool and its features.
+            <br>
+            When you have completed the questionnaire and submitted it, press END.
+            <br>
+            <br>
+        </p>
+    </div>
+
+
+    <div *ngIf="isAdmin || isReader">
+        <p>
+            Complete the following questionnaire to give us your feedback about the StoryVis tool and its features.
+            <br>
+            When you have completed the questionnaire and submitted it, press END.
+            <br>
+            <br>
+        </p>
+    </div>
+
+    <div *ngIf="isAdmin || isReader">
+        <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLSdMxjWGVn0dFwyAt-YL0VYpm_7ttT3Ca_toyLmwLHhCgl3aEA/viewform?embedded=true"></iframe>
+    </div>
+
+    <div *ngIf="isAuthor && isNoProvGraph">
+        <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLSeWhyU1aI6aICEh9AtskJMz-AlJw83v0IB6PUPKengRqUC7Bg/viewform?embedded=true"></iframe>
+    </div>
+
+    <div *ngIf="isAuthor && isProvGraph">
+        <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLSfoqrWEgOaiuXaCDS7Id6-dMX0FevEtafOdIA8sEdJXYu9EnQ/viewform?embedded=true"></iframe>
+    </div>
+
+    <div *ngIf="isAuthor && isPlotTrimmerG">
+        <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLScAamyIV0QAFIizFH-MNpPxmm3XRZB1piZHlJBkQnmLDw8fvA/viewform?embedded=true"></iframe>
+    </div>
+
+    <div *ngIf="isAuthor && isPlotTrimmerC">
+        <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLSeUsYAlbrzMRKWxFHmJm-pigBXxZmA0CKXKhaGKLT9ZUMhAWw/viewform?embedded=true"></iframe>
+    </div>
+
+    <div class="buttonLink">
+        <b>
+            <a routerLink='/thanks'>
+                END
+            </a>
+        </b>
+    </div>
+</div>

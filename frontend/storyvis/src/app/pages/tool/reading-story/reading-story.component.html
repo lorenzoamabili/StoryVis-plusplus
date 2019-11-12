@@ -1,0 +1,65 @@
+﻿<div class="cont split left">
+  <ng-container id="root" *ngIf="provenance.initialized">
+    <!-- <app-menu-bar [canvas]="canvas"></app-menu-bar> -->
+    <mat-sidenav-container hasBackdrop="false">
+
+      <!-- <mat-sidenav position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false">
+
+      <button id="sidenav-trigger" color="primary" style="color: orange" mat-icon-button (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button> -
+  
+        <mat-tab-group dynamicHeight={true} [selectedIndex]="0">
+          <mat-tab>
+            <app-provenance-visualization *ngIf="!isNoProvGraph"></app-provenance-visualization>
+          </mat-tab>
+         <mat-tab label="Tasks">
+            <app-provenance-task-list class="task-list-container"></app-provenance-task-list>
+          </mat-tab>
+        </mat-tab-group> 
+  
+      </mat-sidenav> -->
+
+      <mat-sidenav-content>
+        <app-brainvis-canvas #canvas></app-brainvis-canvas>
+        <div id="bottom-container">
+          <app-slides-container>
+            <app-provenance-slides [canvas]="canvas" #slides></app-provenance-slides>
+          </app-slides-container>
+        </div>
+        <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->
+        <!--<p></p>-->
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </ng-container>
+</div>
+
+
+
+<div class="cont split right">
+
+  <p>
+    A reading comprehension test is shown below.
+    <br>
+    Complete it accordingly to the findings communicated in the visual data story
+    <br>
+    which you can consult during the test.
+    <br>
+    When you have completed the test, submit it and then press NEXT.
+  </p>
+
+  <iframe
+    src="https://docs.google.com/forms/d/e/1FAIpQLSeUsYAlbrzMRKWxFHmJm-pigBXxZmA0CKXKhaGKLT9ZUMhAWw/viewform?embedded=true"></iframe>
+
+    <div *ngIf="isReportFirst" style="text-indent: 85%;">
+        <a routerLink='/questionnaire' class="nav-item nav-link">
+          <b>NEXT</b>
+        </a>
+      </div>
+      <div *ngIf="!isReportFirst" style="text-indent: 85%;">
+        <a routerLink='/tool/reading-report' class="nav-item nav-link">
+          <b>NEXT</b>
+        </a>
+      </div>
+
+</div>

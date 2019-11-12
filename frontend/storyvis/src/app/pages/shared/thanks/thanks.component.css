@@ -1,0 +1,11 @@
+/* iframe{
+}
+
+div.thanks{
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    margin-right: -70%;
+    transform: translate(-70%, -70%)
+} */

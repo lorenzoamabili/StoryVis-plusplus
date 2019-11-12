@@ -1,0 +1,9 @@
+{
+  "/tool/practice": {
+    "target": "https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/",
+    "secure": false,
+    "pathRewrite": {
+      "^/tool/practice": ""
+    }
+  }
+}

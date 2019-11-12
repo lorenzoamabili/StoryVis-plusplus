@@ -1,0 +1,52 @@
+<div style="margin: 5%;" *ngIf = "isReportFirst">
+
+    <p>
+        The text report of an image assessment and a test to evaluate your understanding of the case will be shown in the next session. <br>
+        <br>
+        Read the text report. 
+        <br>
+        Then, complete the test.
+        <br>
+        When you feel that you have finished completing the test, submit it and press NEXT.
+        <br>
+        <br>
+        You will be able to also read a visual data story about the same case.
+        <br>
+        Then, complete the test again, submit it and press NEXT when you feel that you have finished completing the test.
+        <br>
+        <br>
+        <b>
+            Press <a routerLink='/tool/reading-report'>START</a>
+            to start reading the text report.
+        </b>
+    </p>
+
+</div>
+
+
+<div style="margin: 5%;" *ngIf = "!isReportFirst">
+
+        <p>
+            The visual data story of an image assessment and a test to evaluate your understanding of the case will be shown in the next session. <br>
+            <br>
+            Read the visual data story. 
+            <br>
+            You can interact with it as shown in the short tutorial.
+            <br>
+            Then, complete the test. 
+            <br>
+            When you feel that you have finished completing the test, submit it and press NEXT.
+            <br>
+            <br>
+            You will be able to also read a text report about the same case.
+            <br>
+            Then, complete the test again, submit it and press NEXT when you feel that you have finished completing the test.
+            <br>
+            <br>
+            <b>
+                Press <a routerLink='/tool/reading-story'>START</a>
+                to start reading the visual data story.
+            </b>
+        </p>
+    
+    </div>

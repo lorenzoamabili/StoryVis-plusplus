@@ -1,0 +1,94 @@
+import "./style.css";
+import { IProvenanceSlidedeck } from "@visualstorytelling/provenance-core";
+export declare class SlideDeckVisualization {
+    private _slideDeck;
+    private _root;
+    private _slideTable;
+    private _tableHeight;
+    private _tableWidth;
+    private _minimumSlideDuration;
+    private _barWidthTimeMultiplier;
+    private _barPadding;
+    private _resizebarwidth;
+    private _previousSlideX;
+    private _lineX1;
+    private _placeholderWidth;
+    private _placeholderX;
+    private _placeholderHeight;
+    private _toolbarX;
+    private _toolbarY;
+    private _toolbarPadding;
+    private _draggedSlideReAdjustmentFactor;
+    private _originPosition;
+    private _currentTime;
+    private _currentlyPlaying;
+    private _timelineShift;
+    private _timeIndexedSlides;
+    private _currentlyPlayingSlide;
+    private _gridTimeStep;
+    private _gridSnap;
+    private _colorScale;
+    private _annotationContainer;
+    private onDelete;
+    private onSelect;
+    private selectSlide;
+    private onMouseEnter;
+    private onMouseLeave;
+    private onAdd;
+    private onClone;
+    private moveDragStarted;
+    private moveDragged;
+    private moveDragended;
+    private transitionTimeDragged;
+    private transitionTimeSubject;
+    private durationDragged;
+    private durationSubject;
+    private getSnappedTime;
+    private barTransitionTimeWidth;
+    private barDurationWidth;
+    private barTotalWidth;
+    private previousSlidesWidth;
+    private updateTimeIndices;
+    private rescaleTimeline;
+    private onBackward;
+    private playTimeline;
+    private onPlay;
+    private startPlaying;
+    private stopPlaying;
+    private onForward;
+    private seekStarted;
+    private seekDragged;
+    private resizeTable;
+    /**
+     * Gets the width of the text as percieved by the canvas 2D context. It may not be a precise answer but at least it is proportional
+     * to the correct answer. This is not a cross-platoform solution.
+     * @param text The text to measure the width of
+     * @param fontSize The fontsize of the text
+     * @param fontFace The font of the text
+     *
+     * @returns The calculated width of the text
+     */
+    private getTextWidth;
+    /**
+     * Displays the annotation text on the screen. The annotaion text is displayed in lines, each of them with a predetermined max width
+     * @param annotation: The annotation text
+     * @param width: The max width of each line
+     */
+    private displayAnnotationText;
+    /**
+     * Add a new annotation to the currently selected slide, and then display it.
+     */
+    private addAnnotation;
+    private adjustGridScale;
+    private drawGrid;
+    private updateGridSnap;
+    private fixDrawingPriorities;
+    private displayGridLevel;
+    private drawSeekBar;
+    private adjustSlideAddObjectPosition;
+    private adjustHorizontalLine;
+    update(): void;
+    constructor(slideDeck: IProvenanceSlidedeck, elm: HTMLDivElement);
+    setDeck(deck: IProvenanceSlidedeck): void;
+    getDeck(): IProvenanceSlidedeck;
+}

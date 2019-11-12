@@ -1,0 +1,35 @@
+﻿<div style="margin: 5%; overflow: auto; height:740px;">
+<h1>Admin</h1>
+<nav>
+<div>
+    All users:
+    <ul>
+        <li *ngFor="let user of users">{{user.username}} {{user.role}} {{user.group}}
+            <button
+                (click)="deleteUser(user.username)">Delete
+            </button>
+        </li>
+    </ul>
+</div>
+<div>
+    All provenance graphs:
+    <ul>
+        <li *ngFor="let graph of graphs">{{graph._id}}
+            <button
+                (click)="deleteGraph(graph._id)">Delete
+            </button>
+        </li>
+    </ul>
+</div>
+<div>
+    All stories:
+    <ul>
+        <li *ngFor="let story of stories">{{story._id}}
+            <button
+                (click)="deleteStory(story._id)">Delete
+            </button>
+        </li>
+    </ul>
+</div>
+</nav>
+</div>

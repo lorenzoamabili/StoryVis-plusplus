@@ -1,0 +1,21 @@
+<!-- <mat-form-field>
+  <mat-select [(value)]='selectedColorMap'>
+    <mat-option *ngFor="let cm of availableColorMaps" (onSelectionChange)="change($event)" [value]="cm.value">
+      {{cm.viewValue}}
+    </mat-option>
+  </mat-select>
+</mat-form-field> -->
+
+<app-styled-slider [canvas]="canvas"></app-styled-slider>
+
+<!-- <button mat-icon-button (click)="provenance.saveGraph()">
+  <mat-icon>backup</mat-icon>
+  Save provenance tree
+  <mat-progress-spinner *ngIf="provenance.saveStatus === 'saving'" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+</button>
+
+<button mat-icon-button (click)="provenance.saveStory()">
+  <mat-icon>library_books</mat-icon>
+  Save story
+  <mat-progress-spinner *ngIf="provenance.saveStatus === 'saving'" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+</button> -->

@@ -1,0 +1,46 @@
+﻿<div class="cont">
+  <ng-container id="root" *ngIf="provenance.initialized">
+    <app-menu-bar [canvas]="canvas" [IDcreator]="IDcreator"></app-menu-bar>
+    <mat-sidenav-container hasBackdrop="false">
+     
+     
+      <mat-sidenav position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
+
+        <button id="sidenav-trigger" color="primary" style="color: orange" mat-icon-button (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
+  
+        <mat-tab-group dynamicHeight={true} [selectedIndex]="0">
+          <mat-tab>
+            <app-provenance-visualization *ngIf="!isNoProvGraph"></app-provenance-visualization>
+          </mat-tab>
+        <!--  <mat-tab label="Tasks">
+            <app-provenance-task-list class="task-list-container"></app-provenance-task-list>
+          </mat-tab> -->
+        </mat-tab-group>
+  
+  
+      </mat-sidenav>
+  
+      <mat-sidenav-content>
+        <app-brainvis-canvas #canvas [practiceSession]="practiceSession"></app-brainvis-canvas>
+        <div id="bottom-container">
+          <app-slides-container>
+            <app-provenance-slides [canvas]="canvas" #slides></app-provenance-slides>
+          </app-slides-container>
+            <app-text-report>  </app-text-report>
+          </div>
+        <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->
+        <!--<p></p>-->
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </ng-container>
+</div>
+
+<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="currentUser">
+    <div class="navbar-nav">
+        <a routerLink='/questionnaire'
+        (click)="provenance.saveGraph(IDcreator); provenance.saveStory(IDcreator); 
+        provenance.saveTextReport(IDcreator);" class="nav-item nav-link"><b>NEXT</b></a>
+    </div>
+  </nav>

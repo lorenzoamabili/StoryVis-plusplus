@@ -1,0 +1,76 @@
+﻿<div style="margin: 5%;">
+
+    <div *ngIf="isAuthor || isAdmin">
+        <p>A short tutorial about how to perform an image assessment and how to create a text report and visual data
+            story
+            with the StoryVis tool will be shown.
+            <br>
+            When you are done with short tutorial, press NEXT
+            to start the image assessment.
+        </p>
+
+    </div>
+
+    <div *ngIf="isReader || isAdmin">
+        <p>A short tutorial about how to interact with the text report/visual data story will be shown, together with an
+            example of a text report/visual data story. <br>
+            When you are done with short tutorial, press NEXT to start reading the text report/visual data story.
+
+        </p>
+
+    </div>
+
+
+    <div *ngIf="isReader || isAdmin">
+
+        <!-- <video width="720" height="380" controls> -->
+        <video controls>
+            <source src="movie.mp4" type="video/mp4">
+            Something went wrong... <br>
+            Please, ask for assistance. </video>
+    </div>
+
+
+    <div *ngIf="isAuthor && isNoProvGraph">
+
+        <video controls>
+            <source src="movie.mp4" type="video/mp4">
+            Something went wrong... <br>
+            Please, ask for assistance. </video>
+    </div>
+
+
+    <div *ngIf="isAuthor && isProvGraph">
+
+        <video controls>
+            <source src="movie.mp4" type="video/mp4">
+            Something went wrong... <br>
+            Please, ask for assistance. </video>
+    </div>
+
+
+    <div *ngIf="isAuthor && isPlotTrimmerG">
+
+        <video controls>
+            <source src="movie.mp4" type="video/mp4">
+            Something went wrong... <br>
+            Please, ask for assistance. </video>
+    </div>
+
+    <div *ngIf="isAuthor && isPlotTrimmerC">
+
+        <video controls>
+            <source src="movie.mp4" type="video/mp4">
+            Something went wrong... <br>
+            Please, ask for assistance. </video>
+    </div>
+
+    <div class="buttonLink" *ngIf="isAuthor || isAdmin">
+        <b><a routerLink='/tool/intro-prac'>NEXT</a></b>
+    </div>
+
+    <div class="buttonLink" *ngIf="isReader || isAdmin">
+        <b><a routerLink='/tool/intro-read'>NEXT</a></b>
+    </div>
+
+</div>

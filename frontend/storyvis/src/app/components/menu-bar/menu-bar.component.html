@@ -1,0 +1,73 @@
+<mat-toolbar color="primary" style="width: 100%">
+  <mat-toolbar-row>
+    <mat-icon>school</mat-icon>
+    <span>&nbsp;</span>
+    <span>StoryVis</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <div *ngIf="isAdmin">
+      <mat-form-field>
+        <mat-label>Select graph</mat-label>
+        <mat-select (selectionChange)="provenance.restoreGraph($event)">
+          <mat-option *ngFor="let graph of graphs" [value]="graph">
+            {{ graph._id }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Select story</mat-label>
+        <mat-select (selectionChange)="provenance.restoreStory($event)">
+          <mat-option *ngFor="let story of stories" [value]="story">
+            {{ story._id }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Select story</mat-label>
+        <mat-select (selectionChange)="provenance.restoreTextReport($event)">
+          <mat-option *ngFor="let textReport of textReports" [value]="textReport">
+            {{ textReport._id }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
+        <mat-icon>backup</mat-icon>
+      </button>
+
+      <button mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
+        <mat-icon>library_books</mat-icon>
+      </button>
+
+      <button mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
+        <mat-icon>format_color_text</mat-icon>
+      </button>
+
+    </div>
+
+    <mat-button-toggle [checked]="canvas.settings.measurementMode"
+      (change)="canvas.settings.measurementMode = $event.source.checked" matTooltip="Measurement">
+      <mat-icon class="example-icon">videocam</mat-icon>
+    </mat-button-toggle>
+    <mat-menu #appMenu="matMenu">
+      <app-styled-slider [canvas]="canvas"></app-styled-slider>
+      <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
+    </mat-menu>
+    <button matTooltip="Thresholds" mat-raised-button [matMenuTriggerFor]="appMenu">
+      <mat-icon>exposure</mat-icon>
+    </button>
+
+    <div *ngIf="isAdmin">
+      <a>{{IDcreator}}</a>
+    </div>
+
+    <!-- <div id="right">
+      {{ now }}
+    </div> -->
+
+  </mat-toolbar-row>
+</mat-toolbar>
