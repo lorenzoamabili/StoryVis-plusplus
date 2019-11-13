@@ -24,7 +24,6 @@ export declare class SlideDeckVisualization {
     private _currentlyPlaying;
     private _timelineShift;
     private _timeIndexedSlides;
-    private _currentlyPlayingSlide;
     private _gridTimeStep;
     private _gridSnap;
     private _colorScale;
@@ -60,19 +59,8 @@ export declare class SlideDeckVisualization {
     private seekDragged;
     private resizeTable;
     /**
-     * Gets the width of the text as percieved by the canvas 2D context. It may not be a precise answer but at least it is proportional
-     * to the correct answer. This is not a cross-platoform solution.
-     * @param text The text to measure the width of
-     * @param fontSize The fontsize of the text
-     * @param fontFace The font of the text
-     *
-     * @returns The calculated width of the text
-     */
-    private getTextWidth;
-    /**
      * Displays the annotation text on the screen. The annotaion text is displayed in lines, each of them with a predetermined max width
      * @param annotation: The annotation text
-     * @param width: The max width of each line
      */
     private displayAnnotationText;
     /**
@@ -81,9 +69,7 @@ export declare class SlideDeckVisualization {
     private addAnnotation;
     private adjustGridScale;
     private drawGrid;
-    private updateGridSnap;
     private fixDrawingPriorities;
-    private displayGridLevel;
     private drawSeekBar;
     private adjustSlideAddObjectPosition;
     private adjustHorizontalLine;

@@ -97,3 +97,18 @@ rect.add_annotation {
     stroke: black;
     stroke-width: 1px;
 }
+
+#textArea{
+    overflow: hidden;
+    padding: 10px;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 5px solid #556677;
+  }
+
+  #addButton{
+      position: absolute;
+      bottom: 2%;
+      right: 2%;
+  }

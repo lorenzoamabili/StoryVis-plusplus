@@ -6,8 +6,8 @@
 }
 
 #slidesnav-trigger {    
-    position: relative;
+    position: absolute;
     color: orange;
-    right: -100%;
-    bottom: -150px;
+    right: -4%;
+    bottom: 2%;
 }

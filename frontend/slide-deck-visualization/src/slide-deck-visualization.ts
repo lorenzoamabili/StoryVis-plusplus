@@ -13,7 +13,7 @@ import { AnnotationDisplayContainer } from "./annotation-display/annotation-disp
 import { PositionedString } from "./annotation-display/annotation-display";
 
 function firstArgThis(f: (...args: any[]) => any) {
-    return function(this: any, ...args: any[]) {
+    return function (this: any, ...args: any[]) {
         return f(this, ...args);
     };
 }
@@ -47,7 +47,7 @@ export class SlideDeckVisualization {
     private _currentlyPlaying = false;
     private _timelineShift = 0;
     private _timeIndexedSlides: IndexedSlide[] = [];
-    private _currentlyPlayingSlide: IProvenanceSlide | null = null;
+    // private _currentlyPlayingSlide: IProvenanceSlide | null = null;
     private _gridTimeStep = 1000;
     private _gridSnap = false;
     private _colorScale = d3.scaleOrdinal(d3.schemeCategory10);
@@ -88,7 +88,7 @@ export class SlideDeckVisualization {
         slide.transitionTime = originalSlideTransitionTime;
 
         this._annotationContainer.loadForSlide(slide);
-        this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation, 350);
+        this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
         this.update();
     }
 
@@ -204,7 +204,7 @@ export class SlideDeckVisualization {
     private transitionTimeDragged = (that: any, slide: IProvenanceSlide) => {
         let transitionTime =
             Math.max(d3.event.x, 0) / this._barWidthTimeMultiplier;
-        slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
+        // slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
         this.update();
     }
 
@@ -217,7 +217,7 @@ export class SlideDeckVisualization {
             Math.max(d3.event.x, 0) / this._barWidthTimeMultiplier,
             this._minimumSlideDuration
         );
-        slide.duration = this.getSnappedTime(slide, duration, 1);
+        // slide.duration = this.getSnappedTime(slide, duration, 1);
         this.update();
     }
 
@@ -225,25 +225,26 @@ export class SlideDeckVisualization {
         return { x: this.barDurationWidth(slide) };
     }
 
-    private getSnappedTime = (
-        slide: IProvenanceSlide,
-        time: number,
-        isDuration: number
-    ) => {
-        if (this._gridSnap) {
-            let currentTime =
-                this._slideDeck.startTime(slide) +
-                slide.transitionTime * isDuration +
-                time;
-            let remainder = currentTime % this._gridTimeStep;
-            if (remainder > this._gridTimeStep / 2) {
-                return time + this._gridTimeStep - remainder;
-            } else {
-                return time - remainder;
-            }
-        }
-        return time;
-    }
+    // private getSnappedTime = (
+    //     slide: IProvenanceSlide,
+    //     time: number,
+    //     isDuration: number
+    // ) => {
+    //     if (this._gridSnap) {
+    //         let currentTime =
+    //             this._slideDeck.startTime(slide) +
+    //             slide.transitionTime * isDuration +
+    //             time;
+    //         let remainder = currentTime % this._gridTimeStep;
+    //         if (remainder > this._gridTimeStep / 2) {
+    //             return time + this._gridTimeStep - remainder;
+    //         } else {
+    //             return time - remainder;
+    //         }
+    //     }
+    //     return time;
+    // }
+
     private barTransitionTimeWidth(slide: IProvenanceSlide) {
         let calculatedWidth =
             this._barWidthTimeMultiplier * slide.transitionTime;
@@ -342,7 +343,7 @@ export class SlideDeckVisualization {
                 );
                 if (currentSlide !== this._slideDeck.selectedSlide) {
                     this.selectSlide(currentSlide);
-                    this._currentlyPlayingSlide = currentSlide;
+                    // this._currentlyPlayingSlide = currentSlide;
                 }
             }
             this.update();
@@ -407,67 +408,18 @@ export class SlideDeckVisualization {
         d3.select(".slides_background_rect").attr("width", this._tableWidth);
     }
 
-
-
-
-    /**
-     * Gets the width of the text as percieved by the canvas 2D context. It may not be a precise answer but at least it is proportional
-     * to the correct answer. This is not a cross-platoform solution. 
-     * @param text The text to measure the width of
-     * @param fontSize The fontsize of the text
-     * @param fontFace The font of the text
-     * 
-     * @returns The calculated width of the text
-     */
-    private getTextWidth(text: string, fontSize: number, fontFace: string) {
-        let canvas = document.createElement('canvas');
-        let context = canvas.getContext('2d');
-        if (context === null){
-            return 0;
-        }
-        context.font = fontSize + 'px ' + fontFace;
-        return context.measureText(text).width;
-    }
-
     /**
      * Displays the annotation text on the screen. The annotaion text is displayed in lines, each of them with a predetermined max width
      * @param annotation: The annotation text
-     * @param width: The max width of each line
      */
-    private displayAnnotationText = (annotation: string, width: number) => {
-        d3.selectAll("text.annotation").remove();
-        let words = annotation.split(" ");
-        let currentLine = "";
-        let newLine = "";
-        let y = 20;
-        let fontSize = 20;
-        words.forEach(word => {
-            newLine = currentLine + word + " ";
-            if (this.getTextWidth(newLine, fontSize - 1, "Arial") > width){
-                // If the width of the text is more than `width`, display the text
-                d3.select("svg.annotation-area")
-                    .append("text")
-                    .attr("class", "annotation")
-                    .attr("x", 10)
-                    .attr("y", y)
-                    .attr("font-size", fontSize)
-                    .text(currentLine);
-                // Move the height of the next line an arbitrary amount
-                y += 22;
-                currentLine = word + " ";
-            } else {
-                currentLine = newLine;
-            }
-        });
+    private displayAnnotationText = (annotation: string) => {
 
-        // Display the last line
-        d3.select("svg.annotation-area")
-                .append("text")
-                .attr("class", "annotation")
-                .attr("x", 10)
-                .attr("y", y)
-                .attr("font-size", fontSize)
-                .text(currentLine);
+
+        d3.selectAll("text.annotation").remove();
+        
+        let textArea = document.getElementById("textArea") as HTMLTextAreaElement;
+        textArea.value = "";
+        textArea.value = annotation;
 
         this.update();
     }
@@ -476,22 +428,18 @@ export class SlideDeckVisualization {
      * Add a new annotation to the currently selected slide, and then display it.
      */
     private addAnnotation = () => {
-        if(this._slideDeck.selectedSlide === null){
+        if (this._slideDeck.selectedSlide === null) {
             alert("There is no slide currently selected!");
             return;
         }
-        let newAnnotation =  prompt("Edit story: ", this._slideDeck.selectedSlide.mainAnnotation);
-        if(newAnnotation !== null){
+        let textArea = document.getElementById("textArea") as HTMLTextAreaElement;
+        let newAnnotation = textArea.value;
+        if (newAnnotation !== null) {
             this._slideDeck.selectedSlide.mainAnnotation = newAnnotation;
-            if(newAnnotation.length > 150){
-                alert("Find a way to describe your slide in less than 150 characters!");
-                this.addAnnotation();
-                return;
-            }
         } else {
             this._slideDeck.selectedSlide.mainAnnotation = "";
         }
-        this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation, 350);
+        this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
     }
 
 
@@ -527,8 +475,8 @@ export class SlideDeckVisualization {
                 .attr(
                     "cx",
                     this._originPosition +
-                        time * this._barWidthTimeMultiplier -
-                        this._timelineShift
+                    time * this._barWidthTimeMultiplier -
+                    this._timelineShift
                 )
                 .attr("cy", 65);
             time += this._gridTimeStep;
@@ -541,20 +489,20 @@ export class SlideDeckVisualization {
         this._slideTable.select("line.horizontal-line").lower();
     }
 
-    private updateGridSnap = () => {
-        if (d3.event.y === 540 || d3.event.y === 539) {
-            // By far the biggest workaround in the history of code. If the mouse clicks here,
-            // this event still fires, but the checkbox does not get checked. As a result, the gridsnap should
-            // not be updated. This could all be avoided if I could check the checkbox property itself, but
-            // for some reason, all my attempts at accessing the checkbox through d3 is turning up a null value.
-            return;
-        }
-        if (this._gridSnap) {
-            this._gridSnap = false;
-        } else {
-            this._gridSnap = true;
-        }
-    }
+    // private updateGridSnap = () => {
+    //     if (d3.event.y === 540 || d3.event.y === 539) {
+    //         // By far the biggest workaround in the history of code. If the mouse clicks here,
+    //         // this event still fires, but the checkbox does not get checked. As a result, the gridsnap should
+    //         // not be updated. This could all be avoided if I could check the checkbox property itself, but
+    //         // for some reason, all my attempts at accessing the checkbox through d3 is turning up a null value.
+    //         return;
+    //     }
+    //     if (this._gridSnap) {
+    //         this._gridSnap = false;
+    //     } else {
+    //         this._gridSnap = true;
+    //     }
+    // }
 
     private fixDrawingPriorities = () => {
         this._slideTable
@@ -568,11 +516,11 @@ export class SlideDeckVisualization {
         this._slideTable.select("foreignObject.player_forward").raise();
     }
 
-    private displayGridLevel = () => {
-        d3.select("text.grid_display").text(
-            "Grid step: " + (this._gridTimeStep / 1000).toFixed(2) + " Sec"
-        );
-    }
+    // private displayGridLevel = () => {
+    //     d3.select("text.grid_display").text(
+    //         "Grid step: " + (this._gridTimeStep / 1000).toFixed(2) + " Sec"
+    //     );
+    // }
 
     private drawSeekBar = () => {
         const timeWidth = this._currentTime * this._barWidthTimeMultiplier;
@@ -714,32 +662,6 @@ export class SlideDeckVisualization {
             .append("xhtml:body")
             .on("click", this.onClone)
             .html('<i class="fa fa-copy"></i>');
-
-        // function addAnnotationButton(
-        //     toolBar: d3.Selection<any, IProvenanceSlide, any, any>,
-        //     y: number,
-        //     x: number
-        // ) {
-        //     toolBar
-        //         .append("svg:foreignObject")
-        //         .attr("cursor", "pointer")
-        //         .attr("width", 20)
-        //         .attr("height", 20)
-        //         .attr("y", slide => y)
-        //         .attr("x", slide => x)
-        //         .append("xhtml:body")
-        //         .html('<i class="fa fa-font"></i>')
-        //         .on("click", slide => {
-        //             const newAnnotation = new SlideAnnotation(
-        //                 { x: 0, y: 0, value: "" }
-        //             );
-        //             slide.addAnnotation(newAnnotation);
-        //             that._annotationContainer.add(newAnnotation, true);
-        //         });
-        // }
-        // // annotation button
-        // addAnnotationButton(toolbar, this._toolbarY, 50);
-
 
 
         const placeholder = this._slideTable.select("rect.slides_placeholder");
@@ -971,7 +893,7 @@ export class SlideDeckVisualization {
 
         this.fixDrawingPriorities();
 
-        this.displayGridLevel();
+        // this.displayGridLevel();
 
         allExistingNodes.exit().remove();
     }
@@ -1121,59 +1043,43 @@ export class SlideDeckVisualization {
             .on("click", this.onForward)
             .html('<i class="fa fa-forward"></i>');
 
-        this._slideTable
-            .append("text")
-            .attr("class", "grid_display")
-            .attr("x", this._originPosition + 10)
-            .attr("y", 110);
+        // this._slideTable
+        //     .append("text")
+        //     .attr("class", "grid_display")
+        //     .attr("x", this._originPosition + 10)
+        //     .attr("y", 110);
 
-        this._slideTable
-            .append("text")
-            .attr("class", "checkBox_text")
-            .attr("x", this._originPosition + 195)
-            .attr("y", 110)
-            .text("Grid Snap");
+        // this._slideTable
+        //     .append("text")
+        //     .attr("class", "checkBox_text")
+        //     .attr("x", this._originPosition + 195)
+        //     .attr("y", 110)
+        //     .text("Grid Snap");
 
-        this._slideTable
-            .append("foreignObject")
-            .attr("width", 13)
-            .attr("height", 15)
-            .attr("x", this._originPosition + 175)
-            .attr("y", 96)
-            .append("xhtml:body")
-            .html("<form><input type=checkbox class=gridSnap/></form>")
-            .on("click", this.updateGridSnap);
+        // this._slideTable
+        //     .append("foreignObject")
+        //     .attr("width", 13)
+        //     .attr("height", 15)
+        //     .attr("x", this._originPosition + 175)
+        //     .attr("y", 96)
+        //     .append("xhtml:body")
+        //     .html("<form><input type=checkbox class=gridSnap/></form>")
+        //     .on("click", this.updateGridSnap);
 
-        let area = this._root
-            .append<SVGElement>("svg")
-            .attr("class", "annotation-area")
-            .attr("x", this._tableWidth + 5)
-            .attr("y", 0)
-            .attr("width", 350)
-            .attr("height", 150);
-        area
-            .append("rect")
-            .attr("class", "slides_placeholder")
-            .attr("id", "annotation-box")
+        d3.select("#slideDeck")
+            .append("textarea")
+            .attr('id', 'textArea')
+            .attr('placeholder', 'Add annotation to this slide')
             .attr("x", 0)
             .attr("y", 0)
-            .attr("width", 350)
-            .attr("height", 100);
-        area
-            .append("text")
-            .attr("x", 10)
-            .attr("y", 120)
-            .attr("font-size", 18)
-            .text("Edit slide story");
-        area
-            .append("rect")
-            .attr("class", "add_annotation")
-            .attr("x", 0)
-            .attr("y", 100)
-            .attr("width", 150)
-            .attr("height", 30)
-            .attr("cursor", "pointer")
-            .attr("fill", "transparent")
+            .attr("width", 100)
+            .attr("rows", 4);
+
+        d3.select("#slideDeck")
+            .append("input")
+            .attr('id', 'addButton')
+            .attr("type", "button")
+            .attr("value", "Add")
             .on("click", this.addAnnotation);
 
         slideDeck.on("slideAdded", () => this.update());
@@ -1186,9 +1092,9 @@ export class SlideDeckVisualization {
 
     public setDeck(deck: IProvenanceSlidedeck) {
         this._slideDeck = deck;
-      }
+    }
 
-    public getDeck() : IProvenanceSlidedeck{
+    public getDeck(): IProvenanceSlidedeck {
         return this._slideDeck;
     }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { trigger, style, animate, transition, state } from '@angular/animations';
 
 @Component({
@@ -18,13 +18,16 @@ import { trigger, style, animate, transition, state } from '@angular/animations'
   ]
 })
 
-export class SlidesContainerComponent implements OnInit {
+export class SlidesContainerComponent {
   @Input() opened = false;
-
-  ngOnInit() {
-  }
 
   toggleBottomDrawer() {
     this.opened = !this.opened;
+    var cont = document.getElementById("textRep");
+    if (this.opened) {
+      cont.style.zIndex = "-1"
+    } else {
+      cont.style.zIndex = "11"
+    }
   }
 }

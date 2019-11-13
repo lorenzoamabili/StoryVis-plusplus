@@ -6,13 +6,13 @@
 }
 
 #reportnav-trigger {    
-    position: relative;
+    position: absolute;
     color: orange;
-    right: -100%;
-    bottom: -80px;
+    right: -4%;
+    bottom: 2%;
 }
 
-#textArea{
+#textAreaCont{
     overflow: hidden;
     padding: 10px;
     width: 100%;
@@ -20,5 +20,3 @@
     border-radius: 5px;
     border: 5px solid #556677;
   }
-
-button.enter {float: right;} 
