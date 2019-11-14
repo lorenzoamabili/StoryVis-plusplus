@@ -59,7 +59,7 @@ export class SlideDeckVisualization {
     }
 
     private onSelect = (slide: IProvenanceSlide) => {
-        if (d3.event.defaultPrevented) return;
+        // if (d3.event.defaultPrevented) return;
         this.selectSlide(slide);
         if (this._currentlyPlaying) {
             this.stopPlaying();
@@ -133,7 +133,7 @@ export class SlideDeckVisualization {
     }
 
     private moveDragStarted(draggedObject: any) {
-        d3.select<any, any>(this).classed("active", true);
+        d3.select<any, any>(this).raise().classed("active", true);
     }
 
     private moveDragged = (that: any, draggedObject: any) => {
@@ -199,12 +199,17 @@ export class SlideDeckVisualization {
                 );
             });
         this._draggedSlideReAdjustmentFactor = 0;
+            console.log(draggedObject.class);
+        if (draggedObject.className == "vertical-line-seek") {
+            console.log(draggedObject.x1);
+            this._currentTime = draggedObject.x1;
+        }
     }
 
     private transitionTimeDragged = (that: any, slide: IProvenanceSlide) => {
         let transitionTime =
             Math.max(d3.event.x, 0) / this._barWidthTimeMultiplier;
-        // slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
+        slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
         this.update();
     }
 
@@ -217,7 +222,7 @@ export class SlideDeckVisualization {
             Math.max(d3.event.x, 0) / this._barWidthTimeMultiplier,
             this._minimumSlideDuration
         );
-        // slide.duration = this.getSnappedTime(slide, duration, 1);
+        slide.duration = this.getSnappedTime(slide, duration, 1);
         this.update();
     }
 
@@ -225,25 +230,25 @@ export class SlideDeckVisualization {
         return { x: this.barDurationWidth(slide) };
     }
 
-    // private getSnappedTime = (
-    //     slide: IProvenanceSlide,
-    //     time: number,
-    //     isDuration: number
-    // ) => {
-    //     if (this._gridSnap) {
-    //         let currentTime =
-    //             this._slideDeck.startTime(slide) +
-    //             slide.transitionTime * isDuration +
-    //             time;
-    //         let remainder = currentTime % this._gridTimeStep;
-    //         if (remainder > this._gridTimeStep / 2) {
-    //             return time + this._gridTimeStep - remainder;
-    //         } else {
-    //             return time - remainder;
-    //         }
-    //     }
-    //     return time;
-    // }
+    private getSnappedTime = (
+        slide: IProvenanceSlide,
+        time: number,
+        isDuration: number
+    ) => {
+        if (this._gridSnap) {
+            let currentTime =
+                this._slideDeck.startTime(slide) +
+                slide.transitionTime * isDuration +
+                time;
+            let remainder = currentTime % this._gridTimeStep;
+            if (remainder > this._gridTimeStep / 2) {
+                return time + this._gridTimeStep - remainder;
+            } else {
+                return time - remainder;
+            }
+        }
+        return time;
+    }
 
     private barTransitionTimeWidth(slide: IProvenanceSlide) {
         let calculatedWidth =
@@ -296,7 +301,7 @@ export class SlideDeckVisualization {
                 d3.event.x - (this._originPosition - this._timelineShift);
             if (wheelDirection === "down") {
                 let scalingFactor = 0.2;
-                if (this._placeholderX > this._tableWidth / 2) {
+                if (this._placeholderX > this._tableWidth / 5) {
                     this._barWidthTimeMultiplier *= 1 - scalingFactor;
                     this._timelineShift -= correctedShiftAmount * scalingFactor;
                 }
@@ -309,7 +314,7 @@ export class SlideDeckVisualization {
             }
             this.adjustGridScale();
         } else {
-            let shiftAmount = 100;
+            let shiftAmount = 75;
             if (wheelDirection === "down") {
                 this._timelineShift += shiftAmount;
             } else {
@@ -357,6 +362,10 @@ export class SlideDeckVisualization {
             this.startPlaying();
         }
     }
+
+    private onPause = () => {
+//here
+        }
 
     private startPlaying = () => {
         d3.select("foreignObject.player_play")
@@ -416,7 +425,7 @@ export class SlideDeckVisualization {
 
 
         d3.selectAll("text.annotation").remove();
-        
+
         let textArea = document.getElementById("textArea") as HTMLTextAreaElement;
         textArea.value = "";
         textArea.value = annotation;
@@ -539,6 +548,7 @@ export class SlideDeckVisualization {
             this._originPosition + timeWidth - this._timelineShift;
         this._slideTable
             .select("circle.currentTime")
+            .attr("id", "currentTimeCircle")
             .attr("cx", shiftedPosition)
             .raise();
         this._slideTable
@@ -612,8 +622,7 @@ export class SlideDeckVisualization {
                 "height",
                 60
             ) /* removed width = this._barWidth - 2 * this._barPadding */
-            .attr("cursor", "move")
-            .on("click", this.onSelect); // changes made for single click select --Pushpanjali;
+            .attr("cursor", "move");
 
         /* Appnded SVG for text ---Lorenzo */
         slideGroup
@@ -629,7 +638,9 @@ export class SlideDeckVisualization {
         slideGroup
             .append("image")
             .attr("class", "screenshot")
-            .attr("opacity", 0.8);
+            .attr("opacity", 0.8)
+            .on("click", this.onSelect); // changes made for single click select --Pushpanjali;
+
 
         const textPosition = this._resizebarwidth + 4 * this._barPadding + 68;
         /** Ends Appnded SVG for text ---Lorenzo */
@@ -975,6 +986,7 @@ export class SlideDeckVisualization {
             .attr("y1", 65)
             .attr("x2", this._originPosition)
             .attr("y2", 0)
+            .attr("z-index", 11)
             .attr("stroke", "red")
             .attr("stroke-width", 1);
 
@@ -1043,6 +1055,18 @@ export class SlideDeckVisualization {
             .on("click", this.onForward)
             .html('<i class="fa fa-forward"></i>');
 
+        this._slideTable
+            .append("svg:foreignObject")
+            .attr("class", "player_pause")
+            .attr("x", 22)
+            .attr("y", 25)
+            .attr("cursor", "pointer")
+            .attr("width", 20)
+            .attr("height", 20)
+            .append("xhtml:body")
+            .on("click", this.onPause)
+            .html('<i class="fa fa-pause"></i>');
+
         // this._slideTable
         //     .append("text")
         //     .attr("class", "grid_display")
@@ -1072,14 +1096,13 @@ export class SlideDeckVisualization {
             .attr('placeholder', 'Add annotation to this slide')
             .attr("x", 0)
             .attr("y", 0)
-            .attr("width", 100)
             .attr("rows", 4);
 
         d3.select("#slideDeck")
             .append("input")
             .attr('id', 'addButton')
             .attr("type", "button")
-            .attr("value", "Add")
+            .attr("value", "Save")
             .on("click", this.addAnnotation);
 
         slideDeck.on("slideAdded", () => this.update());

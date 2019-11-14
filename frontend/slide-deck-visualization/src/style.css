@@ -101,7 +101,7 @@ rect.add_annotation {
 #textArea{
     overflow: hidden;
     padding: 10px;
-    width: 100%;
+    width: 30%;
     font-size: 14px;
     border-radius: 5px;
     border: 5px solid #556677;

@@ -107,6 +107,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     registerActions(provenance.registry, this);
     this._provenance = provenance;
     this.elem = elem.nativeElement;
+
+    
   }
 
   get perspectiveRenderer() {
@@ -155,6 +157,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._sagittalRenderer = new Renderer2D(this.views[3], this);
 
     this.renderers.forEach(renderer => renderer.init());
+
 
     // this.loadData( (this.practiceSession == false) ?
     // 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz'

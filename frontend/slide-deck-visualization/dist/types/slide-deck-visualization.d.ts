@@ -52,6 +52,7 @@ export declare class SlideDeckVisualization {
     private onBackward;
     private playTimeline;
     private onPlay;
+    private onPause;
     private startPlaying;
     private stopPlaying;
     private onForward;

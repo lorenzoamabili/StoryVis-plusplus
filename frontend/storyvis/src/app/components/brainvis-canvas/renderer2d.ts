@@ -13,7 +13,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
-    this._domElement = <HTMLElement>document.getElementById(view.domId);
+    // this._domElement = <HTMLElement>document.getElementById(view.domId);
     this._color = view.color; // 0x121212
     this._sliceOrientation = view.sliceOrientation; // 'axial'
     this._sliceColor = view.sliceColor; // 0xff1744
@@ -21,7 +21,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   @Output() rulerCreated = new EventEmitter<IPointPair>();
-  @Output() rulerChanged = new EventEmitter<{oldPoints: IPointPair, newPoints: IPointPair}>();
+  @Output() rulerChanged = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
   @Output() rulerRemoved = new EventEmitter<IPointPair>();
 
   init() {
@@ -44,14 +44,14 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._renderer.setClearColor(0x121212, 1);
     this._renderer.domElement.id = this._targetID.toString();
     this._domElement.appendChild(this._renderer.domElement);
-
+     
     // camera
     this._camera = new AMI.OrthographicCamera(
       this._domElement.clientWidth / -2,
       this._domElement.clientWidth / 2,
       this._domElement.clientHeight / 2,
       this._domElement.clientHeight / -2);
-// 1,1000);
+    // 1,1000);
 
     // controls
     this._controls = new AMI.TrackballOrthoControl(
@@ -78,7 +78,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   initHelpersStack(stack) {
     if (!this._initialized) {
-        throw new UninitializedError();
+      throw new UninitializedError();
     }
 
     this._stackHelper = new AMI.StackHelper(stack);
@@ -90,25 +90,25 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // set camera
     const worldbb = stack.worldBoundingBox();
     const lpsDims = new THREE.Vector3(
-        (worldbb[1] - worldbb[0]) / 2,
-        (worldbb[3] - worldbb[2]) / 2,
-        (worldbb[5] - worldbb[4]) / 2
+      (worldbb[1] - worldbb[0]) / 2,
+      (worldbb[3] - worldbb[2]) / 2,
+      (worldbb[5] - worldbb[4]) / 2
     );
 
     // box: {halfDimensions, center}
     const box = {
-        center: stack.worldCenter().clone(),
-        halfDimensions: new THREE.Vector3(
-            lpsDims.x + 10,
-            lpsDims.y + 10,
-            lpsDims.z + 10
-        )
+      center: stack.worldCenter().clone(),
+      halfDimensions: new THREE.Vector3(
+        lpsDims.x + 10,
+        lpsDims.y + 10,
+        lpsDims.z + 10
+      )
     };
 
     // init and zoom
     const canvas = {
-        width: this._domElement.clientWidth,
-        height: this._domElement.clientHeight
+      width: this._domElement.clientWidth,
+      height: this._domElement.clientHeight
     };
 
     this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
@@ -120,7 +120,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     this._stackHelper.orientation = this._camera.stackOrientation;
     this._stackHelper.index = Math.floor(
-        this._stackHelper.orientationMaxIndex / 2
+      this._stackHelper.orientationMaxIndex / 2
     );
     this._scene.add(this._stackHelper);
   }
@@ -291,7 +291,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
   }
 
-  createRuler = ({p0, p1}: IPointPair) => {
+  createRuler = ({ p0, p1 }: IPointPair) => {
     this._ruler = new Ruler(this);
 
     // set position
@@ -305,7 +305,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
   }
 
-  updateRuler = ({p0, p1}: IPointPair) => {
+  updateRuler = ({ p0, p1 }: IPointPair) => {
     if (this._ruler) {
       // set position
       this._ruler.widget._handles[0].worldPosition = p0;
@@ -322,7 +322,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
       this._ruler.remove();
       this._ruler = null;
-      this.rulerRemoved.emit({p0, p1});
+      this.rulerRemoved.emit({ p0, p1 });
       this.measurementMode = false;
     }
   }

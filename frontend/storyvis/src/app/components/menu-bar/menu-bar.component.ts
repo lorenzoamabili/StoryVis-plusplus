@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
-import { ProvenanceService, AuthenticationService, UserService } from '../../shared/_services';
-import { User, Role, Provenance, Story, TextReport } from 'src/app/shared/_models';
-import { ToolComponent } from 'src/app/pages/tool/tool.component';
+import { ProvenanceService, UserService } from '../../shared/_services';
+import { Role, Provenance, Story, TextReport, User } from 'src/app/shared/_models';
+import { IntroComponent } from 'src/app/pages/shared/intro/intro.component';
 
 @Component({
   selector: 'app-menu-bar',
@@ -12,8 +12,8 @@ import { ToolComponent } from 'src/app/pages/tool/tool.component';
 })
 export class MenuBarComponent implements OnInit {
   @Input() canvas: BrainvisCanvasComponent;
-  @Input() IDcreator: ToolComponent;
-  
+  @Input() IDcreator: IntroComponent;
+
   public now: string;
 
   currentUser: User;
@@ -23,10 +23,8 @@ export class MenuBarComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private authenticationService: AuthenticationService,
     public provenance: ProvenanceService
   ) {
-    this.currentUser = this.authenticationService.currentUserValue;
 
     this.userService.getAllGraphs().pipe(first()).subscribe(graphs => {
       this.graphs = graphs;

@@ -28,8 +28,8 @@ export class AMIRenderer {
     constructor(view: View, canvas: BrainvisCanvasComponent) {
         this._canvas = canvas;
         this._domElement = document.getElementById(view.domId);
-        this._color = view.color; // 0x121212
-        this._targetID = view.targetID; // 1
+        // this._color = view.color; // 0x121212
+        // this._targetID = view.targetID; // 1
     }
 
     public get camera() {

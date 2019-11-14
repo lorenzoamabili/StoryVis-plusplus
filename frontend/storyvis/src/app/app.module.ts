@@ -19,11 +19,18 @@ import { AlertService, AuthenticationService, UserService } from './shared/_serv
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpModule } from '@angular/http';
 
-import { ToolModule } from './pages/tool/tool.module';
 import { ProvenanceService } from './shared/_services';
 import { IntroComponent } from './pages/shared/intro/intro.component';
 import { QuestionnaireComponent } from './pages/shared/questionnaire/questionnaire.component';
 import { TutorialComponent } from './pages/shared/tutorial/tutorial.component';
+import { ComponentsModule } from './components/components.module';
+import { IntroPracComponent } from './pages/tool/intro-prac/intro-prac.component';
+import { IntroReadComponent } from './pages/tool/intro-read/intro-read.component';
+import { IntroExploComponent } from './pages/tool/intro-explo/intro-explo.component';
+import { ReadingReportModule } from './pages/tool/reading-report/reading-report.module';
+import { ReadingStoryModule } from './pages/tool/reading-story/reading-story.module';
+import { ExplorationModule } from './pages/tool/exploration/exploration.module';
+import { PracticeModule } from './pages/tool/practice/practice.module';
 
 @NgModule({
     imports: [
@@ -32,8 +39,12 @@ import { TutorialComponent } from './pages/shared/tutorial/tutorial.component';
         AppRoutingModule,
         HttpClientModule,
         BrowserAnimationsModule,
-        ToolModule,
-        HttpModule
+        HttpModule,
+        PracticeModule,
+        ExplorationModule,
+        ReadingStoryModule,
+        ReadingReportModule,
+        ComponentsModule
         ],
     declarations: [
         AppComponent,
@@ -46,7 +57,10 @@ import { TutorialComponent } from './pages/shared/tutorial/tutorial.component';
         HomeComponent,
         IntroComponent,
         QuestionnaireComponent,
-        TutorialComponent
+        TutorialComponent,
+        IntroPracComponent,
+        IntroReadComponent,
+        IntroExploComponent
     ],
     bootstrap: [AppComponent],
     providers: [

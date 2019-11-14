@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProvenanceService } from './shared/_services';
 
@@ -12,7 +12,6 @@ import { User, Role } from './shared/_models';
 export class AppComponent {
     currentUser: User;
     title = 'app';
-    private bottomDrawerOpen = true;
 
     constructor(
         private router: Router,
@@ -22,8 +21,6 @@ export class AppComponent {
         this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
         this.currentUser = this.authenticationService.currentUserValue;
 
-    }
-    ngOnInit() {
     }
 
     get isAdmin() {
@@ -57,9 +54,5 @@ export class AppComponent {
     logout() {
         this.authenticationService.logout();
         this.router.navigateByUrl('/login');
-    }
-
-    toggleBottomDrawer() {
-        this.bottomDrawerOpen = !this.bottomDrawerOpen;
     }
 }

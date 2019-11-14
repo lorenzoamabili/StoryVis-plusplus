@@ -13,6 +13,9 @@ import { Role } from './shared/_models';
 import { TutorialComponent } from './pages/shared/tutorial/tutorial.component';
 import { QuestionnaireComponent } from './pages/shared/questionnaire/questionnaire.component';
 import { IntroComponent } from './pages/shared/intro/intro.component';
+import { IntroReadComponent } from './pages/tool/intro-read/intro-read.component';
+import { IntroPracComponent } from './pages/tool/intro-prac/intro-prac.component';
+import { IntroExploComponent } from './pages/tool/intro-explo/intro-explo.component';
 
 const appRoutes: Routes = [
     {
@@ -44,16 +47,45 @@ const appRoutes: Routes = [
         component: TutorialComponent
     },
     {
-        path: 'tool',
-        canActivate: [AuthGuard],
-        loadChildren: () => import('./pages/tool/tool.module').then(mod => mod.ToolModule)
-
-    },
-    {
         path: 'questionnaire',
         canActivate: [AuthGuard],
         component: QuestionnaireComponent
 
+    },
+    {
+        path: 'reading-story',
+        loadChildren: () => import('./pages/tool/reading-story/reading-story.module').then(mod => mod.ReadingStoryModule),
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'reading-report',
+        loadChildren: () => import('./pages/tool/reading-report/reading-report.module').then(mod => mod.ReadingReportModule),
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'intro-read',
+        component: IntroReadComponent,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'intro-prac',
+        component: IntroPracComponent,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'intro-explo',
+        component: IntroExploComponent,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'exploration',
+        loadChildren: () => import('./pages/tool/exploration/exploration.module').then(mod => mod.ExplorationModule),
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'practice',
+        loadChildren: () => import('./pages/tool/practice/practice.module').then(mod => mod.PracticeModule),
+        canActivate: [AuthGuard]
     },
     {
         path: 'thanks',

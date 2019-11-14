@@ -22,6 +22,7 @@ import {
 
 import { Ng5SliderModule } from 'ng5-slider';
 import { RouterModule, Routes } from '@angular/router';
+import { BrainvisCanvasComponent } from 'src/app/components/brainvis-canvas/brainvis-canvas.component';
 
 const routes: Routes = [
     { path: '', component: PracticeComponent }
@@ -44,7 +45,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [PracticeComponent],
-    providers: [ProvenanceService],
+    providers: [ProvenanceService, BrainvisCanvasComponent],
     exports: [PracticeComponent]
 })
 

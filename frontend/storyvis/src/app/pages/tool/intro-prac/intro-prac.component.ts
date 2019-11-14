@@ -10,7 +10,7 @@ export class IntroPracComponent implements OnInit {
 
     constructor( 
         private authenticationService: AuthenticationService,
-        public provenance: ProvenanceService,
+        public provenance: ProvenanceService
         ) {
             this.currentUser = this.authenticationService.currentUserValue;
         }
