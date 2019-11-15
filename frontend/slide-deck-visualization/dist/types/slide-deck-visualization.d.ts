@@ -27,6 +27,7 @@ export declare class SlideDeckVisualization {
     private _gridTimeStep;
     private _gridSnap;
     private _colorScale;
+    private _playingID;
     private _annotationContainer;
     private onDelete;
     private onSelect;

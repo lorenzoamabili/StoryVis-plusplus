@@ -51,7 +51,7 @@ export class SlideDeckVisualization {
     private _gridTimeStep = 1000;
     private _gridSnap = false;
     private _colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-
+    private _playingID: any = -1;
     private _annotationContainer = new AnnotationDisplayContainer();
 
     private onDelete = (slide: IProvenanceSlide) => {
@@ -199,9 +199,7 @@ export class SlideDeckVisualization {
                 );
             });
         this._draggedSlideReAdjustmentFactor = 0;
-            console.log(draggedObject.class);
         if (draggedObject.className == "vertical-line-seek") {
-            console.log(draggedObject.x1);
             this._currentTime = draggedObject.x1;
         }
     }
@@ -267,7 +265,6 @@ export class SlideDeckVisualization {
     private barTotalWidth(slide: IProvenanceSlide) {
         let calculatedWidth =
             this.barTransitionTimeWidth(slide) + this.barDurationWidth(slide);
-
         return calculatedWidth;
     }
 
@@ -338,9 +335,9 @@ export class SlideDeckVisualization {
 
     private playTimeline() {
         let intervalStepMS = 25;
-        let playingID = setInterval(() => {
+        this._playingID = setInterval(() => {
             if (!this._currentlyPlaying) {
-                clearInterval(playingID);
+                clearInterval(this._playingID);
             } else {
                 this._currentTime += intervalStepMS;
                 let currentSlide = this._slideDeck.slideAtTime(
@@ -356,16 +353,14 @@ export class SlideDeckVisualization {
     }
 
     private onPlay = () => {
-        if (this._currentlyPlaying) {
-            this.stopPlaying();
-        } else {
+        if (!this._currentlyPlaying) {
             this.startPlaying();
         }
     }
 
     private onPause = () => {
-//here
-        }
+        this.stopPlaying();
+    }
 
     private startPlaying = () => {
         d3.select("foreignObject.player_play")
@@ -380,6 +375,8 @@ export class SlideDeckVisualization {
             .select("body")
             .html('<i class="fa fa-play"></i>');
         this._currentlyPlaying = false;
+        clearInterval(this._playingID);
+        this._playingID = -1;
     }
 
     private onForward = () => {
@@ -514,10 +511,7 @@ export class SlideDeckVisualization {
     // }
 
     private fixDrawingPriorities = () => {
-        this._slideTable
-            .select("rect.seek-dragger")
-            .attr("width", this._placeholderX)
-            .raise();
+        this._slideTable.select("rect.seek-dragger").attr("width", this._placeholderX).raise();
         this._slideTable.select("rect.mask").raise();
         this._slideTable.select("#player_placeholder").raise();
         this._slideTable.select("foreignObject.player_backward").raise();
@@ -914,6 +908,7 @@ export class SlideDeckVisualization {
         window.addEventListener("resize", this.resizeTable);
         this._slideDeck = slideDeck;
         this._root = d3.select(elm);
+        const that = this;
 
         this._slideTable = this._root
             .append<SVGElement>("svg")
@@ -1040,8 +1035,14 @@ export class SlideDeckVisualization {
             .attr("width", 20)
             .attr("height", 20)
             .append("xhtml:body")
-            .on("click", this.onPlay)
-            .html('<i class="fa fa-play"></i>');
+            .html('<i class="fa fa-play"></i>')
+            .on("click", function () {
+                if (document.getElementsByClassName("i.fa.fa-play")) {
+                    that.onPlay();
+                } else {
+                    that.onPause();
+                }
+            });
 
         this._slideTable
             .append("svg:foreignObject")
@@ -1054,18 +1055,6 @@ export class SlideDeckVisualization {
             .append("xhtml:body")
             .on("click", this.onForward)
             .html('<i class="fa fa-forward"></i>');
-
-        this._slideTable
-            .append("svg:foreignObject")
-            .attr("class", "player_pause")
-            .attr("x", 22)
-            .attr("y", 25)
-            .attr("cursor", "pointer")
-            .attr("width", 20)
-            .attr("height", 20)
-            .append("xhtml:body")
-            .on("click", this.onPause)
-            .html('<i class="fa fa-pause"></i>');
 
         // this._slideTable
         //     .append("text")

@@ -22,8 +22,6 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   }
 
 
-
-
   canvas.addEventListener('sliceOrientationChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
     tracker.applyAction({

@@ -18590,6 +18590,7 @@
           this._gridTimeStep = 1000;
           this._gridSnap = false;
           this._colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+          this._playingID = -1;
           this._annotationContainer = new AnnotationDisplayContainer();
           this.onDelete = (slide) => {
               this._slideDeck.removeSlide(slide);
@@ -18689,9 +18690,7 @@
                       ", 0)");
               });
               this._draggedSlideReAdjustmentFactor = 0;
-              console.log(draggedObject.class);
               if (draggedObject.className == "vertical-line-seek") {
-                  console.log(draggedObject.x1);
                   this._currentTime = draggedObject.x1;
               }
           };
@@ -18769,16 +18768,13 @@
               }
           };
           this.onPlay = () => {
-              if (this._currentlyPlaying) {
-                  this.stopPlaying();
-              }
-              else {
+              if (!this._currentlyPlaying) {
                   this.startPlaying();
               }
           };
           this.onPause = () => {
-              this._currentTime = this._currentTime;
-              this.update();
+              this.stopPlaying();
+              this._currentTime = 0;
           };
           this.startPlaying = () => {
               d3.select("foreignObject.player_play")
@@ -18792,6 +18788,8 @@
                   .select("body")
                   .html('<i class="fa fa-play"></i>');
               this._currentlyPlaying = false;
+              clearInterval(this._playingID);
+              this._playingID = -1;
           };
           this.onForward = () => {
               this.stopPlaying();
@@ -18863,10 +18861,7 @@
           //     }
           // }
           this.fixDrawingPriorities = () => {
-              this._slideTable
-                  .select("rect.seek-dragger")
-                  .attr("width", this._placeholderX)
-                  .raise();
+              this._slideTable.select("rect.seek-dragger").attr("width", this._placeholderX).raise();
               this._slideTable.select("rect.mask").raise();
               this._slideTable.select("#player_placeholder").raise();
               this._slideTable.select("foreignObject.player_backward").raise();
@@ -18917,6 +18912,7 @@
           window.addEventListener("resize", this.resizeTable);
           this._slideDeck = slideDeck;
           this._root = d3.select(elm);
+          const that = this;
           this._slideTable = this._root
               .append("svg")
               .attr("class", "slide__table")
@@ -19028,8 +19024,15 @@
               .attr("width", 20)
               .attr("height", 20)
               .append("xhtml:body")
-              .on("click", this.onPlay)
-              .html('<i class="fa fa-play"></i>');
+              .html('<i class="fa fa-play"></i>')
+              .on("click", function () {
+              if (document.getElementsByClassName("i.fa.fa-play")) {
+                  that.onPlay();
+              }
+              else {
+                  that.onPause();
+              }
+          });
           this._slideTable
               .append("svg:foreignObject")
               .attr("class", "player_forward")
@@ -19041,17 +19044,6 @@
               .append("xhtml:body")
               .on("click", this.onForward)
               .html('<i class="fa fa-forward"></i>');
-          this._slideTable
-              .append("svg:foreignObject")
-              .attr("class", "player_pause")
-              .attr("x", 22)
-              .attr("y", 25)
-              .attr("cursor", "pointer")
-              .attr("width", 20)
-              .attr("height", 20)
-              .append("xhtml:body")
-              .on("click", this.onPause)
-              .html('<i class="fa fa-pause"></i>');
           // this._slideTable
           //     .append("text")
           //     .attr("class", "grid_display")
@@ -19135,9 +19127,9 @@
       }
       playTimeline() {
           let intervalStepMS = 25;
-          let playingID = setInterval(() => {
+          this._playingID = setInterval(() => {
               if (!this._currentlyPlaying) {
-                  clearInterval(playingID);
+                  clearInterval(this._playingID);
               }
               else {
                   this._currentTime += intervalStepMS;

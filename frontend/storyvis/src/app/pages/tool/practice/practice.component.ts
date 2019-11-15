@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, Input } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { ProvenanceService } from '../../../shared/_services';
 
 import { AuthenticationService } from '../../../shared/_services';
@@ -19,7 +19,7 @@ export class PracticeComponent implements OnInit {
     ) {
         this.currentUser = this.authenticationService.currentUserValue;
         this.IDcreator = this.currentUser.username;
-        }
+    }
 
     ngOnInit() {
         this.practiceSession = !this.practiceSession;
