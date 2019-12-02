@@ -55,7 +55,6 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
         middlePosition.add(stackHelper.slice.planePosition);
 
         // line
-
         const geometryCylinder = new THREE.CylinderGeometry(1.5, 1.5, 40, 8);
         let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
         this.cylinder = new THREE.Mesh(geometryCylinder, material);
@@ -85,7 +84,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
         this.line = new THREE.Line(this.geometryLine, materialLine);
         this.add(this.line);
 
-        // sphre
+        // sphere
         const geometrySphere = new THREE.SphereGeometry(5, 32, 32);
         material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
         this.sphere = new THREE.Mesh(geometrySphere, material);

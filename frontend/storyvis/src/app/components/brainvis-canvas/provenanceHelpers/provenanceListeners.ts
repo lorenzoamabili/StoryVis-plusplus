@@ -46,6 +46,43 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
 
 
+  
+  canvas.addEventListener('AxialZoomChanged', (event: any) => {
+    const { position, direction, oldPosition, oldDirection } = event.changes;
+    tracker.applyAction({
+      metadata: { userIntent: 'exploration' },
+      do: 'setAxialZoom',
+      doArguments: [position, direction],
+      undo: 'setAxialZoom',
+      undoArguments: [oldPosition, oldDirection],
+    }, true);
+  });
+
+
+  canvas.addEventListener('SagittalZoomChanged', (event: any) => {
+    const { position, direction, oldPosition, oldDirection } = event.changes;
+    tracker.applyAction({
+      metadata: { userIntent: 'exploration' },
+      do: 'setSagittalZoom',
+      doArguments: [position, direction],
+      undo: 'setSagittalZoom',
+      undoArguments: [oldPosition, oldDirection],
+    }, true);
+  });
+
+
+  canvas.addEventListener('CoronalZoomChanged', (event: any) => {
+    const { position, direction, oldPosition, oldDirection } = event.changes;
+    tracker.applyAction({
+      metadata: { userIntent: 'exploration' },
+      do: 'setCoronalZoom',
+      doArguments: [position, direction],
+      undo: 'setCoronalZoom',
+      undoArguments: [oldPosition, oldDirection],
+    }, true);
+  });
+
+
   // canvas.settings.alignModeChange.subscribe(val => {
   //   tracker.applyAction({
   //     metadata: {userIntent: 'configuration'},
@@ -182,7 +219,6 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
           undo: 'updateRuler',
           undoArguments: [renderer.sliceOrientation, oldPoints],
         };
-        console.log(action);
         tracker.applyAction(action, true);
       });
     }

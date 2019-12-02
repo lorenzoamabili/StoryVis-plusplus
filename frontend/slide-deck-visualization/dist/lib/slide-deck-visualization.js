@@ -221,7 +221,6 @@ class SlideDeckVisualization {
         };
         this.onPause = () => {
             this.stopPlaying();
-            this._currentTime = 0;
         };
         this.startPlaying = () => {
             d3.select("foreignObject.player_play")

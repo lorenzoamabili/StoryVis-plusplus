@@ -35,7 +35,7 @@
         "ng5-slider": "^1.2.4",
         "rxjs": "^6.5.2",
         "stats-js": "1.0.1",
-        "three": "^0.107.0",
+        "three": "^0.111.0",
         "three-dragcontrols": "^0.88.2",
         "tslib": "^1.10.0",
         "zone.js": "^0.10.2"
@@ -63,6 +63,6 @@
         "ts-node": "~8.3.0",
         "tslint": "^5.18.0",
         "tslint-angular": "^3.0.2",
-        "typescript": "~3.5.3"
+        "typescript": "^3.7.2"
     }
 }

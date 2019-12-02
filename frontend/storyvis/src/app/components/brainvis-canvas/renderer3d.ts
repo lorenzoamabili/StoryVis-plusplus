@@ -5,8 +5,13 @@ import { AMIRenderer } from './amiRenderer';
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
 import { Trackball } from './utils/trackball';
 import { UninitializedError } from './utils/exceptions';
+import { Renderer2D } from './renderer2d';
 
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {
+
+  private renderer2D: Renderer2D;
+  private _dom: HTMLDivElement;
+
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
     // this._domElement = document.getElementById(view.domId);
@@ -79,13 +84,28 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._stackHelper = new AMI.StackHelper(stack);
     this._stackHelper.bbox.visible = false;
     this._stackHelper.borderColor = this._sliceColor;
+    // this._stackHelper.slice._windowWidth = 100;
+    // console.log(this._stackHelper.slice);
+    // console.log(this._stackHelper.slice._windowWidth);
+    // this._stackHelper.slice._windowCenter = 100;
     this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
     this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
 
     this._stackHelper.orientation = this._camera.stackOrientation;
     this._stackHelper.index = Math.floor(
-        this._stackHelper.orientationMaxIndex / 2
+      this._stackHelper.orientationMaxIndex / 2
     );
+
+    // this.renderer2D._pairs.forEach(function (coord) {
+    //   this._dom = document.createElement('div');
+    //   this._dom.style.position = "absolute";
+    //   this._dom.style.left = coord[0] + 'px';
+    //   this._dom.style.top = coord[1] + 'px';
+    //   this._dom.style.top = coord[1] + 'px';
+    //   this._dom.className = 'widgets-handle';
+    //   this._canvas.appendChild(this._dom);
+    // });
+
   }
 
   lookAt(vec: THREE.Vector3) {

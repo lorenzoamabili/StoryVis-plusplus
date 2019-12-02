@@ -12,7 +12,14 @@ export class StyledSliderComponent implements DoCheck {
 
   constructor() {}
 
-  options: Options = {
+  optionsW: Options = {
+    floor: 0,
+    ceil: 1426,
+    step: 1,
+    showTicks: false
+  };
+
+  optionsC: Options = {
     floor: 0,
     ceil: 1426,
     step: 1,
@@ -20,22 +27,41 @@ export class StyledSliderComponent implements DoCheck {
   };
 
   ngDoCheck() {
-    let changeDetected = false;
+    let changeDetectedW = false;
+    let changeDetectedC = false;
 
-    if (this.canvas.settings.thresholdLowerBound !== this.options.floor) {
-      changeDetected = true;
+    if (this.canvas.settings.thresholdLowerBoundW !== this.optionsW.floor) {
+      changeDetectedW = true;
     }
 
-    if (this.canvas.settings.thresholdUpperBound !== this.options.ceil) {
-      changeDetected = true;
+    if (this.canvas.settings.thresholdUpperBoundW !== this.optionsW.ceil) {
+      changeDetectedW = true;
     }
 
-    if (changeDetected) {
-      const newOptions: Options = Object.assign({}, this.options);
-      newOptions.floor = this.canvas.settings.thresholdLowerBound;
-      newOptions.ceil = this.canvas.settings.thresholdUpperBound;
+    if (changeDetectedW) {
+      const newOptions: Options = Object.assign({}, this.optionsW);
+      newOptions.floor = this.canvas.settings.thresholdLowerBoundW;
+      newOptions.ceil = this.canvas.settings.thresholdUpperBoundW;
 
-      this.options = newOptions;
+      this.optionsW = newOptions;
+    }
+
+
+
+    if (this.canvas.settings.thresholdLowerBoundC !== this.optionsC.floor) {
+      changeDetectedC = true;
+    }
+
+    if (this.canvas.settings.thresholdUpperBoundC !== this.optionsC.ceil) {
+      changeDetectedC = true;
+    }
+
+    if (changeDetectedC) {
+      const newOptions: Options = Object.assign({}, this.optionsC);
+      newOptions.floor = this.canvas.settings.thresholdLowerBoundC;
+      newOptions.ceil = this.canvas.settings.thresholdUpperBoundC;
+
+      this.optionsC = newOptions;
     }
   }
 }

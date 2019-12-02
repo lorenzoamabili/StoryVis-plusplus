@@ -55,13 +55,13 @@
       (change)="canvas.settings.measurementMode = $event.source.checked" matTooltip="Measurement">
       <mat-icon class="example-icon">videocam</mat-icon>
     </mat-button-toggle>
-    <mat-menu #appMenu="matMenu">
+    <!-- <mat-menu #appMenu="matMenu"> -->
       <app-styled-slider [canvas]="canvas"></app-styled-slider>
       <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
-    </mat-menu>
-    <button matTooltip="Thresholds" mat-raised-button [matMenuTriggerFor]="appMenu">
+    <!-- </mat-menu> -->
+    <!-- <button matTooltip="Thresholds" mat-raised-button [matMenuTriggerFor]="appMenu">
       <mat-icon>exposure</mat-icon>
-    </button>
+    </button> -->
 
     <div *ngIf="isAdmin">
       <a>{{IDcreator}}</a>

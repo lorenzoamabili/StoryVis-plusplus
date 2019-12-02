@@ -832,7 +832,7 @@ function fromByteArray (uint8) {
 /* WEBPACK VAR INJECTION */(function(global) {/*!
  * The buffer module from node.js, for the browser.
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @author   Feross Aboukhadijeh <http://feross.org>
  * @license  MIT
  */
 /* eslint-disable no-proto */
@@ -22225,7 +22225,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StaticCopyUsage", function() { return StaticCopyUsage; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DynamicCopyUsage", function() { return DynamicCopyUsage; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StreamCopyUsage", function() { return StreamCopyUsage; });
-var REVISION = '110';
+var REVISION = '111';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 var CullFaceNone = 0;
@@ -22582,7 +22582,10 @@ var _points = [
 	new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"](),
 	new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"]()
 ];
+
 var _vector = new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+
+var _box = new Box3();
 
 // triangle centered vertices
 
@@ -22612,6 +22615,7 @@ function Box3( min, max ) {
 	this.max = ( max !== undefined ) ? max : new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"]( - Infinity, - Infinity, - Infinity );
 
 }
+
 
 Object.assign( Box3.prototype, {
 
@@ -22812,8 +22816,6 @@ Object.assign( Box3.prototype, {
 
 	expandByObject: function ( object ) {
 
-		var i, l;
-
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
@@ -22823,44 +22825,23 @@ Object.assign( Box3.prototype, {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.isGeometry ) {
+			if ( geometry.boundingBox === null ) {
 
-				var vertices = geometry.vertices;
-
-				for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-					_vector.copy( vertices[ i ] );
-					_vector.applyMatrix4( object.matrixWorld );
-
-					this.expandByPoint( _vector );
-
-				}
-
-			} else if ( geometry.isBufferGeometry ) {
-
-				var attribute = geometry.attributes.position;
-
-				if ( attribute !== undefined ) {
-
-					for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-						_vector.fromBufferAttribute( attribute, i ).applyMatrix4( object.matrixWorld );
-
-						this.expandByPoint( _vector );
-
-					}
-
-				}
+				geometry.computeBoundingBox();
 
 			}
 
-		}
+			_box.copy( geometry.boundingBox );
+			_box.applyMatrix4( object.matrixWorld );
 
-		//
+			this.expandByPoint( _box.min );
+			this.expandByPoint( _box.max );
+
+		}
 
 		var children = object.children;
 
-		for ( i = 0, l = children.length; i < l; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
 			this.expandByObject( children[ i ] );
 
@@ -25581,7 +25562,7 @@ var _normal = new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
 function Ray( origin, direction ) {
 
 	this.origin = ( origin !== undefined ) ? origin : new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
-	this.direction = ( direction !== undefined ) ? direction : new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+	this.direction = ( direction !== undefined ) ? direction : new _Vector3_js__WEBPACK_IMPORTED_MODULE_0__["Vector3"]( 0, 0, - 1 );
 
 }
 
@@ -27215,6 +27196,12 @@ Object.assign( Vector3.prototype, {
 		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
 
 		return this;
+
+	},
+
+	applyNormalMatrix: function ( m ) {
+
+		return this.applyMatrix3( m ).normalize();
 
 	},
 

@@ -10,6 +10,10 @@ import { UninitializedError } from './utils/exceptions';
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   private _measurementMode: boolean;
   private _ruler: Ruler | null;
+  private _rulers: Ruler[] = [];
+  private _oldRulers: Ruler[] = [];
+  private _newRulers: Ruler[] = [];
+  public _pairs: THREE.Vector3[] = [];
 
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
@@ -44,7 +48,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._renderer.setClearColor(0x121212, 1);
     this._renderer.domElement.id = this._targetID.toString();
     this._domElement.appendChild(this._renderer.domElement);
-     
+
     // camera
     this._camera = new AMI.OrthographicCamera(
       this._domElement.clientWidth / -2,
@@ -84,6 +88,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._stackHelper = new AMI.StackHelper(stack);
     this._stackHelper.bbox.visible = false;
     this._stackHelper.borderColor = this._sliceColor;
+    // this._stackHelper.slice._windowWidth = 1000;
+    // console.log(this._stackHelper.slice);
+    // console.log(this._stackHelper.slice._windowWidth);
+    // this._stackHelper.slice._windowCenter = 1000;
     this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
     this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
 
@@ -243,47 +251,63 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   onScroll(event) {
-    if (!this._measurementMode) {
-      super.onScroll(event);
+    // if (!this._measurementMode) {
+    super.onScroll(event);
 
-      const oldIndex = this._stackHelper.index;
+    const oldIndex = this._stackHelper.index;
 
-      if (event.delta > 0) {
-        if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
-          return;
-        }
-        this._stackHelper.index += 1;
-      } else {
-        if (this._stackHelper.index <= 0) {
-          return;
-        }
-        this._stackHelper.index -= 1;
+    if (event.delta > 0) {
+      if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
+        return;
       }
-
-      const newIndex = this._stackHelper.index;
-
-      this._canvas.dispatchEvent({
-        type: 'sliceIndexChangeStart',
-        changes: {
-          sliceOrientation: this._sliceOrientation,
-          newIndex: newIndex,
-          oldIndex: oldIndex,
-        }
-      });
-
-      this._canvas.dispatchEvent({
-        type: 'sliceIndexChanged',
-        changes: {
-          sliceOrientation: this._sliceOrientation,
-          newIndex: newIndex,
-          oldIndex: oldIndex,
-        }
-      });
+      this._stackHelper.index += 1;
+    } else {
+      if (this._stackHelper.index <= 0) {
+        return;
+      }
+      this._stackHelper.index -= 1;
     }
+
+    const newIndex = this._stackHelper.index;
+
+    this._canvas.dispatchEvent({
+      type: 'sliceIndexChangeStart',
+      changes: {
+        sliceOrientation: this._sliceOrientation,
+        newIndex: newIndex,
+        oldIndex: oldIndex,
+      }
+    });
+
+    this._canvas.dispatchEvent({
+      type: 'sliceIndexChanged',
+      changes: {
+        sliceOrientation: this._sliceOrientation,
+        newIndex: newIndex,
+        oldIndex: oldIndex,
+      }
+    });
+
+
+    if (this._ruler) {
+      if (this._rulers.find(element => element.index == newIndex)) {
+        this._oldRulers = this._rulers.filter(x => x.index == oldIndex);
+        this._oldRulers.forEach(element => element.widget.hideDOM());
+        this._newRulers = this._rulers.filter(x => x.index == newIndex);
+        this._newRulers.forEach(element => element.widget.showDOM());
+      } else {
+        this._oldRulers = this._rulers.filter(x => x.index == oldIndex);
+        this._oldRulers.forEach(element => element.widget.hideDOM());      }
+    }
+
+    // }
   }
 
   startRuler = (evt) => {
     this._ruler = new Ruler(this, evt);
+    this._rulers.push(this._ruler);
+    this._pairs.push(this._ruler.pair);
+
     this._domElement.removeEventListener('mousedown', this.startRuler);
 
     // forward events
@@ -314,17 +338,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
   }
 
-  deleteRuler = () => {
-    if (this._ruler) {
+  deleteRuler = (evt) => {
       // get position (needed for the undo provenance action).
-      const p0 = this._ruler.widget._handles[0].worldPosition;
-      const p1 = this._ruler.widget._handles[1].worldPosition;
-
-      this._ruler.remove();
-      this._ruler = null;
+      const p0 = evt.target.widget._handles[0].worldPosition;
+      const p1 = evt.target.widget._handles[1].worldPosition;
+      evt.target.remove();
       this.rulerRemoved.emit({ p0, p1 });
-      this.measurementMode = false;
-    }
+      // this.measurementMode = false;
   }
 
   get sliceOrientation() { return this._sliceOrientation; }
@@ -334,9 +354,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener('mousedown', this.startRuler);
+      this.domElement.addEventListener('contextmenu', this.deleteRuler);
     } else {
       this.domElement.removeEventListener('mousedown', this.startRuler);
-      this.deleteRuler();
+      this.domElement.removeEventListener('contextmenu', this.deleteRuler);
     }
   }
 }

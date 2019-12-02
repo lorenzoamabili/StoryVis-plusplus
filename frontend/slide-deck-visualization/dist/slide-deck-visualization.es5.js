@@ -18769,7 +18769,6 @@ class SlideDeckVisualization {
         };
         this.onPause = () => {
             this.stopPlaying();
-            this._currentTime = 0;
         };
         this.startPlaying = () => {
             select("foreignObject.player_play")

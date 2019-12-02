@@ -8,6 +8,8 @@ import { IPointPair } from './utils/types';
 export default class Ruler {
   widget: any;
   renderer: Renderer2D;
+  index: any;
+  pair: THREE.Vector3;
 
   /**
    * "isNew" is set to false after creation is done (first mouse up event).
@@ -23,6 +25,8 @@ export default class Ruler {
 
     const {stackHelper, controls} = renderer;
     const stack = stackHelper._stack;
+
+    this.index = renderer.stackHelper.index;
 
     let startPosition = new THREE.Vector3();
 
@@ -44,6 +48,7 @@ export default class Ruler {
       const intersects = raycaster.intersectObject(stackHelper.slice.mesh);
       if (intersects.length > 0) {
         startPosition = intersects[0].point;
+        this.pair = startPosition
       }
     }
 
@@ -52,7 +57,7 @@ export default class Ruler {
       // todo: check if using this _spacing leads to the right scale
       pixelSpacing: stack._spacing.toArray(),
       // ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
-      worldPosition: startPosition,
+      worldPosition: startPosition
     });
 
     this.widget.update();
@@ -70,7 +75,7 @@ export default class Ruler {
     this.widget.free();
   }
 
-  onMouseUp   = (evt) => {
+  onMouseUp = (evt) => {
     this.widget.onEnd(evt);
 
     if (this.isNew) {
@@ -99,5 +104,7 @@ export default class Ruler {
     this.widget.onMove(evt);
   }
 
-  onMouseDown = (evt) => { this.widget.onStart(evt); };
+  onMouseDown = (evt) => { 
+    this.widget.onStart(evt); 
+  };
 }

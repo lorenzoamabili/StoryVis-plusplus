@@ -144,7 +144,7 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
       functionsToDo = arg.functionsToDo;
       argumentsToDo = arg.argumentsToDo;
       functionsToDo.forEach((func: any) => {
-        transitionTimes.push(transitionTime || 0);
+      transitionTimes.push(transitionTime || 0);
       });
     } catch (error) {
       if (error.invalidTraversal) {

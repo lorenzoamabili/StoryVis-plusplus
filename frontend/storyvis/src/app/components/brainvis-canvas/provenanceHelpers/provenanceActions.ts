@@ -4,29 +4,35 @@ import { Renderer2D } from '../renderer2d';
 import * as THREE from 'three';
 import { IPointPair } from '../utils/types';
 
-const getActions = (canvas: BrainvisCanvasComponent): {[key: string]: ActionFunction} => ({
+const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFunction } => ({
   // setControlZoom: (args, transitionTime) => Promise.resolve(canvas.setControlZoom(args, transitionTime)),
   // setControlOrientation: (args, transitionTime) => Promise.resolve(canvas.setControlOrientation(args, transitionTime)),
   setSlicePlaneOrientation: async (position, direction, transitionTime) =>
-      canvas.setSlicePlanePosition({position, direction}, transitionTime),
+    canvas.setSlicePlanePosition({ position, direction }, transitionTime),
   setSlicePlaneZoom: async (position, direction, transitionTime) =>
-      canvas.setSlicePlaneZoom({position, direction}, transitionTime),
-
+    canvas.setSlicePlaneZoom({ position, direction }, transitionTime),
+  setAxialZoom: async (position, direction, transitionTime) =>
+    canvas.setAxialZoom({ position, direction }, transitionTime),
+  setSagittalZoom: async (position, direction, transitionTime) =>
+    canvas.setSagittalZoom({ position, direction }, transitionTime),
+  setCoronalZoom: async (position, direction, transitionTime) =>
+    canvas.setCoronalZoom({ position, direction }, transitionTime),
+    
   setSliceIndex: async (sliceOrientation, index) => canvas.setSliceIndex(sliceOrientation, index),
   setPerspectiveCameraZoomLevel: async (args, transitionTime) => canvas.setPerspectiveCameraZoom(args, transitionTime),
   setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime),
-  createRuler: async (view, {p0, p1}: IPointPair) => {
+  createRuler: async (view, { p0, p1 }: IPointPair) => {
     const renderer = canvas.getRenderer(view);
     if (renderer instanceof Renderer2D) {
-      renderer.createRuler({p0, p1});
+      renderer.createRuler({ p0, p1 });
     }
   },
-  deleteRuler: async (view) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.deleteRuler();
-    }
-  },
+  // deleteRuler: async (view) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.deleteRuler();
+  //   }
+  // },
   updateRuler: async (view, points: IPointPair) => {
     const renderer = canvas.getRenderer(view);
     if (renderer instanceof Renderer2D) {

@@ -88,10 +88,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private contourHelper: AMI.ContourHelper;
   private contourScene: THREE.Scene;
 
-  private _perspectiveRenderer: Renderer3D;
-  private _axialRenderer: Renderer2D;
-  private _coronalRenderer: Renderer2D;
-  private _sagittalRenderer: Renderer2D;
+  public _perspectiveRenderer: Renderer3D;
+  public _axialRenderer: Renderer2D;
+  public _coronalRenderer: Renderer2D;
+  public _sagittalRenderer: Renderer2D;
 
   // extra variables to show mesh plane intersections in 2D renderers
   private clipPlaneAxial = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
@@ -108,7 +108,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._provenance = provenance;
     this.elem = elem.nativeElement;
 
-    
   }
 
   get perspectiveRenderer() {
@@ -226,10 +225,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       });
 
       // Set initial threshold values for white balance
-      this.settings.thresholdLowerBound = this._axialRenderer.stackHelper.stack.minMax[0];
-      this.settings.thresholdUpperBound = this._axialRenderer.stackHelper.stack.minMax[1];
-      this.settings.thresholdMinValue = this._axialRenderer.stackHelper.stack.minMax[0];
-      this.settings.thresholdMaxValue = this._axialRenderer.stackHelper.stack.minMax[1];
+      this.settings.thresholdLowerBoundW = this._axialRenderer.stackHelper.stack.minMax[0];
+      this.settings.thresholdUpperBoundW = this._axialRenderer.stackHelper.stack.minMax[1];
+      this.settings.thresholdLowerBoundC = this._axialRenderer.stackHelper.stack.minMax[0];
+      this.settings.thresholdUpperBoundC = this._axialRenderer.stackHelper.stack.minMax[1];
+      this.settings.thresholdValueW = 2000;
+      this.settings.thresholdValueC = 0;
 
       // Init render to texture target
       this.textureTarget = new THREE.WebGLRenderTarget(
@@ -284,7 +285,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   onAxialChanged() {
     this._axialRenderer.updateLocalizer([this._coronalRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
     this._axialRenderer.updateClipPlane(this.clipPlaneAxial);
-
     if (this.contourHelper) {
       this.contourHelper.geometry = this._axialRenderer.stackHelper.slice.geometry;
     }
@@ -304,6 +304,16 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._axialRenderer.stackHelper.index = ijk.getComponent((this._axialRenderer.stackHelper.orientation + 2) % 3);
     this._coronalRenderer.stackHelper.index = ijk.getComponent((this._coronalRenderer.stackHelper.orientation + 2) % 3);
     this._sagittalRenderer.stackHelper.index = ijk.getComponent((this._sagittalRenderer.stackHelper.orientation + 2) % 3);
+
+    this.onAxialChanged();
+    this.onCoronalChanged();
+    this.onSagittalChanged();
+  }
+
+  updateWindowLevel(){
+    this._axialRenderer.stackHelper.index = this._axialRenderer.stackHelper.index;
+    this._coronalRenderer.stackHelper.index = this._coronalRenderer.stackHelper.index;
+    this._sagittalRenderer.stackHelper.index = this._sagittalRenderer.stackHelper.index;
 
     this.onAxialChanged();
     this.onCoronalChanged();
@@ -333,6 +343,27 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   setSlicePlaneZoom(positions: ISlicePosition, within: number) {
     if (this._perspectiveRenderer.stackHelper) {
+      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
+        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
+    }
+  }
+
+  setAxialZoom(positions: ISlicePosition, within: number) {
+    if (this._axialRenderer.stackHelper) {
+      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
+        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
+    }
+  }
+
+  setSagittalZoom(positions: ISlicePosition, within: number) {
+    if (this._sagittalRenderer.stackHelper) {
+      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
+        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
+    }
+  }
+
+  setCoronalZoom(positions: ISlicePosition, within: number) {
+    if (this._coronalRenderer.stackHelper) {
       this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
         new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
     }
