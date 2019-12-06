@@ -1082,6 +1082,7 @@
           var tree = GratzlLayout(hierarchyRoot, currentHierarchyNode);
           this.hierarchyRoot = tree;
           var treeNodes = tree.descendants();
+          console.log(treeNodes);
           var oldNodes = this.g.selectAll('g.node').data(treeNodes, function (d) {
               var data = d.data.wrappedNodes.map(function (n) { return n.id; }).join();
               return data;

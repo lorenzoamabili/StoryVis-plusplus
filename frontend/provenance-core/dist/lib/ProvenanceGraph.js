@@ -22,6 +22,7 @@ var mitt_1 = require("./mitt");
 var ProvenanceGraph = /** @class */ (function () {
     function ProvenanceGraph(application, userid, rootNode) {
         if (userid === void 0) { userid = 'Unknown'; }
+        this.artifacts = [];
         this._nodes = {};
         this.id = utils_1.generateUUID();
         this._mitt = mitt_1.default();
@@ -37,8 +38,7 @@ var ProvenanceGraph = /** @class */ (function () {
                     createdBy: userid,
                     createdOn: utils_1.generateTimestamp()
                 },
-                children: [],
-                artifacts: {}
+                children: []
             };
         }
         this.addNode(this.root);
@@ -50,6 +50,9 @@ var ProvenanceGraph = /** @class */ (function () {
         }
         this._nodes[node.id] = node;
         this._mitt.emit('nodeAdded', node);
+        if (node.artifact) {
+            this.artifacts.push(node.artifact);
+        }
     };
     ProvenanceGraph.prototype.getNode = function (id) {
         var result = this._nodes[id];

@@ -10,6 +10,7 @@ import { addListeners } from './provenanceHelpers/provenanceListeners';
 import { Settings } from './utils/settings';
 import { Renderer2D } from './renderer2d';
 import { Renderer3D } from './renderer3d';
+import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -29,7 +30,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private _initialized = false;
   public settings = Settings.getInstance(this);
   private elem: Element;
-  private views: View[] = [
+  public views: View[] = [
     { // Left top view (TOP/AXIAL): Patient's top side towards camera, patient's right side to the left
       domId: 'r0',
 
@@ -174,6 +175,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.animate();
 
     this.settings.measurementModeChange.subscribe(this.toggleMeasurementMode.bind(this));
+    this.settings.angleModeChange.subscribe(this.toggleAngleMode.bind(this));
+    this.settings.freehandModeChange.subscribe(this.toggleFreehandMode.bind(this));
+    this.settings.voxelprobeModeChange.subscribe(this.toggleVoxelprobeMode.bind(this));
+    this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
     addListeners(this._provenance.tracker, this);
   }
 
@@ -181,6 +186,30 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._axialRenderer.measurementMode = isEnabled;
     this._sagittalRenderer.measurementMode = isEnabled;
     this._coronalRenderer.measurementMode = isEnabled;
+  }
+
+  toggleAngleMode(isEnabled: boolean) {
+    this._axialRenderer.angleMode = isEnabled;
+    this._sagittalRenderer.angleMode = isEnabled;
+    this._coronalRenderer.angleMode = isEnabled;
+  }
+
+  toggleFreehandMode(isEnabled: boolean) {
+    this._axialRenderer.freehandMode = isEnabled;
+    this._sagittalRenderer.freehandMode = isEnabled;
+    this._coronalRenderer.freehandMode = isEnabled;
+  }
+
+  toggleVoxelprobeMode(isEnabled: boolean) {
+    this._axialRenderer.voxelprobeMode = isEnabled;
+    this._sagittalRenderer.voxelprobeMode = isEnabled;
+    this._coronalRenderer.voxelprobeMode = isEnabled;
+  }
+
+  toggleAnnotationMode(isEnabled: boolean) {
+    this._axialRenderer.annotationMode = isEnabled;
+    this._sagittalRenderer.annotationMode = isEnabled;
+    this._coronalRenderer.annotationMode = isEnabled;
   }
 
     async loadData(url: string) {
@@ -368,6 +397,26 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
     }
   }
+
+  // setAxialMeasurements(measurements: IMeasurement) {
+  //   if(this._axialRenderer.stackHelper.index == measurements.index){
+  //     this.views[0].measurements = measurements
+  //   };
+  // }
+
+  // setSagittalMeasurements(measurements: IMeasurement) {
+  //   if(this._sagittalRenderer.stackHelper.index == measurements.index){
+  //     this.views[2].measurements = measurements
+
+  //   };
+  // }
+
+  // setCoronalMeasurements(measurements: IMeasurement) {
+  //   if(this._coronalRenderer.stackHelper.index == measurements.index){
+  //     this.views[3].measurements = measurements
+
+  //   };
+  // }
 
   setSliceIndex(sliceOrientation: VIEWS, index: number) {
     const renderer = this.getRenderer(sliceOrientation);

@@ -1,4 +1,4 @@
-import { Application, Handler, IProvenanceGraph, NodeIdentifier, ProvenanceNode, RootNode, SerializedProvenanceGraph } from './api';
+import { Application, Handler, IProvenanceGraph, NodeIdentifier, ProvenanceNode, RootNode, SerializedProvenanceGraph, Artifact } from './api';
 /**
  * Provenance Graph implementation
  *
@@ -8,6 +8,7 @@ import { Application, Handler, IProvenanceGraph, NodeIdentifier, ProvenanceNode,
 export declare class ProvenanceGraph implements IProvenanceGraph {
     application: Application;
     readonly root: RootNode;
+    artifacts: Artifact[];
     private _current;
     private _mitt;
     private _nodes;

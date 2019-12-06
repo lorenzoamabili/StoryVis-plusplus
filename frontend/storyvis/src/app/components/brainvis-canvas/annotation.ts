@@ -4,26 +4,23 @@ import * as AMI from 'ami.js';
 import { Renderer2D } from './renderer2d';
 import { EventEmitter, Output } from '@angular/core';
 import { IPointPair } from './utils/types';
-import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
-export default class Ruler {
+export default class Annotation {
   widget: any;
   renderer: Renderer2D;
   index: any;
   pair: THREE.Vector3;
-
-  artifact: Artifact;
+  id: number = -1;
   /**
    * "isNew" is set to false after creation is done (first mouse up event).
    */
   isNew: boolean;
 
-  // @Output() changed = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  // @Output() created = new EventEmitter<IPointPair>();
-  @Output() changed = new EventEmitter<Artifact>();
-  @Output() created = new EventEmitter<Artifact>();
+  @Output() changed = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
+  @Output() created = new EventEmitter<IPointPair>();
 
   constructor(renderer: Renderer2D, evt: MouseEvent | null = null) {
+    this.id = this.id + 1
     this.renderer = renderer;
     this.isNew = true;
 
@@ -56,10 +53,11 @@ export default class Ruler {
       }
     }
 
-    this.widget = new AMI.RulerWidget(stackHelper.slice.mesh, controls, {
-      lps2IJK: stack.lps2IJK,
+    this.widget = new AMI.AnnotationWidget(stackHelper.slice.mesh, controls, {
+      // lps2IJK: stack.lps2IJK,
+      id: this.id,
       // todo: check if using this _spacing leads to the right scale
-      pixelSpacing: stack._spacing.toArray(),
+      // pixelSpacing: stack._spacing.toArray(),
       // ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
       worldPosition: startPosition
     });
@@ -81,7 +79,6 @@ export default class Ruler {
 
   onMouseUp = (evt) => {
     this.widget.onEnd(evt);
-  }
 
   //   if (this.isNew) {
   //     this.created.emit({
@@ -101,8 +98,9 @@ export default class Ruler {
   //       }
   //     });
   //   }
+
   //   this.isNew = false;
-  // }
+  }
 
   onMouseMove = (evt) => {
     this.widget.onMove(evt);

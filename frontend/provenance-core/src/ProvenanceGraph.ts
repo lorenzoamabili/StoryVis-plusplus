@@ -9,7 +9,8 @@ import {
   SerializedProvenanceNode,
   SerializedStateNode,
   IScreenShotProvider,
-  IScreenShot
+  IScreenShot,
+  Artifact
 } from './api';
 import { generateTimestamp, generateUUID, isStateNode } from './utils';
 import mitt from './mitt';
@@ -23,6 +24,7 @@ import mitt from './mitt';
 export class ProvenanceGraph implements IProvenanceGraph {
   public application: Application;
   public readonly root: RootNode;
+  public artifacts: Artifact[] = [];
   private _current: ProvenanceNode;
   private _mitt: any;
   private _nodes: { [key: string]: ProvenanceNode } = {};
@@ -43,8 +45,7 @@ export class ProvenanceGraph implements IProvenanceGraph {
           createdBy: userid,
           createdOn: generateTimestamp()
         },
-        children: [],
-        artifacts: {}
+        children: []
       } as RootNode;
     }
     this.addNode(this.root);
@@ -57,6 +58,10 @@ export class ProvenanceGraph implements IProvenanceGraph {
     }
     this._nodes[node.id] = node;
     this._mitt.emit('nodeAdded', node);
+
+    if (node.artifact) {
+      this.artifacts.push(node.artifact);
+    }
   }
 
   getNode(id: NodeIdentifier): ProvenanceNode {
@@ -99,11 +104,11 @@ export class ProvenanceGraph implements IProvenanceGraph {
     this._mitt.off(type, handler);
   }
 
-  getSelf() : SerializedProvenanceGraph{
+  getSelf(): SerializedProvenanceGraph {
     return serializeProvenanceGraph(this);
   }
 
-  restoreSelf(sgraph: SerializedProvenanceGraph): ProvenanceGraph{
+  restoreSelf(sgraph: SerializedProvenanceGraph): ProvenanceGraph {
     return restoreProvenanceGraph(sgraph);
   }
 }

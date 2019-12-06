@@ -14,6 +14,10 @@ export class Settings {
     private _thresholdValueC = 20;
     private _thresholdUpperBoundC = 1426;
     private _measurementMode = false;
+    private _angleMode = false;
+    private _freehandMode = false;
+    private _voxelprobeMode = false;
+    private _annotationMode = false;
 
     get colorMap() { return Settings.instance._colorMap; }
     get thresholdLowerBoundW() { return Settings.instance._thresholdLowerBoundW; }
@@ -23,6 +27,8 @@ export class Settings {
     get thresholdValueC() { return Settings.instance._thresholdValueC; }
     get thresholdUpperBoundC() { return Settings.instance._thresholdUpperBoundC; }
     get measurementMode() { return Settings.instance._measurementMode; }
+    get angleMode() { return Settings.instance._angleMode; }
+    get freehandMode() { return Settings.instance._freehandMode; }
 
     private constructor() { }
 
@@ -95,6 +101,30 @@ export class Settings {
         Settings.instance.measurementModeChange.emit(measurementMode);
     }
     @Output() measurementModeChange = new EventEmitter<boolean>();
+
+    @Input() set angleMode(angleMode: boolean) {
+        Settings.instance._angleMode = angleMode;
+        Settings.instance.angleModeChange.emit(angleMode);
+    }
+    @Output() angleModeChange = new EventEmitter<boolean>();
+
+    @Input() set freehandMode(freehandMode: boolean) {
+        Settings.instance._freehandMode = freehandMode;
+        Settings.instance.freehandModeChange.emit(freehandMode);
+    }
+    @Output() freehandModeChange = new EventEmitter<boolean>();
+
+    @Input() set voxelprobeMode(voxelprobeMode: boolean) {
+        Settings.instance._voxelprobeMode = voxelprobeMode;
+        Settings.instance.voxelprobeModeChange.emit(voxelprobeMode);
+    }
+    @Output() voxelprobeModeChange = new EventEmitter<boolean>();
+
+    @Input() set annotationMode(annotationMode: boolean) {
+        Settings.instance._annotationMode = annotationMode;
+        Settings.instance.annotationModeChange.emit(annotationMode);
+    }
+    @Output() annotationModeChange = new EventEmitter<boolean>();
 
     static getInstance(canvas) {
         if (!Settings.instance) {

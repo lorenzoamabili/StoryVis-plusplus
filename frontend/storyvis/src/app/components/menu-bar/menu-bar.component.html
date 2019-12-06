@@ -48,16 +48,37 @@
       <button mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
         <mat-icon>format_color_text</mat-icon>
       </button>
-
     </div>
 
+
     <mat-button-toggle [checked]="canvas.settings.measurementMode"
-      (change)="canvas.settings.measurementMode = $event.source.checked" matTooltip="Measurement">
-      <mat-icon class="example-icon">videocam</mat-icon>
+      (change)="canvas.settings.measurementMode = $event.source.checked" matTooltip="Ruler">
+      <mat-icon class="example-icon">space_bar</mat-icon>
     </mat-button-toggle>
+
+    <mat-button-toggle [checked]="canvas.settings.angleMode"
+      (change)="canvas.settings.angleMode = $event.source.checked" matTooltip="Angle Measurement">
+      <mat-icon class="example-icon">launch</mat-icon>
+    </mat-button-toggle>
+
+    <mat-button-toggle [checked]="canvas.settings.freehandMode"
+      (change)="canvas.settings.freehandMode = $event.source.checked" matTooltip="Freehand Measurement">
+      <mat-icon class="example-icon">pan_tool</mat-icon>
+    </mat-button-toggle>
+
+    <mat-button-toggle [checked]="canvas.settings.voxelprobeMode"
+      (change)="canvas.settings.voxelprobeMode = $event.source.checked" matTooltip="VoxelProbe">
+      <mat-icon class="example-icon">fingerprint</mat-icon>
+    </mat-button-toggle>
+
+    <mat-button-toggle [checked]="canvas.settings.annotationMode"
+      (change)="canvas.settings.annotationMode = $event.source.checked" matTooltip="Create Annotation">
+      <mat-icon class="example-icon">speaker_notes</mat-icon>
+    </mat-button-toggle>
+
     <!-- <mat-menu #appMenu="matMenu"> -->
-      <app-styled-slider [canvas]="canvas"></app-styled-slider>
-      <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
+    <app-styled-slider [canvas]="canvas"></app-styled-slider>
+    <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
     <!-- </mat-menu> -->
     <!-- <button matTooltip="Thresholds" mat-raised-button [matMenuTriggerFor]="appMenu">
       <mat-icon>exposure</mat-icon>

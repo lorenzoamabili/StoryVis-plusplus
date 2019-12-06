@@ -1,5 +1,6 @@
 import { Camera } from 'three';
 import * as THREE from 'three';
+import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
 export interface IOrientation {
     position: number[];
@@ -28,6 +29,7 @@ export interface View {
     sliceOrientation: string;
     sliceColor: number;
     targetID: number;
+    artifacts?: Artifact[];
 }
 
 export interface IAMIRenderer {
@@ -42,4 +44,11 @@ export interface IAMIRenderer {
 export interface IPointPair {
     p0: THREE.Vector3;
     p1: THREE.Vector3;
+}
+
+export interface IPointAngle {
+    p0: THREE.Vector3;
+    p1: THREE.Vector3;
+    p2: THREE.Vector3;
+
 }

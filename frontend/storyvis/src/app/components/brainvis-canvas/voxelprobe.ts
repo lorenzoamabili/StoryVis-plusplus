@@ -4,26 +4,23 @@ import * as AMI from 'ami.js';
 import { Renderer2D } from './renderer2d';
 import { EventEmitter, Output } from '@angular/core';
 import { IPointPair } from './utils/types';
-import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
-export default class Ruler {
+export default class Voxelprobe {
   widget: any;
   renderer: Renderer2D;
   index: any;
   pair: THREE.Vector3;
-
-  artifact: Artifact;
+  id: number = -1;
   /**
    * "isNew" is set to false after creation is done (first mouse up event).
    */
   isNew: boolean;
 
-  // @Output() changed = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  // @Output() created = new EventEmitter<IPointPair>();
-  @Output() changed = new EventEmitter<Artifact>();
-  @Output() created = new EventEmitter<Artifact>();
+  @Output() changed = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
+  @Output() created = new EventEmitter<IPointPair>();
 
   constructor(renderer: Renderer2D, evt: MouseEvent | null = null) {
+    this.id = this.id + 1
     this.renderer = renderer;
     this.isNew = true;
 
@@ -56,10 +53,10 @@ export default class Ruler {
       }
     }
 
-    this.widget = new AMI.RulerWidget(stackHelper.slice.mesh, controls, {
-      lps2IJK: stack.lps2IJK,
+    this.widget = new AMI.VoxelProbeWidget(stackHelper.slice.mesh, controls, {
+      stack: stack,
+      id: this.id,
       // todo: check if using this _spacing leads to the right scale
-      pixelSpacing: stack._spacing.toArray(),
       // ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
       worldPosition: startPosition
     });
@@ -81,28 +78,28 @@ export default class Ruler {
 
   onMouseUp = (evt) => {
     this.widget.onEnd(evt);
-  }
 
-  //   if (this.isNew) {
-  //     this.created.emit({
-  //       p0: this.widget._handles[0].worldPosition,
-  //       p1: this.widget._handles[1].worldPosition,
-  //     });
-  //   } else {
-  //     this.changed.emit({
-  //       oldPoints: {
-  //         // todo: get actual old position (not possible with AMI ruler widget atm)
-  //         p0: this.widget._handles[0].worldPosition.clone(),
-  //         p1: this.widget._handles[1].worldPosition.clone(),
-  //       },
-  //       newPoints: {
-  //         p0: this.widget._handles[0].worldPosition.clone(),
-  //         p1: this.widget._handles[1].worldPosition.clone(),
-  //       }
-  //     });
-  //   }
-  //   this.isNew = false;
-  // }
+    // if (this.isNew) {
+    //   this.created.emit({
+    //     p0: this.widget._handles[0].worldPosition,
+    //     p1: this.widget._handles[1].worldPosition,
+    //   });
+    // } else {
+    //   this.changed.emit({
+    //     oldPoints: {
+    //       // todo: get actual old position (not possible with AMI ruler widget atm)
+    //       p0: this.widget._handles[0].worldPosition.clone(),
+    //       p1: this.widget._handles[1].worldPosition.clone(),
+    //     },
+    //     newPoints: {
+    //       p0: this.widget._handles[0].worldPosition.clone(),
+    //       p1: this.widget._handles[1].worldPosition.clone(),
+    //     }
+    //   });
+    // }
+
+    // this.isNew = false;
+  }
 
   onMouseMove = (evt) => {
     this.widget.onMove(evt);

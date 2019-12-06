@@ -44,7 +44,13 @@ export interface NodeMetadata {
 /**
  * Artifacts that are attached to a node
  */
-export interface Artifacts {
+export interface Artifact {
+    id: number;
+    type: string;
+    typeID: number;
+    sliceIndex: number;
+    view: string;
+    elements: HTMLElement[] | null;
     /**
      * Enable custom properties
      */
@@ -73,7 +79,7 @@ export interface RootNode {
     /**
      * Artifacts
      */
-    artifacts: Artifacts;
+    artifact?: Artifact;
 }
 /**
  * State node extending the RootNode
@@ -186,6 +192,7 @@ export interface IProvenanceGraph {
     current: ProvenanceNode;
     root: RootNode;
     id: string;
+    artifacts?: Artifact[];
     /**
      * Add a new node to the provenance graph
      * @param node ProvenanceNode to add
@@ -256,7 +263,7 @@ export interface IProvenanceTracker {
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    applyAction(action: Action, skipFirstDoFunctionCall: boolean): Promise<StateNode>;
+    applyAction(action: Action, skipFirstDoFunctionCall: boolean, artifact?: Artifact): Promise<StateNode>;
     getGraph(): SerializedProvenanceGraph;
     restoreGraph(sgraph: any): void;
 }
@@ -304,7 +311,7 @@ export interface SerializedRootNode {
     children: NodeIdentifier[];
     label: string;
     metadata: NodeMetadata;
-    artifacts: Artifacts;
+    artifact?: Artifact;
 }
 export declare type SerializedStateNode = SerializedRootNode & {
     parent: NodeIdentifier;

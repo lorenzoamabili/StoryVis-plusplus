@@ -204,6 +204,7 @@ function mitt(all) {
 var ProvenanceGraph = /** @class */ (function () {
     function ProvenanceGraph(application, userid, rootNode) {
         if (userid === void 0) { userid = 'Unknown'; }
+        this.artifacts = [];
         this._nodes = {};
         this.id = generateUUID();
         this._mitt = mitt();
@@ -219,8 +220,7 @@ var ProvenanceGraph = /** @class */ (function () {
                     createdBy: userid,
                     createdOn: generateTimestamp()
                 },
-                children: [],
-                artifacts: {}
+                children: []
             };
         }
         this.addNode(this.root);
@@ -232,6 +232,9 @@ var ProvenanceGraph = /** @class */ (function () {
         }
         this._nodes[node.id] = node;
         this._mitt.emit('nodeAdded', node);
+        if (node.artifact) {
+            this.artifacts.push(node.artifact);
+        }
     };
     ProvenanceGraph.prototype.getNode = function (id) {
         var result = this._nodes[id];
@@ -349,10 +352,11 @@ var ProvenanceTracker = /** @class */ (function () {
      * will be taken as the label for this node.
      *
      * @param action
+     * @param artifacts
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall) {
+    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifact) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
             var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
@@ -381,7 +385,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             actionResult: actionResult,
                             parent: parentNode,
                             children: [],
-                            artifacts: {}
+                            artifact: artifact
                         }); };
                         currentNode = this.graph.current;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];

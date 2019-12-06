@@ -8,7 +8,8 @@ import {
   ProvenanceNode,
   RootNode,
   IScreenShotProvider,
-  SerializedProvenanceGraph
+  SerializedProvenanceGraph,
+  Artifact
 } from './api';
 import { generateUUID, generateTimestamp } from './utils';
 import { ProvenanceGraph, serializeProvenanceGraph } from './ProvenanceGraph';
@@ -51,10 +52,11 @@ export class ProvenanceTracker implements IProvenanceTracker {
    * will be taken as the label for this node.
    *
    * @param action
+   * @param artifacts
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
-  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false): Promise<StateNode> {
+  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, artifact?: Artifact): Promise<StateNode> {
     if (!this.acceptActions) {
       return Promise.resolve(this.graph.current as StateNode);
     }
@@ -77,7 +79,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       actionResult,
       parent: parentNode,
       children: [],
-      artifacts: {}
+      artifact: artifact
     });
 
     let newNode: StateNode;
@@ -87,6 +89,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
 
     if (skipFirstDoFunctionCall) {
       newNode = createNewStateNode(this.graph.current, null);
+
     } else {
       // Get the registered function from the action out of the registry
       const functionNameToExecute: string = action.do;
@@ -105,6 +108,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
         console.warn('Error while getting screenshot', e);
       }
     }
+ 
 
     // When the node is created, we need to update the graph.
     currentNode.children.push(newNode);

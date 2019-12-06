@@ -53,7 +53,15 @@ export interface NodeMetadata {
 /**
  * Artifacts that are attached to a node
  */
-export interface Artifacts {
+export interface Artifact {
+
+  id: number;
+  type: string;
+  typeID: number;
+  sliceIndex: number;
+  view: string; 
+  elements: HTMLElement[] | null;
+
   /**
    * Enable custom properties
    */
@@ -87,7 +95,7 @@ export interface RootNode {
   /**
    * Artifacts
    */
-  artifacts: Artifacts;
+  artifact?: Artifact;
 }
 
 /**
@@ -221,6 +229,7 @@ export interface IProvenanceGraph {
 
   root: RootNode;
   id: string;
+  artifacts?: Artifact[];
 
   /**
    * Add a new node to the provenance graph
@@ -246,7 +255,7 @@ export interface IProvenanceGraph {
    */
   on(type: string, handler: Handler): void;
   off(type: string, handler: Handler): void;
-  getSelf() : SerializedProvenanceGraph;
+  getSelf(): SerializedProvenanceGraph;
   restoreSelf(sgraph: SerializedProvenanceGraph): ProvenanceGraph;
 }
 
@@ -300,8 +309,8 @@ export interface IProvenanceTracker {
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
-  applyAction(action: Action, skipFirstDoFunctionCall: boolean): Promise<StateNode>;
-  getGraph() :SerializedProvenanceGraph;
+  applyAction(action: Action, skipFirstDoFunctionCall: boolean, artifact?: Artifact): Promise<StateNode>;
+  getGraph(): SerializedProvenanceGraph;
   restoreGraph(sgraph: any): void;
 }
 
@@ -354,7 +363,7 @@ export interface SerializedRootNode {
   children: NodeIdentifier[];
   label: string;
   metadata: NodeMetadata;
-  artifacts: Artifacts;
+  artifact?: Artifact;
 }
 
 export type SerializedStateNode = SerializedRootNode & {
@@ -444,12 +453,12 @@ export interface IProvenanceSlidedeck {
    */
   on(type: string, handler: Handler): void;
   off(type: string, handler: Handler): void;
-  serializeSelf() : SerializedSlidedeck;
+  serializeSelf(): SerializedSlidedeck;
   restoreSelf(
-    serializedSlides: SerializedSlidedeck, 
-    traverser: IProvenanceGraphTraverser, 
+    serializedSlides: SerializedSlidedeck,
+    traverser: IProvenanceGraphTraverser,
     graph: ProvenanceGraph,
-    app: Application) : IProvenanceSlidedeck;
+    app: Application): IProvenanceSlidedeck;
 }
 
 export type IScreenShot = any;

@@ -2,7 +2,6 @@ import { ProvenanceTracker } from '@visualstorytelling/provenance-core';
 import { debounce } from 'lodash';
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 import { Renderer2D } from '../renderer2d';
-import { IPointPair } from '../utils/types';
 import { registerActions } from './provenanceActions';
 
 export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
@@ -29,7 +28,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       do: 'setSlicePlaneOrientation',
       doArguments: [position, direction],
       undo: 'setSlicePlaneOrientation',
-      undoArguments: [oldPosition, oldDirection],
+      undoArguments: [oldPosition, oldDirection]
     });
   });
 
@@ -40,7 +39,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       do: 'setSlicePlaneZoom',
       doArguments: [position, direction],
       undo: 'setSlicePlaneZoom',
-      undoArguments: [oldPosition, oldDirection],
+      undoArguments: [oldPosition, oldDirection]
     }, true);
   });
 
@@ -54,7 +53,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       do: 'setAxialZoom',
       doArguments: [position, direction],
       undo: 'setAxialZoom',
-      undoArguments: [oldPosition, oldDirection],
+      undoArguments: [oldPosition, oldDirection]
     }, true);
   });
 
@@ -66,7 +65,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       do: 'setSagittalZoom',
       doArguments: [position, direction],
       undo: 'setSagittalZoom',
-      undoArguments: [oldPosition, oldDirection],
+      undoArguments: [oldPosition, oldDirection]
     }, true);
   });
 
@@ -78,7 +77,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       do: 'setCoronalZoom',
       doArguments: [position, direction],
       undo: 'setCoronalZoom',
-      undoArguments: [oldPosition, oldDirection],
+      undoArguments: [oldPosition, oldDirection]
     }, true);
   });
 
@@ -122,7 +121,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
         do: 'setSliceIndex',
         doArguments: [startEvent.changes.sliceOrientation, event.changes.newIndex],
         undo: 'setSliceIndex',
-        undoArguments: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex],
+        undoArguments: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex]
       }, true);
     }, 500, { trailing: true });
     canvas.addEventListener('sliceIndexChanged', sliceIndexEndListener);
@@ -147,7 +146,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
         do: 'setPerspectiveCameraZoomLevel',
         doArguments: [event.orientation],
         undo: 'setPerspectiveCameraZoomLevel',
-        undoArguments: [startEvent.orientation],
+        undoArguments: [startEvent.orientation]
       }, true);
     }, 500, { trailing: true });
     canvas.addEventListener('perspectiveCameraZoomChanged', perspectiveZoomEndListener);
@@ -171,7 +170,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
         do: 'setPerspectiveCameraOrientation',
         doArguments: [event.orientation],
         undo: 'setPerspectiveCameraOrientation',
-        undoArguments: [startEvent.orientation],
+        undoArguments: [startEvent.orientation]
       }, true);
     }, 500, { trailing: true });
     canvas.addEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
@@ -181,45 +180,103 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
-      renderer.rulerRemoved.subscribe((args) => {
-        const action = {
-          metadata: {
-            userIntent: 'measurement',
-            label: 'delete ruler'
-          },
-          do: 'deleteRuler',
-          doArguments: [renderer.sliceOrientation],
-          undo: 'createRuler',
-          undoArguments: [renderer.sliceOrientation, args],
-        };
-        tracker.applyAction(action, true);
-      });
+      // renderer.rulerRemoved.subscribe((args) => {
+      //   const action = {
+      //     metadata: {
+      //       userIntent: 'measurement',
+      //       label: 'delete ruler'
+      //     },
+      //     do: 'deleteRuler',
+      //     doArguments: [renderer.sliceOrientation],
+      //     undo: 'createRuler',
+      //     undoArguments: [renderer.sliceOrientation, args],
+      //   };
+      //   tracker.applyAction(action, true);
+      // });
+
       renderer.rulerCreated.subscribe((args) => {
         const action = {
           metadata: {
             userIntent: 'measurement',
             label: 'create ruler'
           },
-          do: 'createRuler',
+          do: 'addRuler',
           doArguments: [renderer.sliceOrientation, args],
-          undo: 'deleteRuler',
-          undoArguments: [renderer.sliceOrientation],
+          undo: 'removeRuler',
+          undoArguments: [renderer.sliceOrientation, args]
         };
-        tracker.applyAction(action, true);
+        tracker.applyAction(action, true, args.abstract);
       });
 
-      renderer.rulerChanged.subscribe(({ oldPoints, newPoints }: { oldPoints: IPointPair, newPoints: IPointPair }) => {
+      // renderer.rulerChanged.subscribe(({ oldPoints, newPoints }: { oldPoints: IPointPair, newPoints: IPointPair }) => {
+      //   const action = {
+      //     metadata: {
+      //       userIntent: 'measurement',
+      //       label: 'update ruler'
+      //     },
+      //     do: 'updateRuler',
+      //     doArguments: [renderer.sliceOrientation, newPoints],
+      //     undo: 'updateRuler',
+      //     undoArguments: [renderer.sliceOrientation, oldPoints],
+      //   };
+      //   tracker.applyAction(action, true);
+      // });
+
+      renderer.angleCreated.subscribe((args) => {
         const action = {
           metadata: {
             userIntent: 'measurement',
-            label: 'update ruler'
+            label: 'create angle'
           },
-          do: 'updateRuler',
-          doArguments: [renderer.sliceOrientation, newPoints],
-          undo: 'updateRuler',
-          undoArguments: [renderer.sliceOrientation, oldPoints],
+          do: 'addAngle',
+          doArguments: [renderer.sliceOrientation, args],
+          undo: 'removeAngle',
+          undoArguments: [renderer.sliceOrientation, args]
         };
-        tracker.applyAction(action, true);
+        tracker.applyAction(action, true, args.abstract);
+      });
+
+
+      renderer.freehandCreated.subscribe((args) => {
+        const action = {
+          metadata: {
+            userIntent: 'measurement',
+            label: 'create freehand'
+          },
+          do: 'addFreehand',
+          doArguments: [renderer.sliceOrientation, args],
+          undo: 'removeFreehand',
+          undoArguments: [renderer.sliceOrientation, args]
+        };
+        tracker.applyAction(action, true, args.abstract);
+      });
+
+      renderer.voxelprobeCreated.subscribe((args) => {
+        const action = {
+          metadata: {
+            userIntent: 'measurement',
+            label: 'create voxelprobe'
+          },
+          do: 'addVoxelprobe',
+          doArguments: [renderer.sliceOrientation, args],
+          undo: 'removeVoxelprobe',
+          undoArguments: [renderer.sliceOrientation, args]
+        };
+        tracker.applyAction(action, true, args.abstract);
+      });
+
+      renderer.annotationCreated.subscribe((args) => {
+        const action = {
+          metadata: {
+            userIntent: 'measurement',
+            label: 'create annotation'
+          },
+          do: 'addAnnotation',
+          doArguments: [renderer.sliceOrientation, args],
+          undo: 'removeAnnotation',
+          undoArguments: [renderer.sliceOrientation, args]
+        };
+        tracker.applyAction(action, true, args.abstract);
       });
     }
   });

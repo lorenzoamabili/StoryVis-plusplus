@@ -3,6 +3,7 @@ import { View } from './utils/types';
 import * as AMI from 'ami.js';
 import * as THREE from 'three';
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
+import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
 export class AMIRenderer {
     protected _initialized = false;
@@ -12,6 +13,7 @@ export class AMIRenderer {
     protected _targetID = 1;
 
     protected _domElement: HTMLElement;
+    protected _domID: string;
     protected _renderer: THREE.WebGLRenderer;
     protected _camera: any;
     protected _controls: any;
@@ -21,13 +23,16 @@ export class AMIRenderer {
     protected _sliceOrientation: string;
     protected _sliceColor: number;
 
-    protected _stackHelper: AMI.HelpersStack;
     protected _localizerHelper: AMI.HelpersLocalizer;
     protected _localizerScene: THREE.Scene;
 
+    protected _stackHelper: AMI.HelpersStack;
+    public _artifacts: Artifact[] = [];
+
     constructor(view: View, canvas: BrainvisCanvasComponent) {
         this._canvas = canvas;
-        this._domElement = document.getElementById(view.domId);
+        this._domID = view.domId;
+        this._domElement = document.getElementById(this._domID);
         // this._color = view.color; // 0x121212
         // this._targetID = view.targetID; // 1
     }
