@@ -17,8 +17,24 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
     canvas.setSagittalZoom({ position, direction }, transitionTime),
   setCoronalZoom: async (position, direction, transitionTime) =>
     canvas.setCoronalZoom({ position, direction }, transitionTime),
-    
-  setSliceIndex: async (sliceOrientation, index) => canvas.setSliceIndex(sliceOrientation, index),
+  setSliceIndex: async (sliceOrientation, oldIndex, newIndex, oldArtifacts, newArtifacts) => 
+  { 
+    // canvas.removeArtifacts(sliceOrientation, oldArtifacts);
+    canvas.setSliceIndex(sliceOrientation, oldIndex, newIndex);
+    // canvas.renderArtifacts(sliceOrientation, newArtifacts);
+  },
+  setWindowLevelC: async (value) => {
+    canvas._thresholdValueSetManually = false,
+    canvas.setWindowLevelC(value)
+    },
+  setWindowLevelW: async (value) => { 
+    canvas._thresholdValueSetManually = false,
+    canvas.setWindowLevelW(value)
+  },
+
+  // retainArtifacts: async (sliceOrientation, artifact) => canvas.retainArtifacts(sliceOrientation, artifact),
+  // renderArtifacts: async (sliceOrientation, artifact) => canvas.renderArtifacts(sliceOrientation, artifact),
+
   setPerspectiveCameraZoomLevel: async (args, transitionTime) => canvas.setPerspectiveCameraZoom(args, transitionTime),
   setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime),
 
@@ -35,16 +51,16 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
   //   }
   // },
 
-  addRuler: async (view, ruler) => {
+  addArtifact: async (view, artifact) => {
     const renderer = canvas.getRenderer(view);
     if (renderer instanceof Renderer2D) {
-      renderer.addRuler(ruler);
+      renderer.addArtifact(artifact);
     }
   },
-  removeRuler: async (view, ruler) => {
+  removeArtifact: async (view, artifact) => {
     const renderer = canvas.getRenderer(view);
     if (renderer instanceof Renderer2D) {
-      renderer.removeRuler(ruler);
+      renderer.removeArtifact(artifact);
     }
   },
   // updateRuler: async (view, points: IPointPair) => {
@@ -55,54 +71,54 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
   // },
 
 
-  addAngle: async (view, angle) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.addAngle(angle);
-    }
-  },
-  removeAngle: async (view, angle) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.removeAngle(angle);
-    }
-  },
-  addFreehand: async (view, freehand) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.addFreehand(freehand);
-    }
-  },
-  removeFreehand: async (view, freehand) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.removeFreehand(freehand);
-    }
-  },
-  addVoxelprobe: async (view, voxelprobe) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.addVoxelprobe(voxelprobe);
-    }
-  },
-  removeVoxelprobe: async (view, voxelprobe) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.removeVoxelprobe(voxelprobe);
-    }
-  },
-  addAnnotation: async (view, annotation) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.addAnnotation(annotation);
-    }
-  },
-  removeAnnotation: async (view, annotation) => {
-    const renderer = canvas.getRenderer(view);
-    if (renderer instanceof Renderer2D) {
-      renderer.removeAnnotation(annotation);
-    }
-  }
+  // addAngle: async (view, angle) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.addAngle(angle);
+  //   }
+  // },
+  // removeAngle: async (view, angle) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.removeAngle(angle);
+  //   }
+  // },
+  // addFreehand: async (view, freehand) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.addFreehand(freehand);
+  //   }
+  // },
+  // removeFreehand: async (view, freehand) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.removeFreehand(freehand);
+  //   }
+  // },
+  // addVoxelprobe: async (view, voxelprobe) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.addVoxelprobe(voxelprobe);
+  //   }
+  // },
+  // removeVoxelprobe: async (view, voxelprobe) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.removeVoxelprobe(voxelprobe);
+  //   }
+  // },
+  // addAnnotation: async (view, annotation) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.addAnnotation(annotation);
+  //   }
+  // },
+  // removeAnnotation: async (view, annotation) => {
+  //   const renderer = canvas.getRenderer(view);
+  //   if (renderer instanceof Renderer2D) {
+  //     renderer.removeAnnotation(annotation);
+  //   }
+  // }
 
 
 

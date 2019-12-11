@@ -12,49 +12,41 @@ import Freehand from './freehand';
 import Voxelprobe from './voxelprobe';
 import Annotation from './annotation';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
+import { ProvenanceTracker } from '@visualstorytelling/provenance-core';
 
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
-  private _measurementMode: boolean;
+  private _rulerMode: boolean;
   private _angleMode: boolean;
   private _freehandMode: boolean;
   private _voxelprobeMode: boolean;
   private _annotationMode: boolean;
 
-  private _ruler: Ruler | null;
-  private _rulers: Ruler[] = [];
-  private _oldRulers: Ruler[] = [];
-  private _newRulers: Ruler[] = [];
+  private _measurement: Ruler | Angle | Freehand | Voxelprobe | Annotation | null;
+  public _measurements: Artifact[] = [];  // measurements/artifacts created in the current branch
+  public _oldMeasurements: Artifact[] = [];
+  public _newMeasurements: Artifact[] = [];
+  public _currentArtifacts: Artifact[] = [];
+
   public _pairs: THREE.Vector3[] = [];
 
-  private _angle: Angle | null;
-  private _angles: Angle[] = [];
-  private _oldAngles: Angle[] = [];
-  private _newAngles: Angle[] = [];
+  private _artifactInit: boolean = true;
 
-  private _freehand: Freehand;
-  private _freehands: Freehand[] = [];
-  private _newFreehands: Freehand[] = [];
-  private _oldFreehands: Freehand[] = [];
+  public tracker: ProvenanceTracker;
 
-  private _voxelprobe: Voxelprobe;
-  private _voxelprobes: Voxelprobe[] = [];
-  private _newVoxelprobes: Voxelprobe[] = [];
-  private _oldVoxelprobes: Voxelprobe[] = [];
-
-  private _annotation: Annotation;
-  private _annotations: Annotation[] = [];
-  private _newAnnotations: Annotation[] = [];
-  private _oldAnnotations: Annotation[] = [];
+  // private _angleInit: boolean = false;
+  // private _freehandInit: boolean = false;
+  // private _voxelprobeInit: boolean = false;
+  // private _annotationInit: boolean = false;
 
   private _rulerID: number = -1;
   private _angleID: number = -1;
   private _freehandID: number = -1;
   private _voxelprobeID: number = -1;
   private _annotationID: number = -1;
-
   public _artifactID: number = -1;
-  public _artifacts: Artifact[] = []; 
+
   public _view: View;
+
 
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
@@ -64,31 +56,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._sliceColor = view.sliceColor; // 0xff1744
     this._targetID = view.targetID; // 1
     this._view = view;
-    // this._artifacts = view.artifacts; //null
   }
 
-  @Output() rulerCreated = new EventEmitter<Ruler>();
-  @Output() rulerChanged = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  @Output() rulerRemoved = new EventEmitter<Ruler>();
-
-  @Output() angleCreated = new EventEmitter<Angle>();
-  @Output() angleChanged = new EventEmitter<{ oldPoints: IPointAngle, newPoints: IPointAngle }>();
-  @Output() angleRemoved = new EventEmitter<Angle>();
-
-  @Output() freehandCreated = new EventEmitter<Freehand>();
-  @Output() freehandChanged = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  @Output() freehandRemoved = new EventEmitter<Freehand>();
-
-  @Output() voxelprobeCreated = new EventEmitter<Voxelprobe>();
-  @Output() voxelprobeChanged = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  @Output() voxelprobeRemoved = new EventEmitter<Voxelprobe>();
-
-  @Output() annotationCreated = new EventEmitter<Annotation>();
-  @Output() annotationChanged = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  @Output() annotationRemoved = new EventEmitter<Annotation>();
+  @Output() artifactCreated = new EventEmitter<Artifact>();
+  // @Output() artifactChanged = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
+  @Output() artifactRemoved = new EventEmitter<Artifact>();
 
   init() {
-    // this.rulerChanged.subscribe(console.log);
     if (this._initialized) {
       return;
     }
@@ -105,7 +79,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this._domElement.clientHeight
     );
     this._renderer.setClearColor(0x121212, 1);
-    this._renderer.domElement.id = this._targetID.toString();  //0,1,2,3 view ID
+    this._renderer.domElement.id = this._targetID.toString();  // 0,1,2,3 view ID
     this._domElement.appendChild(this._renderer.domElement); // append canvas to main DOMelement
 
     // camera
@@ -133,25 +107,15 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     // this.scene.add()
 
-    this._ruler = null;
-    this._measurementMode = false;
-
-    this._angle = null;
+    this._measurement = null;
+    this._rulerMode = false;
     this._angleMode = false;
-
-    this._freehand = null;
     this._freehandMode = false;
-
-    this._voxelprobe = null;
     this._voxelprobeMode = false;
-
-    this._annotation = null;
     this._annotationMode = false;
 
     this._initialized = true;
 
-    // this._measurements.find(element => element.measurementID.sliceIndex == this._stackHelper.index)
-    // .elements.forEach(element => element.style.display = 'block');
   }
 
   initHelpersStack(stack) {
@@ -325,7 +289,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   onScroll(event) {
-    // if (!this._measurementMode) {
+    // if (this._rulerMode || this._angleMode || this._freehandMode || this._voxelprobeMode || this._annotationMode) {}
+    // else {
     super.onScroll(event);
 
     const oldIndex = this._stackHelper.index;
@@ -344,98 +309,145 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     const newIndex = this._stackHelper.index;
 
+    let oldArtifacts = this._currentArtifacts;
+    this.updateArtifact(newIndex, oldIndex);
+    let newArtifacts = this._currentArtifacts;
+
+    console.log(newArtifacts);
+
     this._canvas.dispatchEvent({
       type: 'sliceIndexChangeStart',
       changes: {
         sliceOrientation: this._sliceOrientation,
-        newIndex: newIndex,
-        oldIndex: oldIndex
-      }
+        oldIndex: oldIndex,
+        newIndex: newIndex
+      },
+      oldArtifacts: oldArtifacts
     });
+
+    // console.log(this._currentArtifacts);
+
+
+    // console.log(this._currentArtifacts);
 
     this._canvas.dispatchEvent({
       type: 'sliceIndexChanged',
       changes: {
         sliceOrientation: this._sliceOrientation,
-        newIndex: newIndex,
-        oldIndex: oldIndex
-      }
+        oldIndex: oldIndex,
+        newIndex: newIndex
+      },
+      newArtifacts: newArtifacts
     });
 
-    // Ruler behaviour when scrolling is performed
-    if (this._ruler) {
-      if (this._rulers.find(element => element.index == newIndex)) {
-        this._oldRulers = this._rulers.filter(x => x.index == oldIndex);
-        this._oldRulers.forEach(element => element.widget.hideDOM());
-        this._newRulers = this._rulers.filter(x => x.index == newIndex);
-        this._newRulers.forEach(element => element.widget.showDOM());
-      } else {
-        this._oldRulers = this._rulers.filter(x => x.index == oldIndex);
-        this._oldRulers.forEach(element => element.widget.hideDOM());
-      }
-    }
+    // this.oldArtifacts(oldArtifacts);
+    // this.newArtifacts(newArtifacts);
+    //}
+  }
 
-    // Angle behaviour when scrolling is performed
-    if (this._angle) {
-      if (this._angles.find(element => element.index == newIndex)) {
-        this._oldAngles = this._angles.filter(x => x.index == oldIndex);
-        this._oldAngles.forEach(element => element.widget.hideDOM());
-        this._newAngles = this._angles.filter(x => x.index == newIndex);
-        this._newAngles.forEach(element => element.widget.showDOM());
-      } else {
-        this._oldAngles = this._angles.filter(x => x.index == oldIndex);
-        this._oldAngles.forEach(element => element.widget.hideDOM());
-      }
-    }
 
-    // Freehand behaviour when scrolling is performed
-    if (this._freehand) {
-      if (this._freehands.find(element => element.index == newIndex)) {
-        this._oldFreehands = this._freehands.filter(x => x.index == oldIndex);
-        this._oldFreehands.forEach(element => element.widget.hideDOM());
-        this._newFreehands = this._freehands.filter(x => x.index == newIndex);
-        this._newFreehands.forEach(element => element.widget.showDOM());
+  updateArtifact(newIndex, oldIndex) {
+    // Artifacts behaviour when scrolling is performed 
+    if (this._measurements.length !== 0) {
+      if (this._measurements.find(x => x.sliceIndex == newIndex)) {
+        if (this._currentArtifacts.length !== 0) {
+          this._oldMeasurements = this._measurements.filter(x => x.sliceIndex == oldIndex);
+          this._oldMeasurements.forEach(x => this.removeArtifactElms(x));
+        }
+        this._newMeasurements = this._measurements.filter(x => x.sliceIndex == newIndex);
+        this._newMeasurements.forEach(x => this.renderArtifactElms(x));
       } else {
-        this._oldFreehands = this._freehands.filter(x => x.index == oldIndex);
-        this._oldFreehands.forEach(element => element.widget.hideDOM());
+        if (this._currentArtifacts.length !== 0) {
+          this._oldMeasurements = this._measurements.filter(x => x.sliceIndex == oldIndex);
+          this._oldMeasurements.forEach(x => this.removeArtifactElms(x));
+        }
       }
     }
+  }
 
-    // Voxelprobe behaviour when scrolling is performed
-    if (this._voxelprobe) {
-      if (this._voxelprobes.find(element => element.index == newIndex)) {
-        this._oldVoxelprobes = this._voxelprobes.filter(x => x.index == oldIndex);
-        this._oldVoxelprobes.forEach(element => element.widget.hideDOM());
-        this._newVoxelprobes = this._voxelprobes.filter(x => x.index == newIndex);
-        this._newVoxelprobes.forEach(element => element.widget.showDOM());
-      } else {
-        this._oldVoxelprobes = this._voxelprobes.filter(x => x.index == oldIndex);
-        this._oldVoxelprobes.forEach(element => element.widget.hideDOM());
-      }
-    }
 
-    // Annotation behaviour when scrolling is performed
-    if (this._annotation) {
-      if (this._annotations.find(element => element.index == newIndex)) {
-        this._oldAnnotations = this._annotations.filter(x => x.index == oldIndex);
-        this._oldAnnotations.forEach(element => element.widget.hideDOM());
-        this._newAnnotations = this._annotations.filter(x => x.index == newIndex);
-        this._newAnnotations.forEach(element => element.widget.showDOM());
-      } else {
-        this._oldAnnotations = this._annotations.filter(x => x.index == oldIndex);
-        this._oldAnnotations.forEach(element => element.widget.hideDOM());
+  // oldArtifacts(oldArtifacts) {
+  //   console.log(oldArtifacts);
+  //   if ((oldArtifacts) && (oldArtifacts.length !== 0)) {
+  //     for (let i = 0; i < oldArtifacts.length; i++) {
+  //       this.renderArtifactElms(oldArtifacts[i]);
+  //     }
+  //   }
+  // }
+
+  // newArtifacts(newArtifacts) {
+  //   console.log(newArtifacts);
+  //   if ((newArtifacts) && (newArtifacts.length !== 0)) {
+  //     for (let i = 0; i < newArtifacts.length; i++) {
+  //       this.renderArtifactElms(newArtifacts[i]);
+  //     }
+  //   }
+  // }
+
+
+
+  // renderArtifacts(artifact) {
+  //   for (let i = 0; i < artifact.elements.length; i++) {
+  //     if (artifact.elements[i].length !== 1) {
+  //       for (let l = 0; l < artifact.elements[i].length; l++) {
+  //         this._domElement.appendChild(artifact.elements[i][l]);
+  //       }
+  //     }
+  //     this._domElement.appendChild(artifact.elements[i]);
+  //   }
+  // }
+
+  // removeArtifacts(artifact) {
+  //   for (let i = 0; i < artifact.elements.length; i++) {
+  //     if (artifact.elements[i].length !== 1) {
+  //       for (let l = 0; l < artifact.elements[i].length; l++) {
+  //         this._domElement.removeChild(artifact.elements[i][l]);
+  //       }
+  //     }
+  //     this._domElement.removeChild(artifact.elements[i]);
+  //   }
+  // }
+
+  renderArtifactElms(artifact: Artifact) {
+    if (!this._artifactInit) {
+      for (let i = 0; i < artifact.elements.length; i++) {
+        this._domElement.appendChild(artifact.elements[i]);
       }
+    } else {
+      this._artifactInit = false;
     }
-    // }
+    this._currentArtifacts.push(artifact);
+  }
+
+  removeArtifactElms(artifact: Artifact) {
+    for (let i = 0; i < artifact.elements.length; i++) {
+      this._domElement.removeChild(artifact.elements[i]);
+    }
+    this._currentArtifacts.splice(-1, 1);
+  }
+
+
+
+  addArtifact = (artifact: Artifact) => {
+    this.renderArtifactElms(artifact);
+    this._measurements.push(this._measurement.artifact);
+    console.log(this._measurements);
+    this.artifactCreated.emit(artifact);
+  }
+
+  removeArtifact = (artifact: Artifact) => {
+    this.removeArtifactElms(artifact);
+    this._measurements.splice(-1, 1);
+    console.log();
+    this.artifactRemoved.emit(artifact);
   }
 
 
   // Ruler
 
   startRuler = (evt) => {
-    this._ruler = new Ruler(this, evt);
-    this._rulers.push(this._ruler);
-    this._pairs.push(this._ruler.pair);
+    this._measurement = new Ruler(this, evt);
+    this._pairs.push(this._measurement.pair);
 
     this._domElement.removeEventListener('mousedown', this.startRuler);
 
@@ -446,449 +458,148 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // create artifact
     this._artifactID = this._artifactID + 1;
     this._rulerID = this._rulerID + 1;
-    this._ruler.artifact = {
+    this._measurement.artifact = {
       id: this._artifactID,
       type: 'ruler',
       typeID: this._rulerID,
-      sliceIndex: this._ruler.index,
+      sliceIndex: this._measurement.index,
       view: this._domID,
-      elements: [this._ruler.widget._line, this._ruler.widget._label
-        // ,this._ruler.widget.children[0]._dom, this._ruler.widget.children[1]._dom
+      elements: [this._measurement.widget._line, this._measurement.widget._label
+        , this._measurement.widget.children[0]._dom, this._measurement.widget.children[1]._dom
       ]
     }
-    this._artifacts.push(this._ruler.artifact);
+    this._artifactInit = true;
+    this.addArtifact(this._measurement.artifact);
 
-    this.addRuler(this._ruler);
-
- }
-
-
-  addRuler = ( ruler: Ruler ) => {
-    ruler.widget.append();
-    console.log((window as any).prov.graph);
-    this.rulerCreated.emit(ruler); 
-
-    //need to add rendering update based on the artifacts
-
-    // (window as any).prov.graph.artifacts.push(artifact);
-  }
-
-  removeRuler = ( ruler: Ruler ) => {
-    ruler.widget.remove();
-    (window as any).prov.graph.artifacts.splice(-1,1);
-    this.rulerRemoved.emit(ruler); 
-
-    //need to add rendering update based on the artifacts
-
-
-    // for(let i = 0, length = this._ruler.artifact.elements.length; i<length; i++){
-    //   document.getElementById("r0").appendChild(this._ruler.artifact.elements[i])
-    // } 
-  //  this.rulerRemoved.emit(elements);
-  }
-
-  createRuler = ({ p0, p1 }: IPointPair) => {
-    this._ruler = new Ruler(this);
-
-    // set position
-    this._ruler.widget._handles[0].worldPosition = p0;
-    this._ruler.widget._handles[1].worldPosition = p1;
-
-    // make sure we're not in dragging mode
-    this._ruler.widget._handles[1]._active = false;
-
-
-    // forward events
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-  }
-
-  // updateRuler = ({ p0, p1 }: IPointPair) => {
-  //   if (this._ruler) {
-  //     // set position
-  //     this._ruler.widget._handles[0].worldPosition = p0;
-  //     this._ruler.widget._handles[1].worldPosition = p1;
-  //     this._ruler.widget.update();
-  //   }
-  // }
-
-  deleteRuler = () => {
-    if (this._ruler) {
-      // get position (needed for the undo provenance action).
-      const p0 = this._ruler.widget._handles[0].worldPosition;
-      const p1 = this._ruler.widget._handles[1].worldPosition;
-
-      this._ruler.remove();
-      this._ruler = null;
-      // this.rulerRemoved.emit({ p0, p1 });
-      this.measurementMode = false;
-    }
   }
 
 
   // Angle
 
   startAngle = (evt) => {
-    this._angle = new Angle(this, evt);
-    this._angles.push(this._angle);
+    this._measurement = new Angle(this, evt);
     // this._pairs.push(this._ruler.pair);
 
     this._domElement.removeEventListener('mousedown', this.startAngle);
 
-    // forward events
-    this._angle.created.subscribe(arg => this.angleCreated.emit(arg));
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-
-    // to store the elements
+    // create artifact
     this._artifactID = this._artifactID + 1;
-
-    let measurementID = {
-      groupID: this._artifactID,
-      sliceIndex: this._stackHelper.index,
-      type: 'angle'
-    };
-
-    let elements = [this._angle.widget._line, this._angle.widget._line2, this._angle.widget._label];
-    // this._measurements.push({ measurementID, elements });
-  }
-
-  addAngle = ( angle: Angle ) => {
-    angle.widget.append();
-    console.log((window as any).prov.graph);
-    this.angleCreated.emit(angle); 
-
-    //need to add rendering update based on the artifacts
-
-    // (window as any).prov.graph.artifacts.push(artifact);
-  }
-
-  removeAngle = ( angle: Angle ) => {
-    angle.widget.remove();
-    (window as any).prov.graph.artifacts.splice(-1,1);
-    this.angleRemoved.emit(angle); 
-
-    //need to add rendering update based on the artifacts
-
-
-    // for(let i = 0, length = this._ruler.artifact.elements.length; i<length; i++){
-    //   document.getElementById("r0").appendChild(this._ruler.artifact.elements[i])
-    // } 
-  //  this.rulerRemoved.emit(elements);
-  }
-
-  createAngle = ({ p0, p1, p2 }: IPointAngle) => {
-    this._angle = new Angle(this);
-
-    // set position
-    this._angle.widget._handles[0].worldPosition = p0;
-    this._angle.widget._handles[1].worldPosition = p1;
-    this._angle.widget._handles[2].worldPosition = p2;
-
-    // make sure we're not in dragging mode
-    this._angle.widget._handles[2]._active = false;
-
-    // forward events
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-  }
-
-  // updateAngle = ({ p0, p1 }: IPointPair) => {
-  //   if (this._angle) {
-  //     // set position
-  //     this._angle.widget._handles[0].worldPosition = p0;
-  //     this._angle.widget._handles[1].worldPosition = p1;
-  //     this._angle.widget.update();
-  //   }
-  // }
-
-  deleteAngle = () => {
-    if (this._angle) {
-      // get position (needed for the undo provenance action).
-      const p0 = this._angle.widget._handles[0].worldPosition;
-      const p1 = this._angle.widget._handles[1].worldPosition;
-      const p2 = this._angle.widget._handles[2].worldPosition;
-
-      this._angle.remove();
-      this._angle = null;
-      // this.angleRemoved.emit({ p0, p1, p2 });
-      this.angleMode = false;
+    this._angleID = this._angleID + 1;
+    this._measurement.artifact = {
+      id: this._artifactID,
+      type: 'angle',
+      typeID: this._angleID,
+      sliceIndex: this._measurement.index,
+      view: this._domID,
+      elements: [this._measurement.widget._line, this._measurement.widget._label, this._measurement.widget._line2
+        , this._measurement.widget.children[0]._dom, this._measurement.widget.children[1]._dom, this._measurement.widget.children[2]._dom
+      ]
     }
+    this._artifactInit = true;
+    this.addArtifact(this._measurement.artifact);
   }
+
 
 
   // Freehand
 
   startFreehand = (evt) => {
-    this._freehand = new Freehand(this, evt);
-    this._freehands.push(this._freehand);
+    this._measurement = new Freehand(this, evt);
     // this._pairs.push(this._ruler.pair);
 
     this._domElement.removeEventListener('mousedown', this.startFreehand);
 
-    // forward events
-    this._freehand.created.subscribe(arg => this.freehandCreated.emit(arg));
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-
-    // to store the elements
+    // create artifact
     this._artifactID = this._artifactID + 1;
-
-    let measurementID = {
-      groupID: this._artifactID,
-      sliceIndex: this._stackHelper.index,
-      type: 'freehand'
-    };
-
-    let elements = [this._freehand.widget._lines, this._freehand.widget._label];
-    // this._measurements.push({ measurementID, elements });
-  }
-
-  addFreehand = ( freehand: Freehand ) => {
-    freehand.widget.append();
-    console.log((window as any).prov.graph);
-    this.freehandCreated.emit(freehand); 
-
-    //need to add rendering update based on the artifacts
-
-    // (window as any).prov.graph.artifacts.push(artifact);
-  }
-
-  removeFreehand = ( freehand: Freehand ) => {
-    freehand.widget.remove();
-    (window as any).prov.graph.artifacts.splice(-1,1);
-    this.freehandRemoved.emit(freehand); 
-
-    //need to add rendering update based on the artifacts
-
-
-    // for(let i = 0, length = this._ruler.artifact.elements.length; i<length; i++){
-    //   document.getElementById("r0").appendChild(this._ruler.artifact.elements[i])
-    // } 
-  //  this.rulerRemoved.emit(elements);
-  }
-
-  createFreehand = ({ p0, p1 }: IPointPair) => {
-    this._freehand = new Freehand(this);
-
-    // set position
-    this._freehand.widget._handles[0].worldPosition = p0;
-    this._freehand.widget._handles[1].worldPosition = p1;
-
-    // make sure we're not in dragging mode
-    this._freehand.widget._handles[1]._active = false;
-
-    // forward events
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-  }
-
-  // updateFreehand = ({ p0, p1 }: IPointPair) => {
-  //   if (this._freehand) {
-  //     // set position
-  //     this._freehand.widget._handles[0].worldPosition = p0;
-  //     this._freehand.widget._handles[1].worldPosition = p1;
-  //     this._freehand.widget.update();
-  //   }
-  // }
-
-  deleteFreehand = () => {
-    if (this._freehand) {
-      // get position (needed for the undo provenance action).
-      const p0 = this._freehand.widget._handles[0].worldPosition;
-      const p1 = this._freehand.widget._handles[1].worldPosition;
-
-      this._freehand.remove();
-      this._freehand = null;
-      // this.freehandRemoved.emit({ p0, p1 });
-      this.freehandMode = false;
+    this._freehandID = this._freehandID + 1;
+    const handles = this._measurement.widget.children.filter(x => x !== null);
+    for (let i = 0, length = this._measurement.widget.children.length; i < length; i++) {
+      handles.push(this._measurement.widget.children[i]._dom);
     }
+    const elems = [this._measurement.widget._label, ...this._measurement.widget._lines, ...handles];
+
+    this._measurement.artifact = {
+      id: this._artifactID,
+      type: 'freehand',
+      typeID: this._freehandID,
+      sliceIndex: this._measurement.index,
+      view: this._domID,
+      elements: elems
+    }
+    this._artifactInit = true;
+    this.addArtifact(this._measurement.artifact);
   }
 
 
   // VoxelProbe
 
   startVoxelprobe = (evt) => {
-    this._voxelprobe = new Voxelprobe(this, evt);
-    this._voxelprobes.push(this._voxelprobe);
+    this._measurement = new Voxelprobe(this, evt);
     // this._pairs.push(this._ruler.pair);
 
     this._domElement.removeEventListener('mousedown', this.startVoxelprobe);
 
-    // forward events
-    this._voxelprobe.created.subscribe(arg => this.voxelprobeCreated.emit(arg));
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-
-    // to store the elements
+    // create artifact
     this._artifactID = this._artifactID + 1;
-
-    let measurementID = {
-      groupID: this._artifactID,
-      sliceIndex: this._stackHelper.index,
-      type: 'voxelprobe'
-    };
-
-    let elements = [this._voxelprobe.widget._label];
-    // this._measurements.push({ measurementID, elements });
-  }
-
-  addVoxelprobe = ( voxelprobe: Voxelprobe ) => {
-    voxelprobe.widget.append();
-    console.log((window as any).prov.graph);
-    this.voxelprobeCreated.emit(voxelprobe); 
-
-    //need to add rendering update based on the artifacts
-
-    // (window as any).prov.graph.artifacts.push(artifact);
-  }
-
-  removeVoxelprobe = ( voxelprobe: Voxelprobe ) => {
-    voxelprobe.widget.remove();
-    (window as any).prov.graph.artifacts.splice(-1,1);
-    this.voxelprobeRemoved.emit(voxelprobe); 
-
-    //need to add rendering update based on the artifacts
-
-
-    // for(let i = 0, length = this._ruler.artifact.elements.length; i<length; i++){
-    //   document.getElementById("r0").appendChild(this._ruler.artifact.elements[i])
-    // } 
-  //  this.rulerRemoved.emit(elements);
-  }
-
-  createVoxelprobe = ({ p0, p1 }: IPointPair) => {
-    this._voxelprobe = new Voxelprobe(this);
-
-    // set position
-    this._voxelprobe.widget._handles[0].worldPosition = p0;
-    this._voxelprobe.widget._handles[1].worldPosition = p1;
-
-    // make sure we're not in dragging mode
-    this._voxelprobe.widget._handles[1]._active = false;
-
-
-    // forward events
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-  }
-
-  // updateVoxelprobe = ({ p0, p1 }: IPointPair) => {
-  //   if (this._voxelprobe) {
-  //     // set position
-  //     this._voxelprobe.widget._handles[0].worldPosition = p0;
-  //     this._voxelprobe.widget._handles[1].worldPosition = p1;
-  //     this._voxelprobe.widget.update();
-  //   }
-  // }
-
-  deleteVoxelprobe = () => {
-    if (this._voxelprobe) {
-      // get position (needed for the undo provenance action).
-      const p0 = this._voxelprobe.widget._handles[0].worldPosition;
-      const p1 = this._voxelprobe.widget._handles[1].worldPosition;
-
-      this._voxelprobe.remove();
-      this._voxelprobe = null;
-      // this.voxelprobeRemoved.emit({ p0, p1 });
-      this.voxelprobeMode = false;
+    this._voxelprobeID = this._voxelprobeID + 1;
+    this._measurement.artifact = {
+      id: this._artifactID,
+      type: 'voxelprobe',
+      typeID: this._voxelprobeID,
+      sliceIndex: this._measurement.index,
+      view: this._domID,
+      elements: [this._measurement.widget._label, this._measurement.widget.children[0]._dom
+      ]
     }
+    this._artifactInit = true;
+    this.addArtifact(this._measurement.artifact);
   }
 
 
   // Annotation
 
   startAnnotation = (evt) => {
-    this._annotation = new Annotation(this, evt);
-    this._annotations.push(this._annotation);
+    this._measurement = new Annotation(this, evt);
     // this._pairs.push(this._ruler.pair);
 
     this._domElement.removeEventListener('mousedown', this.startAnnotation);
 
-    // forward events
-    this._annotation.created.subscribe(arg => this.annotationCreated.emit(arg));
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-  }
-
-  addAnnotation = ( annotation: Annotation ) => {
-    annotation.widget.append();
-    console.log((window as any).prov.graph);
-    this.annotationCreated.emit(annotation); 
-
-    //need to add rendering update based on the artifacts
-
-    // (window as any).prov.graph.artifacts.push(artifact);
-  }
-
-  removeAnnotation = ( annotation: Annotation ) => {
-    annotation.widget.remove();
-    (window as any).prov.graph.artifacts.splice(-1,1);
-    this.annotationRemoved.emit(annotation); 
-
-    //need to add rendering update based on the artifacts
-
-
-    // for(let i = 0, length = this._ruler.artifact.elements.length; i<length; i++){
-    //   document.getElementById("r0").appendChild(this._ruler.artifact.elements[i])
-    // } 
-  //  this.rulerRemoved.emit(elements);
-  }
-
-  createAnnotation = ({ p0, p1 }: IPointPair) => {
-    this._annotation = new Annotation(this);
-
-    // set position
-    this._annotation.widget._handles[0].worldPosition = p0;
-    this._annotation.widget._handles[1].worldPosition = p1;
-
-    // make sure we're not in dragging mode
-    this._annotation.widget._handles[1]._active = false;
-
-    // forward events
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-
-    // to store the elements
-    this._artifactID = this._artifactID + 1;
-
-    let measurementID = {
-      groupID: this._artifactID,
-      sliceIndex: this._stackHelper.index,
-      type: 'annotation'
-    };
-
-    let elements = [this._annotation.widget._labeltext, this._annotation.widget._dashline, this._annotation.widget._line, this._annotation.widget._label];
-    // this._measurements.push({ measurementID, elements });
-  }
-
-  // updateAnnotation = ({ p0, p1 }: IPointPair) => {
-  //   if (this._annotation) {
-  //     // set position
-  //     this._annotation.widget._handles[0].worldPosition = p0;
-  //     this._annotation.widget._handles[1].worldPosition = p1;
-  //     this._annotation.widget.update();
-  //   }
-  // }
-
-  deleteAnnotation = () => {
-    if (this._annotation) {
-      // get position (needed for the undo provenance action).
-      const p0 = this._annotation.widget._handles[0].worldPosition;
-      const p1 = this._annotation.widget._handles[1].worldPosition;
-
-      this._annotation.remove();
-      this._annotation = null;
-      // this.annotationRemoved.emit({ p0, p1 });
-      this.annotationMode = false;
+    const handles = this._measurement.widget.children.filter(x => x !== null);
+    for (let i = 0, length = handles.length; i < length; i++) {
+      handles.push(this._measurement.widget.children[i]._dom);
     }
+    const elems = [this._measurement.widget._line, this._measurement.widget._label, this._measurement.widget._dashline, ...handles];
+
+    // create artifact
+    this._artifactID = this._artifactID + 1;
+    this._annotationID = this._annotationID + 1;
+    this._measurement.artifact = {
+      id: this._artifactID,
+      type: 'annotation',
+      typeID: this._annotationID,
+      sliceIndex: this._measurement.index,
+      view: this._domID,
+      elements: elems.filter(x => x instanceof HTMLElement)
+    }
+    this._artifactInit = true;
+    this.addArtifact(this._measurement.artifact);
   }
+
 
   get sliceOrientation() { return this._sliceOrientation; }
 
   // get updateArtifact() { return this.graph; }
 
 
-  set measurementMode(isEnabled: boolean) {
-    this._measurementMode = isEnabled;
+  set rulerMode(isEnabled: boolean) {
+    this._rulerMode = isEnabled;
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener('mousedown', this.startRuler);
-      this.domElement.addEventListener('shiftKey', this.deleteRuler);
+      // this.domElement.addEventListener('shiftKey', this.deleteRuler);
     } else {
       this.domElement.removeEventListener('mousedown', this.startRuler);
-      this.domElement.removeEventListener('shiftKey', this.deleteRuler);
+      // this.domElement.removeEventListener('shiftKey', this.deleteRuler);
     }
   }
 
@@ -897,10 +608,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener('mousedown', this.startAngle);
-      this.domElement.addEventListener('shiftKey', this.deleteAngle);
+      // this.domElement.addEventListener('shiftKey', this.deleteAngle);
     } else {
       this.domElement.removeEventListener('mousedown', this.startAngle);
-      this.domElement.removeEventListener('shiftKey', this.deleteAngle);
+      // this.domElement.removeEventListener('shiftKey', this.deleteAngle);
     }
   }
 
@@ -909,10 +620,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener('mousedown', this.startFreehand);
-      this.domElement.addEventListener('shiftKey', this.deleteFreehand);
+      // this.domElement.addEventListener('shiftKey', this.deleteFreehand);
     } else {
       this.domElement.removeEventListener('mousedown', this.startFreehand);
-      this.domElement.removeEventListener('shiftKey', this.deleteFreehand);
+      // this.domElement.removeEventListener('shiftKey', this.deleteFreehand);
     }
   }
 
@@ -921,10 +632,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener('mousedown', this.startVoxelprobe);
-      this.domElement.addEventListener('shiftKey', this.deleteVoxelprobe);
+      // this.domElement.addEventListener('shiftKey', this.deleteVoxelprobe);
     } else {
       this.domElement.removeEventListener('mousedown', this.startVoxelprobe);
-      this.domElement.removeEventListener('shiftKey', this.deleteVoxelprobe);
+      // this.domElement.removeEventListener('shiftKey', this.deleteVoxelprobe);
     }
   }
 
@@ -933,10 +644,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener('mousedown', this.startAnnotation);
-      this.domElement.addEventListener('shiftKey', this.deleteAnnotation);
+      // this.domElement.addEventListener('shiftKey', this.deleteAnnotation);
     } else {
       this.domElement.removeEventListener('mousedown', this.startAnnotation);
-      this.domElement.removeEventListener('shiftKey', this.deleteAnnotation);
+      // this.domElement.removeEventListener('shiftKey', this.deleteAnnotation);
     }
   }
 }

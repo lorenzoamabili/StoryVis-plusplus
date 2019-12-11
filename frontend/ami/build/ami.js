@@ -45165,16 +45165,16 @@ const widgetsAngle = (three = window.THREE) => {
 
     createDOM() {
       this._line = document.createElement('div');
-      this._line.className = 'widgets-line measurement';
-      // this._container.appendChild(this._line);
+      this._line.className = 'widgets-line';
+      this._container.appendChild(this._line);
 
       this._line2 = document.createElement('div');
-      this._line2.className = 'widgets-line measurement';
-      // this._container.appendChild(this._line2);
+      this._line2.className = 'widgets-line';
+      this._container.appendChild(this._line2);
 
       this._label = document.createElement('div');
-      this._label.className = 'widgets-label measurement';
-      // this._container.appendChild(this._label);
+      this._label.className = 'widgets-label';
+      this._container.appendChild(this._label);
 
       this.updateDOMColor();
     }
@@ -45265,18 +45265,6 @@ const widgetsAngle = (three = window.THREE) => {
       this._line.style.backgroundColor = this._color;
       this._line2.style.backgroundColor = this._color;
       this._label.style.borderColor = this._color;
-    }
-
-    append() {
-      this._container.appendChild(this._line);
-      this._container.appendChild(this._line2);
-      this._container.appendChild(this._label);
-    }
-
-    remove() {
-      this._container.removeChild(this._line);
-      this._container.removeChild(this._line2);
-      this._container.removeChild(this._label);
     }
 
     free() {
@@ -45593,19 +45581,18 @@ const widgetsAnnotation = (three = window.THREE) => {
 
     createDOM() {
       this._line = document.createElement('div');
-      this._line.className = 'widgets-line measurement';
-      // this._container.appendChild(this._line);
+      this._line.className = 'widgets-line';
+      this._container.appendChild(this._line);
 
       this._dashline = document.createElement('div');
-      this._dashline.className = 'widgets-dashline measurement';
+      this._dashline.className = 'widgets-dashline';
       this._dashline.style.display = 'none';
-      // this._container.appendChild(this._dashline);
+      this._container.appendChild(this._dashline);
 
       this._label = document.createElement('div');
-      this._label.className = 'widgets-label measurement';
+      this._label.className = 'widgets-label';
       this._label.style.display = 'none';
-      // this._container.appendChild(this._label);
-
+      this._container.appendChild(this._label);
 
       this.updateDOMColor();
     }
@@ -45698,18 +45685,6 @@ const widgetsAnnotation = (three = window.THREE) => {
       this._label.style.display = '';
       this._handles.forEach(elem => elem.showDOM());
     }
-
-    append() {
-            this._container.appendChild(this._line);
-                  this._container.appendChild(this._dashline);
-                        this._container.appendChild(this._label);
-    }
-
-    remove() {
-      this._container.removeChild(this._line);
-            this._container.removeChild(this._dashline);
-                  this._container.removeChild(this._label);
-}
 
     free() {
       this.removeEventListeners();
@@ -47994,7 +47969,7 @@ const widgetsFreehand = (three = window.THREE) => {
 
     createDOM() {
       this._label = document.createElement('div');
-      this._label.className = 'widgets-label measurement';
+      this._label.className = 'widgets-label';
 
       // measurements
       const measurementsContainer = document.createElement('div');
@@ -48013,7 +47988,7 @@ const widgetsFreehand = (three = window.THREE) => {
 
       this._label.appendChild(measurementsContainer);
 
-      // this._container.appendChild(this._label);
+      this._container.appendChild(this._label);
 
       this.updateDOMColor();
     }
@@ -48021,11 +47996,11 @@ const widgetsFreehand = (three = window.THREE) => {
     createLine() {
       const line = document.createElement('div');
 
-      line.className = 'widgets-line measurement';
+      line.className = 'widgets-line';
       line.addEventListener('mouseenter', this.onHover);
       line.addEventListener('mouseleave', this.onHover);
       this._lines.push(line);
-      // this._container.appendChild(line);
+      this._container.appendChild(line);
     }
 
     hideDOM() {
@@ -48269,14 +48244,6 @@ const widgetsFreehand = (three = window.THREE) => {
       labelPosition = this.adjustLabelTransform(this._label, labelPosition);
 
       this._label.style.transform = `translate3D(${labelPosition.x}px, ${labelPosition.y}px, 0)`;
-    }
-
-    append() {
-      this._container.appendChild(this._label);
-    }
-
-    remove() {
-      this._container.removeChild(this._label);
     }
 
     free() {
@@ -48601,7 +48568,7 @@ const widgetsHandle = (three = window.THREE) => {
 
     createDOM() {
       this._dom = document.createElement('div');
-      this._dom.className = 'widgets-handle measurement';
+      this._dom.className = 'widgets-handle';
 
       this._dom.style.transform = `translate3D(
       ${this._screenPosition.x}px,
@@ -48609,7 +48576,7 @@ const widgetsHandle = (three = window.THREE) => {
 
       this.updateDOMColor();
 
-      // this._container.appendChild(this._dom);
+      this._container.appendChild(this._dom);
     }
 
     update() {
@@ -50793,12 +50760,12 @@ const widgetsRuler = (three = window.THREE) => {
 
     createDOM() {
       this._line = document.createElement('div');
-      this._line.className = 'widgets-line measurement';
-      // this._container.appendChild(this._line);
+      this._line.className = 'widgets-line';
+      this._container.appendChild(this._line);
 
       this._label = document.createElement('div');
-      this._label.className = 'widgets-label measurement';
-      // this._container.appendChild(this._label);
+      this._label.className = 'widgets-label';
+      this._container.appendChild(this._label);
 
       this.updateDOMColor();
     }
@@ -50885,16 +50852,6 @@ const widgetsRuler = (three = window.THREE) => {
     updateDOMColor() {
       this._line.style.backgroundColor = this._color;
       this._label.style.borderColor = this._color;
-    }
-
-    append(){      
-      this._container.appendChild(this._line);
-      this._container.appendChild(this._label);
-    }
-
-    remove(){      
-      this._container.removeChild(this._line);
-      this._container.removeChild(this._label);
     }
 
     free() {
@@ -51746,7 +51703,7 @@ const widgetsVoxelprobe = (three = window.THREE) => {
 
     createDOM() {
       this._label = document.createElement('div');
-      this._label.className = 'widgets-label measurement';
+      this._label.className = 'widgets-label';
 
       // measurements
       let measurementsContainer = document.createElement('div');
@@ -51765,7 +51722,7 @@ const widgetsVoxelprobe = (three = window.THREE) => {
 
       this._label.appendChild(measurementsContainer);
 
-      // this._container.appendChild(this._label);
+      this._container.appendChild(this._label);
 
       this.updateDOMColor();
     }
@@ -51816,14 +51773,6 @@ const widgetsVoxelprobe = (three = window.THREE) => {
 
     updateDOMColor() {
       this._label.style.borderColor = this._color;
-    }
-
-    append() {
-      this._container.appendChild(this._label);
-    }
-
-    remove() {
-      this._container.removeChild(this._label);
     }
 
     free() {

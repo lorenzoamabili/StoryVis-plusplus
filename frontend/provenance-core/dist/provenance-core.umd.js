@@ -238,8 +238,8 @@
           }
           this._nodes[node.id] = node;
           this._mitt.emit('nodeAdded', node);
-          if (node.artifact) {
-              this.artifacts.push(node.artifact);
+          if (node.artifacts) {
+              this.artifacts.concat(node.artifacts);
           }
       };
       ProvenanceGraph.prototype.getNode = function (id) {
@@ -358,14 +358,14 @@
        * will be taken as the label for this node.
        *
        * @param action
-       * @param artifacts
+       * @param artifact
        * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
        *        it will only be called when traversing.
        */
       ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifact) {
           if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
           return __awaiter(this, void 0, void 0, function () {
-              var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
+              var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult, nodeArtifacts;
               var _this = this;
               return __generator(this, function (_a) {
                   switch (_a.label) {
@@ -380,7 +380,7 @@
                           else {
                               label = action.do;
                           }
-                          createNewStateNode = function (parentNode, actionResult) { return ({
+                          createNewStateNode = function (parentNode, actionResult, artifacts) { return ({
                               id: generateUUID(),
                               label: label,
                               metadata: {
@@ -391,19 +391,21 @@
                               actionResult: actionResult,
                               parent: parentNode,
                               children: [],
-                              artifact: artifact
+                              artifacts: artifacts
                           }); };
                           currentNode = this.graph.current;
                           if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
-                          newNode = createNewStateNode(this.graph.current, null);
+                          newNode = createNewStateNode(this.graph.current, null, []);
                           return [3 /*break*/, 3];
                       case 1:
                           functionNameToExecute = action.do;
                           funcWithThis = this.registry.getFunctionByName(functionNameToExecute);
-                          return [4 /*yield*/, funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments)];
+                          return [4 /*yield*/, funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args)];
                       case 2:
                           actionResult = _a.sent();
-                          newNode = createNewStateNode(currentNode, actionResult);
+                          nodeArtifacts = (action.doArguments.artifacts && action.doArguments.artifacts[1].length !== 0) ?
+                              ((artifact) ? action.doArguments.artifacts[1].push(artifact) : action.doArguments.artifacts[1]) : artifact;
+                          newNode = createNewStateNode(currentNode, actionResult, nodeArtifacts);
                           _a.label = 3;
                       case 3:
                           if (this.autoScreenShot && this.screenShotProvider) {
@@ -629,10 +631,12 @@
                           thisNode.action.undo === "setControlOrientation" ||
                           thisNode.action.undo === "setSlicePlaneOrientation" ||
                           thisNode.action.undo === "setSlicePlaneZoom") {
-                          argumentsToDo.push(thisNode.action.undoArguments.concat([transitionTime]));
+                          argumentsToDo.push(thisNode.action.undoArguments.args.concat([transitionTime]));
                       }
                       else {
-                          argumentsToDo.push(thisNode.action.undoArguments);
+                          console.log(thisNode.action.undoArguments.artifacts);
+                          argumentsToDo.push(thisNode.action.undoArguments.args
+                              .concat(thisNode.action.undoArguments.artifacts ? thisNode.action.undoArguments.artifacts : []));
                       }
                   }
                   else {
@@ -649,10 +653,12 @@
                           nextNode.action.do === "setControlOrientation" ||
                           nextNode.action.do === "setSlicePlaneOrientation" ||
                           nextNode.action.do === "setSlicePlaneZoom") {
-                          argumentsToDo.push(nextNode.action.doArguments.concat([transitionTime]));
+                          argumentsToDo.push(nextNode.action.doArguments.args.concat([transitionTime]));
                       }
                       else {
-                          argumentsToDo.push(nextNode.action.doArguments);
+                          console.log(nextNode.action.doArguments.artifacts);
+                          argumentsToDo.push(nextNode.action.doArguments.args
+                              .concat(nextNode.action.doArguments.artifacts ? nextNode.action.doArguments.artifacts : []));
                       }
                   }
                   else {

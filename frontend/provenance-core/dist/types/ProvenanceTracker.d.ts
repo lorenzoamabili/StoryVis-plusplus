@@ -23,7 +23,7 @@ export declare class ProvenanceTracker implements IProvenanceTracker {
      * will be taken as the label for this node.
      *
      * @param action
-     * @param artifacts
+     * @param artifact
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */

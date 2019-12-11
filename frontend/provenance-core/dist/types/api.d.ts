@@ -51,6 +51,7 @@ export interface Artifact {
     sliceIndex: number;
     view: string;
     elements: HTMLElement[] | null;
+    treeNodeID?: string;
     /**
      * Enable custom properties
      */
@@ -79,7 +80,7 @@ export interface RootNode {
     /**
      * Artifacts
      */
-    artifact?: Artifact;
+    artifacts?: Artifact[];
 }
 /**
  * State node extending the RootNode
@@ -118,8 +119,12 @@ export interface IrreversibleAction {
      * Multiple arguments that are passed to the registered do function.
      * The arguments should be immutable!
      */
-    doArguments: any[];
+    doArguments: Argument;
 }
+export declare type Argument = {
+    artifacts?: Artifact[];
+    args: any[];
+};
 /**
  * Reversible action that can be applied and reverted
  */
@@ -136,7 +141,7 @@ export interface ReversibleAction {
      * Multiple arguments that are passed to the registered do function.
      * The arguments should be immutable and serializable to json!
      */
-    doArguments: any[];
+    doArguments: Argument;
     /**
      * Function name to a registered function that is executed when reverting an action
      */
@@ -145,7 +150,7 @@ export interface ReversibleAction {
      * Multiple arguments that are passed to the registered do function.
      * The arguments should be immutable and serializable to json!
      */
-    undoArguments: any[];
+    undoArguments: Argument;
 }
 /**
  * Action function that can be registered and will be executed when applying an Action
@@ -311,7 +316,7 @@ export interface SerializedRootNode {
     children: NodeIdentifier[];
     label: string;
     metadata: NodeMetadata;
-    artifact?: Artifact;
+    artifacts?: Artifact[];
 }
 export declare type SerializedStateNode = SerializedRootNode & {
     parent: NodeIdentifier;

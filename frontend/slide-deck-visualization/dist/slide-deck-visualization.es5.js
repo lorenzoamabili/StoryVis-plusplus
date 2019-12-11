@@ -168,6 +168,7 @@ function mitt(all) {
 var ProvenanceGraph = /** @class */ (function () {
     function ProvenanceGraph(application, userid, rootNode) {
         if (userid === void 0) { userid = 'Unknown'; }
+        this.artifacts = [];
         this._nodes = {};
         this.id = generateUUID();
         this._mitt = mitt();
@@ -183,8 +184,7 @@ var ProvenanceGraph = /** @class */ (function () {
                     createdBy: userid,
                     createdOn: generateTimestamp()
                 },
-                children: [],
-                artifacts: {}
+                children: []
             };
         }
         this.addNode(this.root);
@@ -196,6 +196,9 @@ var ProvenanceGraph = /** @class */ (function () {
         }
         this._nodes[node.id] = node;
         this._mitt.emit('nodeAdded', node);
+        if (node.artifact) {
+            this.artifacts.push(node.artifact);
+        }
     };
     ProvenanceGraph.prototype.getNode = function (id) {
         var result = this._nodes[id];
@@ -313,10 +316,11 @@ var ProvenanceTracker = /** @class */ (function () {
      * will be taken as the label for this node.
      *
      * @param action
+     * @param artifact
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall) {
+    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifact) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
             var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
@@ -345,7 +349,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             actionResult: actionResult,
                             parent: parentNode,
                             children: [],
-                            artifacts: {}
+                            artifact: artifact
                         }); };
                         currentNode = this.graph.current;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
@@ -13335,15 +13339,7 @@ Typo.prototype = {
 			
 			try {
 				if (fs$1.existsSync(path)) {
-					var stats = fs$1.statSync(path);
-					
-					var fileDescriptor = fs$1.openSync(path, 'r');
-					
-					var buffer = new Buffer(stats.size);
-					
-					fs$1.readSync(fileDescriptor, buffer, 0, buffer.length, null);
-					
-					return buffer.toString(charset, 0, buffer.length);
+					return fs$1.readFileSync(path, charset);
 				}
 				else {
 					console.log("Path " + path + " does not exist.");
@@ -13371,7 +13367,7 @@ Typo.prototype = {
 		// Remove comment lines
 		data = this._removeAffixComments(data);
 		
-		var lines = data.split("\n");
+		var lines = data.split(/\r?\n/);
 		
 		for (i = 0, _len = lines.length; i < _len; i++) {
 			line = lines[i];
@@ -13503,7 +13499,7 @@ Typo.prototype = {
 	_parseDIC : function (data) {
 		data = this._removeDicComments(data);
 		
-		var lines = data.split("\n");
+		var lines = data.split(/\r?\n/);
 		var dictionaryTable = {};
 		
 		function addWord(word, rules) {
@@ -13525,6 +13521,11 @@ Typo.prototype = {
 		for (var i = 1, _len = lines.length; i < _len; i++) {
 			var line = lines[i];
 			
+			if (!line) {
+				// Ignore empty lines.
+				continue;
+			}
+
 			var parts = line.split("/", 2);
 			
 			var word = parts[0];
@@ -13870,38 +13871,85 @@ Typo.prototype = {
 		}
 		*/
 		
-		function edits1(words) {
-			var rv = [];
+		/**
+		 * Returns a hash keyed by all of the strings that can be made by making a single edit to the word (or words in) `words`
+		 * The value of each entry is the number of unique ways that the resulting word can be made.
+		 *
+		 * @arg mixed words Either a hash keyed by words or a string word to operate on.
+		 * @arg bool known_only Whether this function should ignore strings that are not in the dictionary.
+		 */
+		function edits1(words, known_only) {
+			var rv = {};
 			
-			var ii, i, j, _iilen, _len, _jlen;
+			var i, j, _len, _jlen, _edit;
 			
-			for (ii = 0, _iilen = words.length; ii < _iilen; ii++) {
-				var word = words[ii];
-				
+			if (typeof words == 'string') {
+				var word = words;
+				words = {};
+				words[word] = true;
+			}
+
+			for (var word in words) {
 				for (i = 0, _len = word.length + 1; i < _len; i++) {
 					var s = [ word.substring(0, i), word.substring(i) ];
 				
 					if (s[1]) {
-						rv.push(s[0] + s[1].substring(1));
+						_edit = s[0] + s[1].substring(1);
+
+						if (!known_only || self.check(_edit)) {
+							if (!(_edit in rv)) {
+								rv[_edit] = 1;
+							}
+							else {
+								rv[_edit] += 1;
+							}
+						}
 					}
 					
 					// Eliminate transpositions of identical letters
 					if (s[1].length > 1 && s[1][1] !== s[1][0]) {
-						rv.push(s[0] + s[1][1] + s[1][0] + s[1].substring(2));
-					}
+						_edit = s[0] + s[1][1] + s[1][0] + s[1].substring(2);
 
-					if (s[1]) {
-						for (j = 0, _jlen = self.alphabet.length; j < _jlen; j++) {
-							// Eliminate replacement of a letter by itself
-							if (self.alphabet[j] != s[1].substring(0,1)){
-								rv.push(s[0] + self.alphabet[j] + s[1].substring(1));
+						if (!known_only || self.check(_edit)) {
+							if (!(_edit in rv)) {
+								rv[_edit] = 1;
+							}
+							else {
+								rv[_edit] += 1;
 							}
 						}
 					}
 
 					if (s[1]) {
 						for (j = 0, _jlen = self.alphabet.length; j < _jlen; j++) {
-							rv.push(s[0] + self.alphabet[j] + s[1]);
+							// Eliminate replacement of a letter by itself
+							if (self.alphabet[j] != s[1].substring(0,1)){
+								_edit = s[0] + self.alphabet[j] + s[1].substring(1);
+
+								if (!known_only || self.check(_edit)) {
+									if (!(_edit in rv)) {
+										rv[_edit] = 1;
+									}
+									else {
+										rv[_edit] += 1;
+									}
+								}
+							}
+						}
+					}
+
+					if (s[1]) {
+						for (j = 0, _jlen = self.alphabet.length; j < _jlen; j++) {
+							_edit = s[0] + self.alphabet[j] + s[1];
+
+							if (!known_only || self.check(_edit)) {
+								if (!(_edit in rv)) {
+									rv[_edit] = 1;
+								}
+								else {
+									rv[_edit] += 1;
+								}
+							}
 						}
 					}
 				}
@@ -13909,40 +13957,30 @@ Typo.prototype = {
 			
 			return rv;
 		}
-		
-		function known(words) {
-			var rv = [];
-			
-			for (var i = 0, _len = words.length; i < _len; i++) {
-				if (self.check(words[i])) {
-					rv.push(words[i]);
-				}
-			}
-			
-			return rv;
-		}
-		
+
 		function correct(word) {
 			// Get the edit-distance-1 and edit-distance-2 forms of this word.
-			var ed1 = edits1([word]);
-			var ed2 = edits1(ed1);
-			
-			var corrections = known(ed1.concat(ed2));
-			
-			var i, _len;
+			var ed1 = edits1(word);
+			var ed2 = edits1(ed1, true);
 			
 			// Sort the edits based on how many different ways they were created.
-			var weighted_corrections = {};
+			var weighted_corrections = ed2;
 			
-			for (i = 0, _len = corrections.length; i < _len; i++) {
-				if (!(corrections[i] in weighted_corrections)) {
-					weighted_corrections[corrections[i]] = 1;
+			for (var ed1word in ed1) {
+				if (!self.check(ed1word)) {
+					continue;
+				}
+
+				if (ed1word in weighted_corrections) {
+					weighted_corrections[ed1word] += ed1[ed1word];
 				}
 				else {
-					weighted_corrections[corrections[i]] += 1;
+					weighted_corrections[ed1word] = ed1[ed1word];
 				}
 			}
 			
+			var i;
+
 			var sorted_corrections = [];
 			
 			for (i in weighted_corrections) {
@@ -13950,17 +13988,21 @@ Typo.prototype = {
 					sorted_corrections.push([ i, weighted_corrections[i] ]);
 				}
 			}
-			
+
 			function sorter(a, b) {
-				if (a[1] < b[1]) {
+				var a_val = a[1];
+				var b_val = b[1];
+				if (a_val < b_val) {
 					return -1;
+				} else if (a_val > b_val) {
+					return 1;
 				}
-				
-				return 1;
+				// @todo If a and b are equally weighted, add our own weight based on something like the key locations on this language's default keyboard.
+				return b[0].localeCompare(a[0]);
 			}
 			
 			sorted_corrections.sort(sorter).reverse();
-			
+
 			var rv = [];
 
 			var capitalization_scheme = "lowercase";
@@ -13972,7 +14014,9 @@ Typo.prototype = {
 				capitalization_scheme = "capitalized";
 			}
 			
-			for (i = 0, _len = Math.min(limit, sorted_corrections.length); i < _len; i++) {
+			var working_limit = limit;
+
+			for (i = 0; i < Math.min(working_limit, sorted_corrections.length); i++) {
 				if ("uppercase" === capitalization_scheme) {
 					sorted_corrections[i][0] = sorted_corrections[i][0].toUpperCase();
 				}
@@ -13980,11 +14024,15 @@ Typo.prototype = {
 					sorted_corrections[i][0] = sorted_corrections[i][0].substr(0, 1).toUpperCase() + sorted_corrections[i][0].substr(1);
 				}
 				
-				if (!self.hasFlag(sorted_corrections[i][0], "NOSUGGEST")) {
+				if (!self.hasFlag(sorted_corrections[i][0], "NOSUGGEST") && rv.indexOf(sorted_corrections[i][0]) == -1) {
 					rv.push(sorted_corrections[i][0]);
 				}
+				else {
+					// If one of the corrections is not eligible as a suggestion , make sure we still return the right number of suggestions.
+					working_limit++;
+				}
 			}
-			
+
 			return rv;
 		}
 		

@@ -26,6 +26,14 @@ export class StyledSliderComponent implements DoCheck {
     showTicks: false
   };
 
+  // get tickInterval(): number {
+  //   return this._tickInterval;
+  // }
+  // set tickInterval(value) {
+  //   this._tickInterval = value;
+  // }
+  // private _tickInterval = 1;
+
   ngDoCheck() {
     let changeDetectedW = false;
     let changeDetectedC = false;
@@ -45,7 +53,6 @@ export class StyledSliderComponent implements DoCheck {
 
       this.optionsW = newOptions;
     }
-
 
 
     if (this.canvas.settings.thresholdLowerBoundC !== this.optionsC.floor) {

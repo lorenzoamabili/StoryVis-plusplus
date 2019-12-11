@@ -29,7 +29,6 @@ export interface View {
     sliceOrientation: string;
     sliceColor: number;
     targetID: number;
-    artifacts?: Artifact[];
 }
 
 export interface IAMIRenderer {

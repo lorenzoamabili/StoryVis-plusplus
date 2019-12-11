@@ -224,8 +224,7 @@ export class ProvenanceTreeVisualization {
     this.hierarchyRoot = tree;
 
     const treeNodes = tree.descendants();
-    console.log(treeNodes);
-
+console.log(treeNodes);
     const oldNodes = this.g.selectAll('g.node').data(treeNodes, (d: any) => {
       const data = d.data.wrappedNodes.map((n: any) => n.id).join();
       return data;

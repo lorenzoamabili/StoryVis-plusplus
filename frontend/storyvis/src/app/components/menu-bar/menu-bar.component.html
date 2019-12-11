@@ -51,8 +51,8 @@
     </div>
 
 
-    <mat-button-toggle [checked]="canvas.settings.measurementMode"
-      (change)="canvas.settings.measurementMode = $event.source.checked" matTooltip="Ruler">
+    <mat-button-toggle [checked]="canvas.settings.rulerMode"
+      (change)="canvas.settings.rulerMode = $event.source.checked" matTooltip="Ruler">
       <mat-icon class="example-icon">space_bar</mat-icon>
     </mat-button-toggle>
 

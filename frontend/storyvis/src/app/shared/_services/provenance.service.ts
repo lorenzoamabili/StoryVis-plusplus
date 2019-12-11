@@ -192,7 +192,7 @@ export class ProvenanceService {
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
     this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
-console.log(this.graph);
+
     (window as any).prov = {
       graph: this.graph,
       registry: this.registry,

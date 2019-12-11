@@ -108,6 +108,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
   }
 
+  updateArtifact() {}
+
   lookAt(vec: THREE.Vector3) {
     this._camera.lookAt(vec);
   }

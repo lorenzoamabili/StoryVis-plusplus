@@ -27,7 +27,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
   /**
    * When acceptActions is false, the Tracker will ignore calls to applyAction
    */
-  
+
   public acceptActions = true;
 
   private graph: IProvenanceGraph;
@@ -39,7 +39,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
   constructor(
     registry: IActionFunctionRegistry,
     graph: IProvenanceGraph,
-    username: string = 'Unknown'
+    username: string = 'Unknown',
   ) {
     this.registry = registry;
     this.graph = graph;
@@ -52,7 +52,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
    * will be taken as the label for this node.
    *
    * @param action
-   * @param artifacts
+   * @param artifact
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
@@ -68,7 +68,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       label = action.do;
     }
 
-    const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any): StateNode => ({
+    const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any, artifacts: Artifact[]): StateNode => ({
       id: generateUUID(),
       label: label,
       metadata: {
@@ -79,7 +79,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       actionResult,
       parent: parentNode,
       children: [],
-      artifact: artifact
+      artifacts
     });
 
     let newNode: StateNode;
@@ -88,7 +88,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
     const currentNode = this.graph.current;
 
     if (skipFirstDoFunctionCall) {
-      newNode = createNewStateNode(this.graph.current, null);
+      newNode = createNewStateNode(this.graph.current, null, []);
 
     } else {
       // Get the registered function from the action out of the registry
@@ -96,9 +96,12 @@ export class ProvenanceTracker implements IProvenanceTracker {
       const funcWithThis: ActionFunctionWithThis = this.registry.getFunctionByName(
         functionNameToExecute
       );
-      const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments);
+      const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args);
 
-      newNode = createNewStateNode(currentNode, actionResult);
+      const nodeArtifacts = (action.doArguments.artifacts && action.doArguments.artifacts[1].length !== 0) ?
+       ( (artifact) ? action.doArguments.artifacts[1].push(artifact) : action.doArguments.artifacts[1] ) : artifact ;
+
+       newNode = createNewStateNode(currentNode, actionResult, nodeArtifacts);
     }
 
     if (this.autoScreenShot && this.screenShotProvider) {
@@ -108,7 +111,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
         console.warn('Error while getting screenshot', e);
       }
     }
- 
+
 
     // When the node is created, we need to update the graph.
     currentNode.children.push(newNode);
@@ -138,13 +141,16 @@ export class ProvenanceTracker implements IProvenanceTracker {
     }
   }
 
-  getGraph() : SerializedProvenanceGraph{
+  getGraph(): SerializedProvenanceGraph {
     return this.graph.getSelf();
   }
-  
+
   restoreGraph(sgraph: any): void {
     Object.setPrototypeOf(sgraph, serializeProvenanceGraph.prototype);
     alert(JSON.stringify(sgraph));
     this.graph = this.graph.restoreSelf(sgraph);
   }
+
+  // updateArtifacts(): void {
+  // }
 }

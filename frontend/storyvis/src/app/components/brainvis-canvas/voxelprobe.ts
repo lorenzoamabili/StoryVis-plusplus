@@ -3,24 +3,25 @@ import * as AMI from 'ami.js';
 
 import { Renderer2D } from './renderer2d';
 import { EventEmitter, Output } from '@angular/core';
-import { IPointPair } from './utils/types';
+import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
 export default class Voxelprobe {
   widget: any;
   renderer: Renderer2D;
   index: any;
   pair: THREE.Vector3;
-  id: number = -1;
+
+  artifact: Artifact;
+
   /**
    * "isNew" is set to false after creation is done (first mouse up event).
    */
   isNew: boolean;
 
-  @Output() changed = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  @Output() created = new EventEmitter<IPointPair>();
+  @Output() changed = new EventEmitter<Artifact>();
+  @Output() created = new EventEmitter<Artifact>();
 
   constructor(renderer: Renderer2D, evt: MouseEvent | null = null) {
-    this.id = this.id + 1
     this.renderer = renderer;
     this.isNew = true;
 
@@ -55,7 +56,6 @@ export default class Voxelprobe {
 
     this.widget = new AMI.VoxelProbeWidget(stackHelper.slice.mesh, controls, {
       stack: stack,
-      id: this.id,
       // todo: check if using this _spacing leads to the right scale
       // ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
       worldPosition: startPosition

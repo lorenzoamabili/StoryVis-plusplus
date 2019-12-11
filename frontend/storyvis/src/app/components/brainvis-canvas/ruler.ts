@@ -3,7 +3,6 @@ import * as AMI from 'ami.js';
 
 import { Renderer2D } from './renderer2d';
 import { EventEmitter, Output } from '@angular/core';
-import { IPointPair } from './utils/types';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
 export default class Ruler {

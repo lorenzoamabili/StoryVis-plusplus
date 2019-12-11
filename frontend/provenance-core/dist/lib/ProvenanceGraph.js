@@ -50,8 +50,8 @@ var ProvenanceGraph = /** @class */ (function () {
         }
         this._nodes[node.id] = node;
         this._mitt.emit('nodeAdded', node);
-        if (node.artifact) {
-            this.artifacts.push(node.artifact);
+        if (node.artifacts) {
+            this.artifacts.concat(node.artifacts);
         }
     };
     ProvenanceGraph.prototype.getNode = function (id) {

@@ -230,10 +230,12 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         thisNode.action.undo === "setControlOrientation" ||
                         thisNode.action.undo === "setSlicePlaneOrientation" ||
                         thisNode.action.undo === "setSlicePlaneZoom") {
-                        argumentsToDo.push(thisNode.action.undoArguments.concat([transitionTime]));
+                        argumentsToDo.push(thisNode.action.undoArguments.args.concat([transitionTime]));
                     }
                     else {
-                        argumentsToDo.push(thisNode.action.undoArguments);
+                        console.log(thisNode.action.undoArguments.artifacts);
+                        argumentsToDo.push(thisNode.action.undoArguments.args
+                            .concat(thisNode.action.undoArguments.artifacts ? thisNode.action.undoArguments.artifacts : []));
                     }
                 }
                 else {
@@ -250,10 +252,12 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         nextNode.action.do === "setControlOrientation" ||
                         nextNode.action.do === "setSlicePlaneOrientation" ||
                         nextNode.action.do === "setSlicePlaneZoom") {
-                        argumentsToDo.push(nextNode.action.doArguments.concat([transitionTime]));
+                        argumentsToDo.push(nextNode.action.doArguments.args.concat([transitionTime]));
                     }
                     else {
-                        argumentsToDo.push(nextNode.action.doArguments);
+                        console.log(nextNode.action.doArguments.artifacts);
+                        argumentsToDo.push(nextNode.action.doArguments.args
+                            .concat(nextNode.action.doArguments.artifacts ? nextNode.action.doArguments.artifacts : []));
                     }
                 }
                 else {
