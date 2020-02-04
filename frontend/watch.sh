@@ -15,7 +15,7 @@ TREE_PID=$!
 (cd slide-deck-visualization && yarn start) &
 DECK_PID=$!
 
-(cd storyvis && yarn start) &
+(cd storyvis && yarn start --host 0.0.0.0) &
 STORYVIS_PID=$!
 
 sleep 10d &
