@@ -1,0 +1,3 @@
+build
+!build/ami.js
+!build/ami.min.js
