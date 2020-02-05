@@ -1,0 +1,5 @@
+data
+node_modules
+*/**/.rpt2_cache
+*/**/node_modules
+*/**/.idea

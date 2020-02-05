@@ -196,8 +196,8 @@ var ProvenanceGraph = /** @class */ (function () {
         }
         this._nodes[node.id] = node;
         this._mitt.emit('nodeAdded', node);
-        if (node.artifact) {
-            this.artifacts.push(node.artifact);
+        if (node.artifacts) {
+            this.artifacts.concat(node.artifacts);
         }
     };
     ProvenanceGraph.prototype.getNode = function (id) {
@@ -323,7 +323,7 @@ var ProvenanceTracker = /** @class */ (function () {
     ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifact) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
+            var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult, nodeArtifacts;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -338,7 +338,7 @@ var ProvenanceTracker = /** @class */ (function () {
                         else {
                             label = action.do;
                         }
-                        createNewStateNode = function (parentNode, actionResult) { return ({
+                        createNewStateNode = function (parentNode, actionResult, artifacts) { return ({
                             id: generateUUID(),
                             label: label,
                             metadata: {
@@ -349,19 +349,21 @@ var ProvenanceTracker = /** @class */ (function () {
                             actionResult: actionResult,
                             parent: parentNode,
                             children: [],
-                            artifact: artifact
+                            artifacts: artifacts
                         }); };
                         currentNode = this.graph.current;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
-                        newNode = createNewStateNode(this.graph.current, null);
+                        newNode = createNewStateNode(this.graph.current, null, []);
                         return [3 /*break*/, 3];
                     case 1:
                         functionNameToExecute = action.do;
                         funcWithThis = this.registry.getFunctionByName(functionNameToExecute);
-                        return [4 /*yield*/, funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments)];
+                        return [4 /*yield*/, funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args)];
                     case 2:
                         actionResult = _a.sent();
-                        newNode = createNewStateNode(currentNode, actionResult);
+                        nodeArtifacts = (action.doArguments.artifacts && action.doArguments.artifacts[1].length !== 0) ?
+                            ((artifact) ? action.doArguments.artifacts[1].push(artifact) : action.doArguments.artifacts[1]) : artifact;
+                        newNode = createNewStateNode(currentNode, actionResult, nodeArtifacts);
                         _a.label = 3;
                     case 3:
                         if (this.autoScreenShot && this.screenShotProvider) {
