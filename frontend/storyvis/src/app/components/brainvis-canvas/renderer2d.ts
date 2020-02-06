@@ -85,11 +85,15 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._domElement.appendChild(this._renderer.domElement); // append canvas to main DOMelement
 
     // camera
+    const width = this._domElement.clientWidth;
+    const height = this._domElement.clientHeight;
+    const aspect = width / height;
+    const viewSize = 0.5 * width;
     this._camera = new AMI.OrthographicCamera(
-      this._domElement.clientWidth / -2,
-      this._domElement.clientWidth / 2,
-      this._domElement.clientHeight / 2,
-      this._domElement.clientHeight / -2);
+      aspect * viewSize / -2,
+      aspect * viewSize / 2,
+      viewSize / 2,
+      viewSize / -2);
     // 1,1000);
 
     // controls
@@ -273,24 +277,17 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   onWindowResize() {
-    this._camera.canvas = {
-      width: this._domElement.clientWidth,
-      height: this._domElement.clientHeight,
-    };
-    this._camera.fitBox(2, 1);
     const width = this._renderer.domElement.clientWidth;
     const height = this._renderer.domElement.clientHeight;
-    this._renderer.setSize(
-      width,
-      height,
-      false
-    );
-
-    // update info to draw borders properly
-    this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
-    this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
-    this._localizerHelper.canvasWidth = this._domElement.clientWidth;
-    this._localizerHelper.canvasHeight = this._domElement.clientHeight;
+    const aspect = width / height;
+    const viewSize = 0.5 * width;
+    this._camera.left = aspect * viewSize / -2;
+    this._camera.right = aspect * viewSize  / 2;
+    this._camera.top = viewSize / 2;
+    this._camera.bottom = viewSize / -2;
+    this._camera.canvas.width = width;
+    this._camera.canvas.height = height;
+    this._camera.updateProjectionMatrix();
   }
 
   onScroll(event) {
