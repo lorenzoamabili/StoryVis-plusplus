@@ -32,8 +32,10 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     });
     this._renderer.setSize(
       this._domElement.clientWidth,
-      this._domElement.clientHeight
+      this._domElement.clientHeight,
+      false
     );
+    this._renderer.domElement.setAttribute('style', 'width:100%; height:100%');
     this._renderer.setClearColor(this._color, 1);
     this._renderer.domElement.id = this._targetID.toString();
     this._domElement.appendChild(this._renderer.domElement);
@@ -125,9 +127,11 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
   }
 
   onWindowResize() {
-    this._camera.aspect = this._domElement.clientWidth / this._domElement.clientHeight;
+    const width = this._renderer.domElement.clientWidth;
+    const height = this._renderer.domElement.clientHeight;
+    this._camera.aspect = width / height;
     this._camera.updateProjectionMatrix();
-    this._renderer.setSize(this._domElement.clientWidth, this._domElement.clientHeight);
+    this._renderer.setSize(width, height, false);
   }
 
   getCameraOrientation() {

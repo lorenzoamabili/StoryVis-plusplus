@@ -76,8 +76,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._renderer.localClippingEnabled = true;
     this._renderer.setSize(
       this._domElement.clientWidth,
-      this._domElement.clientHeight
+      this._domElement.clientHeight,
+      false
     );
+    this._renderer.domElement.setAttribute('style', 'width:100%; height:100%');
     this._renderer.setClearColor(0x121212, 1);
     this._renderer.domElement.id = this._targetID.toString();  // 0,1,2,3 view ID
     this._domElement.appendChild(this._renderer.domElement); // append canvas to main DOMelement
@@ -276,9 +278,12 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       height: this._domElement.clientHeight,
     };
     this._camera.fitBox(2, 1);
+    const width = this._renderer.domElement.clientWidth;
+    const height = this._renderer.domElement.clientHeight;
     this._renderer.setSize(
-      this._domElement.clientWidth,
-      this._domElement.clientHeight
+      width,
+      height,
+      false
     );
 
     // update info to draw borders properly
