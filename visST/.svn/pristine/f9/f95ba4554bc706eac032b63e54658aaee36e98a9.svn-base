@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="670.96991mm"
+   height="162.78128mm"
+   viewBox="0 0 670.96991 162.78129"
+   version="1.1"
+   id="svg8915"
+   inkscape:version="0.92.3 (3ce5693, 2018-03-11)"
+   sodipodi:docname="opt.svg">
+  <defs
+     id="defs8909">
+    <linearGradient
+       id="linearGradient2795"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop2793" />
+    </linearGradient>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker8506"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mend">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path8504"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker8254"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mend">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path8252"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker7972"
+       style="overflow:visible"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         id="path7970"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker7774"
+       style="overflow:visible"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         id="path7772"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker7528"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mend"
+       inkscape:collect="always">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path7526"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend"
+       style="overflow:visible"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         id="path6590"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-9"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path6590-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.55087855"
+     inkscape:cx="697.09174"
+     inkscape:cy="87.784322"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1871"
+     inkscape:window-height="1145"
+     inkscape:window-x="49"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-object-midpoints="false"
+     showborder="true"
+     inkscape:pagecheckerboard="true" />
+  <metadata
+     id="metadata8912">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(350.88068,55.035961)">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4376"
+       style="font-style:normal;font-weight:normal;font-size:26.66666603px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       transform="translate(0,0.52916667)"><flowRegion
+         id="flowRegion4378"><rect
+           id="rect4380"
+           width="423.35403"
+           height="376.13058"
+           x="-135.04248"
+           y="873.79242" /></flowRegion><flowPara
+         id="flowPara4382" /></flowRoot>    <ellipse
+       id="path3699-3-3-3-1"
+       cx="88.806488"
+       cy="4.0654073"
+       style="fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.257;stroke-miterlimit:4;stroke-dasharray:none"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-62-1-6-2"
+       cx="88.268143"
+       cy="86.578705"
+       style="fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-9-0-1-9"
+       cx="88.806488"
+       cy="-22.479094"
+       style="fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-2-2-0-3"
+       cx="88.806488"
+       cy="59.256931"
+       style="fill:#f03b20;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 88.791387,81.761995 0.0302,-17.591929"
+       id="path4597-6-63-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#fc9272;fill-opacity:1;stroke:#000000;stroke-width:0.25747308;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 86.287497,36.16202 c -1.85825,-1.128056 -2.80117,-3.362412 -2.26131,-5.358489 0.732,-2.706413 3.48839,-4.421672 5.93352,-3.692324 5.62409,1.677598 4.72835,9.661432 -1.08349,9.657196 -1.02692,-7.94e-4 -1.94552,-0.215926 -2.58872,-0.606383 z"
+       id="path4657-1-2-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffff00;stroke:#000000;stroke-width:0.65700001;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 87.256227,-44.429519 c -3.27017,-1.160513 -4.43044,-5.051384 -2.30758,-7.738269 2.50746,-3.173689 7.83615,-1.928611 8.67651,2.027308 0.79035,3.720518 -2.83,6.966858 -6.36893,5.710961 z"
+       id="path4754-5-0-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 88.709297,-17.236286 0.0359,16.2032052"
+       id="path1173-8"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 88.691367,9.2033366 V 27.014367"
+       id="path1175-4"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 88.745187,36.839901 V 54.043536"
+       id="path1177-5"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 88.821567,64.170077 -0.14815,17.242054"
+       id="path1179-0"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 88.820119,-44.307695 -0.01085,16.722532"
+       id="path6194"
+       inkscape:connector-curvature="0" />
+    <ellipse
+       id="path3699-3-3-3-1-4"
+       cx="155.30487"
+       cy="4.292172"
+       style="fill:#fc9272;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-9-0-1-9-6"
+       cx="155.30487"
+       cy="-22.252333"
+       style="fill:#fc9272;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-2-2-0-3-5"
+       cx="155.33067"
+       cy="59.483696"
+       style="fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.257;stroke-miterlimit:4;stroke-dasharray:none"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <path
+       style="fill:#f03b20;fill-opacity:1;stroke:#000000;stroke-width:0.25747308;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 152.78663,36.388783 c -1.85826,-1.128056 -2.80119,-3.362412 -2.26132,-5.358489 0.732,-2.706413 3.48841,-4.421672 5.93354,-3.692324 5.62409,1.677598 4.72835,9.661432 -1.08349,9.657196 -1.02692,-7.94e-4 -1.94553,-0.215926 -2.58873,-0.606383 z"
+       id="path4657-1-2-9-37"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffff00;stroke:#000000;stroke-width:0.65700001;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 153.75536,-44.429519 c -3.27018,-1.160513 -4.43046,-5.051384 -2.30759,-7.738269 2.50747,-3.17369 7.83617,-1.92861 8.67653,2.027308 0.79035,3.720518 -2.83,6.966858 -6.36894,5.710961 z"
+       id="path4754-5-0-4-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 155.20844,-17.009523 0.0359,16.20320467"
+       id="path1173-8-5"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 155.19051,9.4300986 V 27.24113"
+       id="path1175-4-2"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 155.24433,37.066664 V 54.270299"
+       id="path1177-5-5"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 155.31927,-44.080932 -0.0108,16.722531"
+       id="path6194-7"
+       inkscape:connector-curvature="0" />
+    <ellipse
+       id="path3699-3-3-3-1-44"
+       cx="221.36127"
+       cy="4.2014036"
+       style="fill:#f03b20;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-9-0-1-9-0"
+       cx="221.36127"
+       cy="-22.343094"
+       style="fill:#f03b20;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <path
+       style="fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.25747308;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 218.75695,36.298021 c -1.85825,-1.128056 -2.80117,-3.362412 -2.26131,-5.358489 0.732,-2.706413 3.48839,-4.421672 5.93352,-3.692324 5.62409,1.677598 4.72835,9.661432 -1.08349,9.657196 -1.02692,-7.94e-4 -1.94552,-0.215926 -2.58872,-0.606383 z"
+       id="path4657-1-2-9-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffff00;stroke:#000000;stroke-width:0.65700001;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 219.81215,-44.429516 c -3.27017,-1.160522 -4.43044,-5.051392 -2.30758,-7.738272 2.50746,-3.17369 7.83615,-1.92861 8.67651,2.02731 0.79035,3.72051 -2.83,6.966852 -6.36893,5.710962 z"
+       id="path4754-5-0-4-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 221.26522,-17.100285 0.0359,16.20320477"
+       id="path1173-8-8"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 221.24729,9.3393366 V 27.150368"
+       id="path1175-4-4"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 221.37605,-44.171695 -0.0108,16.72253"
+       id="path6194-4"
+       inkscape:connector-curvature="0" />
+    <ellipse
+       id="path3699-62-1-6-2-2"
+       cx="288.65472"
+       cy="5.7708249"
+       style="fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-2-2-0-3-8"
+       cx="288.84366"
+       cy="-21.550953"
+       style="fill:#f03b20;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 288.82874,0.95411713 0.0302,-17.59193013"
+       id="path4597-6-63-1-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffff00;stroke:#000000;stroke-width:0.65700001;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 287.21078,-44.429519 c -3.27017,-1.160513 -4.43044,-5.051384 -2.30758,-7.738269 2.50746,-3.173689 7.83615,-1.928611 8.67651,2.027308 0.79035,3.720518 -2.83,6.966858 -6.36893,5.710961 z"
+       id="path4754-5-0-4-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 288.78254,-43.967979 v 17.203636"
+       id="path1177-5-50"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 288.85892,-16.526899 288.71077,0.60425313"
+       id="path1179-0-48"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="118.49447"
+       y="82.044273"
+       id="text8786-54-7"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-74-2"
+         x="118.49447"
+         y="82.044273"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46666718px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">per parameter change</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="187.59067"
+       y="53.322144"
+       id="text8786-5-4-7"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-5-3-2"
+         x="187.59067"
+         y="53.322144"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46666718px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">per user interaction</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="262.6568"
+       y="26.284908"
+       id="text8786-4-0-2"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-7-7-6"
+         x="262.6568"
+         y="26.284908"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46666718px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">per user intent</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="67.197083"
+       y="105.74293"
+       id="text8786-54-7-1"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-74-2-0"
+         x="67.197083"
+         y="105.74293"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.46666718px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">no grouping</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#fc9272;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="5.8505359"
+       y="35.568539"
+       id="text1052-5-5-5"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1050-9-5-9"
+         x="5.8505359"
+         y="35.568539"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#fc9272;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Rotation (γ)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#de2d26;fill-opacity:1;stroke:#000000;stroke-width:0.09715965;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="19.819508"
+       y="63.528828"
+       id="text1090-4-4"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1088-7-9"
+         x="19.819508"
+         y="63.528828"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#de2d26;fill-opacity:1;stroke:none;stroke-width:0.09715965;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Zoom</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="4.8574471"
+       y="91.177925"
+       id="text1094-6-0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1092-5-9"
+         x="4.8574471"
+         y="91.177925"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222118px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#2c7fb8;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Highlighting</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="5.5370312"
+       y="7.9785385"
+       id="text1052-5-8-6-1"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1050-9-9-9-7"
+         x="5.5370312"
+         y="7.9785385"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#fcc5c0;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Rotation (φ)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="5.712863"
+       y="-19.513132"
+       id="text1052-5-7-3-7"
+       inkscape:transform-center-x="10.91917"
+       inkscape:transform-center-y="13.977068"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1050-9-3-7-1"
+         x="5.712863"
+         y="-19.513132"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#fcc5c0;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Rotation (θ) </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="20.662514"
+       y="-47.289455"
+       id="text1048-6-1"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1046-1-5"
+         x="20.662514"
+         y="-47.289455"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222118px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">Start</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.40000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.8, 1.6;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
+       d="m 93.980714,-22.471815 55.523306,0.0684"
+       id="path6579"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.40000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.8, 1.60000000000000009;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker7528)"
+       d="M 93.943096,4.1909578 149.53914,-22.178156"
+       id="path7518"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.40000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.8, 1.6;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker7774)"
+       d="m 160.44129,-22.198385 55.11536,-0.19372"
+       id="path7764"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.39916903;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.79833799, 1.59667597;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker7972)"
+       d="M 160.42327,4.6122124 215.61415,-22.165782"
+       id="path7962"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.40000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.8, 1.6;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker8254)"
+       d="m 226.47024,-22.234979 56.56892,0.659973"
+       id="path8244"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.40000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.8, 1.6;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker8506)"
+       d="m 226.51255,4.178694 56.58388,-25.527655"
+       id="path8496"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#4d4d4d;stroke-width:0.5995928;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1044-3-3"
+       width="44.524963"
+       height="159.45229"
+       x="-265.47836"
+       y="-41.871357"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="opacity:0;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:0.43899998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect4272"
+       width="105.66454"
+       height="129.19893"
+       x="-197.22728"
+       y="-57.590248" />
+    <rect
+       style="opacity:0.33900003;fill:#666666;stroke:#000000;stroke-width:0.4857983;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect233-5"
+       width="26.829971"
+       height="72.991348"
+       x="-256.55481"
+       y="-15.477666"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="opacity:0.33900003;fill:#ececec;stroke:#000000;stroke-width:0.43932846;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1044-3"
+       width="36.23584"
+       height="105.02969"
+       x="-261.25772"
+       y="-20.748209"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="opacity:0.3;fill:#000000;stroke:#000000;stroke-width:0.93584543;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect8755-5"
+       width="11.740068"
+       height="41.656277"
+       x="-249.00995"
+       y="-9.5942535"
+       ry="5.0970147e-14"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.25706825px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M -110.93844,21.373839 Z"
+       id="path4748-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <ellipse
+       id="path3699-62-1-6"
+       cx="-243.2594"
+       cy="105.48675"
+       style="fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-9-0-1"
+       cx="-243.2594"
+       cy="-3.5710578"
+       style="fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <ellipse
+       id="path3699-2-2-0"
+       cx="-243.2594"
+       cy="78.164955"
+       style="fill:#f03b20;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -243.27441,100.66997 0.0302,-17.591877"
+       id="path4597-6-63"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#fc9272;fill-opacity:1;stroke:#000000;stroke-width:0.25747308;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m -245.7783,55.070048 c -1.85825,-1.128059 -2.80117,-3.36241 -2.26131,-5.35849 0.732,-2.706412 3.48839,-4.421669 5.93352,-3.692329 5.62409,1.677601 4.72835,9.66144 -1.08349,9.657199 -1.02692,-7.94e-4 -1.94552,-0.215919 -2.58872,-0.60638 z"
+       id="path4657-1-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffff00;stroke:#000000;stroke-width:0.65700006;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m -244.80957,-25.648933 c -3.27017,-1.160511 -4.43044,-5.05138 -2.30758,-7.738271 2.50746,-3.17369 7.83615,-1.92861 8.67651,2.02731 0.79035,3.72052 -2.83,6.96686 -6.36893,5.710961 z"
+       id="path4754-5-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="-253.25793"
+       y="-49.201466"
+       id="text1048-6"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1046-1"
+         x="-253.25793"
+         y="-49.201466"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87777781px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">Start</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#fc9272;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-216.06786"
+       y="53.194717"
+       id="text1052-5-5"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1050-9-5"
+         x="-216.06786"
+         y="53.194717"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87777805px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#fc9272;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Rotation (γ)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#de2d26;fill-opacity:1;stroke:#000000;stroke-width:0.09715965;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-201.69547"
+       y="81.15509"
+       id="text1090-4"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1088-7"
+         x="-201.69547"
+         y="81.15509"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87777805px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#de2d26;fill-opacity:1;stroke:none;stroke-width:0.09715965;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Zoom</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-218.65916"
+       y="108.27386"
+       id="text1094-6"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1092-5"
+         x="-218.65916"
+         y="108.27386"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87777805px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#2c7fb8;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Highlighting</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-216.40549"
+       y="25.074417"
+       id="text1052-5-8-6"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1050-9-9-9"
+         x="-216.40549"
+         y="25.074417"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87777805px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#fcc5c0;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Rotation (φ)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-216.50504"
+       y="-0.82623792"
+       id="text1052-5-7-3"
+       inkscape:transform-center-x="10.91917"
+       inkscape:transform-center-y="13.977068"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan1050-9-3-7"
+         x="-216.50504"
+         y="-0.82623792"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87777805px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';fill:#fcc5c0;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Rotation (θ) </tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.51025373;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -246.23308,8.9404679 c -24.12563,-3.9e-5 -24.12563,-3.9e-5 -24.12563,-3.9e-5"
+       id="path8757-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -250.3626,38.957627 c -25.70735,-4e-5 -25.70735,-4e-5 -25.70735,-4e-5"
+       id="path8757-6-5"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -254.94895,69.82159 c -40.22278,-4e-5 -40.22278,-4e-5 -40.22278,-4e-5"
+       id="path8757-1-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="-362.85052"
+       y="11.274914"
+       id="text8786-54"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-74"
+         x="-362.85052"
+         y="11.274914"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">per parameter change</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="-362.85052"
+       y="41.295338"
+       id="text8786-5-4"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-5-3"
+         x="-362.85052"
+         y="41.295338"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">per user interaction</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="-362.85052"
+       y="72.227592"
+       id="text8786-4-0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-7-7"
+         x="-362.85052"
+         y="72.227592"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">per user intent</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.28685009px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m -158.95122,-6.3239478 c 7.93732,0.687869 -2.38967,16.9099748 9.66617,16.6384968 -11.11677,-2.2051918 -1.46466,12.068239 -9.35436,15.47766"
+       id="path8820-8"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.29182613px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m -112.34665,-8.1275347 c 15.976659,9.9414436 -11.92562,45.5392037 8.60148,46.4137047 -20.1917,-1.087062 5.585698,44.643603 -11.21933,46.413663"
+       id="path8824-6"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#de2d26;fill-opacity:1;stroke:#000000;stroke-width:0.15000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-94.789062"
+       y="40.316925"
+       id="text8828-8"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8826-8"
+         x="-94.789062"
+         y="40.316925"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:9.87777805px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Bold';fill:#de2d26;fill-opacity:1;stroke:none;stroke-width:0.15000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Exploration</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.17222214px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#2c7fb8;fill-opacity:1;stroke:#000000;stroke-width:0.15000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-89.687889"
+       y="108.48847"
+       id="text8832-4"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8830-3"
+         x="-89.687889"
+         y="108.48847"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:9.87777805px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Bold';fill:#2c7fb8;fill-opacity:1;stroke:none;stroke-width:0.15000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Selection</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -103.56403,106.2283 c -34.03896,-1e-5 -46.17725,-2e-5 -54.9308,-3e-5"
+       id="path8757-65-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:6.85515308px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.06315377;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-142.41618"
+       y="12.081976"
+       id="text8851-4"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8849-9"
+         x="-142.41618"
+         y="12.081976"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.54066896px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke:#000000;stroke-width:0.06315377;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">θ ≈ φ  </tspan></text>
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -243.2717,-25.37425 -0.049,16.5594733"
+       id="path1161"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#path4754-5-0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -243.3565,1.6717399 0.0359,16.2032091"
+       id="path1173"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -243.37443,28.111369 v 17.81102"
+       id="path1175"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M -243.32061,55.747929 V 72.95156"
+       id="path1177"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.55741554;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -243.24423,83.175714 -0.14815,17.144386"
+       id="path1179"
+       inkscape:connector-curvature="0" />
+    <ellipse
+       id="path3699-9-0-1-6"
+       cx="-243.33292"
+       cy="22.945028"
+       style="fill:#fcc5c0;fill-opacity:1;stroke:#000000;stroke-width:0.25706825"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       rx="5.1527324"
+       ry="5.130023" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.54986286;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -258.22644,-29.409843 c -48.65208,-4e-5 -48.65208,-4e-5 -48.65208,-4e-5"
+       id="path8757-1-2-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.2827301px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25706825"
+       x="-363.9053"
+       y="-27.223017"
+       id="text8786-4-0-7"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8784-7-7-5"
+         x="-363.9053"
+         y="-27.223017"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.17222214px;font-family:'Century Schoolbook L';-inkscape-font-specification:'Century Schoolbook L Italic';stroke-width:0.25706825">no grouping</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.28685009px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 0.31574327,8.0094339 C -7.6215769,7.3215649 2.7054123,-8.9005476 -9.3504269,-8.6290696 1.7663423,-6.4238766 -7.8857669,-20.69731 0.00393327,-24.106731"
+       id="path8820-8-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:6.85515308px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.06315377;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="-33.912167"
+       y="-6.8564854"
+       id="text8851-4-5"
+       inkscape:export-filename="/home/lorenzo/Desktop/temp/egPublStyle-EuroVis_full-short-stars-posters-2018/level.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0022109,0.99779397)"><tspan
+         sodipodi:role="line"
+         id="tspan8849-9-6"
+         x="-33.912167"
+         y="-6.8564854"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.54066896px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke:#000000;stroke-width:0.06315377;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">θ ≈ φ  </tspan></text>
+  </g>
+</svg>

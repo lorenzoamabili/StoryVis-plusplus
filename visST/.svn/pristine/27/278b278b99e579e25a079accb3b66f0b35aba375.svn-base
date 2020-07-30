@@ -1,0 +1,860 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{multicol}
+
+
+
+\usepackage{geometry}
+\geometry{
+	a4paper,
+	total={130mm,257mm},
+	left=40mm,
+	top=20mm,
+}
+
+\makeatletter
+\newcommand*{\centerfloat}{%
+	\parindent \z@
+	\leftskip \z@ \@plus 1fil \@minus \textwidth
+	\rightskip\leftskip
+	\parfillskip \z@skip}
+\makeatother
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+	
+	\begin{titlepage}
+		\begin{center}
+			\includegraphics[width=\textwidth]{rug_logo}
+			\vspace*{5cm}
+			
+			\huge
+			\textbf{Literature Review (draft)}\\
+			
+			\vspace{1.5cm}
+			\Large
+			\vspace{3.5cm}
+			
+			\textbf{Lorenzo Amabili}\\
+			\today\\
+			\vspace{3.5cm}
+			%\vfill
+			%\textbf{Bachelor Thesis}\\
+			%Scientific Visualization and Computer Graphics\\
+			%University of Groningen, The Netherlands\\
+			%\vfill
+			%\large
+			%\begin{multicols}{2}
+			%\textbf{Primary supervisor}\\
+			%PhD A. Sobiecki\\
+			
+			%\columnbreak
+			%\textbf{Secondary supervisor}\\
+			%Prof. Dr. A.C. Telea\\
+			%\vspace{0.8cm}
+			
+			%\end{multicols}
+			Visual Storytelling of Big Imaging Data
+			
+			
+		\end{center}
+	\end{titlepage}
+	
+	\newpage
+	
+	\section*{The CLUE model - Caleydo}
+
+	\subsection*{From Visual Exploration to Storytelling and Back Again}
+	\textbf{Author:} Gratzl, S.
+	Lex, A.
+	Gehlenborg, N.
+	Cosgrove, N.
+	Streit, M. \\
+	\textbf{Year:} 2016\\
+	\textbf{Topic:}  The CLUE model \\
+	
+	The CLUE model allows to reproduce, annotate and present visualization-driven data exploration based on automatically captured provenance data. It is characterized by the possibility of returning back to any point of the exploration to review the state of visualization in detail or to conduct additional analysis.
+	The stories are based on scientific discoveries (on the data) so the author can be different by the editor.\\
+	The CLUE model provides (back-)link from curated story to the exploration stage and the underlying data (reproducibility and extension possible).
+	The provenance of the state of a visual exploration process refers to all information and actions that lead to it. It can be categorized in \textit{type (data, visualization interaction, insight, rationale)} and \textit{purpose} by annotations and bookmarks. This information can be used for recalling the current state, for recovering actions, for replicating, for collaborative communication, for presenting the analysis and for meta-analysis. However, provenance does not address storytelling aspects.\\
+	The results are non-linear stories based on the provenance of the analysis and the history of an exploratory analysis extended by new explorations, based on the Vistories.
+	There are three possible modes in the CLUE: Exploration, Authoring and Presentation.
+	Transitions between exploration and presentation are possible thanks to authoring.
+	The current exploration state is encoded in the URL which makes the Vistories easily sharable.
+	A provenance graph is always shown and it contains all actions performed during the exploration.
+	It consists of four node types: \textit{state}, \textit{action}, \textit{object} and \textit{slide} which altogether form a Vistory. The objects are also characterized by a \textit{type}: \textit{data}, \textit{visual}, \textit{layout}, \textit{logic} and  \textit{selection}. Alternatively, the actions are characterized by operations, \textit{create}, \textit{update} and \textit{remove}. 
+	A state is characterized by the sequence of actions leading to it.\\
+	
+	VisTrails is another interesting and related product which assumes a specific goal in mind rather than exploration.\\
+	
+	\textbf{Remarks:}\\
+	The information and visual elements of one mode at time are shown.\\ 
+	The design and implementation of a well-scalable provenance visualization can be improved.\\
+	One tool for the whole process?.\\
+	Synchronous collaboration not yet available.\\
+	Full provenance tracking to integrate (datasets and tools).\\
+	Only the actions performed by the user during the exploration are tracked.\\
+	Scalability can be based on the user-specified states of interest.\\
+	Detecting independent actions can be useful for parallel execution.\\
+		
+		
+		
+	\textbf{Caleydo Web: An Integrated Visual Analysis Platform for Biomedical Data}\\
+	
+	Big Picture: Analyzing big data means issues related to the volume, complexity and heterogeneity (type, scale, meaning and sources) of the data.\\
+	
+	Caleydo integrates interactive gene expression visualization with cross-database pathway exploration by means of novel visualization techniques.\\
+	It consists of a system for data preprocessing and automatic classification, and a set of visualization views.\\
+    Thus, pathway exploration, gene expression analysis and information comparison with and without visual links are possible.\\		
+	Pathways are represented as large collections of interwoven graphs, with complex structures present in both the individual graphs and their interconnections. They are used to understand the different behavior of the genes.\\
+	Navigation in the network of pathways is facilitated by a hierarchical approach which dynamically selects a working set of individual pathways for closer inspection, interactively rendered together with visual interconnections in a 2.5D view using graphics hardware acceleration.\\
+	KEGG and BioCarta pathways are used and they imply a pre-defined layout, but interactions such as linking+brushing, neighborhood search or detail on demand are still fully interactive in Caleydo. \\
+	
+	KEY ASPECTS:\\
+	Data scale and Heterogeneity (challenges about accessing, processing, interactively visualizing data).\\
+	Identifier Management (entities of different types can be defined on different levels of granularity).\\
+	Multiple Coordinated Views (MCV) (need to visually link the entities through annotations and granularity levels). \\
+	Provenance and Collaboration (need of provenance tracking, results sharing, communication and collaboration in order to interpret, communicate and reproduce all stages of the analysis). \\
+	Integrated Data Analysis (data processing and data mining followed by the system reports of intermediate results and suitability of parameters).\\
+	Adaptability (to change environment, need of specific application use cases). \\
+	
+	Caleydo is based on a client-server architecture with a plugin mechanism on both sides. (Web browser-based) client and (Python) server are coupled by REST and WebSocket.\\
+	A graph database, a command design pattern for managing provenance information and R/Python/Refinery for executing workflows are used.\\
+	The implementation is in TypeScript and JavaScript using HTML5. This allows to use D3, HTML Canvas or WebGL. The server is implemented in Python using the Flask framework. The data storage files are in HDF or CSV format, and databases such as Neo4j.\\
+
+		
+	Many are its extensions.\\
+	
+    Matchmaker, a visualization technique that allows researchers to arbitrarily arrange and compare multiple groups of dimensions at the same time, can create separate groups of dimensions which can be clustered individually, and place them in an arrangement of heat maps reminiscent of parallel coordinates. To compare the effects of clustering on multidimensional data (multidimensional table) color brushing, ribbons and orthogonal stretching can be used.
+	Clustering techniques available: affinity propagation, k-means, hierarchical clustering.\\
+	
+	enRoute can present large amounts of data for every pathway node. It can visualize hundreds of samples, dozens of experimental conditions, and even multiple datasets capturing different aspects of a node at the same time. \\
+	
+	StratomeX, an integrative visualization tool that allows investigators to explore the relationships of candidate subtypes across multiple genomic data types, represents datasets as columns and subtypes as bricks in these columns. It is based on sample stratification and different clustering. Ribbons between the columns connect bricks to show subtype relationships across datasets. Drill-down features enable detailed exploration. \\
+	In addition, it makes use of a meta visualization and configuration interface for dataset dependencies and data-view relationships. \\
+	The dual analysis method, which uses statistics to describe both the dimensions and the rows of a high dimensional dataset (explorative analysis using meta-data), is also integrated into StratomeX.\\
+    Moreover, it makes use of a method that explicitly visualizes the quality of cluster assignments, allows comparisons of clustering results and enables analysts to manually curate and refine cluster assignments. Our methods are applicable to matrix data clustered with partitional, hierarchical, and fuzzy clustering algorithms. In this way, analysts are enabled to explore clustering results in context of other data.\\
+		 	
+	Entourage is a visualization technique that provides contextual information lost due to the artificial partitioning of the biological network, but at the same time limits the presented information to what is relevant to the analyst’s task. We use one pathway map as the focus of an analysis and allow a larger set of contextual pathways.
+	Entourage suggests related pathways based on similarities and highlights parts of a pathway that are interesting in terms of mapped experimental data. We visualize interdependencies between pathways (context) using stubs of visual links, which we found effective yet not obtrusive. \\
+	
+	LineUp is a interactive and scalable visualization technique that uses bar charts which supports the ranking of items based on multiple heterogeneous attributes with different scales and semantics. It enables users to interactively combine attributes and flexibly refine parameters to explore the effect of changes in the attribute combination.\\
+
+		\textbf{Model-driven design for the visual analysis of heterogeneous data}\\
+In this case, the goal is known and the authoring process is the core.\\
+From Data Manager to Visual Analysis Expert to Domain Expert\\
+From Setup Model to Analysis Session Model to Domain Model\\
+From Interface-oriented to Task-oriented to Workflow-oriented\\ 
+Every session is based on a combination of visual interfaces, computational interfaces and operators.\\
+The visual history is provided.
+	 
+	 		\newpage
+	 		
+	 \textbf{ShowMe, UpSet, Domino, ConTour, Vials, Avocado, Pathfinder, TACO, Lineage}\\
+	 
+	 ShowMe visualizes the hidden contents on multi-sources.\\
+	 
+	 Domino, a multiform visualization technique for effectively representing subsets and the relationships between them based on a block-oriented interface. By providing comprehensive tools to arrange, combine, and extract subsets, it allows users to create both common and advanced visualizations tailored to specific use cases.\\
+	 
+	 UpSet, a visualization technique for the quantitative analysis of sets, their intersections, and aggregates of intersections. It is focused on creating task-driven aggregates, communicating the size and properties of aggregates and intersections. UpSet visualizes set intersections in a matrix layout and introduces aggregates based on groupings and queries. The matrix layout enables the effective representation of associated data. Sorting according to various measures enables a task-driven analysis of relevant intersections and aggregates. The elements represented in the sets and their associated attributes are visualized in a separate view. Queries based on containment in specific intersections, aggregates or driven by attribute filters are propagated between both views.\\
+	 
+	 ConTour, an interactive visual analytics technique that enables the exploration of complex, multi-relational datasets, lists all items of each dataset in a column. Relationships between the columns are revealed through interaction and correlation scores. Filters based on relationships enable drilling down into the large data space. To identify interesting items, ConTour employs strategies based on connectivity strength and uniqueness as well as sorting based on item attributes. It also introduces interactive nesting of columns to show the related items of a child column for each item in the parent column. Finally, it provides a number of detail views, which can show items from multiple datasets and their associated data at the same time.\\
+	 
+	 Vials is a visual analysis tool that enables analysts to explore the various datasets that scientists use to make judgments about isoforms. It is scalable as it allows for the simultaneous analysis of many samples in multiple groups and it enables experts to (a) identify patterns of isoform abundance in groups of samples and (b) evaluate the quality of the data. \\
+	 
+	 Avocado is an interest-driven adaptive provenance visualization approach which allows users to review and communicate complex multi-step analyses which can be based on hundreds of files that are processed by numerous workflows.\\
+	 
+	 Pathfinder is a technique that provides visual methods to query paths while considering various constraints. The resulting set of paths is visualized in both a ranked list (related attribute data) and as a node-link diagram (topological context). The paths can be ranked based on topological properties, such as path length or average node degree, and scores derived from attribute data. Pathfinder is designed to scale the graphs with tens of thousands of nodes and edges by employing strategies such as incremental query results.\\
+	 
+	 TACO, an interactive comparison tool that visualizes effectively the differences between multiple tables at various levels of detail, shows the aggregated differences between multiple table versions over time, the aggregated changes between two selected table versions, and detailed changes between the selection.\\
+	 
+	 Lineage is a visual representation for tree-like, multivariate graphs which is based on data-driven aggregation methods to scale the multiple families with hundreds of members across several generations. By designing the genealogy graph layout to align with a tabular view that displays clinical data for each family member, this tool allows to incorporate extensive, multivariate attributes in the analysis of the genealogy without cluttering the graph.
+	 
+	 
+	 
+	 
+	
+		\newpage
+			\section*{Visual storytelling}
+	\subsection*{Narrative Visualization: Telling Stories with Data}
+	\textbf{Author:} Segel, Edward
+	Heer, Jeffrey
+		\textbf{Year:} 2010\\
+	\textbf{Topic:} Design space analysis of narrative visualization \\
+	
+	
+	The graphical elements and the interactive exploration can lead to a balance between the narrative flow intended by the author and story discovery.
+	Focusing on graphical and interactive elements: less attention to the cognitive and emotional experience of the reader.
+	Narrative visualizations consist of a sequence of graphical elements (and not only)
+	linked together by a unifying argument.\\
+	
+	
+	Taxonomy of transition types:\\
+	- momentum-to-momentum \\
+	- action-to-action \\
+	- subject-to-subject \\
+	- scene-to-scene \\
+	- aspect-to-aspect \\
+	- non-sequitur \\
+	- extra-pictorial element \\
+	- callouts \\
+
+	
+	Design strategies:\\
+	- annotation\\
+	- matching on content (less confusion while switching between sections)\\
+	- visual highlighting (size, position, color, boldness) \\
+	- progress bar (to navigate between slides)\\
+	- consistent visual platform (changing only the content within each panel)\\
+	- multi-messaging (related but different information) \\
+	- details-on-demand (mousing-over the chart)\\
+	- timeline slider (control over time)\\
+	- interactive slideshow (allows users to interact)\\
+	- single-frame interactivity \\
+	- tacit tutorial (available interactions during the presentation)\\ 
+	- martini glass structure (first author-driven, then reader-driven)\\
+	- semantically consistent (color encoding) \\
+	- markers of interactivity (to show interactive components) \\
+	- summary \\
+	- checklist structure (grid of labeled screenshots) \\
+	- animated transition \\
+	
+	Interactivity as continuation and/or new branch of a story.\\
+	Commentary and visualizations are linked together (e.g. selecting a comment reveals the annotations).\\
+	The graphics must to be connected to the narrative and a main objective is to annotate data with stories instead of annotating stories with data.\\
+	
+	Design space analysis:\\	
+    Seven genres of narrative visualization:\\
+	- magazine style \\
+	- annotated chart \\
+	- partitioned poster \\
+	- flow chart \\
+	- comic strip \\
+	- slide show \\
+	- video \\
+	
+	The Visual Narrative techniques can be subgrouped in:\\	
+	--- Visual Structuring\\
+		 - Establishing shot/Splash screen\\ 
+		- Consistent visual platform\\
+		- Progress bar/Timebar\\
+		- Checklist progress tracker\\			
+ --- Highlighting\\	
+		- Close-ups\\
+		- Feature distinction\\
+		- Character direction\\
+		- Motion \\
+        - Audio\\
+        - Zooming\\     
+		--- Transition Guidance\\	
+	- Familiar objects \\
+	- Viewing angle \\ 
+	- Viewer (camera) motion \\ 
+	 - Continuity editing \\
+	  - Object continuity \\
+	 - Animated transitions \\
+
+	The Narrative Structure can be:\\
+	--- Ordering\\	
+	- Random access\\ 
+	- User directed path\\
+	- Linear\\	
+	--- Interactivity\\
+	- Hover highlighting/Details\\
+	- Filtering/Selection/Search\\
+	- Navigation buttons\\
+	- Very limited interactivity \\
+	- Explicit instructions\\
+	- Tacit tutorial\\
+		- Stimulating default views\\		
+	--- Messaging\\
+	- Captions/Headlines \\
+	- Annotations \\ 
+	- Accompanying article \\ 
+	- Multi-messaging \\
+	- Comment repetition \\
+	- Introductory text \\
+		- Summary \\
+
+Based on the orientation of the stories, we can choose:\\
+- Martini-Glass structure (author-driven)\\
+- Interactive Slidehow (balance between author- and reader-driven)\\
+- Drill-Down Story (reader-driven)\\
+
+The author-driven stories are characterized by linear ordering of scenes, heavy messaging and no interactivity contrary to the reader-driven ones.
+While the reader-driven stories support hypothesis formation, data diagnostics and pattern discovery.\\
+The choice of the right storytelling characteristics depends on several factors such as the complexity of the data and of the story, the intended audience and the intended medium which influence also the tailoring of the visualization systems.\\
+ 
+	
+		\textbf{Remarks:} \\
+		Features of video games can be used in scientific storytelling (choose-your-own-adventure).\\
+	The clustering of different ordering structures, the consistency of interaction design and the under-utilization of authoring are considered during the design space analysis.\\	
+	A good transition solution can be the block (i.e. multiple visualizations) progression which has to occur often, but not for long at various checkpoints.\\
+	Eye-tracking studies can help to understand the users behavior.\\
+	
+	
+		\newpage
+	
+	\subsection*{Storytelling: the Next Step for Visualization}
+	\textbf{Author:} Mackinlay Robert, Kosara Jock
+		\textbf{Year:} 2013\\
+	\textbf{Topic:}   The importance of storytelling\\
+	
+	The visual storytelling is a sequence of visualization steps based on data.\\
+	The order can be linear as well as nonlinear. However, within each segment of the story the order must be consistent.\\
+	The storytelling can be used for exploration, analysis and presentation. But sometimes they only show and explain, not analyze.\\
+	Some initial cues are important to help to prioritize particular interpretations.\\
+	Also the embellishments are important for enhancing the visualizations positive effects on memory. There is a need to find a balance between distracting/helpful animation (chart junk).\\
+	In addition, storytelling is useful when the findings are gathered with complex tools.\\
+	
+	The storytelling can be:\\
+	- entirely self-running \\
+	- live presentation (more flexible, question/answer section)\\
+	- small-group presentation (more interaction, also for collecting additional knowledge)\\
+	
+	For an effective and efficient storytelling we need to consider:\\
+	- the time it takes to complete a task and the response accuracy\\
+	- the evaluation of the story (its effectiveness and if it achieved the goals)\\
+	- story metrics (engagement, interest, key points recall, information provided)\\	
+	
+	Interaction must allow the user to quickly change the view, add different data, to make analysis and pausing the story while respecting the trade-off interaction/focus.\\
+	Another balance to respect is between text and visualization (too much text = away from the data, too little text = viewer confused)\\	
+	
+	\textbf{Remarks:}
+	The right approach must combine concepts from computer graphics and visualization, cognitive psychology and social sciences.\\
+	Concept of \textit{storytelling affordances} which provides a narrative structure and guide the reader through the story.\\
+	A temporal structure can provide the causal relationships between facts and events.\\  
+	The location of the visualization story is relevant.
+	
+	
+		\newpage
+	
+	\subsection*{Scientific Storytelling Using Visualization}
+	\textbf{Author:} Kwan-Liu Ma, Isaac Liao, Helwig Hauser, Helen-Nicole Kostis, Jennifer Frazier
+		\textbf{Year:} 2012\\
+	\textbf{Topic:}  Scientific storytelling \\
+	
+	All stories are sequences of causally related events and their pacing should be dependent on the audience. The attention of audience is captured by the subject and by the visualizations.\\
+	The setting is all the background information needed to contextualize and comprehend the visualizations.
+		How the visual elements interact and compare with one other, and how they evolve overtime must be accessible by the readers.
+	Therefore, the visualization should start in a non-interactive mode, ensuring that it presents the most salient features of the datasets, and then let users explore the rest of the dataset.  \\
+	
+	Note that, scientific visualization aim to see real data that are normally invisible, sacrificing details only to facilitate understanding.
+			Whereas information visualization tends to use more abstract representation to reach a more general audience.\\
+	
+	General issues:\\
+	- Complexity and volume of the data\\
+	- Lack of expertise in visualization techniques\\
+	- Complexity of the tools and technology necessary\\
+	
+	Issues related to the data:\\
+	- Data gaps\\
+	- Insufficient data\\
+	- Low resolution\\
+	- Unexpected data pattern\\
+	 
+	The creation of a good scientific visualization requires:\\
+	- Communication among all the parties involved\\
+	- Data availability and transparency\\
+	- Clear context \\
+	- Resources \\
+	- Science visualizer abilities\\
+	
+	First objective is to be able to detect pattern although the volume of the data.\\
+	
+	The visualizations used are generally created after the fact, separately and independently from data exploration. The target stories must be manually constructed by scientists immersed in data domain assembling pieces of the story as they learn more and more about the data.\\
+	The stories are composed of story nodes connected by story transitions.\\
+	A possible method to tell a story can be starting with an overview first, zoom and filter, then details on demands. And they can aim at comparative visualizations.\\
+	
+	Taxonomy of the level of interactivity:\\
+	- passive storytelling\\
+	- storytelling with interactive approval (temporary control)\\
+	- semi-interactive storytelling\\
+	- full interactive storytelling\\
+	
+	
+	
+	\textbf{Remarks:}\\
+	Time constraints and attention span are two relevant aspects to consider.\\
+	Visual storytelling as a tool (e.g. like a microscope).\\
+	Tailoring the storytelling to different end users can be an option.\\
+	An higher level of interactivity means an higher level of credibility, comprehension and involvement from the user.\\
+	Regarding comprehension and accessibility of the findings, information visualization is more efficient than scientific visualization.
+	
+		\newpage
+	
+
+
+
+\subsection*{More Than Telling a Story: Transforming Data into Visually Shared Stories}
+\textbf{Author:} Bongshin Lee, Nathalie Henry Riche\\
+	\textbf{Year:} 2015\\
+\textbf{Topic:}  The visual storytelling process \\
+
+Finding insights can be communicated to a target audience through visual storytelling.
+To achieve this, the data exploration is followed by the creation of the story and, finally, the effective communication of this story.\\
+A story is always composed of structure, elements and concepts and the narration always depends on people, tools and channels (design elements and presentation methods). Hence, interaction techniques for exploratory purposes are mixed to communication techniques.\\
+Specific facts (data), the stress on some story elements (annotations) and the communication goal (story order) characterize each data story.\\
+
+After collecting the relevant data (and pertinent to the data story content), the plot is created which means that the ordering, logical connections, developing flow and the main message have to be established. Finally, we have to materialize the abstract plot and deliver the story by using the selected medium in order to receive a feedback from the audience.\\
+
+A complex visual storytelling process can involve different roles:\\
+a data analyst, a scripter, an editor, a presenter and an audience.\\
+
+Some of the external factors which play a fundamental role are:
+the target audience, which is usually related to the topic and the context of the story, the time and place where the story is conveyed, the level of possible audience participation and the medium, for instance, if the visualizations are static or interactive.\\
+
+There are research opportunities:\\
+a tool that at the same time simplifies the extraction of information and the creation of the story is needed. Suggesting different plots and visualizations based on data types, data dimension and story properties, the message can be conveyed more clearly through a more appropriate story structure and ordering.\\
+Furthermore, the (non-expert) authors should be able to create visualizations importing data, selecting the visualization type and configuring the visual attributes in an intuitive way.\\
+
+\textbf{Remarks:}\\
+The visual storytelling process is highly nonlinear.\\
+Interactive visualizations including free exploration without any guidance cannot be considered data stories, unless rich annotations are present.\\
+The excerpts may not be tied to any specific visual representation.\\
+A story well-communicated is also more transparent and credible.\\
+The collaborative story creation must be a feature of the next visual storytelling tools.
+
+
+
+
+
+		\newpage
+
+\subsection*{How do People Make Sense of Unfamiliar Visualizations?: A Grounded Model of Noviceś Information Visualization Sensemaking}
+\textbf{Author:} Sukwon Lee, Sung-Hee Kim, Ya-Hsin Hung, Heidi La, Youn-ah Kang and Ji Soo Yi\\
+	\textbf{Year:} 2016\\
+\textbf{Topic:}  A visualization sensemaking model \\
+
+There are three levels of graph comprehension:\\
+1) Elementary (can read a specific value)\\
+2) Intermediate (can read relationships)\\
+3) Advanced (can read beyond what is presented)\\
+
+There are four factors influencing the graph interpretation:\\
+1) Graph formats (related to characteristics of tasks or purposes)\\
+2) Visual characteristics (based on the graphical perception and the information decoded)\\
+3) Knowledge about graphs (prior knowledge, graph schema) \\
+4) Knowledge about content (previous experience or domain knowledge) \\
+
+The general process of grounded theory consists of:\\
+1) Open coding (identifying concepts and categorizing excerpts) \\
+2) Axial coding (identifying central ideas) \\
+3) Selective coding (developing a narrative) \\
+
+A visual object is any identifiable, separate, or distinct element (textual or non-textual objects).
+A frame is an explanatory internal structure that accounts for visual objects. The frame of content explains underlying topic and data, the frame of visual encoding explains how to interpret non-textual objects.\\
+
+NOVIS model:\\
+- Encountering visualizations (first impression of the graph, overall layout, colors
+ and complexity) \\
+- Constructing a frame (often rely on textual objects and prior knowledge) \\
+- Exploring visualizations (retrieving information, recalling domain knowledge and wandering around visualization, to discover insights based on the frame, also based on the non-textual objects) \\
+- Questioning the frame (to verify the frame) \\
+- Floundering on visualizations (give up making sense of visualizations after failing to construct any reasonable frames) \\
+- Miscellaneous (feedback and suggestions to improve the visualizations) \\
+
+Different visualizations and underlying data could influence the sensemaking activities characterized by recurring transitions.\\
+Moreover, participants focus on certain parts of graph they might know better, they focused on the textual objects to construct a frame if the graph looked unfamiliar and they tend to construct different frames and compare them.\\
+Besides, the emotions aroused by the visualizations (the visualization format) and the personal interest about the content play an important role in the interpretation of graphs.\\
+
+
+
+\textbf{Remarks:}\\
+To interpret graphs is important the formation of expectations or beliefs about data.\\
+A think-aloud method used with breaks, semi-structured interview and demographic survey questionnaire is not enough for scientific validations.\\
+Novice users do not tend to revise their frame once it is constructed in their mind.\\
+People tend to give meaning to colors in any case.\\
+Selected annotations for a couple of objects could be presented to demonstrate how to interpret the graph.
+
+
+		\newpage
+
+\subsection*{A Deeper Understanding of Sequence in Narrative Visualization}
+\textbf{Author:} Jessica Hullman, Steven Drucker, Nathalie Henry Riche, Bongshin Lee, Danyel Fisher and Eytan Adar\\
+	\textbf{Year:} 2013\\
+\textbf{Topic:}  The role of sequencing in narrative visualization \\
+
+Data stories involve the sequential process of context definition, information selection, modality selection and ordering of visualizations. They represent the patterns in data sets which are the events of interest described in the visual storytelling. Their sequence affects the meaning, the interpretation and the ability to recall the information later.
+Stories are perceived to contain a micro-structure (details of events) and a macro-structure (relationship of those events) and there is no one way to structure their plot effectively (parallel prototypes instead of iteration and refining of a single design can help).\\
+
+There are different transition categories:\\
+- Dialogue (question in one visualization, answer in following visualization)\\
+- Temporal (ordering the visualization states)\\
+- Causal (to explicitly hypothesize a casual relationship)\\
+- Granularity (ordering based on the level of detail)\\
+- Comparison (either the independent variable (the dimension) or the dependent variable (the measure) is held constant while the other is changed) \\
+- Spatial (same dependent variable is shown for different spatial areas in sequence)\\
+
+The transition types can be also divided in explicit transition type (after interpretation of the data) and implicit transition type (inferable from the data attributes).
+Maintaining consistency across transitions augments story coherence perceived and can be obtained by using local transitions and parallelism of sequence patterns.\\
+An objective function applies weights to edges in the graphs (where nodes=states, edges=transitions and attributes=(independent variable, dependent variable, time and hierarchical level)) which allows to identify local sequences in a set of visualization states comparing relevant data attributes between the nodes after filtering the set of possible transitions between visualizations. This captures the amount of difference between the attribute values of each visualization node. Thus, it is necessary to assign the cost functions after labeling all possible transitions to enable filtering.
+The attribute values are defined using data characteristics and information on the data-to-visualization mapping whereas filtering and hierarchical relations by applying operations and encoding to the graph. Time is usually independent of the representation.
+\\
+In conclusion, there is stronger preference for lower cost transitions at a local level (need to weight by type to cost to filter transitions) and differences in preferences based on type (need to weight edges by type to identify sequences).
+Also, there is need for more complex global constraints (summing transition costs not enough) to determine the best path and prioritizing sequences that use parallelism.\\
+Future works should focus on the conflict between single visualization and sequence models. To increase the amount that is learned from visualized data while still guiding interaction, navigational choices can be used to compare focus visualizations with visualizations that are not shown initially.\\
+
+
+\textbf{Remarks:}\\
+The transition parallelism is based on the repetition of a structure (visualization).\\
+Local transitions mean small number of changes and constant multiple dimensions.\\
+The transitions related to independent and dependent variables are comparative; dimension (within-group sequence) and measure walk (between-group sequence).\\
+The transformation cost is the total number of changes (relative to the full set of visualization parameters).\\
+Systematic preferences for some transitions could be incorporated when weighting.\\
+There is a order effect and temporal>(dimension|measure)>granularity.\\
+Animation can be used to overcome the effects of costly transitions.
+
+
+
+		\newpage
+
+\subsection*{Timelines Revisited: A Design Space and Considerations for Expressive Storytelling}
+\textbf{Author:} Matthew Brehmer, Bongshin Lee, Benjamin Bach, Nathalie Henry Riche and Tamara Muzner\\
+	\textbf{Year:} 2017\\
+\textbf{Topic:}  All about timelines in visual storytelling \\
+
+The three dimensions of the timeline design space are:\\
+- Representation (linear, radial, grid, spiral and arbitrary) \\
+- Scale (chronological, relative, logarithm, sequential and sequential+interim duration) \\
+- Layout (unified, faceted, segmented, faceted+segmented) \\
+and it should be:\\
+- Purposeful for a known narrative point \\
+- Interpretable by the audience of the story \\
+- Generalizable across datasets \\
+ 
+Usually a timeline indicates:\\
+- the types of events \\
+- the number of events \\
+- the order in which they occurred \\
+and the more complex ones indicate also:\\
+- whether the events are ordered chronologically\\
+- how long they lasted\\
+- whether any of the events overlapped\\
+
+Timeline stories can be made by annotations, highlighting, captioning and animated transitions (more than one timeline design for a single story). In addition, panning and zooming can be used too.\\
+
+The use of animated transitions is common for linking narrative together which can reduce the cognitive load (e.g. reducing/restoring the opacity and adjusting the size).\\ 
+In addition, the transition can be staggered which means that the event marks move individually following a slight delay from one another instead of moving as a single mass.\\
+Single-dimension transitions are less overwhelming (no change of scale and representation simultaneously).\\
+To support pronounced changes the new timeline should be introduced after a short delay.\\
+Transitions between faceted and segmented layouts can be jarring. A possible solution is to use an intermediate transition.\\
+
+
+
+
+
+
+
+
+\textbf{Remarks:}\\
+Trade-off between perceptual and narrative effectiveness (linear representation vs aesthetically-appealing representation).\\
+Since context may not be preserved in transitions, tracking these changes between timeline is critical (history/provenance).\\
+Transitions between two grids can be overwhelming.\\
+A visual tool with the authoring feature would allow to study the storytelling by authors and the story interpretation by the audience and observe whether their narrative goals and the interpretative capacities are supported/constrained by the principles embodied in the design space.
+
+
+
+		\newpage
+
+\subsection*{A Situated Practice of Ethics for Participatory Visual and Digital Methods in Public Health Research and Practice: A Focus on Digital Storytelling}
+\textbf{Author:} Aline C. Gubrium, Amy L. Hill and Sarah Flicker\\
+	\textbf{Year:} 2014\\
+\textbf{Topic:}    Ethical issues related to digital storytelling in Public Health Research and Practice\\
+
+There are 7 common ethical issues when using digital storytelling:\\
+- Fuzzy boundaries (all partners should be in agreement about specific goals, policies and procedures)  \\
+- Recruitment and consent to participate (people involved should know about the realistic benefits and potential risks of participation, and consent) \\
+- Power of shaping  (trade-off between fidelity to the data and emphasizing the story needed) \\
+- Representation and harm (need of guidelines for risk management and harm reduction)\\ 
+- Confidentiality (stories are sometimes so distinct that it is impossible to guarantee confidentiality) \\
+- Release of materials (where, why, how and by whom stories are released needs to be negotiated)
+
+\vspace{1 cm}
+
+\subsection*{Toward a Deeper Understanding of Role of Interaction in Information Visualization}
+\textbf{Author:} Ji Soo Yi, Youn-ah Kang, John T. Stasko and Julie A. Jacko\\
+	\textbf{Year:} 2007\\
+\textbf{Topic:}    \\
+
+To evaluate interaction models we can use three dimensions:\\
+- Descriptive power \\
+- Evaluation power \\
+- Generative power \\
+
+Seven general categories of interaction techniques:\\
+- Select (mark something as interesting) \\
+- Explore (show me something else) \\
+- Reconfigure (show me a different arrangement) \\
+- Encode (show me a different representation) \\
+- Abstract/Elaborate (show me more or less detail) \\
+- Filter (show me something conditionally) \\
+- Connect (show me related items)\\
+- Other (undo/redo, change configuration, etc.)\\
+
+These categories are less vulnerable to new developments unless a new technique will achieve a goal/need of the user not mentioned. Thus, this list is useful for checking whether a system fulfills the needs of users.\\
+Representation and interaction have a symbiotic relationship. Interaction is an operator changing representations. However, the representation is just a static image without interaction. Moreover, representations are independent on time whereas interactions are strongly dependent on time. Hence, there is a trade-off between using multiple static representations and one interactive representation.\\
+
+
+
+\textbf{Remarks:}\\
+In categorizing the interaction techniques, the focus is more on what users achieve by using them rather than how they work.\\
+Understanding what users need promotes the creativity of designers.
+
+
+		\newpage
+
+\subsection*{Story Telling Aspects in Medical Applications}
+\textbf{Author:} Michael Wohlfart\\
+\textbf{Year:}  2007\\
+\textbf{Topic:}   Virtual Storytelling + Volume Visualization\\
+
+The audience can lack expertise to handle visualization tools or the priori knowledge about the datasets. Using kind of a story can introduce the users to the dataset and deliver some additional information. \\
+
+Volume visualization consists of:\\
+- Interactive Volume Visualization (data exploration) \\
+- Volume Classification (based on function evaluation, spatial position and local properties) \\
+- Volume Representation and Illustration (Focus+Context Visualization, in storytelling can alternate between focusing on a specific story part and providing a contextual overview) \\
+- Volume Annotations (labeling for co-referential information) \\
+
+The evolution of the communication has always required (and it will always require) a constant increase of use of external longterm storage for information.\\
+The \textit{narrative paradox} can be overcome by permitting concurrent scene interaction in a structured way and using an application of a multi-layered interaction approach to manage non-linear scenario.\\
+
+To integrate virtual storytelling to volume visualization we need a new approach:\\
+- Hierarchical story model (story authoring is done by the users and it is separated by storytelling done by the author)\\
+- Partial user interaction during presentation\\
+- XML story scheme to define a basic story vocabulary\\
+
+The hierarchical story model is composed of:\\
+- Story nodes (they might contain annotations and text)\\
+- Story transitions (multiple story action groups executed sequentially)\\
+- Story action groups (multiple story action atoms executed simultaneously)\\
+- Story action atoms (they influence directly viewing, representation and data parameters)\\
+
+The story authoring process consists of:\\
+- Story recording (by using recording or without (no impact on the story)) \\
+- Story editing (recording additional story parts, adding story text, adding annotations and combining several story actions to groups) \\
+The final objective is to be able to report the actual user interaction steps.\\
+
+
+The storytelling process is based on categorizing all possible actions affecting the scene and to leave the control to the users or to the authors. The categories are:\\
+- Viewing interaction (the only parameter not affected is view center) \\
+- Representation interaction (volume illustration/representation parameters) \\
+- Data interaction (related to the visualized data objects) \\
+Thus, the users/authors can enable one of the interaction categories from above.\\
+
+A possible approach is based on RTVR (Real-time Volume Rendering Java Library)\\
+
+\textbf{Remarks:}\\
+The story has to adapt to the user but maintaining the narrative structure.  \\
+The story follows a story line, from a general overview of the data to the specific message of the story.
+
+
+
+\newpage
+
+	\section*{Data Visualization and Interaction}
+	
+		\subsection*{Visualizing visualizations/Revisualizing Visualizations}
+	\textbf{Author:} Kwan-Liu Ma/Gary Singh \\ 
+	\textbf{Year:} 2000/2009\\
+	\textbf{Topic:}   User interfaces in data visualization\\
+	
+A good data visualization system lets interactively explore the parameter space intuitively. The fewer the iterations needed for parameter selection, the more efficient the system.\\
+Information about the data exploration should be shared and reused by a visual representation of the exploration process.\\
+The interface should allow the user to manipulate visualizations, comparing and reviewing images generated at different time points and to visualize the iterative process of parameter selection and different sequences of data processing.\\
+A possible solution can be an \textit{image graph} where the nodes are images and their visualization parameters and the edges show the change in rendering parameters.\\
+Nodes with similar parameters lie close to each other in the graph.\\
+Alternatively, a tabular organization can be used. A \textit{spreadsheet} allows quick comparison of rendered results so that the visualization process become a process of maneuvering the spreadsheet window through parameter space. In this way, the exploration of the parameter is more organized and quick.\\
+
+Thus, image graphs display the order of operations and the data exploration strategy whereas spreadsheets is more effective for manipulating information.\\
+Furthermore, it is essential that the user interface allows to query metadata such as parameter space exploration results through a database-centered.\\
+
+The user interface is particularly important especially when the user can play a direct role in making visualization animations.\\
+
+
+	
+	\textbf{Remarks:} 
+	Scientists (also doctors) could be convinced to use the new user interface design integrating the new design into existing visualization systems they have been using.\\
+	Important criteria for evaluating an user interface is to check whether the visualizations produced can be reused to produce new visualizations, how quick is this visualization process and to account for representing the accumulated knowledge.\\
+	A good system can do calculations without explicit requests by the user.\\
+	Collaborative visualization, illustrative visualization and animated interfaces with incorporated machine learning require more studies yet.\\
+	Data visualization requires the skills of artists, mathematicians and visual-perception people.
+	
+
+	\subsection*{Improving the radiologist-CAD interaction: designing for appropriate trust}
+\textbf{Author:} W. Jorritsma, F. Cnossen, P.M.A. van Ooijen \\ 
+\textbf{Year:} 2016\\
+\textbf{Topic:}   CAD interaction \\
+
+\textbf{Remarks:}
+
+	\newpage
+
+	\subsection*{Big Data and the Future of Radiology Informatics}
+\textbf{Author:} Akash P. Kansagra et al. \\ 
+\textbf{Year:} 2016\\
+\textbf{Topic:}    Reasons to Use Big Data in Radiology \\
+
+There are mainly two kind of studies: hypothesis-driven research (control study) and data-driven research (observational study).\\
+The latter ones rely on Big Data which are characterized by Volume, Variety, Velocity, Veracity (uncertainty in some data elements).\\
+To extract new diagnostic information, the analysis are based on computer-directed queries based on machine learning using imaging data, clinical data and laboratory data.\\
+
+To optimize accuracy of diagnosis and patient management, the personalized image interpretation using Big Data is based on supplementing the traditional visual assessments with patient-specific clinical data and large-scale reference datasets.\\
+This creates new and larger clinical reference datasets pooling data from multiple clinical trails.\\
+
+Moreover, often some information is encoded in the raw images and will not be represented on the report.\\
+We need to identify new imaging markers and Big Data methods provide more significant statistical power. Combined with computer vision (image processing) algorithms , automated and quantitative evaluation of imaging studies is possible.\\
+
+The diagnostic tests may confirm a suspected diagnosis, suggest an alternative diagnosis and/or identify an additional incidental diagnosis (test-result-action-outcome chain). Using Big Data methods can improve the efficiency of care in terms of time, costs and resources.\\
+The true value of a test is represented by the incremental outcome and cost benefit relative to no imaging test. It is not static and it differs between patients.\\
+
+The modern radiology workflow begins with an electronic request for imaging from the electronic medical record (EMR), followed by patient scheduling in the radiology information system (RIS), image acquisition and interpretation in the picture archiving and communication system (PACS) and creation of a report in the EMR for review (and peer review) which is finally sent to the health information exchanges (HIE).\\
+To make this workflow possible the involvement of aggregated datasets is required and so of Big Data methods (especially for data review).\\
+
+For advancing Big Data adoption in radiology, we need trust and investments on these methods, adequate staff and equipment and storing data in data centers rather than locally (increasing scalability, data accessibility, data privacy and security while reduce burden of software maintenance).
+In addition, large-scale integration of data from multiple sources must be simplified.\\
+Regarding data extraction, search tools must be implemented, natural language processing algorithms should be used (e.g. Python-based Natural Language Toolkit, cTAKES). Annotations and markers should be also used.\\
+
+
+\textbf{Remarks:} 	
+There is a limitation regarding sharing clinical data due to ethical and legal aspects.\\
+The high-dimensional and sparse data need very large data or data processing (dimensionality reduction).\\
+Data dredging issue (confounding variables).\\
+Missing data and bad data quality issues.
+
+	
+	
+	\subsection*{Human-Computer Interaction in Radiology}
+	\textbf{Author:} Wiard Jorritsma \\ 
+		\textbf{Year:} 2016\\
+	\textbf{Topic:}   The interaction between radiologists and computer systems\\
+	
+	\textbf{Usability Evaluation}\\
+	
+	Usability is the effectiveness, efficiency and satisfaction with which users can use a system to achieve their goals in a specific context of use.\\
+	
+	A PACS with better functionalities do not mean necessarily that it has higher usability. Thus, a task-based usability evaluation methodology which yields both subjective preference data and objective performance data of the interaction would be suitable for usability test.
+	
+	A pre-deployment usability evaluation in radiology has limited generalizability to clinical practice. This means that also a post-deployment usability evaluation is required.\\	
+	
+	
+	Analysis of user interaction logs using a data mining technique called closed sequential pattern mining reveals few usability issues compared to a field study.\\
+	A sequential pattern is a sequence of actions (not necessarily consecutive) and the support of a pattern is the number of interaction sequences in which the pattern occurs (given a certain threshold). It is closed if is has no super-pattern with the same support.\\
+	
+	
+Four usability issues:\\
+1) Display issues\\
+2) Line measurement tool issues\\
+3) 3D functionality limited\\
+4) Underuse of the PAC´s\\
+	
+	To set an appropriate observational study, the usability evaluation was based on interviews and observations of users during their daily work. Two main issues: difficulties in collecting large sample size and the time-consuming to analyze this type of data. A possible solution can be using (semi-) automatic analysis of user interaction log data. In this way, voluminous (low-level) log data can be obtained.
+    However, they do not provide the relative effectiveness of this approach. So it is an inefficient approach compared to the field study. A log data analysis can be useful as a preliminary analysis to guide the collection of sources of usability data, to automatically provide user-specific customization support and to obtain an accurate estimate of an issue´s frequency of occurrence.\\
+    In addition, it explains what users are doing but not why (difficult interpretation). Need to support the results with observational usability evaluation methods.
+ 
+    Analyzing log data of users performing pre-defined tasks simplifies the interpretation but it is an artificial scenario.
+    Usability depends on the quality and level of abstraction with which the interaction information was logged.
+    The default setting of the measurement tools should be ´deactivate after one use´.\\
+    
+		
+	\textbf{Interaction Techniques}\\
+	Four touch-based interaction techniques for I2Vote: an image-based audience response system for radiology education in which users need to accurately mark a target on a medical image.\\
+	
+	Land-on\\
+	Marking the target by tapping it directly on the screen.\\
+	Issues: ambiguous selection point and fingers may occlude the selection target.\\
+	
+	Take-off\\
+	Dragging the cursor to the target and select it by removing their finger from the screen. It takes longer to select targets. There is a distance between the finger and the mark to avoid interfering with the native scroll. The larger targets can still be selected with one tap.\\
+	
+	Zoom-pointing \\
+	It consists of zooming out and then to mark the target by tapping on it.\\
+	Zooming out to press the submit button can be annoying.\\
+	
+	Shift\\
+	A tap on a screen evokes a magnifier and a handle. Another tap removes the magnifier and the handle and leaves the mark.\\
+	The control display ratio for moving the magnifier is set to 1:4 (more precise).
+	The larger targets can still be selected with one tap.
+	User´s fingers may occlude the selection target and the technique can be too complex.\\
+	
+	Shift is the most accurate technique, followed by take-off and zoom-pointing, then land-on. Creating a distance between the user´s finger and the mark as well as enlarging the target have a positive effect on accuracy. A combination of these approaches (as done by shift) has a even higher positive effect.\\
+	Land-on is faster. Repeated tapping (sense of trial and errors) might be more frustrating than one continuous dragging action (sense of movement towards a goal).\\
+	Apparently, touching directly the target is perceived more intuitive than dragging over the target.\\
+	The take-off and the zoom-pointing provide the best trade-off between accuracy, efficiency, ease-to-use and intuitiveness.\\
+	
+	
+	
+	\textbf{User Interface Customization}\\
+	It is based on function usage.\\
+	The adaptable interfaces are more beneficial than the static ones even if users do not always customize effectively.
+	An alternative can be an adaptive approach where the interface changes automatically based on the user´s behavior. However, the mixed-initiative is preferred since it suggests changes preserving predictability, transparency and user's control over the system. As a consequence, there is an increase of the likelihood (and the quality) of customization, an increase of awareness of the benefits of the interface customization and a decrease of the time users spent customizing the interface.\\
+	A significant increase in efficiency due to the support was not found but participants perceived it as increasing their efficiency.\\
+	The type of adaptive support depends on the type of interface and the nature of the tasks. Content customization and hiding all irrelevant functions should be also integrated.\\
+	
+	
+	
+	\textbf{Computer-Aided Diagnosis (CAD)}\\
+	It uses image processing and artificial intelligence techniques to detect and/or evaluate abnormalities in medical images.
+	An important factor in the interaction between humans and automated aids is trust.\\
+	
+	CAD should be used as second opinion to be matched with the radiologist´s one.\\
+	The performance of the radiologist-CAD team is based on their individual performance and their quality of interaction. For an optimal performance, it is vital that an appropriate level of reliance occurs.\\
+		
+	Sometimes radiologists under-trust CAD (reducing the potential benefits) or over-trust CAD (leading to diagnostic errors).\\
+	Confidence rating based on a response criterion which can be controlled (slide-bar) by the radiologist can increase the trust in the automation.\\
+	It is also important that radiologists have a good understanding of CAD´s decision making process which can be achieved by informing them about the algorithms and their limitations (global rationale) and providing an explanation for each specific CAD decision (local rationale).
+	
+	CAD´s output can be improved in 3 ways:\\
+	1) presenting a confidence rating for CAD´s decisions\\
+	2) providing a global and local rationale \\
+	3) informing radiologists of CAD´s performance levels in different context\\
+	resulting in multiple CAD systems for different diagnostic tasks based on the usability principles and design choices that do not interfere with the workflow of the radiologist.\\
+	 
+	CAD is more effective for novice than for expert radiologists (ceiling effect).\\
+	
+	\textbf{Structured Reporting}\\
+	The traditional structured manner of reporting would require extra actions by the radiologist which cost time and might interfere with the interpretation of the images.\\
+	
+	Some issues:\\
+	1) the report database cannot be searched effectively\\
+	2) free-text reporting leads to a high variability in reports\\
+	a solution can be a standardized lexicon or to develop a system that automatically converts free-text reports into a structured format using NLP techniques.\\
+	
+	
+	The Linear Chain Conditional Random Fields (LC-CRF) machine learner was trained on classifying information in the annotated free-text reports. It takes context into account and is suitable for structured predictions.\\
+	
+	The structured information could furthermore be converted into standardized structured report format. Since medical texts are highly susceptible to abbreviations, poor sentence structure, incorrect spelling and more human-introduced complexities, they are to process using conventional NLP.\\
+		
+	
+	
+	\textbf{Future perspectives:} \\
+	It is vital to study the way humans interact with technology.\\
+	To prevent use errors, technology must be evaluated for its effectiveness, user satisfaction, efficiency and usability (pre- and post-deployment evaluation). In addition, it should be evaluated taking demographical, environmental and longitudinal effects into account. The interfaces must be harmonized so that users working on different systems have a consistent user experience and allow to display new types of image data.\\
+	In future, the performance of multiple interaction techniques for basic radiological interaction tasks considering changes in user interaction paradigms.\\
+	Besides, software should be customizable to the needs and preferences of each individual users and context of use (e.g. display protocol customization, report customization).\\
+	Thus, these improvements in user interface technology would reduce the cognitive overhead radiologists face while interacting with technology and thereby allow them to spend more cognitive resources on actual patient diagnosis. 
+	
+	
+	
+
+	
+	\newpage
+	
+%	Problem Statement and Plan
+%	
+%	Before you start a project, in particular one you came up with yourself, you should have a problem statement (1–2 pages). In this you should outline the following things:
+%	what is the general area you want to work in? why is it important?
+%	what is the state of the art, what have people been doing so far (some references)
+%	why do you want to do something different and what? why is that new/cool/better/different/more elegant/more efficient/etc.?
+%	what is the problem you want to solve? why does it solve the issues/problems with the previous approaches/methods/solutions and how does it do that?
+%	what is the methodology/steps that you want to use to approach the problem?
+%	what is the plan for the timeframe of your project?
+	
+\end{document}

@@ -1,0 +1,134 @@
+@ARTICLE{Shneiderman1996,
+author = {Shneiderman, B.},
+doi = {10.1109/VL.1996.545307},
+journal = {Proceedings 1996 IEEE Symposium on Visual Languages},
+pages = {336--343},
+title = {{The eyes have it: a task by data type taxonomy for information visualizations}},
+year = {1996}
+}
+@ARTICLE{AMI,
+	author = {FNNDSC},
+	title = {{AMI Medical Imaging (AMI) JS ToolKit for THREEJS}},
+	url = {https://github.com/FNNDSC/ami}
+}
+@ARTICLE{Herington2012,
+	author = {O'Reilly, J. M. and Hubbard, M. L. and Lessler, J. T. and Biemer, P. P. and Turner, C. F.},
+	doi = {10.1016/j.fertnstert.2010.09.017.Development},
+	number = {4},
+	pages = {1295--1301},
+	publisher = {{NIH Public Access}},
+	title = {Audio and Video Computer-Assisted Self Interviewing:
+	Preliminary Tests of New Technologies for Data Collection},
+	volume = {95},
+	year = {2012}
+}
+@ARTICLE{Gratzl2016,
+author = {Gratzl, S. and Lex, A. and Gehlenborg, N. and Cosgrove, N. and Streit, M.},
+doi = {10.1111/cgf.12925},
+journal = {Computer Graphics Forum},
+number = {3},
+pages = {491--500},
+publisher = {The Royal College of Radiologists},
+title = {{From Visual Exploration to Storytelling and Back Again}},
+volume = {35},
+year = {2016}
+}
+@ARTICLE{Freire2006,
+author = {Freire, J. and Silva, C. T. and Callahan, S. P. and Santos, E. and Scheidegger, C. E. and Vo, H. T.},
+doi = {10.1007/11890850_2},
+journal = {Proceedings of the 2006 International Conference on Provenance and Annotation of Data},
+pages = {10--18},
+title = {{Managing Rapidly-evolving Scientific Workflows}},
+year = {2006}
+}
+@ARTICLE{Callahan2006,
+author = {Callahan, S. P. and Freire, J. and Santos, E. and Scheidegger, C. E. and Silva, C. T. and Vo, Huy T.},
+doi = {10.1109/ICDEW.2006.75},
+journal = {Data Engineering Workshops},
+pages = {71},
+title = {{Managing the Evolution of Dataflows with VisTrails}},
+year = {2006}
+}
+@ARTICLE{Silva2007,
+author = {Silva, C. T. and Freire, J. and Callahan, S. P.},
+journal = {Computing in Science and Engineering},
+title = {{Provenance for Visualizations}},
+year = {2007}
+}
+@ARTICLE{Acar2010,
+author = {Acar, U. and Buneman, P. and Cheney, J. and Van Den Bussche, J. and Kwasnikowska, N. and Vansummeren, S.},
+journal = {Procs. TAPP'10 workshop (Theory and Practice of Provenance)},
+pages = {8},
+title = {{A graph model of data and workflow provenance}},
+year = {2010}
+}
+@ARTICLE{Simmhan2005a,
+author = {Simmhan, Y. L. and Plale, B. and Gannon, D.},
+doi = {10.1145/1084805.1084812},
+journal = {Science},
+number = {3},
+pages = {1--25},
+title = {{A Survey of Data Provenance Techniques}},
+volume = {47405},
+year = {2005}
+}
+@ARTICLE{Jankun-Kelly2001,
+author = {Jankun-Kelly, T. J. and Ma, K. L.},
+doi = {10.1109/2945.942695},
+journal = {IEEE Transactions on Visualization and Computer Graphics},
+number = {3},
+pages = {275--287},
+title = {{Visualization exploration and encapsulation via a spreadsheet-like interface}},
+volume = {7},
+year = {2001}
+}
+@ARTICLE{Heer2008,
+author = {Heer, J. and Mackinlay, J. D. and Stolte, C. and Agrawala, M.},
+doi = {10.1109/TVCG.2008.137},
+journal = {IEEE Transactions on Visualization and Computer Graphics},
+number = {6},
+pages = {1189--1196},
+title = {{Graphical histories for visualization: Supporting analysis, communication, and evaluation}},
+volume = {14},
+year = {2008}
+}
+@ARTICLE{Yi2007,
+author = {Yi, J. S. and Ah Kang, Y. and Stasko, J.},
+doi = {10.1109/TVCG.2007.70515},
+journal = {IEEE Transactions on Visualization and Computer Graphics},
+number = {6},
+pages = {1224--1231},
+title = {{Toward a Deeper Understanding of the Role of Interaction in Information Visualization}},
+volume = {13},
+year = {2007}
+}
+@ARTICLE{Ma1999,
+author = {Ma, K. L.},
+doi = {10.1109/VISUAL.1999.809871},
+journal = {Proceedings of the conference on Visualization'99: celebrating ten years},
+pages = {81--88},
+title = {{Image Graphs - A Novel Approach to Visual Data Exploration}},
+year = {1999}
+}
+@ARTICLE{Stolper2017,
+author = {Stolper, C. D and Lee, B. and Riche, N. H. and Stasko, J.},
+pages = {1--14},
+title = {{Emerging and Recurring Data-Driven Storytelling Techniques : Analysis of a Curated Collection of Recent Stories}},
+year = {2017}
+}
+@ARTICLE{Wohlfart2006,
+author = {Wohlfart, M.},
+journal = {Central European Seminar for Computer Graphics},
+title = {{Story Telling Aspects in Medical Applications}},
+year = {2006}
+}
+@ARTICLE{Segel2010,
+author = {Segel, E. and Heer, J.},
+doi = {10.1109/TVCG.2010.179},
+journal = {IEEE Transactions on Visualization and Computer Graphics},
+number = {6},
+pages = {1139--1148},
+title = {{Narrative Visualization : Telling Stories with Data}},
+volume = {16},
+year = {2010}
+}

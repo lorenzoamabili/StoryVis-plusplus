@@ -1,0 +1,169 @@
+coordinator review
+score 4/5
+
+  Summary Review Text
+
+    All Reviewers believe this paper falls best into the applications category.
+    The paper is generally well written and is technically sound. All seemed to
+    appreciate the acquisition of requirements as a basis for the tool design.
+    The paper could benefit from a few statements regarding the current state of the
+    art, some indication of the end-users response to such a tool (did the effort of
+    requirements gathering pay off?), and a description of how the tool might be
+    effective in the domain(concrete example). It would also be valuable if reviewer
+    2's  comment on capturing intent was addressed or acknowledged as a problem for
+    further investigation in the paper.
+
+  Summary Rating
+
+    Probably accept: I would argue for accepting this paper.
+
+  Paper Type
+
+    Application / Design Study
+
+  Rating
+
+    Probably accept: I would argue for accepting this paper.
+
+  Expertise
+
+    Knowledgeable
+
+  The Review
+
+    This paper contributes a survey on a radiology visualization workflow and the
+    initial results of a prototype of a visual storytelling tool that allows users to
+    perform data exploration and present findings based on provenance.
+
+    Strengths and weaknesses? The strength of the paper lies in its interesting
+    application and its being well written.  The primary weakness is the lack of
+    explanation of the current state of radiology analysis software and what drove
+    this software to be produced. Do current software systems lack the storytelling?
+    The work is relevant to the EuroVis Conference.
+    The work is adequately referenced, though I would have liked to have seen some
+    information on the existing software used by the radiologists and how this
+    software is different.
+    The paper is technically sound.
+    The work could be reproduced by a technically competent graduate student.
+    The exposition is clear, though I had a difficult time understanding figures 3 and
+    4 and spent some time going back to the text, I am not sure how to improve on that
+    in the 4 page limit (I think enough information is provided).
+    Perhaps figure 3 could be halved to make room for the comparison against existing
+    methodologies?
+
+    Figure 1.  All of the text needs to be a bit larger and thus legible.
+    I like figure 2.
+    In Figure 3 my problem started because the caption notes there are four levels of
+    abstraction, but only three are labeled in the image. It took me a while to figure
+    out  the first one was the whole thing… The right side is perhaps redundant and
+    space consumptive.
+
+----------------------------------------------------------------
+
+committee member review
+score 4/5
+
+  Paper Type
+
+    Application / Design Study
+
+  Rating
+
+    Probably accept: I would argue for accepting this paper.
+
+  Expertise
+
+    Knowledgeable
+
+  The Review
+
+    What are the contributions of the paper?
+
+    a tool for image assessment reusing existing workflow methods.
+
+    What are its strengths and weaknesses?
+
+    Strengths:
+    + The methodology of capturing the needs and designing the tool. This is how the
+    design work should be carried out.
+    + capturing the needs from a relatively large population.
+    + showing provenance through interaction seems to be good.
+
+    Weaknesses:
+    - it is unclear to me how user's intent is captured here, since those interaction
+    are not mutual exclusive or independent. Take Figure 4 as an example, it s unclear
+    if the user's rotation is for explore or for select. Thus the node aggregation
+    seems to be somewhat arbitrary.
+
+    Is this work relevant for the EuroVis conference?
+
+    Yes.
+
+    Is relevant previous work adequately referenced? If not, what citations should be
+    added?
+
+    yes.
+
+    Is the paper technically sound?
+
+    Yes, somewhat (see the weakness above.)
+
+    Could it be reproduced by a skilled graduate student?
+
+    Yes.
+
+    Is the exposition clear? How could the structure or style of the presentation be
+    improved?
+
+    Yes. the paper is easy to understand and well written. Please use the third-person
+    to refer to yourself, when citing your own work. Otherwise, the paper is not
+    anonymous, unfair to other paper authors.
+
+    Should anything be deleted or condensed from the writeup?
+    Yes.
+    Are the figures as informative as possible?
+    Yes.
+    Is the (optional) supplementary material helpful (if provided)?
+    N/P
+
+----------------------------------------------------------------
+
+committee member review
+score 3/5
+
+  Paper Type
+
+    Application / Design Study
+
+  Rating
+
+    Borderline: the strengths and weaknesses balance for this paper.
+
+  Expertise
+
+    Expert
+
+  The Review
+
+    The paper "Improving Provenance Data Interaction for Visual Storytelling in
+    Medical Imaging Data Exploration" aims to give guidelines on how to improve the
+    interaction with prominance data displayed in a graph in order to facilitate
+    auhoring and the creation of visual data stories.
+
+    The paper is well written und well structured. It gives an good overview over the
+    requirements and carefully summarizes the needs of the underlying user group.
+
+    My big issue with this paper is that the requirements and guidelines made by the
+    authors are very vague. Although this is a short paper I would at least expect one
+    evaluation setting with a user group from the medical domain or at least user
+    statements if the presented approach fits their needs.
+
+    As the paper states in the title, the system is especially designed for medical
+    purposes. Besides some minor statements I don't see how this system differs from
+    setting in other domains. I am also missing an concrete example on how the system
+    is used in a specific task (surgery or treatment planning would be nice here).
+
+    Overall, I will rate this contribution as a borderline as I am not sure if the
+    provided content is enough for a paper and the reasing for the presented
+    requirements and settings is missing.
+

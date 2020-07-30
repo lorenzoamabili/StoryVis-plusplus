@@ -1,0 +1,169 @@
+\documentclass{article}
+\usepackage{times,amsfonts,amssymb,amsmath}
+\usepackage{graphics,graphicx,psfrag,tabularx,color}
+
+\usepackage[round]{natbib}
+
+\newcommand{\cre}[1]{{\color{red}#1}}
+\newcommand{\yun}[1]{{\color{blue}#1}}
+
+
+\headsep=0mm
+\headheight=-20mm
+\topmargin=4.6mm
+\voffset=10mm
+\footskip=10mm
+\oddsidemargin=-5mm
+\evensidemargin=-5mm
+\hoffset=0mm
+\marginparwidth=0mm
+\marginparsep=0mm
+\textwidth=165mm
+\textheight=235mm
+
+\newcommand{\f}[1]{\mathbf{#1}}
+\newcommand{\RR}{{\mathbb R}}
+\newcommand{\cis}[1][C]{\ensuremath{\mathbb{#1}}}
+
+\newcommand{\dd}[1]{\overset{\scriptscriptstyle{\triangledown}}{#1}}
+\newcommand{\uu}[1]{\overset{\scriptscriptstyle{\vartriangle}}{#1}}
+
+\newcommand{\todo}[1]{{\color{red}{\bf TODO:} \emph{#1}}}
+
+
+\parskip 0.5em
+\setlength{\parindent}{0mm}
+
+\begin{document}
+	\sloppy
+	
+	\begin{center}
+		\bf
+		\large
+		Revision of short paper 1032\\[4pt]
+		\vspace{2ex}
+		\Large Improving Provenance Data Interaction for Visual Storytelling\\ in Medical Imaging Data Exploration\\[4pt]
+		\vspace{2ex}
+		{\large submitted to EuroVis 2018}
+	\end{center}
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section*{Comments and replies}
+	
+	{\em We thank the anonymous referees for their reports and comments. We have carefully addressed all the issues raised and prepared a revision of our manuscript. Here is a summary of our response to the reports and the changes we have made.}
+	
+	\vspace*{1ex}
+	
+	\begin{center}
+		*************************
+	\end{center}
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	%\subsection*{Summary review:}
+	%
+	%The paper could benefit from a few statements regarding \\
+	%1) the current state of the art, 
+	%2) some indication of the end-users response to such a tool (did the effort of
+	%requirements gathering pay off?),\\
+	%3) a description of how the tool might be effective in the domain (concrete example)
+	%
+	%{\em Reply: \cre{1) we agree with you, 2) we agree with you, 3) collaboration physician-radiologist, communication pre- and post-operation with patients, checking the analysis process of a wrong diagnosis, etc...}
+	%}
+	%
+	%
+	%It would also be valuable if capturing intent was addressed or acknowledged as a problem for further investigation in the paper.
+	%
+	%{\em Reply: \cre{We agree with you}
+	%}
+	
+	
+	\subsection*{Coordinator review:}
+	
+	The primary weakness is the lack of explanation of the current state of radiology analysis software and what drove this software to be produced. Do current software systems lack the storytelling?
+	
+	{\em Reply: According to our respondents from the preliminary survey and the literature, the current radiology analysis software focuses on image data (CT, MRI) analysis. During analysis and decision making, several outputs are generated, such as audio recording during exploration, key images, and a detailed report. Although all these pieces of information are related to each other in the diagnosis process, they exist separately. They lack the storytelling aspect both for exploration and presentation purposes. Our work ties this information into a visual story and thus creates a connection between the images, exploration, findings and conclusions to be drawn from the data. We have made this clearer in the introduction.
+	}
+	
+	\vspace{.5 cm}
+	
+	I had a difficult time understanding figures 3 and 4 and spent some time going back to the text, I am not sure how to improve on that in the 4 page limit.
+	Perhaps figure 3 could be halved to make room for the comparison against existing
+	methodologies?
+	
+	In Figure 3 my problem started because the caption notes there are four levels of
+	abstraction, but only three are labeled in the image. It took me a while to figure
+	out the first one was the whole thing... The right side is perhaps redundant and
+	space consumptive.
+	
+	{\em Reply: We removed one diagram, and also improved Figure 3. Now the figure clearly shows how data would be visualized at four different levels of abstraction.
+		However, it is difficult to make a comparison against existing methodologies since through the preliminary survey and to our knowledge, visual storytelling concept has not been integrated into current radiology analysis software (yet). [GLG* 16] presents a storytelling tool based on the Phovea framework, however they did not employ the grouping strategy as we show in Figures 3 and 4.}
+	%{\em Reply: \cre{Based on adjustments on Comment 4. (As mentioned above, we preferred to remove the diagram on the left side of Fig. 3).}
+	%}
+	
+	%{\em Reply: \cre{(we could remove the diagram on the left side of Fig. 3).}
+	%}
+	
+	\vspace{.5 cm}
+	
+	Figure 1. All of the text needs to be a bit larger and thus legible.
+	
+	{\em Reply: We have increased the font size of the text and its layout to make it more readable.
+	}
+	
+	\vspace{.5 cm}
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\subsection*{Committee member review \#1:}
+	
+	It is unclear to me how user's intent is captured here, since those interaction
+	are not mutual exclusive or independent. 
+	Take Figure 4 as an example, it is unclear if the user's rotation is for explore or for select. 
+	Thus the node aggregation seems to be somewhat arbitrary.
+	
+	%{\em Reply: Figure 4 shows an example of exploration steps. At this moment, as we explained in section 4.2, we simply category user interactions (exploration steps), for instance, Explore (rotate, zoom, translate) and Select (highlight, select). Our current work on grouping user interactions are based on the defined categorization. However we see the point that you addressed and we agree that more sophisticated strategies are required in the grouping based on users' intention. We revised the section 6 and made it clearer that we will further investigate the taxonomy. Thanks for your suggestion.}
+	
+	{\em The node aggregation is based on a defined categorization, as we explained in Section 4.2. At this stage, we simply categorize each user interaction (each exploration step) using an adjusted version of the taxonomy made by Yi et al. However, we see the point raised and we agree that more sophisticated (and possibly exhaustive) rules are required in the grouping based on user's intention. We have revised Section 6 and made it clearer that we will further investigate the taxonomy.}
+		
+	\vspace{.5 cm}
+	
+	The paper is easy to understand and well written. Please use the third-person
+	to refer to yourself, when citing your own work. Otherwise, the paper is not
+	anonymous, unfair to other paper authors.
+	
+	{\em Reply: Although we did not cite our own work in the submission, we checked all the citations again to avoid misunderstanding.}
+		
+	\vspace{.5 cm}
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\subsection*{Committee member review \#2:}
+	
+	My big issue with this paper is that the requirements and guidelines made by the
+	authors are very vague. Although this is a short paper I would at least expect one
+	evaluation setting with a user group from the medical domain or at least user
+	statements if the presented approach fits their needs.
+	
+	{\em Reply:
+		We agree with this and, for this reason, we aim to evaluate our tool and its features in the near future, as we now mention in the last section.
+			Nevertheless, we have added some user statements in the Discussion section. Overall, the benefits of using our prototype and of creating visual stories over text reports is well-perceived.
+	}
+	
+	\vspace{.5 cm}
+	
+	As the paper states in the title, the system is especially designed for medical
+		purposes. Besides some minor statements I don't see how this system differs from
+		setting in other domains.
+	
+	%{\em Reply: Currently diagnostics in radiology is indeed the primary use case to test our tool. However, our visual storytelling tool is not a domain-specific tool for medical purposes. The main concepts are quite generalizable and they can be adapted to different fields of application (e.g., using different taxonomy and levels of abstraction based on different user interactions). The key element here is the use of storytelling as a means of visual data communication. However, we have to further investigate how the system differs from specific settings in other domains. We made this clearer in the introduction. \yun{Lorenzo, can you make it?}}
+	
+	{\em Reply: Although our visual storytelling tool and its features are generic and they can be adapted to different fields of application, it has been designed based on our survey and user needs in medical imaging data exploration: diagnostics in radiology is our primary use case. We have now made this clearer in the introduction. Then, assuming that the type of (image) data, type and size of provenance data, user intents, and interaction with provenance data differ from domain to domain, we believe that systems should differ as well. This is an interesting avenue for further research.}
+	
+	\vspace{.5 cm}
+	
+	I am also missing a concrete example on how the system is used in a specific task (surgery or treatment planning would be nice here).
+	
+	{\em Reply: Thank you for your suggestion. To make it more understandable, we have added a concrete example to the introduction.}
+	%{\em Reply: \cre{Thank you for your comment which is related to Comment 1. We were not very clear with this. Although we started designing it based on the needs of radiologists, this tool has not been thought as a domain-specific tool. The main concepts are quite generalizable and they can be adapted to different fields of application (e.g., using different taxonomy and levels of abstraction based on different user interactions). We made this clearer and we added some concrete examples in the introduction.}
+	
+	
+\end{document}
