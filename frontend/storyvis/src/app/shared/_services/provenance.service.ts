@@ -153,6 +153,7 @@ export class ProvenanceService {
 
   public loadGraph(graphInput: any){
     const dataGraph = JSON.parse(graphInput.serializedGraph);
+    console.log(dataGraph)
     this.graph = restoreProvenanceGraph(dataGraph);
     this.graph.current = this.graph.root;
     this.registry = new ActionFunctionRegistry();

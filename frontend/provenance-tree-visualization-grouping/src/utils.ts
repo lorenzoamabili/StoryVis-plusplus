@@ -3,6 +3,7 @@ export interface IGroupedTreeNode<T> {
   wrappedNodes: T[];
   plotTrimmerValue: number;
   neighbour: boolean;
+  bookmarked: boolean;
 }
 
 export const copyTree = <T>(node: IGroupedTreeNode<T>): typeof node => {

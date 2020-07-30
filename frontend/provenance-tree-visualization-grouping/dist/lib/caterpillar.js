@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.caterpillar = void 0;
 var aggregation_objects_1 = require("./aggregation/aggregation-objects");
 var gratzl_old_1 = require("./gratzl_old");
 var d3 = require("d3");

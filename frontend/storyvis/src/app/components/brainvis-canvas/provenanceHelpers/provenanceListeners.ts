@@ -45,8 +45,6 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   });
 
 
-
-
   canvas.addEventListener('AxialZoomChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
     tracker.applyAction({
@@ -116,21 +114,19 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       }
       const action: Action = {
         metadata: {
-          userIntent: 'configuration',
+          userIntent: 'exploration',
           label: label
         },
         do: 'setSliceIndex',
         doArguments: {
-          args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, event.changes.newIndex],
-          artifacts: [startEvent.oldArtifacts, event.newArtifacts]
-        },
+          args: [startEvent.changes.sliceOrientation, event.changes.newIndex, startEvent.changes.oldIndex, event.changes.newIndex]
+                },
         undo: 'setSliceIndex',
         undoArguments: {
-          args: [startEvent.changes.sliceOrientation, event.changes.oldIndex, startEvent.changes.newIndex],
-          artifacts: [event.oldArtifacts, startEvent.newArtifacts]
+          args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, startEvent.changes.newIndex, event.changes.oldIndex]
         }
       }
-      tracker.applyAction(action, true);
+      tracker.applyAction(action);
     }, 500, { trailing: true });
     canvas.addEventListener('sliceIndexChanged', sliceIndexEndListener);
   };
@@ -205,177 +201,69 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       renderer.artifactCreated.subscribe((artifact) => {
         const action = {
           metadata: {
-            userIntent: 'measurement',
+            userIntent: 'derivation',
             label: artifact.type
           },
-          do: 'addArtifact',
+          do: 'renderArtifact',
           doArguments: { args: [renderer.sliceOrientation, artifact] },
           undo: 'removeArtifact',
           undoArguments: { args: [renderer.sliceOrientation, artifact] }
         };
-        tracker.applyAction(action, true, artifact);
+        tracker.applyAction(action, true);
       });
     }
   });
 
 
-    // Window Level Changes Listener - Debounced
-    let wLChangeEndListenerC: EventListener = null;
-    const wLChangeListenerC = (startEvent) => {
-      canvas.removeEventListener('thresholdValueChangedC', wLChangeEndListenerC);
-      wLChangeEndListenerC = debounce((event: any) => {
-        const action: Action = {
-          metadata: {
-            userIntent: 'configuration',
-            label: 'WL C' + event.changes.value
-          },
-          do: 'setWindowLevelC',
-          doArguments: {
-            args: [event.changes.value]
-          },
-          undo: 'setWindowLevelC',
-          undoArguments: {
-            args: [startEvent.changes.value]
-          }
+  // Window Level Changes Listener - Debounced
+  let wLChangeEndListenerC: EventListener = null;
+  const wLChangeListenerC = (startEvent) => {
+    canvas.removeEventListener('thresholdValueChangedC', wLChangeEndListenerC);
+    wLChangeEndListenerC = debounce((event: any) => {
+      const action: Action = {
+        metadata: {
+          userIntent: 'configuration',
+          label: 'WL C' + event.changes.value
+        },
+        do: 'setWindowLevelC',
+        doArguments: {
+          args: [event.changes.value]
+        },
+        undo: 'setWindowLevelC',
+        undoArguments: {
+          args: [startEvent.changes.value]
         }
-        tracker.applyAction(action, true);
-      }, 500, { trailing: true });
-      canvas.addEventListener('thresholdValueChangedC', wLChangeEndListenerC);
-    };
-    canvas.addEventListener('thresholdValueChangeStartC', debounce(wLChangeListenerC, 500, { leading: true }));
+      }
+      tracker.applyAction(action, true);
+    }, 500, { trailing: true });
+    canvas.addEventListener('thresholdValueChangedC', wLChangeEndListenerC);
+  };
+  canvas.addEventListener('thresholdValueChangeStartC', debounce(wLChangeListenerC, 500, { leading: true }));
 
 
 
-    // Window Level Changes Listener - Debounced
-    let wLChangeEndListenerW: EventListener = null;
-    const wLChangeListenerW = (startEvent) => {
-      canvas.removeEventListener('thresholdValueChangedW', wLChangeEndListenerW);
-      wLChangeEndListenerW = debounce((event: any) => {
-        const action: Action = {
-          metadata: {
-            userIntent: 'configuration',
-            label: 'WL W' + event.changes.value
-          },
-          do: 'setWindowLevelW',
-          doArguments: {
-            args: [event.changes.value]
-          },
-          undo: 'setWindowLevelW',
-          undoArguments: {
-            args: [startEvent.changes.value]
-          }
+  // Window Level Changes Listener - Debounced
+  let wLChangeEndListenerW: EventListener = null;
+  const wLChangeListenerW = (startEvent) => {
+    canvas.removeEventListener('thresholdValueChangedW', wLChangeEndListenerW);
+    wLChangeEndListenerW = debounce((event: any) => {
+      const action: Action = {
+        metadata: {
+          userIntent: 'configuration',
+          label: 'WL W' + event.changes.value
+        },
+        do: 'setWindowLevelW',
+        doArguments: {
+          args: [event.changes.value]
+        },
+        undo: 'setWindowLevelW',
+        undoArguments: {
+          args: [startEvent.changes.value]
         }
-        tracker.applyAction(action, true);
-      }, 500, { trailing: true });
-      canvas.addEventListener('thresholdValueChangedW', wLChangeEndListenerW);
-    };
-    canvas.addEventListener('thresholdValueChangeStartW', debounce(wLChangeListenerW, 500, { leading: true }));
-
-
-      // canvas.renderers.forEach(renderer => {
-      //   if (renderer instanceof Renderer2D) {
-      //     canvas.settings.thresholdValueChangeC.subscribe((values) => {
-      //       const action = {
-      //         metadata: {
-      //           userIntent: 'configuration',
-      //           label: 'WL C change '
-      //         },
-      //         do: 'changeThresholdValueC',
-      //         doArguments: { args: values[1] },
-      //         undo: 'changeThresholdValueC',
-      //         undoArguments: { args: values[0] }
-      //       };
-      //       tracker.applyAction(action, true);
-      //     });
-      //   }
-      // });
-
-      //   canvas.renderers.forEach(renderer => {
-      //     if (renderer instanceof Renderer2D) {
-      //       canvas.settings.thresholdValueChangeW.subscribe((values) => {
-      //         const action = {
-      //           metadata: {
-      //             userIntent: 'configuration',
-      //             label: 'WL W change '
-      //           },
-      //           do: 'changeThresholdValueW',
-      //           doArguments: { args: values[1] },
-      //           undo: 'changeThresholdValueW',
-      //           undoArguments: { args: values[0] }
-      //         };
-      //         tracker.applyAction(action, true);
-      //       });
-      //     }
-      //   });
-
-          // renderer.rulerChanged.subscribe(({ oldPoints, newPoints }: { oldPoints: IPointPair, newPoints: IPointPair }) => {
-          //   const action = {
-          //     metadata: {
-          //       userIntent: 'measurement',
-          //       label: 'update ruler'
-          //     },
-          //     do: 'updateRuler',
-          //     doArguments: [renderer.sliceOrientation, newPoints],
-          //     undo: 'updateRuler',
-          //     undoArguments: [renderer.sliceOrientation, oldPoints],
-          //   };
-          //   tracker.applyAction(action, true);
-          // });
-
-          // renderer.angleCreated.subscribe((args) => {
-          //   const action = {
-          //     metadata: {
-          //       userIntent: 'measurement',
-          //       label: 'angle'
-          //     },
-          //     do: 'addAngle',
-          //     doArguments: [renderer.sliceOrientation, args],
-          //     undo: 'removeAngle',
-          //     undoArguments: [renderer.sliceOrientation, args]
-          //   };
-          //   tracker.applyAction(action, true, args.artifact);
-          // });
-
-
-          // renderer.freehandCreated.subscribe((args) => {
-          //   const action = {
-          //     metadata: {
-          //       userIntent: 'measurement',
-          //       label: 'freehand'
-          //     },
-          //     do: 'addFreehand',
-          //     doArguments: [renderer.sliceOrientation, args],
-          //     undo: 'removeFreehand',
-          //     undoArguments: [renderer.sliceOrientation, args]
-          //   };
-          //   tracker.applyAction(action, true, args.artifact);
-          // });
-
-          // renderer.voxelprobeCreated.subscribe((args) => {
-          //   const action = {
-          //     metadata: {
-          //       userIntent: 'measurement',
-          //       label: 'voxelprobe'
-          //     },
-          //     do: 'addVoxelprobe',
-          //     doArguments: [renderer.sliceOrientation, args],
-          //     undo: 'removeVoxelprobe',
-          //     undoArguments: [renderer.sliceOrientation, args]
-          //   };
-          //   tracker.applyAction(action, true, args.artifact);
-          // });
-
-          // renderer.annotationCreated.subscribe((args) => {
-          //   const action = {
-          //     metadata: {
-          //       userIntent: 'measurement',
-          //       label: 'annotation'
-          //     },
-          //     do: 'addAnnotation',
-          //     doArguments: [renderer.sliceOrientation, args],
-          //     undo: 'removeAnnotation',
-          //     undoArguments: [renderer.sliceOrientation, args]
-          //   };
-          //   tracker.applyAction(action, true, args.artifact);
-          // });
-        }
+      }
+      tracker.applyAction(action, true);
+    }, 500, { trailing: true });
+    canvas.addEventListener('thresholdValueChangedW', wLChangeEndListenerW);
+  };
+  canvas.addEventListener('thresholdValueChangeStartW', debounce(wLChangeListenerW, 500, { leading: true }));
+}

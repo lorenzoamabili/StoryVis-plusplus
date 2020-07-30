@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnnotationDisplayContainer = void 0;
 const annotation_display_1 = require("./annotation-display");
 class AnnotationDisplayContainer {
     constructor() {

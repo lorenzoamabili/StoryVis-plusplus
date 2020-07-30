@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProvenanceTracker = void 0;
 var utils_1 = require("./utils");
 var ProvenanceGraph_1 = require("./ProvenanceGraph");
 /**
@@ -64,14 +65,13 @@ var ProvenanceTracker = /** @class */ (function () {
      * will be taken as the label for this node.
      *
      * @param action
-     * @param artifact
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifact) {
+    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult, nodeArtifacts;
+            var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -86,7 +86,7 @@ var ProvenanceTracker = /** @class */ (function () {
                         else {
                             label = action.do;
                         }
-                        createNewStateNode = function (parentNode, actionResult, artifacts) { return ({
+                        createNewStateNode = function (parentNode, actionResult) { return ({
                             id: utils_1.generateUUID(),
                             label: label,
                             metadata: {
@@ -96,12 +96,11 @@ var ProvenanceTracker = /** @class */ (function () {
                             action: action,
                             actionResult: actionResult,
                             parent: parentNode,
-                            children: [],
-                            artifacts: artifacts
+                            children: []
                         }); };
                         currentNode = this.graph.current;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
-                        newNode = createNewStateNode(this.graph.current, null, []);
+                        newNode = createNewStateNode(this.graph.current, null);
                         return [3 /*break*/, 3];
                     case 1:
                         functionNameToExecute = action.do;
@@ -109,9 +108,7 @@ var ProvenanceTracker = /** @class */ (function () {
                         return [4 /*yield*/, funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args)];
                     case 2:
                         actionResult = _a.sent();
-                        nodeArtifacts = (action.doArguments.artifacts && action.doArguments.artifacts[1].length !== 0) ?
-                            ((artifact) ? action.doArguments.artifacts[1].push(artifact) : action.doArguments.artifacts[1]) : artifact;
-                        newNode = createNewStateNode(currentNode, actionResult, nodeArtifacts);
+                        newNode = createNewStateNode(currentNode, actionResult);
                         _a.label = 3;
                     case 3:
                         if (this.autoScreenShot && this.screenShotProvider) {
@@ -138,7 +135,7 @@ var ProvenanceTracker = /** @class */ (function () {
         set: function (provider) {
             this._screenShotProvider = provider;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceTracker.prototype, "autoScreenShot", {
@@ -151,7 +148,7 @@ var ProvenanceTracker = /** @class */ (function () {
                 console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceTracker.prototype.getGraph = function () {

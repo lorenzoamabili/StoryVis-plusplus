@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.aggregationObjectsUI2 = exports.aggregationObjectsUI1 = exports.aggregationObjects = exports.plotTrimmerG = exports.plotTrimmerC = exports.plotTrimmer = exports.pruning = exports.compression = exports.grouping = exports.rawData = exports.defaultData = exports.testNeighbours = exports.testIsIntervalNode = exports.testUserIntent = exports.testNothing = exports.wrapNode = exports.groupNodeLabel = exports.isKeyNode = exports.getNodeIntent = void 0;
 var aggregation_implementations_1 = require("./aggregation-implementations");
 var provenance_core_1 = require("@visualstorytelling/provenance-core");
 /**
@@ -56,7 +57,8 @@ exports.wrapNode = function (node) {
         wrappedNodes: [node],
         children: node.children.map(exports.wrapNode),
         plotTrimmerValue: -1,
-        neighbour: false
+        neighbour: false,
+        bookmarked: false
     };
 };
 /**

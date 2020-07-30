@@ -1,6 +1,6 @@
 ﻿<div style="margin: 5%;  text-align: center;">
 
-    <div *ngIf="isAuthor || isAdmin">
+    <div *ngIf="isAuthor">
         <p>A short tutorial about how to perform an image assessment and how to create a text report and visual data
             story
             with the StoryVis tool will be shown.
@@ -11,7 +11,7 @@
 
     </div>
 
-    <div *ngIf="isReader || isAdmin">
+    <div *ngIf="isReader">
         <p>A short tutorial about how to interact with the text report/visual data story will be shown, together with an
             example of a text report/visual data story. <br>
             When you are done with short tutorial, press NEXT to start reading the text report/visual data story.
@@ -21,7 +21,7 @@
     </div>
 
 
-    <div *ngIf="isReader || isAdmin">
+    <div *ngIf="isReader">
 
         <!-- <video width="720" height="380" controls> -->
         <video controls>
@@ -69,7 +69,7 @@
         <b><a routerLink='/intro-prac'>NEXT</a></b>
     </div>
 
-    <div class="buttonLink" *ngIf="isReader || isAdmin">
+    <div class="buttonLink" *ngIf="isReader">
         <b><a routerLink='/intro-read'>NEXT</a></b>
     </div>
 

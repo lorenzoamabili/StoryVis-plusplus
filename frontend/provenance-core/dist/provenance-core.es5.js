@@ -254,14 +254,14 @@ var ProvenanceGraph = /** @class */ (function () {
             this._current = node;
             this._mitt.emit('currentChanged', node);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceGraph.prototype, "nodes", {
         get: function () {
             return this._nodes;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {
@@ -352,14 +352,13 @@ var ProvenanceTracker = /** @class */ (function () {
      * will be taken as the label for this node.
      *
      * @param action
-     * @param artifact
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifact) {
+    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult, nodeArtifacts;
+            var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -374,7 +373,7 @@ var ProvenanceTracker = /** @class */ (function () {
                         else {
                             label = action.do;
                         }
-                        createNewStateNode = function (parentNode, actionResult, artifacts) { return ({
+                        createNewStateNode = function (parentNode, actionResult) { return ({
                             id: generateUUID(),
                             label: label,
                             metadata: {
@@ -384,12 +383,11 @@ var ProvenanceTracker = /** @class */ (function () {
                             action: action,
                             actionResult: actionResult,
                             parent: parentNode,
-                            children: [],
-                            artifacts: artifacts
+                            children: []
                         }); };
                         currentNode = this.graph.current;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
-                        newNode = createNewStateNode(this.graph.current, null, []);
+                        newNode = createNewStateNode(this.graph.current, null);
                         return [3 /*break*/, 3];
                     case 1:
                         functionNameToExecute = action.do;
@@ -397,9 +395,7 @@ var ProvenanceTracker = /** @class */ (function () {
                         return [4 /*yield*/, funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args)];
                     case 2:
                         actionResult = _a.sent();
-                        nodeArtifacts = (action.doArguments.artifacts && action.doArguments.artifacts[1].length !== 0) ?
-                            ((artifact) ? action.doArguments.artifacts[1].push(artifact) : action.doArguments.artifacts[1]) : artifact;
-                        newNode = createNewStateNode(currentNode, actionResult, nodeArtifacts);
+                        newNode = createNewStateNode(currentNode, actionResult);
                         _a.label = 3;
                     case 3:
                         if (this.autoScreenShot && this.screenShotProvider) {
@@ -426,7 +422,7 @@ var ProvenanceTracker = /** @class */ (function () {
         set: function (provider) {
             this._screenShotProvider = provider;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceTracker.prototype, "autoScreenShot", {
@@ -439,7 +435,7 @@ var ProvenanceTracker = /** @class */ (function () {
                 console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceTracker.prototype.getGraph = function () {
@@ -682,7 +678,7 @@ var SlideAnnotation = /** @class */ (function () {
         get: function () {
             return this._id;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(SlideAnnotation.prototype, "data", {
@@ -693,7 +689,7 @@ var SlideAnnotation = /** @class */ (function () {
             this._data = value;
             this._mitt.emit('change', value);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     SlideAnnotation.prototype.on = function (type, handler) {
@@ -737,14 +733,14 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (annotation) {
             this._mainAnnotation = annotation;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "id", {
         get: function () {
             return this._id;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "node", {
@@ -754,7 +750,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._node = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "nodeId", {
@@ -764,7 +760,7 @@ var ProvenanceSlide = /** @class */ (function () {
             }
             return null;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "name", {
@@ -774,7 +770,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._name = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "duration", {
@@ -784,7 +780,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._duration = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "transitionTime", {
@@ -794,7 +790,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._transitionTime = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlide.prototype.addAnnotation = function (annotation) {
@@ -810,7 +806,7 @@ var ProvenanceSlide = /** @class */ (function () {
         get: function () {
             return this._annotations;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlide.prototype.on = function (type, handler) {
@@ -826,14 +822,14 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._xPosition = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "metadata", {
         get: function () {
             return this._metadata;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     return ProvenanceSlide;
@@ -889,7 +885,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._application;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.addSlide = function (slide, index) {
@@ -944,7 +940,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
             this._selectedSlide = slide;
             this._mitt.emit('slideSelected', slide);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.moveSlide = function (indexFrom, indexTo) {
@@ -987,7 +983,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._slides;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.next = function () {
@@ -1018,7 +1014,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._graph;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeck.prototype, "screenShotProvider", {
@@ -1028,7 +1024,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         set: function (provider) {
             this._screenShotProvider = provider;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeck.prototype, "autoScreenShot", {
@@ -1041,7 +1037,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
                 console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.on = function (type, handler) {
@@ -1101,7 +1097,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._slides;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "currentSlideIndex", {
@@ -1111,7 +1107,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         set: function (index) {
             this._currentSlideIndex = index;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.play = function () {
@@ -1156,7 +1152,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._status;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.stop = function () {

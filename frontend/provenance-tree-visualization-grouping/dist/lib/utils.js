@@ -11,6 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.group = exports.preOrderTraversal = exports.copyTree = void 0;
 exports.copyTree = function (node) {
     return __assign(__assign({}, node), { children: node.children.map(exports.copyTree) });
 };

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.aggregateNodes = exports.findHierarchyNodeFromProvenanceNode = void 0;
 var d3 = require("d3");
 /**
  * @description Return the HierarchyNode corresponding to the ProvenanceNode.

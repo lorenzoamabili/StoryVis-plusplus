@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.plotTrimmerFuncC = exports.plotTrimmerFuncG = exports.trimmerAssignValues = exports.plotTrimmerFunc = exports.prune = exports.compress = exports.group = exports.doNothing = exports.connectivity = exports.subrootDist = exports.maxDepth = exports.minDepth = exports.distanceToMainBranch = exports.areNeighbours = exports.isIntervalNode = exports.isLeafNode = exports.shouldConstrain = void 0;
 var provenance_core_1 = require("@visualstorytelling/provenance-core");
 /**
  * @description Child removed, child's children go to the parent.

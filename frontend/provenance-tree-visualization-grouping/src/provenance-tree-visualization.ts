@@ -19,7 +19,7 @@ import {
   plotTrimmerG
 } from './aggregation/aggregation-objects';
 import {
-  addAggregationButtons, 
+  addAggregationButtons,
   setTitle
 } from './components';
 import {
@@ -85,13 +85,13 @@ export class ProvenanceTreeVisualization {
     }
 
     // Add title too root elm
-    setTitle(this.container, () => {
-      window.alert(
-        this.aggregation.aggregator.name.toUpperCase() +
-        ': \n' +
-        this.aggregation.aggregator.description
-      );
-    });
+    // setTitle(this.container, () => {
+    //   window.alert(
+    //     this.aggregation.aggregator.name.toUpperCase() +
+    //     ': \n' +
+    //     this.aggregation.aggregator.description
+    //   );
+    // });
 
     // Append svg element
     this.svg = this.container
@@ -224,7 +224,6 @@ export class ProvenanceTreeVisualization {
     this.hierarchyRoot = tree;
 
     const treeNodes = tree.descendants();
-console.log(treeNodes);
     const oldNodes = this.g.selectAll('g.node').data(treeNodes, (d: any) => {
       const data = d.data.wrappedNodes.map((n: any) => n.id).join();
       return data;
@@ -240,24 +239,24 @@ console.log(treeNodes);
         'transform',
         (d: any) => `translate(${d.x * xScale}, ${d.y * yScale})`
       );
-    newNodes.append('rect')
-      .attr('width', 40)
-      .attr('height', 20)
-      .attr('x', (d: any) => d.x - 20)
-      .attr('y', (d: any) => -10)
-      .attr('stroke', 'none')
-      .attr('fill', (d: any) => d.data.wrappedNodes[0].action ? this.colorScheme(d.data.wrappedNodes[0].action.metadata.taskId) : 'none')
-      .attr('fill-opacity', 0.8)
-      .on('mouseover', (d: any) => {
-        newNodes.append('text')
-          .attr('class', 'taskName')
-          .attr('x', (data) => data.x - 30)
-          .attr('y', (data) => data.y - 5)
-          .text(d.data.wrappedNodes[0].action.metadata.taskName);
-      })
-      .on('mouseout', () => {
-        d3.select('.taskName').remove();
-      });
+    // newNodes.append('rect')
+    //   .attr('width', 40)
+    //   .attr('height', 20)
+    //   .attr('x', (d: any) => d.x - 20)
+    //   .attr('y', (d: any) => -10)
+    //   .attr('stroke', 'none')
+    //   .attr('fill', (d: any) => d.data.wrappedNodes[0].action ? this.colorScheme(d.data.wrappedNodes[0].action.metadata.taskId) : 'none')
+    //   .attr('fill-opacity', 0.8)
+    //   .on('mouseover', (d: any) => {
+    //     newNodes.append('text')
+    //       .attr('class', 'taskName')
+    //       .attr('x', (data) => data.x - 30)
+    //       .attr('y', (data) => data.y - 5)
+    //       .text(d.data.wrappedNodes[0].action.metadata.taskName);
+    //   })
+    //   .on('mouseout', () => {
+    //     d3.select('.taskName').remove();
+    //   });
 
     // node label
     newNodes
@@ -274,27 +273,29 @@ console.log(treeNodes);
     updateNodes.selectAll('g.bookmarked').remove();
     updateNodes.selectAll('.circle-text').remove();
 
+
     const getNodeSize = (node: IGroupedTreeNode<ProvenanceNode>) => {
       return Math.min(2.7 + 0.3 * node.wrappedNodes.length, 7);
     };
 
+
     // set nodes containing Slides to square
-    updateNodes
-      .filter((d: any) => {
-        return d.data.wrappedNodes.some(
-          (node: ProvenanceNode) => node.metadata.isSlideAdded
-        );
-      })
-      .append('g')
-      .attr('class', 'bookmarked')
-      .append('rect')
-      .attr('fill', (d: any) => {
-        return d.data.wrappedNodes[0].metadata.bgColor;
-      })
-      .attr('width', (d: any) => 2 * getNodeSize(d.data))
-      .attr('height', (d: any) => 2 * getNodeSize(d.data))
-      .attr('x', (d: any) => -getNodeSize(d.data))
-      .attr('y', (d: any) => -getNodeSize(d.data));
+    // updateNodes
+    //   .filter((d: any) => {
+    //     return d.data.wrappedNodes.some(
+    //       (node: ProvenanceNode) => node.metadata.isSlideAdded
+    //     );
+    //   })
+    //   .append('g')
+    //   .attr('class', 'bookmarked')
+    //   .append('rect')
+    //   .attr('fill', (d: any) => {
+    //     return d.data.wrappedNodes[0].metadata.bgColor;
+    //   })
+    //   .attr('width', (d: any) => 2 * getNodeSize(d.data))
+    //   .attr('height', (d: any) => 2 * getNodeSize(d.data))
+    //   .attr('x', (d: any) => -getNodeSize(d.data))
+    //   .attr('y', (d: any) => -getNodeSize(d.data));
 
     // other nodes to circle
     updateNodes
@@ -306,11 +307,21 @@ console.log(treeNodes);
       .append('g')
       .attr('class', 'normal');
 
+      updateNodes.on('contextmenu', (d: any) => {
+        d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
+        this.update();
+      });
+      
+      
     updateNodes
       .select('g')
       .append('circle')
       .attr('class', (d: any) => {
         let classString = '';
+        console.log(d.data.wrappedNodes[0]);
+        if (d.data.wrappedNodes[0].bookmarked === true) {
+          classString += ' bookmarked';
+        }
         if (isKeyNode(d.data.wrappedNodes[0])) {
           classString += ' keynode';
         }
@@ -319,6 +330,7 @@ console.log(treeNodes);
         return classString;
       })
       .attr('r', (d: any) => getNodeSize(d.data));
+
 
     // set node size text in circles / rects
     updateNodes
@@ -338,6 +350,10 @@ console.log(treeNodes);
       this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
       this.update();
     });
+
+
+
+
     // set classes on node
     updateNodes
       .attr('class', 'node branch-active')
@@ -399,3 +415,13 @@ console.log(treeNodes);
     return this.traverser;
   }
 }
+
+(function () {
+  var blockContextMenu;
+
+  blockContextMenu = function (evt: any) {
+    evt.preventDefault();
+  };
+
+  window.addEventListener('contextmenu', blockContextMenu);
+})();

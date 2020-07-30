@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnnotationDisplay = exports.defaultOptions = void 0;
 const easymde_1 = require("easymde");
 require("./easymde.css");
 require("./style.css");

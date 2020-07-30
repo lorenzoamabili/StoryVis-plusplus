@@ -76,7 +76,8 @@ export const wrapNode = (
     wrappedNodes: [node],
     children: node.children.map(wrapNode),
     plotTrimmerValue: -1,
-    neighbour: false
+    neighbour: false,
+    bookmarked: false
   };
 };
 

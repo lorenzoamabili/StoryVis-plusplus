@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ActionFunctionRegistry = void 0;
 var ActionFunctionRegistry = /** @class */ (function () {
     function ActionFunctionRegistry() {
         this.functionRegistry = {};

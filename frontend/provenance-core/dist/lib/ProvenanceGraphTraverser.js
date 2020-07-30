@@ -56,6 +56,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProvenanceGraphTraverser = void 0;
 var utils_1 = require("./utils");
 var mitt_1 = require("./mitt");
 function isNextNodeInTrackUp(currentNode, nextNode) {

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SlideDeckVisualization = void 0;
 const d3 = require("d3");
 require("./style.css");
 const provenance_core_1 = require("@visualstorytelling/provenance-core");

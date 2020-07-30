@@ -1,53 +1,53 @@
 <mat-toolbar color="primary" style="width: 100%">
   <mat-toolbar-row>
-    <button mat-raised-button matTooltip="Initialize the app" onClick="window.location.reload()">
-      <mat-icon>school</mat-icon>
+    <!-- <button mat-raised-button matTooltip="Initialize the app" onClick="window.location.reload()">
+      <mat-icon>refresh</mat-icon>
     </button>
     <span>&nbsp;</span>
-    <!-- <span>StoryVis</span> -->
+    <span>StoryVis</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
-    <span>&nbsp;</span>
+    <span>&nbsp;</span> -->
 
-    <div *ngIf="isAdmin">
+    <div>
       <mat-form-field>
-        <mat-label>Select graph</mat-label>
+        <mat-label>Select Graph</mat-label>
         <mat-select (selectionChange)="provenance.restoreGraph($event)">
           <mat-option *ngFor="let graph of graphs" [value]="graph">
-            {{ graph._id }}
+            {{ graph._id}}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Select story</mat-label>
+      <!-- <mat-form-field>
+        <mat-label>Select Story</mat-label>
         <mat-select (selectionChange)="provenance.restoreStory($event)">
-          <mat-option *ngFor="let story of stories" [value]="story">
+          <mat-option *ngFor="let story of stories" [value]="story">s
             {{ story._id }}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
 
-      <mat-form-field>
-        <mat-label>Select story</mat-label>
+      <!-- <mat-form-field>
+        <mat-label>Select Report</mat-label>
         <mat-select (selectionChange)="provenance.restoreTextReport($event)">
           <mat-option *ngFor="let textReport of textReports" [value]="textReport">
             {{ textReport._id }}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
 
-      <button mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
+      <!-- <button mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
         <mat-icon>backup</mat-icon>
-      </button>
+      </button> -->
 
-      <button mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
+      <!-- <button mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
         <mat-icon>library_books</mat-icon>
-      </button>
+      </button> -->
 
-      <button mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
-        <mat-icon>format_color_text</mat-icon>
-      </button>
+      <!-- <button mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
+        <mat-icon>library_books</mat-icon>
+      </button> -->
     </div>
 
 
@@ -61,10 +61,10 @@
       <mat-icon class="example-icon">launch</mat-icon>
     </mat-button-toggle>
 
-    <mat-button-toggle [checked]="canvas.settings.freehandMode"
+    <!-- <mat-button-toggle [checked]="canvas.settings.freehandMode"
       (change)="canvas.settings.freehandMode = $event.source.checked" matTooltip="Freehand Measurement">
       <mat-icon class="example-icon">pan_tool</mat-icon>
-    </mat-button-toggle>
+    </mat-button-toggle> -->
 
     <mat-button-toggle [checked]="canvas.settings.voxelprobeMode"
       (change)="canvas.settings.voxelprobeMode = $event.source.checked" matTooltip="VoxelProbe">

@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProvenanceSlidedeckPlayer = exports.STATUS = void 0;
 var STATUS;
 (function (STATUS) {
     STATUS[STATUS["IDLE"] = 0] = "IDLE";
@@ -56,7 +57,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._slides;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "currentSlideIndex", {
@@ -66,7 +67,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         set: function (index) {
             this._currentSlideIndex = index;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.play = function () {
@@ -111,7 +112,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._status;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.stop = function () {

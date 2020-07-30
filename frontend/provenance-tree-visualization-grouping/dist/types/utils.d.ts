@@ -3,6 +3,7 @@ export interface IGroupedTreeNode<T> {
     wrappedNodes: T[];
     plotTrimmerValue: number;
     neighbour: boolean;
+    bookmarked: boolean;
 }
 export declare const copyTree: <T>(node: IGroupedTreeNode<T>) => IGroupedTreeNode<T>;
 export declare const preOrderTraversal: <T>(node: IGroupedTreeNode<T>, cb: (n: IGroupedTreeNode<T>) => any) => void;

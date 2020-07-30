@@ -11,6 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.serializeProvenanceGraph = exports.restoreProvenanceGraph = exports.ProvenanceGraph = void 0;
 var utils_1 = require("./utils");
 var mitt_1 = require("./mitt");
 /**
@@ -72,14 +73,14 @@ var ProvenanceGraph = /** @class */ (function () {
             this._current = node;
             this._mitt.emit('currentChanged', node);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceGraph.prototype, "nodes", {
         get: function () {
             return this._nodes;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {

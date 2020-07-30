@@ -1,28 +1,34 @@
-import * as THREE from 'three';
-import * as AMI from 'ami.js';
-import { IAMIRenderer, IPointPair, IPointAngle, View } from './utils/types';
-import { AMIRenderer } from './amiRenderer';
-import { BrainvisCanvasComponent } from './brainvis-canvas.component';
-import { EventEmitter, Output } from '@angular/core';
-import { UninitializedError } from './utils/exceptions';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-import Ruler from './ruler';
-import Angle from './angle';
-import Freehand from './freehand';
-import Voxelprobe from './voxelprobe';
-import Annotation from './annotation';
-import { Artifact } from '@visualstorytelling/provenance-core/src/api';
-import { ProvenanceTracker } from '@visualstorytelling/provenance-core';
+import * as THREE from "three";
+import * as AMI from "ami.js";
+import { IAMIRenderer, IPointPair, IPointAngle, View } from "./utils/types";
+import { AMIRenderer } from "./amiRenderer";
+import { BrainvisCanvasComponent } from "./brainvis-canvas.component";
+import { EventEmitter, Output } from "@angular/core";
+import { UninitializedError } from "./utils/exceptions";
+import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
+import Ruler from "./ruler";
+import Angle from "./angle";
+import Freehand from "./freehand";
+import Voxelprobe from "./voxelprobe";
+import Annotation from "./annotation";
+import { Artifact } from "@visualstorytelling/provenance-core/src/api";
+import { ProvenanceTracker } from "@visualstorytelling/provenance-core";
 
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   private _rulerMode: boolean;
   private _angleMode: boolean;
-  private _freehandMode: boolean;
+  // private _freehandMode: boolean;
   private _voxelprobeMode: boolean;
   private _annotationMode: boolean;
 
-  private _measurement: Ruler | Angle | Freehand | Voxelprobe | Annotation | null;
-  public _measurements: Artifact[] = [];  // measurements/artifacts created in the current branch
+  private _measurement:
+    | Ruler
+    | Angle
+    | Freehand
+    | Voxelprobe
+    | Annotation
+    | null;
+  public _measurements: Artifact[] = []; // measurements/artifacts created in the current branch
   public _oldMeasurements: Artifact[] = [];
   public _newMeasurements: Artifact[] = [];
   public _currentArtifacts: Artifact[] = [];
@@ -33,11 +39,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   public tracker: ProvenanceTracker;
 
-  // private _angleInit: boolean = false;
-  // private _freehandInit: boolean = false;
-  // private _voxelprobeInit: boolean = false;
-  // private _annotationInit: boolean = false;
-
   private _rulerID: number = -1;
   private _angleID: number = -1;
   private _freehandID: number = -1;
@@ -46,7 +47,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   public _artifactID: number = -1;
 
   public _view: View;
-
 
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
@@ -59,8 +59,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   @Output() artifactCreated = new EventEmitter<Artifact>();
-  // @Output() artifactChanged = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
-  @Output() artifactRemoved = new EventEmitter<Artifact>();
 
   init() {
     if (this._initialized) {
@@ -70,7 +68,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // renderer
     this._renderer = new THREE.WebGLRenderer({
       antialias: true,
-      preserveDrawingBuffer: true
+      preserveDrawingBuffer: true,
     });
     this._renderer.autoClear = false;
     this._renderer.localClippingEnabled = true;
@@ -79,9 +77,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this._domElement.clientHeight,
       false
     );
-    this._renderer.domElement.setAttribute('style', 'width:100%; height:100%');
+    this._renderer.domElement.setAttribute("style", "width:100%; height:100%");
     this._renderer.setClearColor(0x121212, 1);
-    this._renderer.domElement.id = this._targetID.toString();  // 0,1,2,3 view ID
+    this._renderer.domElement.id = this._targetID.toString(); // 0,1,2,3 view ID
     this._domElement.appendChild(this._renderer.domElement); // append canvas to main DOMelement
 
     // camera
@@ -90,10 +88,11 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     const aspect = width / height;
     const viewSize = 0.5 * width;
     this._camera = new AMI.OrthographicCamera(
-      aspect * viewSize / -2,
-      aspect * viewSize / 2,
+      (aspect * viewSize) / -2,
+      (aspect * viewSize) / 2,
       viewSize / 2,
-      viewSize / -2);
+      viewSize / -2
+    );
     // 1,1000);
 
     // controls
@@ -108,20 +107,21 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // scene
     this._scene = new THREE.Scene();
 
-
-    this._renderer.domElement.addEventListener('click', this.onClick.bind(this));
+    this._renderer.domElement.addEventListener(
+      "click",
+      this.onClick.bind(this)
+    );
 
     // this.scene.add()
 
     this._measurement = null;
     this._rulerMode = false;
     this._angleMode = false;
-    this._freehandMode = false;
+    // this._freehandMode = false;
     this._voxelprobeMode = false;
     this._annotationMode = false;
 
     this._initialized = true;
-
   }
 
   initHelpersStack(stack) {
@@ -154,13 +154,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         lpsDims.x + 10,
         lpsDims.y + 10,
         lpsDims.z + 10
-      )
+      ),
     };
 
     // init and zoom
     const canvas = {
       width: this._domElement.clientWidth,
-      height: this._domElement.clientHeight
+      height: this._domElement.clientHeight,
     };
 
     this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
@@ -189,8 +189,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     );
 
     for (let i = 0; i < localizers.length; i++) {
-      this._localizerHelper['plane' + (i + 1)] = localizers[i].plane;
-      this._localizerHelper['color' + (i + 1)] = localizers[i].color;
+      this._localizerHelper["plane" + (i + 1)] = localizers[i].plane;
+      this._localizerHelper["color" + (i + 1)] = localizers[i].color;
     }
 
     this._localizerHelper.canvasWidth = this._domElement.clientWidth;
@@ -208,14 +208,14 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // bit of a hack... works fine for this application
     for (let i = 0; i < targetLocalizersHelpers.length; i++) {
       for (let j = 0; j < 3; j++) {
-        const targetPlane = targetLocalizersHelpers[i]['plane' + (j + 1)];
+        const targetPlane = targetLocalizersHelpers[i]["plane" + (j + 1)];
         if (
           targetPlane &&
           plane.x.toFixed(6) === targetPlane.x.toFixed(6) &&
           plane.y.toFixed(6) === targetPlane.y.toFixed(6) &&
           plane.z.toFixed(6) === targetPlane.z.toFixed(6)
         ) {
-          targetLocalizersHelpers[i]['plane' + (j + 1)] = plane;
+          targetLocalizersHelpers[i]["plane" + (j + 1)] = plane;
         }
       }
     }
@@ -226,15 +226,21 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   updateClipPlane(clipPlane) {
     const vertices = this._stackHelper.slice.geometry.vertices;
-    const p1 = new THREE.Vector3(vertices[0].x, vertices[0].y, vertices[0].z).applyMatrix4(
-      this._stackHelper._stack.ijk2LPS
-    );
-    const p2 = new THREE.Vector3(vertices[1].x, vertices[1].y, vertices[1].z).applyMatrix4(
-      this._stackHelper._stack.ijk2LPS
-    );
-    const p3 = new THREE.Vector3(vertices[2].x, vertices[2].y, vertices[2].z).applyMatrix4(
-      this._stackHelper._stack.ijk2LPS
-    );
+    const p1 = new THREE.Vector3(
+      vertices[0].x,
+      vertices[0].y,
+      vertices[0].z
+    ).applyMatrix4(this._stackHelper._stack.ijk2LPS);
+    const p2 = new THREE.Vector3(
+      vertices[1].x,
+      vertices[1].y,
+      vertices[1].z
+    ).applyMatrix4(this._stackHelper._stack.ijk2LPS);
+    const p3 = new THREE.Vector3(
+      vertices[2].x,
+      vertices[2].y,
+      vertices[2].z
+    ).applyMatrix4(this._stackHelper._stack.ijk2LPS);
 
     clipPlane.setFromCoplanarPoints(p1, p2, p3);
 
@@ -246,7 +252,11 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
 
     // resize event
-    this._renderer.domElement.addEventListener('resize', this.onWindowResize, false);
+    this._renderer.domElement.addEventListener(
+      "resize",
+      this.onWindowResize,
+      false
+    );
   }
 
   render() {
@@ -281,8 +291,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     const height = this._renderer.domElement.clientHeight;
     const aspect = width / height;
     const viewSize = 0.5 * width;
-    this._camera.left = aspect * viewSize / -2;
-    this._camera.right = aspect * viewSize  / 2;
+    this._camera.left = (aspect * viewSize) / -2;
+    this._camera.right = (aspect * viewSize) / 2;
     this._camera.top = viewSize / 2;
     this._camera.bottom = viewSize / -2;
     this._camera.canvas.width = width;
@@ -291,14 +301,15 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   onScroll(event) {
-    // if (this._rulerMode || this._angleMode || this._freehandMode || this._voxelprobeMode || this._annotationMode) {}
-    // else {
     super.onScroll(event);
 
     const oldIndex = this._stackHelper.index;
 
     if (event.delta > 0) {
-      if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
+      if (
+        this._stackHelper.index >=
+        this._stackHelper.orientationMaxIndex - 1
+      ) {
         return;
       }
       this._stackHelper.index += 1;
@@ -311,107 +322,50 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     const newIndex = this._stackHelper.index;
 
-    let oldArtifacts = this._currentArtifacts;
-    this.updateArtifact(newIndex, oldIndex);
-    let newArtifacts = this._currentArtifacts;
-
-    console.log(newArtifacts);
-
     this._canvas.dispatchEvent({
-      type: 'sliceIndexChangeStart',
+      type: "sliceIndexChangeStart",
       changes: {
         sliceOrientation: this._sliceOrientation,
         oldIndex: oldIndex,
-        newIndex: newIndex
-      },
-      oldArtifacts: oldArtifacts
+        newIndex: newIndex,
+      }
     });
 
-    // console.log(this._currentArtifacts);
-
-
-    // console.log(this._currentArtifacts);
 
     this._canvas.dispatchEvent({
-      type: 'sliceIndexChanged',
+      type: "sliceIndexChanged",
       changes: {
         sliceOrientation: this._sliceOrientation,
         oldIndex: oldIndex,
-        newIndex: newIndex
-      },
-      newArtifacts: newArtifacts
+        newIndex: newIndex,
+      }
     });
-
-    // this.oldArtifacts(oldArtifacts);
-    // this.newArtifacts(newArtifacts);
-    //}
   }
 
 
-  updateArtifact(newIndex, oldIndex) {
-    // Artifacts behaviour when scrolling is performed 
+  changeSliceRemove(oldIndex) {
+    if (this._currentArtifacts.length !== 0) {
+      if (this._measurements.find((x) => x.sliceIndex == oldIndex)) {
+        this._oldMeasurements = this._measurements.filter(
+          (x) => x.sliceIndex == oldIndex);
+        this._oldMeasurements.forEach((x) => this.removeArtifactElms(x))
+      }
+    }
+  }
+
+  changeSliceRender(newIndex) {
     if (this._measurements.length !== 0) {
-      if (this._measurements.find(x => x.sliceIndex == newIndex)) {
-        if (this._currentArtifacts.length !== 0) {
-          this._oldMeasurements = this._measurements.filter(x => x.sliceIndex == oldIndex);
-          this._oldMeasurements.forEach(x => this.removeArtifactElms(x));
-        }
-        this._newMeasurements = this._measurements.filter(x => x.sliceIndex == newIndex);
-        this._newMeasurements.forEach(x => this.renderArtifactElms(x));
-      } else {
-        if (this._currentArtifacts.length !== 0) {
-          this._oldMeasurements = this._measurements.filter(x => x.sliceIndex == oldIndex);
-          this._oldMeasurements.forEach(x => this.removeArtifactElms(x));
-        }
+      if (this._measurements.find((x) => x.sliceIndex == newIndex)) {
+        this._newMeasurements = this._measurements.filter(
+          (x) => x.sliceIndex == newIndex);
+        this._newMeasurements.forEach((x) => this.renderArtifactElms(x))
       }
     }
   }
 
 
-  // oldArtifacts(oldArtifacts) {
-  //   console.log(oldArtifacts);
-  //   if ((oldArtifacts) && (oldArtifacts.length !== 0)) {
-  //     for (let i = 0; i < oldArtifacts.length; i++) {
-  //       this.renderArtifactElms(oldArtifacts[i]);
-  //     }
-  //   }
-  // }
-
-  // newArtifacts(newArtifacts) {
-  //   console.log(newArtifacts);
-  //   if ((newArtifacts) && (newArtifacts.length !== 0)) {
-  //     for (let i = 0; i < newArtifacts.length; i++) {
-  //       this.renderArtifactElms(newArtifacts[i]);
-  //     }
-  //   }
-  // }
-
-
-
-  // renderArtifacts(artifact) {
-  //   for (let i = 0; i < artifact.elements.length; i++) {
-  //     if (artifact.elements[i].length !== 1) {
-  //       for (let l = 0; l < artifact.elements[i].length; l++) {
-  //         this._domElement.appendChild(artifact.elements[i][l]);
-  //       }
-  //     }
-  //     this._domElement.appendChild(artifact.elements[i]);
-  //   }
-  // }
-
-  // removeArtifacts(artifact) {
-  //   for (let i = 0; i < artifact.elements.length; i++) {
-  //     if (artifact.elements[i].length !== 1) {
-  //       for (let l = 0; l < artifact.elements[i].length; l++) {
-  //         this._domElement.removeChild(artifact.elements[i][l]);
-  //       }
-  //     }
-  //     this._domElement.removeChild(artifact.elements[i]);
-  //   }
-  // }
-
   renderArtifactElms(artifact: Artifact) {
-    if (!this._artifactInit) {
+    if (!this._artifactInit && artifact) {
       for (let i = 0; i < artifact.elements.length; i++) {
         this._domElement.appendChild(artifact.elements[i]);
       }
@@ -422,27 +376,28 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   removeArtifactElms(artifact: Artifact) {
-    for (let i = 0; i < artifact.elements.length; i++) {
-      this._domElement.removeChild(artifact.elements[i]);
+    if (this._domElement.childNodes && artifact) {
+      for (let i = 0; i < artifact.elements.length; i++) {
+        this._domElement.removeChild(artifact.elements[i]);
+      }
+      this._currentArtifacts.splice(-1, 1);
     }
-    this._currentArtifacts.splice(-1, 1);
   }
-
-
 
   addArtifact = (artifact: Artifact) => {
     this.renderArtifactElms(artifact);
-    this._measurements.push(this._measurement.artifact);
-    console.log(this._measurements);
-    this.artifactCreated.emit(artifact);
-  }
+    this._measurements.push(artifact);
+    console.log(artifact)
+  };
 
   removeArtifact = (artifact: Artifact) => {
-    this.removeArtifactElms(artifact);
-    this._measurements.splice(-1, 1);
-    console.log();
-    this.artifactRemoved.emit(artifact);
-  }
+    if (artifact && (this._currentArtifacts.length !== 0)) {
+      this.removeArtifactElms(artifact);
+      this._measurements.splice(-1, 1);
+    }
+  };
+
+
 
 
   // Ruler
@@ -451,7 +406,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._measurement = new Ruler(this, evt);
     this._pairs.push(this._measurement.pair);
 
-    this._domElement.removeEventListener('mousedown', this.startRuler);
+    this._domElement.removeEventListener("mousedown", this.startRuler);
 
     // forward events
     // this._ruler.created.subscribe(arg => this.rulerCreated.emit(arg));
@@ -462,145 +417,162 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._rulerID = this._rulerID + 1;
     this._measurement.artifact = {
       id: this._artifactID,
-      type: 'ruler',
+      type: "ruler",
       typeID: this._rulerID,
       sliceIndex: this._measurement.index,
       view: this._domID,
-      elements: [this._measurement.widget._line, this._measurement.widget._label
-        , this._measurement.widget.children[0]._dom, this._measurement.widget.children[1]._dom
-      ]
-    }
+      elements: [
+        this._measurement.widget._line,
+        this._measurement.widget._label,
+        this._measurement.widget.children[0]._dom,
+        this._measurement.widget.children[1]._dom,
+      ],
+    };
     this._artifactInit = true;
     this.addArtifact(this._measurement.artifact);
-
-  }
-
+    this.artifactCreated.emit(this._measurement.artifact);
+    this._canvas.settings.rulerMode = false;
+  };
 
   // Angle
 
   startAngle = (evt) => {
     this._measurement = new Angle(this, evt);
-    // this._pairs.push(this._ruler.pair);
 
-    this._domElement.removeEventListener('mousedown', this.startAngle);
+    this._domElement.removeEventListener("mousedown", this.startAngle);
 
     // create artifact
     this._artifactID = this._artifactID + 1;
     this._angleID = this._angleID + 1;
     this._measurement.artifact = {
       id: this._artifactID,
-      type: 'angle',
+      type: "angle",
       typeID: this._angleID,
       sliceIndex: this._measurement.index,
       view: this._domID,
-      elements: [this._measurement.widget._line, this._measurement.widget._label, this._measurement.widget._line2
-        , this._measurement.widget.children[0]._dom, this._measurement.widget.children[1]._dom, this._measurement.widget.children[2]._dom
-      ]
-    }
+      elements: [
+        this._measurement.widget._line,
+        this._measurement.widget._label,
+        this._measurement.widget._line2,
+        this._measurement.widget.children[0]._dom,
+        this._measurement.widget.children[1]._dom,
+        this._measurement.widget.children[2]._dom,
+      ],
+    };
     this._artifactInit = true;
     this.addArtifact(this._measurement.artifact);
-  }
-
-
+    this.artifactCreated.emit(this._measurement.artifact);
+    this._canvas.settings.angleMode = false;
+  };
 
   // Freehand
 
-  startFreehand = (evt) => {
-    this._measurement = new Freehand(this, evt);
-    // this._pairs.push(this._ruler.pair);
+  // startFreehand = (evt) => {
+  //   this._measurement = new Freehand(this, evt);
 
-    this._domElement.removeEventListener('mousedown', this.startFreehand);
+  //   this._domElement.removeEventListener("mousedown", this.startFreehand);
 
-    // create artifact
-    this._artifactID = this._artifactID + 1;
-    this._freehandID = this._freehandID + 1;
-    const handles = this._measurement.widget.children.filter(x => x !== null);
-    for (let i = 0, length = this._measurement.widget.children.length; i < length; i++) {
-      handles.push(this._measurement.widget.children[i]._dom);
-    }
-    const elems = [this._measurement.widget._label, ...this._measurement.widget._lines, ...handles];
+  //   // create artifact
+  //   this._artifactID = this._artifactID + 1;
+  //   this._freehandID = this._freehandID + 1;
+  //   const handles = this._measurement.widget.children.filter((x) => x !== null);
+  //   for (
+  //     let i = 0, length = this._measurement.widget.children.length; i < length; i++ ) {
+  //     handles.push(this._measurement.widget.children[i]._dom);
+  //   }
+  //   const elems = [
+  //     this._measurement.widget._label,
+  //     ...this._measurement.widget._lines,
+  //     ...handles
+  //   ];
 
-    this._measurement.artifact = {
-      id: this._artifactID,
-      type: 'freehand',
-      typeID: this._freehandID,
-      sliceIndex: this._measurement.index,
-      view: this._domID,
-      elements: elems
-    }
-    this._artifactInit = true;
-    this.addArtifact(this._measurement.artifact);
-  }
-
+  //   this._measurement.artifact = {
+  //     id: this._artifactID,
+  //     type: "freehand",
+  //     typeID: this._freehandID,
+  //     sliceIndex: this._measurement.index,
+  //     view: this._domID,
+  //     elements: elems
+  //   };
+  //   this._artifactInit = true;
+  //   this.addArtifact(this._measurement.artifact);
+  //   this.artifactCreated.emit(this._measurement.artifact);
+  // };
 
   // VoxelProbe
 
   startVoxelprobe = (evt) => {
     this._measurement = new Voxelprobe(this, evt);
-    // this._pairs.push(this._ruler.pair);
 
-    this._domElement.removeEventListener('mousedown', this.startVoxelprobe);
+    this._domElement.removeEventListener("mousedown", this.startVoxelprobe);
 
     // create artifact
     this._artifactID = this._artifactID + 1;
     this._voxelprobeID = this._voxelprobeID + 1;
     this._measurement.artifact = {
       id: this._artifactID,
-      type: 'voxelprobe',
+      type: "voxelprobe",
       typeID: this._voxelprobeID,
       sliceIndex: this._measurement.index,
       view: this._domID,
-      elements: [this._measurement.widget._label, this._measurement.widget.children[0]._dom
-      ]
-    }
+      elements: [
+        this._measurement.widget._label,
+        this._measurement.widget.children[0]._dom,
+      ],
+    };
     this._artifactInit = true;
     this.addArtifact(this._measurement.artifact);
-  }
-
+    this.artifactCreated.emit(this._measurement.artifact);
+    this._canvas.settings.voxelprobeMode = false;
+  };
 
   // Annotation
 
   startAnnotation = (evt) => {
     this._measurement = new Annotation(this, evt);
-    // this._pairs.push(this._ruler.pair);
 
-    this._domElement.removeEventListener('mousedown', this.startAnnotation);
+    this._domElement.removeEventListener("mousedown", this.startAnnotation);
 
-    const handles = this._measurement.widget.children.filter(x => x !== null);
+    const handles = this._measurement.widget.children.filter((x) => x !== null);
     for (let i = 0, length = handles.length; i < length; i++) {
       handles.push(this._measurement.widget.children[i]._dom);
     }
-    const elems = [this._measurement.widget._line, this._measurement.widget._label, this._measurement.widget._dashline, ...handles];
+    const elems = [
+      this._measurement.widget._line,
+      this._measurement.widget._label,
+      this._measurement.widget._dashline,
+      ...handles
+    ];
 
     // create artifact
     this._artifactID = this._artifactID + 1;
     this._annotationID = this._annotationID + 1;
     this._measurement.artifact = {
       id: this._artifactID,
-      type: 'annotation',
+      type: "annotation",
       typeID: this._annotationID,
       sliceIndex: this._measurement.index,
       view: this._domID,
-      elements: elems.filter(x => x instanceof HTMLElement)
-    }
+      elements: elems.filter((x) => x instanceof HTMLElement)
+    };
     this._artifactInit = true;
     this.addArtifact(this._measurement.artifact);
+    this.artifactCreated.emit(this._measurement.artifact);
+    this._canvas.settings.annotationMode = false;
+  };
+
+  get sliceOrientation() {
+    return this._sliceOrientation;
   }
-
-
-  get sliceOrientation() { return this._sliceOrientation; }
-
-  // get updateArtifact() { return this.graph; }
-
 
   set rulerMode(isEnabled: boolean) {
     this._rulerMode = isEnabled;
     if (isEnabled) {
       // create a ruler on first click
-      this.domElement.addEventListener('mousedown', this.startRuler);
+      this.domElement.addEventListener("mousedown", this.startRuler);
       // this.domElement.addEventListener('shiftKey', this.deleteRuler);
     } else {
-      this.domElement.removeEventListener('mousedown', this.startRuler);
+      this.domElement.removeEventListener("mousedown", this.startRuler);
       // this.domElement.removeEventListener('shiftKey', this.deleteRuler);
     }
   }
@@ -609,34 +581,34 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._angleMode = isEnabled;
     if (isEnabled) {
       // create a ruler on first click
-      this.domElement.addEventListener('mousedown', this.startAngle);
+      this.domElement.addEventListener("mousedown", this.startAngle);
       // this.domElement.addEventListener('shiftKey', this.deleteAngle);
     } else {
-      this.domElement.removeEventListener('mousedown', this.startAngle);
+      this.domElement.removeEventListener("mousedown", this.startAngle);
       // this.domElement.removeEventListener('shiftKey', this.deleteAngle);
     }
   }
 
-  set freehandMode(isEnabled: boolean) {
-    this._freehandMode = isEnabled;
-    if (isEnabled) {
-      // create a ruler on first click
-      this.domElement.addEventListener('mousedown', this.startFreehand);
-      // this.domElement.addEventListener('shiftKey', this.deleteFreehand);
-    } else {
-      this.domElement.removeEventListener('mousedown', this.startFreehand);
-      // this.domElement.removeEventListener('shiftKey', this.deleteFreehand);
-    }
-  }
+  // set freehandMode(isEnabled: boolean) {
+  //   this._freehandMode = isEnabled;
+  //   if (isEnabled) {
+  //     // create a ruler on first click
+  //     this.domElement.addEventListener("mousedown", this.startFreehand);
+  //     // this.domElement.addEventListener('shiftKey', this.deleteFreehand);
+  //   } else {
+  //     this.domElement.removeEventListener("mousedown", this.startFreehand);
+  //     // this.domElement.removeEventListener('shiftKey', this.deleteFreehand);
+  //   }
+  // }
 
   set voxelprobeMode(isEnabled: boolean) {
     this._voxelprobeMode = isEnabled;
     if (isEnabled) {
       // create a ruler on first click
-      this.domElement.addEventListener('mousedown', this.startVoxelprobe);
+      this.domElement.addEventListener("mousedown", this.startVoxelprobe);
       // this.domElement.addEventListener('shiftKey', this.deleteVoxelprobe);
     } else {
-      this.domElement.removeEventListener('mousedown', this.startVoxelprobe);
+      this.domElement.removeEventListener("mousedown", this.startVoxelprobe);
       // this.domElement.removeEventListener('shiftKey', this.deleteVoxelprobe);
     }
   }
@@ -645,10 +617,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._annotationMode = isEnabled;
     if (isEnabled) {
       // create a ruler on first click
-      this.domElement.addEventListener('mousedown', this.startAnnotation);
+      this.domElement.addEventListener("mousedown", this.startAnnotation);
       // this.domElement.addEventListener('shiftKey', this.deleteAnnotation);
     } else {
-      this.domElement.removeEventListener('mousedown', this.startAnnotation);
+      this.domElement.removeEventListener("mousedown", this.startAnnotation);
       // this.domElement.removeEventListener('shiftKey', this.deleteAnnotation);
     }
   }

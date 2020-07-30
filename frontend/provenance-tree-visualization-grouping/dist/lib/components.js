@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.addSlider = exports.addAggregationButtons = exports.setTitle = void 0;
 var d3 = require("d3");
 var aggregation_objects_1 = require("./aggregation/aggregation-objects");
 var legend_1 = require("./legend");
@@ -20,12 +21,12 @@ exports.setTitle = setTitle;
  * @description Show the buttons of the user interface.
  */
 function addAggregationButtons(elm, provenanceTreeVisualization, aggreg) {
+    var container = elm.append('div').attr('class', 'container');
+    var holder = container.append('div');
+    legend_1.addLegend(container);
+    holder.attr('id', 'aggregationControls');
     if (aggreg == "ProvGraph") { }
     else {
-        var container = elm.append('div').attr('class', 'container');
-        var holder = container.append('div');
-        legend_1.addLegend(container);
-        holder.attr('id', 'aggregationControls');
         // Data aggregation Div
         var dataDiv = holder.append('div').attr('class', 'dataAggregation-Box');
         // Combobox

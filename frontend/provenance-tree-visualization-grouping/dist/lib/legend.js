@@ -1,41 +1,54 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.addLegend = void 0;
 var legendData = {
     legends: [
+        // {
+        //   name: 'Provenance Node',
+        //   color: '#fff',
+        //   shape: 'circle'
+        // },
         {
-            name: 'Provenance Node',
+            name: 'bookmark',
             color: '#fff',
-            shape: 'circle'
-        },
-        {
-            name: 'Bookmarked Node',
-            color: '#fff',
-            shape: 'rect'
-        },
-        {
-            name: 'selection',
-            color: '#286090',
-            shape: 'circle'
-        },
-        {
-            name: 'configuration',
-            color: '#b8852c',
-            shape: 'circle'
+            shape: 'circle',
+            opacity: 0.3
         },
         {
             name: 'exploration',
-            color: '#60aa85',
-            shape: 'circle'
+            color: '#8dd3c7',
+            shape: 'circle',
+            opacity: 0.3
         },
         {
-            name: 'provenance',
-            color: '#9210dd',
-            shape: 'circle'
+            name: 'selection',
+            color: '#80b1d3',
+            shape: 'circle',
+            opacity: 0.3
+        },
+        {
+            name: 'configuration',
+            color: '#fdb462',
+            shape: 'circle',
+            opacity: 0.3
         },
         {
             name: 'derivation',
-            color: '#a94442',
-            shape: 'circle'
+            color: '#fb8072',
+            shape: 'circle',
+            opacity: 0.3
+        },
+        {
+            name: 'provenance',
+            color: '#bebada',
+            shape: 'circle',
+            opacity: 0.3
+        },
+        {
+            name: 'annotation',
+            color: '#ffffb3',
+            shape: 'circle',
+            opacity: 0.3
         }
     ]
 };
@@ -49,7 +62,8 @@ function addLegend(elm) {
         .append('li');
     listItem
         .append('div')
-        .attr('class', function (d) { return (d.shape === 'circle' ? 'circle' : 'rect'); })
+        // .attr('class', (d: any) => (d.shape === 'circle' ? 'circle' : 'rect'))
+        .attr('class', function (d) { return (d.name === 'bookmark' ? 'bookmark' : 'circle'); })
         .attr('style', function (d) { return "background-color:" + d.color; });
     listItem.append('span').text(function (d) {
         return d.name;

@@ -166,19 +166,19 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     //   :
     // 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_slice.nii.gz');
 
-    //  this.loadData( (this.practiceSession == false) ?
-    //  'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' :
-    //  'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
-
-    this.loadData(
+      this.loadData( (this.practiceSession == false) ?
+      'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' :
       'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
+
+    // this.loadData(
+    //   'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
 
     this.addEventListeners();
     this.animate();
 
     this.settings.rulerModeChange.subscribe(this.toggleRulerMode.bind(this));
     this.settings.angleModeChange.subscribe(this.toggleAngleMode.bind(this));
-    this.settings.freehandModeChange.subscribe(this.toggleFreehandMode.bind(this));
+    // this.settings.freehandModeChange.subscribe(this.toggleFreehandMode.bind(this));
     this.settings.voxelprobeModeChange.subscribe(this.toggleVoxelprobeMode.bind(this));
     this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
     addListeners(this._provenance.tracker, this);
@@ -196,11 +196,11 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._coronalRenderer.angleMode = isEnabled;
   }
 
-  toggleFreehandMode(isEnabled: boolean) {
-    this._axialRenderer.freehandMode = isEnabled;
-    this._sagittalRenderer.freehandMode = isEnabled;
-    this._coronalRenderer.freehandMode = isEnabled;
-  }
+  // toggleFreehandMode(isEnabled: boolean) {
+  //   this._axialRenderer.freehandMode = isEnabled;
+  //   this._sagittalRenderer.freehandMode = isEnabled;
+  //   this._coronalRenderer.freehandMode = isEnabled;
+  // }
 
   toggleVoxelprobeMode(isEnabled: boolean) {
     this._axialRenderer.voxelprobeMode = isEnabled;
@@ -420,52 +420,60 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     }
   }
 
-  setSliceIndex(sliceOrientation: VIEWS, oldIndex: number, newIndex: number) {
+  setSliceIndex(sliceOrientation: VIEWS, newIndex: number) {
     const renderer = this.getRenderer(sliceOrientation);
     renderer.stackHelper.index = newIndex;
-
-    if (sliceOrientation === 'axial') {
-      this._axialRenderer.updateArtifact(newIndex, oldIndex);
-    }
-    else if (sliceOrientation === 'coronal') {
-      this._coronalRenderer.updateArtifact(newIndex, oldIndex);
-    }
-    else if (sliceOrientation === 'sagittal') {
-      this._sagittalRenderer.updateArtifact(newIndex, oldIndex);
-    }
   }
 
-  // removeArtifacts(sliceOrientation: VIEWS, artifacts: Artifact[]) {
-  //   if (artifacts && (artifacts.length !== 0)) {
-  //     console.log(artifacts);
-
-  //     if (sliceOrientation === 'axial') {
-  //       this._axialRenderer.oldArtifacts(artifacts);
-  //     }
-  //     else if (sliceOrientation === 'coronal') {
-  //       this._coronalRenderer.oldArtifacts(artifacts);
-  //     }
-  //     else if (sliceOrientation === 'sagittal') {
-  //       this._sagittalRenderer.oldArtifacts(artifacts);
-  //     }
-  //   }
-  // }
-
-  // renderArtifacts(sliceOrientation: VIEWS, artifacts: Artifact[]) {
-  //   if (artifacts && (artifacts.length !== 0)) {
-  //     console.log(artifacts);
-
-  //     if (sliceOrientation === 'axial') {
-  //       this._axialRenderer.newArtifacts(artifacts);
-  //     }
-  //     else if (sliceOrientation === 'coronal') {
-  //       this._coronalRenderer.newArtifacts(artifacts);
-  //     }
-  //     else if (sliceOrientation === 'sagittal') {
-  //       this._sagittalRenderer.newArtifacts(artifacts);
-  //     }
-  //   }
-  // }
+    changeSliceRemove(sliceOrientation: VIEWS, oldIndex: number) {
+      if (sliceOrientation === 'axial') {
+        this._axialRenderer.changeSliceRemove(oldIndex);
+      }
+      else if (sliceOrientation === 'coronal' ) {
+        this._coronalRenderer.changeSliceRemove(oldIndex);
+      }
+      else if (sliceOrientation === 'sagittal' ) {
+        this._sagittalRenderer.changeSliceRemove(oldIndex);
+      }
+    }
+  
+    changeSliceRender(sliceOrientation: VIEWS, newIndex: number) {
+      if (sliceOrientation === 'axial') {
+        this._axialRenderer.changeSliceRender(newIndex);
+      }
+      else if (sliceOrientation === 'coronal' ) {
+        this._coronalRenderer.changeSliceRender(newIndex);
+      }
+      else if (sliceOrientation === 'sagittal' ) {
+        this._sagittalRenderer.changeSliceRender(newIndex);
+      } 
+    }
+  
+    removeArtifact(view: VIEWS, artifact: Artifact) {
+        if (view === 'axial') {
+          this._axialRenderer.removeArtifact(artifact);
+        }
+        else if (view === 'coronal') {
+          this._coronalRenderer.removeArtifact(artifact);
+        }
+        else if (view === 'sagittal') {
+          this._sagittalRenderer.removeArtifact(artifact);
+        
+      }
+    }
+  
+    renderArtifact(view: VIEWS, artifact: Artifact) {
+        if (view === 'axial') {
+          this._axialRenderer.addArtifact(artifact);
+        }
+        else if (view === 'coronal') {
+          this._coronalRenderer.addArtifact(artifact);
+        }
+        else if (view === 'sagittal') {
+          this._sagittalRenderer.addArtifact(artifact);
+      }
+    }
+  
 
   setPerspectiveCameraZoom(args: IOrientation, transitionTime: number) {
     this._perspectiveRenderer.setCameraOrientation(args, transitionTime);

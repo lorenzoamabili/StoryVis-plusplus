@@ -8,8 +8,7 @@ import {
   ProvenanceNode,
   RootNode,
   IScreenShotProvider,
-  SerializedProvenanceGraph,
-  Artifact
+  SerializedProvenanceGraph
 } from './api';
 import { generateUUID, generateTimestamp } from './utils';
 import { ProvenanceGraph, serializeProvenanceGraph } from './ProvenanceGraph';
@@ -52,11 +51,10 @@ export class ProvenanceTracker implements IProvenanceTracker {
    * will be taken as the label for this node.
    *
    * @param action
-   * @param artifact
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
-  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, artifact?: Artifact): Promise<StateNode> {
+  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false): Promise<StateNode> {
     if (!this.acceptActions) {
       return Promise.resolve(this.graph.current as StateNode);
     }
@@ -68,7 +66,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       label = action.do;
     }
 
-    const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any, artifacts: Artifact[]): StateNode => ({
+    const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any): StateNode => ({
       id: generateUUID(),
       label: label,
       metadata: {
@@ -78,8 +76,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       action,
       actionResult,
       parent: parentNode,
-      children: [],
-      artifacts
+      children: []
     });
 
     let newNode: StateNode;
@@ -88,7 +85,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
     const currentNode = this.graph.current;
 
     if (skipFirstDoFunctionCall) {
-      newNode = createNewStateNode(this.graph.current, null, []);
+      newNode = createNewStateNode(this.graph.current, null);
 
     } else {
       // Get the registered function from the action out of the registry
@@ -98,10 +95,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       );
       const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args);
 
-      const nodeArtifacts = (action.doArguments.artifacts && action.doArguments.artifacts[1].length !== 0) ?
-       ( (artifact) ? action.doArguments.artifacts[1].push(artifact) : action.doArguments.artifacts[1] ) : artifact ;
-
-       newNode = createNewStateNode(currentNode, actionResult, nodeArtifacts);
+       newNode = createNewStateNode(currentNode, actionResult);
     }
 
     if (this.autoScreenShot && this.screenShotProvider) {

@@ -1,4 +1,4 @@
-import { StateNode, Action, IProvenanceTracker, IActionFunctionRegistry, IProvenanceGraph, IScreenShotProvider, SerializedProvenanceGraph, Artifact } from './api';
+import { StateNode, Action, IProvenanceTracker, IActionFunctionRegistry, IProvenanceGraph, IScreenShotProvider, SerializedProvenanceGraph } from './api';
 /**
  * Provenance Graph Tracker implementation
  *
@@ -23,11 +23,10 @@ export declare class ProvenanceTracker implements IProvenanceTracker {
      * will be taken as the label for this node.
      *
      * @param action
-     * @param artifact
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    applyAction(action: Action, skipFirstDoFunctionCall?: boolean, artifact?: Artifact): Promise<StateNode>;
+    applyAction(action: Action, skipFirstDoFunctionCall?: boolean): Promise<StateNode>;
     get screenShotProvider(): IScreenShotProvider | null;
     set screenShotProvider(provider: IScreenShotProvider | null);
     get autoScreenShot(): boolean;

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.serializeSlideDeck = exports.restoreSlideDeck = exports.ProvenanceSlidedeck = void 0;
 var mitt_1 = require("./mitt");
 var ProvenanceSlide_1 = require("./ProvenanceSlide");
 var ProvenanceSlidedeck = /** @class */ (function () {
@@ -18,7 +19,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._application;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.addSlide = function (slide, index) {
@@ -73,7 +74,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
             this._selectedSlide = slide;
             this._mitt.emit('slideSelected', slide);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.moveSlide = function (indexFrom, indexTo) {
@@ -116,7 +117,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._slides;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.next = function () {
@@ -147,7 +148,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._graph;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeck.prototype, "screenShotProvider", {
@@ -157,7 +158,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         set: function (provider) {
             this._screenShotProvider = provider;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeck.prototype, "autoScreenShot", {
@@ -170,7 +171,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
                 console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.on = function (type, handler) {

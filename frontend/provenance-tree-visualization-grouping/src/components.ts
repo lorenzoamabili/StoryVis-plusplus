@@ -41,14 +41,15 @@ export function addAggregationButtons(
   provenanceTreeVisualization: ProvenanceTreeVisualization,
   aggreg: string
 ) {
+  const container = elm.append('div').attr('class', 'container');
+
+  const holder = container.append('div');
+  addLegend(container);
+  holder.attr('id', 'aggregationControls');
+
   if (aggreg == "ProvGraph") { }
   else {
-    const container = elm.append('div').attr('class', 'container');
-
-    const holder = container.append('div');
-    addLegend(container);
-    holder.attr('id', 'aggregationControls');
-
+  
     // Data aggregation Div
     const dataDiv = holder.append('div').attr('class', 'dataAggregation-Box');
     // Combobox
