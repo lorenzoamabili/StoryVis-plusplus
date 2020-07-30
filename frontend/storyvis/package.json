@@ -2,8 +2,6 @@
     "name": "storyvis",
     "version": "0.0.1",
     "homepage": "https://visualstorytelling.github.io/userStudy",
-    "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build",
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
