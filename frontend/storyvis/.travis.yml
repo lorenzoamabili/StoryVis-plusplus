@@ -1,23 +1,16 @@
 language: node_js
-node_js:
-  - 'stable'
-cache:
-  directories:
-    - node_modules
-    - dist
-jobs:
-  include:
-    - stage: build
-      install: yarn
-      script:
-        - rm -rf dist
-        - yarn build
-        - yarn build --base-href /userStudy/
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: SHA256:KWtU+fkuf5U4Io/YgVZQy2dkcIqjuwtqF4KfKflrH+k
-  keep_history: true
-  on:
-    branch: master
+script: echo "Run your build here"
+
+# Only use the `after_deploy` step if you are using the `deploy`
+# step. If you're not using `deploy`, then put the following code in
+# the `after_script` step.
+after_deploy:
+  - |
+    curl -u $ASSERTIBLE_TOKEN: -XPOST "https://assertible.com/deployments" -d'{
+        "service": "'"${ASSERTIBLE_SERVICE}"'",
+        "environmentName": "production",
+        "version": "'"${TRAVIS_COMMIT}"'",
+        "ref": "'"${TRAVIS_COMMIT}"'",
+        "github": true
+    }'
 
