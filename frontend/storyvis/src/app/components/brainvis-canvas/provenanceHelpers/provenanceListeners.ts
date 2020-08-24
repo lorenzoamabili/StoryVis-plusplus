@@ -214,6 +214,23 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }
   });
 
+  canvas.renderers.forEach(renderer => {
+    if (renderer instanceof Renderer2D) {
+      renderer.annotationCreated.subscribe((artifact) => {
+        const action = {
+          metadata: {
+            userIntent: 'annotation',
+            label: artifact.type
+          },
+          do: 'renderArtifact',
+          doArguments: { args: [renderer.sliceOrientation, artifact] },
+          undo: 'removeArtifact',
+          undoArguments: { args: [renderer.sliceOrientation, artifact] }
+        };
+        tracker.applyAction(action, true);
+      });
+    }
+  });
 
   // Window Level Changes Listener - Debounced
   let wLChangeEndListenerC: EventListener = null;

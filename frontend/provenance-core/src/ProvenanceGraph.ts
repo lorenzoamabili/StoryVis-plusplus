@@ -151,7 +151,7 @@ export function serializeProvenanceGraph(graph: ProvenanceGraph): SerializedProv
     serializedNode.children = node.children.map(child => child.id);
     return serializedNode;
   });
-
+  
   return {
     nodes,
     root: graph.root.id,

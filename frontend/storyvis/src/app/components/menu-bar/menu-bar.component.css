@@ -1,6 +1,8 @@
 .mat-toolbar.mat-primary {
   background: #4b5366;
   color: #fff;
+  font-family: Times;
+  font-size: 16px;
 }
 mat-button-toggle,
 button {

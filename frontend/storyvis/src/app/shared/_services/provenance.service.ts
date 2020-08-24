@@ -73,7 +73,8 @@ export class ProvenanceService {
   }
 
   public async saveTextReport(IDcreator: Number) { 
-      const textArea = document.getElementById("textArea") as HTMLTextAreaElement;
+      const textArea = document.getElementById("textAreaCont") as HTMLTextAreaElement;
+      console.log(textArea);
       this.textReport = textArea.value;
       this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
       {

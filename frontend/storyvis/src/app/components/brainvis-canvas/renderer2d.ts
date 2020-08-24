@@ -59,6 +59,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   @Output() artifactCreated = new EventEmitter<Artifact>();
+  @Output() annotationCreated = new EventEmitter<Artifact>();
 
   init() {
     if (this._initialized) {
@@ -557,7 +558,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     };
     this._artifactInit = true;
     this.addArtifact(this._measurement.artifact);
-    this.artifactCreated.emit(this._measurement.artifact);
+    this.annotationCreated.emit(this._measurement.artifact);
     this._canvas.settings.annotationMode = false;
   };
 

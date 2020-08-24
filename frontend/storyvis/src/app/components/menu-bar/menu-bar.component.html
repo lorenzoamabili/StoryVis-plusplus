@@ -36,20 +36,22 @@
           </mat-option>
         </mat-select>
       </mat-form-field> -->
+      <span>&nbsp;</span>
 
-      <!-- <button mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
+      <button mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
         <mat-icon>backup</mat-icon>
-      </button> -->
+      </button>
 
       <!-- <button mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
         <mat-icon>library_books</mat-icon>
       </button> -->
 
-      <!-- <button mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
+      <button mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
         <mat-icon>library_books</mat-icon>
-      </button> -->
+      </button>
     </div>
 
+    <span>&nbsp;</span>
 
     <mat-button-toggle [checked]="canvas.settings.rulerMode"
       (change)="canvas.settings.rulerMode = $event.source.checked" matTooltip="Ruler">

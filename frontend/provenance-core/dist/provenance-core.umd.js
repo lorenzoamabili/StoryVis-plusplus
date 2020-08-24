@@ -324,6 +324,7 @@
           serializedNode.children = node.children.map(function (child) { return child.id; });
           return serializedNode;
       });
+      console.log("aaa" + nodes);
       return {
           nodes: nodes,
           root: graph.root.id,

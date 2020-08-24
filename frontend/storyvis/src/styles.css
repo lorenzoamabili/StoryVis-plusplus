@@ -9,6 +9,7 @@ html, body {
   display: flex;
   overflow-x: hidden;
   overflow-y: hidden;
+  font-family: Times;
 }
 
 #app {
