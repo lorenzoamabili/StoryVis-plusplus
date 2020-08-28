@@ -19,34 +19,35 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- <mat-form-field>
+      <mat-form-field>
         <mat-label>Select Story</mat-label>
         <mat-select (selectionChange)="provenance.restoreStory($event)">
-          <mat-option *ngFor="let story of stories" [value]="story">s
+          <mat-option *ngFor="let story of stories" [value]="story">
             {{ story._id }}
           </mat-option>
         </mat-select>
-      </mat-form-field> -->
+      </mat-form-field>
 
-      <!-- <mat-form-field>
+      <mat-form-field>
         <mat-label>Select Report</mat-label>
         <mat-select (selectionChange)="provenance.restoreTextReport($event)">
           <mat-option *ngFor="let textReport of textReports" [value]="textReport">
             {{ textReport._id }}
           </mat-option>
         </mat-select>
-      </mat-form-field> -->
+      </mat-form-field>
+
       <span>&nbsp;</span>
 
-      <button mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
+      <button class = "save" mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
         <mat-icon>backup</mat-icon>
       </button>
 
-      <!-- <button mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
-        <mat-icon>library_books</mat-icon>
-      </button> -->
+      <button class = "save" mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
+        <mat-icon>mms icon</mat-icon>
+      </button>
 
-      <button mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
+      <button class = "save" mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
         <mat-icon>library_books</mat-icon>
       </button>
     </div>

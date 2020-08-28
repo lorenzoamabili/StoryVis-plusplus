@@ -8,14 +8,14 @@ import { Settings } from '../utils/settings';
 export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
 
 
-  // Naive way to reset the canvas after restoring a proveance graphs 
+  // Naive way to reset the canvas after restoring a provenance graph 
   let elem = document.createElement('button');
   elem.setAttribute('id', 'fake');
   elem.style.display = "none";
-  elem.addEventListener('click', resetCanavas);
+  elem.addEventListener('click', resetCanvas);
   document.body.appendChild(elem);
 
-  function resetCanavas(e: Event) {
+  function resetCanvas(e: Event) {
     registerActions(canvas.provenance.registry, canvas);
     addListeners(canvas.provenance.tracker, canvas);
     canvas.addEventListeners();

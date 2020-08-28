@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     serializedGraph: String,
+    serializedRegistry: String,
     IDcreator: Number,
     createdDate: { type: Date, default: Date.now }
 });

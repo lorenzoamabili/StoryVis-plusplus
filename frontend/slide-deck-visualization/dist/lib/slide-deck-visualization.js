@@ -14,10 +14,10 @@ class SlideDeckVisualization {
     constructor(slideDeck, elm) {
         this._tableHeight = 125;
         this._tableWidth = 1800;
-        this._minimumSlideDuration = 1000;
+        this._minimumSlideDuration = 100;
         this._barWidthTimeMultiplier = 0.05;
         this._barPadding = 5;
-        this._resizebarwidth = 5;
+        this._resizebarwidth = 3;
         this._previousSlideX = 0;
         this._lineX1 = 50;
         this._placeholderWidth = 60;
@@ -78,8 +78,8 @@ class SlideDeckVisualization {
             const node = slideDeck.graph.current;
             const slide = new provenance_core_1.ProvenanceSlide(node.label, 5000, 0, [], node);
             slideDeck.addSlide(slide, slideDeck.slides.length);
-            node.metadata.isSlideAdded = true;
-            slideDeck.graph.emitNodeChangedEvent(node);
+            // node.metadata.isSlideAdded = true;
+            // slideDeck.graph.emitNodeChangedEvent(node);
             this.selectSlide(slide);
         };
         this.onClone = (slide) => {
@@ -221,7 +221,9 @@ class SlideDeckVisualization {
             }
         };
         this.onPause = () => {
-            this.stopPlaying();
+            if (this._currentlyPlaying) {
+                this.stopPlaying();
+            }
         };
         this.startPlaying = () => {
             d3.select("foreignObject.player_play")
@@ -237,6 +239,7 @@ class SlideDeckVisualization {
             this._currentlyPlaying = false;
             clearInterval(this._playingID);
             this._playingID = -1;
+            console.log("aaa");
         };
         this.onForward = () => {
             this.stopPlaying();
@@ -355,7 +358,7 @@ class SlideDeckVisualization {
                 .select("line.horizontal-line")
                 .attr("x2", this._placeholderX + 60 - this._timelineShift);
         };
-        this._tableWidth = window.innerWidth - 400;
+        this._tableWidth = window.innerWidth - 100;
         window.addEventListener("resize", this.resizeTable);
         this._slideDeck = slideDeck;
         this._root = d3.select(elm);
@@ -764,20 +767,20 @@ class SlideDeckVisualization {
                 (slide.xPosition - this._timelineShift) +
                 ", 0 )");
         });
-        allNodes
-            .select("image.screenshot")
-            .attr("href", d => d.metadata.screenShot)
-            .attr("width", (slide) => {
-            this._placeholderX =
-                this._previousSlideX +
-                    this.barDurationWidth(slide) +
-                    this.barTransitionTimeWidth(slide);
-            return this.barDurationWidth(slide);
-        })
-            .attr("height", 60)
-            .attr("x", (slide) => {
-            return this.barTransitionTimeWidth(slide);
-        });
+        // allNodes
+        //     .select("image.screenshot")
+        //     .attr("href", d => d.metadata.screenShot)
+        //     .attr("width", (slide: IProvenanceSlide) => {
+        //         this._placeholderX =
+        //             this._previousSlideX +
+        //             this.barDurationWidth(slide) +
+        //             this.barTransitionTimeWidth(slide);
+        //         return this.barDurationWidth(slide);
+        //     })
+        //     .attr("height", 60)
+        //     .attr("x", (slide: IProvenanceSlide) => {
+        //         return this.barTransitionTimeWidth(slide);
+        //     });
         allNodes
             .select("rect.slides_transitionTime_rect")
             .attr("width", (slide) => {
@@ -820,14 +823,14 @@ class SlideDeckVisualization {
             return this.barDurationWidth(slide) - 5;
         });
         toolbar = allNodes.select("g.slide_toolbar");
-        toolbar
-            .select("foreignObject.slides_delete_icon")
-            .attr("y", (slide) => {
-            return this._toolbarY;
-        })
-            .attr("x", (slide) => {
-            return this._toolbarX + this.barTransitionTimeWidth(slide) - 3;
-        });
+        // toolbar
+        //     .select("foreignObject.slides_delete_icon")
+        //     .attr("y", (slide: IProvenanceSlide) => {
+        //         return this._toolbarY;
+        //     })
+        //     .attr("x", (slide: IProvenanceSlide) => {
+        //         return this._toolbarX + this.barTransitionTimeWidth(slide) - 3;
+        //     });
         toolbar
             .select("foreignObject.slides_clone_icon")
             .attr("y", (slide) => {

@@ -943,7 +943,7 @@
       } // if of caterpillar procedure
   }
 
-  var xScale = -40;
+  var xScale = -20;
   var yScale = 20;
   var fontSize = 8;
   /**
@@ -962,6 +962,7 @@
           };
           // public _aggregator: NodeAggregator<ProvenanceNode> = rawData; // changed from original
           this.caterpillarActivated = false;
+          this.width = 0;
           this.traverser = traverser;
           this.colorScheme = d3.scaleOrdinal(d3.schemeAccent);
           this.container = d3.select(elm)
@@ -1001,12 +1002,13 @@
               _this.update();
           });
           traverser.graph.on('nodeAdded', function () {
-              _this.scaleToFit();
+              _this.scaleToFit(_this.width);
           });
           this.update();
           this.zoomer = d3.zoom();
           this.setZoomExtent();
           this.svg.call(this.zoomer);
+          this.scaleToFit(this.width);
       }
       ProvenanceTreeVisualization.prototype.setZoomExtent = function () {
           var _this = this;
@@ -1015,12 +1017,20 @@
           });
           this.scaleToFit();
       };
-      ProvenanceTreeVisualization.prototype.scaleToFit = function () {
+      ProvenanceTreeVisualization.prototype.scaleToFit = function (n) {
           var sizeX = this.svg.node().clientWidth;
           var sizeY = this.svg.node().clientHeight;
           var maxScale = 2;
-          var magicNum = 0.75; // todo: get relevant number based on dimensions
-          var scaleFactor = Math.min(maxScale, (magicNum * sizeY) / (this.hierarchyRoot.height * yScale));
+          var magicNumY = 0.75; // todo: get relevant number based on dimensions
+          var magicNumX = 0.5; // todo: get relevant number based on dimensions
+          if (n !== undefined) {
+              this.width = n;
+              var scaleFactor = Math.min(maxScale, (magicNumY * sizeY) / (this.hierarchyRoot.height * yScale), (magicNumX * sizeX) / (this.width * -xScale));
+          }
+          else {
+              var scaleFactor = Math.min(maxScale, (magicNumY * sizeY) / (this.hierarchyRoot.height * yScale), (magicNumX * sizeX) / (this.width * -xScale));
+              return scaleFactor;
+          }
           this.svg
               .transition()
               .duration(0)
@@ -1163,7 +1173,7 @@
               .append('circle')
               .attr('class', function (d) {
               var classString = '';
-              console.log(d.data.wrappedNodes[0]);
+              // console.log(d.data.wrappedNodes[0]);
               if (d.data.wrappedNodes[0].bookmarked === true) {
                   classString += ' bookmarked';
               }
@@ -1205,7 +1215,16 @@
               .data(treeNodes)
               .transition()
               .duration(500)
-              .attr('transform', function (d) { return "translate(" + d.x * xScale + ", " + d.y * yScale + ")"; });
+              .attr('transform', function (d) {
+              if (d.x > 0) {
+                  var classString = "translate(" + d.x * xScale + ", " + d.y * yScale + ")";
+                  _this.scaleToFit(d.x);
+              }
+              else {
+                  var classString = "translate(" + d.x * xScale + ", " + d.y * yScale + ")";
+              }
+              return classString;
+          });
           var oldLinks = this.g
               .selectAll('path.link')
               .data(tree.links(), function (d) {

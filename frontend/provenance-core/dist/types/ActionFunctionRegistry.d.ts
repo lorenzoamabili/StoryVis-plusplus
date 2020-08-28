@@ -1,6 +1,8 @@
 import { IActionFunctionRegistry, ActionFunction, ActionFunctionWithThis } from './api';
 export declare class ActionFunctionRegistry implements IActionFunctionRegistry {
-    private functionRegistry;
+    functionRegistry: {
+        [key: string]: ActionFunctionWithThis;
+    };
     /**
      * Register a new function into the provenance tracker (to be able to call it later)
      *

@@ -28,8 +28,8 @@ import {
 } from './aggregation/aggregation';
 import { caterpillar } from './caterpillar';
 
-const xScale = -40;
-const yScale = 20;
+var xScale = -20;
+var yScale = 20;
 
 const fontSize = 8;
 
@@ -64,6 +64,7 @@ export class ProvenanceTreeVisualization {
     | d3.HierarchyPointNode<IGroupedTreeNode<ProvenanceNode>>
     | undefined;
   private zoomer: any;
+  public width: number = 0;
 
   constructor(traverser: ProvenanceGraphTraverser, elm: HTMLDivElement, aggreg: string) {
     this.traverser = traverser;
@@ -117,14 +118,17 @@ export class ProvenanceTreeVisualization {
     });
 
     traverser.graph.on('nodeAdded', () => {
-      this.scaleToFit();
+      this.scaleToFit(this.width);
     });
 
     this.update();
     this.zoomer = d3.zoom() as any;
     this.setZoomExtent();
     this.svg.call(this.zoomer);
+    this.scaleToFit(this.width);
+
   }
+
   public setZoomExtent() {
     this.zoomer.scaleExtent([0.1, 2]).on('zoom', () => {
       this.g.attr('transform', d3.event.transform);
@@ -132,15 +136,29 @@ export class ProvenanceTreeVisualization {
     this.scaleToFit();
   }
 
-  public scaleToFit() {
+  public scaleToFit(n?: number) {
     const sizeX = this.svg.node()!.clientWidth;
     const sizeY = this.svg.node()!.clientHeight;
     const maxScale = 2;
-    const magicNum = 0.75; // todo: get relevant number based on dimensions
-    const scaleFactor = Math.min(
-      maxScale,
-      (magicNum * sizeY) / (this.hierarchyRoot!.height * yScale)
-    );
+    const magicNumY = 0.75; // todo: get relevant number based on dimensions
+    const magicNumX = 0.5; // todo: get relevant number based on dimensions
+
+
+    if (n !== undefined) {
+      this.width = n;
+      var scaleFactor = Math.min(
+        maxScale,
+        (magicNumY * sizeY) / (this.hierarchyRoot!.height * yScale),
+        (magicNumX * sizeX) / (this.width * -xScale)
+      );
+    } else {
+      var scaleFactor = Math.min(
+        maxScale,
+        (magicNumY * sizeY) / (this.hierarchyRoot!.height * yScale),
+        (magicNumX * sizeX) / (this.width * -xScale)
+      );
+      return scaleFactor;
+    }
 
     this.svg
       .transition()
@@ -158,6 +176,7 @@ export class ProvenanceTreeVisualization {
     target: HierarchyPointNode<IGroupedTreeNode<ProvenanceNode>>;
   }): string {
     const [s, t] = [source, target];
+
     // tslint:disable-next-line
     return `M${s.x * xScale},${s.y * yScale}
               C${s.x * xScale},  ${(s.y * yScale + t.y * yScale) / 2} ${t.x *
@@ -307,18 +326,18 @@ export class ProvenanceTreeVisualization {
       .append('g')
       .attr('class', 'normal');
 
-      updateNodes.on('contextmenu', (d: any) => {
-        d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
-        this.update();
-      });
-      
-      
+    updateNodes.on('contextmenu', (d: any) => {
+      d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
+      this.update();
+    });
+
+
     updateNodes
       .select('g')
       .append('circle')
       .attr('class', (d: any) => {
         let classString = '';
-        console.log(d.data.wrappedNodes[0]);
+        // console.log(d.data.wrappedNodes[0]);
         if (d.data.wrappedNodes[0].bookmarked === true) {
           classString += ' bookmarked';
         }
@@ -373,7 +392,15 @@ export class ProvenanceTreeVisualization {
       .duration(500)
       .attr(
         'transform',
-        (d: any) => `translate(${d.x * xScale}, ${d.y * yScale})`
+        (d: any) => {
+          if (d.x > 0) {
+            var classString = `translate(${d.x * xScale}, ${d.y * yScale})`;
+            this.scaleToFit(d.x);
+          } else {
+            var classString = `translate(${d.x * xScale}, ${d.y * yScale})`;
+          }
+          return classString;
+        }
       );
 
     const oldLinks = this.g

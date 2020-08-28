@@ -1,14 +1,21 @@
 .mat-toolbar.mat-primary {
-  background: #4b5366;
+  background: #434957;
   color: #fff;
   font-family: Times;
   font-size: 16px;
 }
 mat-button-toggle,
+
 button {
   color: white;
-  background-color: transparent;
+  background-color: #4a5268;
 }
+
+.save {
+  color: white;
+  background-color: #586072;
+}
+
 mat-button-toggle.mat-button-toggle-checked {
   background-color: rgba(255, 255, 255, 0.4);
 }

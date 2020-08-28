@@ -124,7 +124,7 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
     }
     var graph = new ProvenanceGraph(serializedProvenanceGraph.application);
     graph._nodes = nodes;
-    graph._current = nodes[serializedProvenanceGraph.current];
+    graph._current = nodes[serializedProvenanceGraph.root];
     graph.root = nodes[serializedProvenanceGraph.root];
     return graph;
 }
@@ -139,7 +139,6 @@ function serializeProvenanceGraph(graph) {
         serializedNode.children = node.children.map(function (child) { return child.id; });
         return serializedNode;
     });
-    console.log("aaa" + nodes);
     return {
         nodes: nodes,
         root: graph.root.id,

@@ -234,7 +234,6 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         argumentsToDo.push(thisNode.action.undoArguments.args.concat([transitionTime]));
                     }
                     else {
-                        console.log(thisNode.action.undoArguments.artifacts);
                         argumentsToDo.push(thisNode.action.undoArguments.args
                             .concat(thisNode.action.undoArguments.artifacts ? thisNode.action.undoArguments.artifacts : []));
                     }
@@ -256,7 +255,6 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         argumentsToDo.push(nextNode.action.doArguments.args.concat([transitionTime]));
                     }
                     else {
-                        console.log(nextNode.action.doArguments.artifacts);
                         argumentsToDo.push(nextNode.action.doArguments.args
                             .concat(nextNode.action.doArguments.artifacts ? nextNode.action.doArguments.artifacts : []));
                     }

@@ -73,8 +73,7 @@ export class ProvenanceService {
   }
 
   public async saveTextReport(IDcreator: Number) { 
-      const textArea = document.getElementById("textAreaCont") as HTMLTextAreaElement;
-      console.log(textArea);
+      const textArea = document.getElementById("textArea") as HTMLTextAreaElement;
       this.textReport = textArea.value;
       this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
       {
@@ -154,9 +153,7 @@ export class ProvenanceService {
 
   public loadGraph(graphInput: any){
     const dataGraph = JSON.parse(graphInput.serializedGraph);
-    console.log(dataGraph)
     this.graph = restoreProvenanceGraph(dataGraph);
-    this.graph.current = this.graph.root;
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);

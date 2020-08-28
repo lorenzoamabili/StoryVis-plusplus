@@ -26,9 +26,10 @@ export declare class ProvenanceTreeVisualization {
     caterpillarActivated: boolean;
     private hierarchyRoot;
     private zoomer;
+    width: number;
     constructor(traverser: ProvenanceGraphTraverser, elm: HTMLDivElement, aggreg: string);
     setZoomExtent(): void;
-    scaleToFit(): void;
+    scaleToFit(n?: number): number | undefined;
     linkPath({ source, target }: {
         source: HierarchyPointNode<IGroupedTreeNode<ProvenanceNode>>;
         target: HierarchyPointNode<IGroupedTreeNode<ProvenanceNode>>;

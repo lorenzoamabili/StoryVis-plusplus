@@ -135,7 +135,7 @@ export function restoreProvenanceGraph(
 
   const graph = new ProvenanceGraph(serializedProvenanceGraph.application);
   (graph as any)._nodes = nodes;
-  (graph as any)._current = nodes[serializedProvenanceGraph.current];
+  (graph as any)._current = nodes[serializedProvenanceGraph.root];
   (graph as any).root = nodes[serializedProvenanceGraph.root];
 
   return graph;
