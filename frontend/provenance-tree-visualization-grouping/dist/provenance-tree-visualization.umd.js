@@ -1089,6 +1089,7 @@
        */
       ProvenanceTreeVisualization.prototype.update = function () {
           var _this = this;
+          console.log('si vola');
           var wrappedRoot = wrapNode(this.traverser.graph.root);
           aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
           var hierarchyRoot = d3.hierarchy(wrappedRoot); // Updated de treeRoot
@@ -1176,6 +1177,9 @@
               // console.log(d.data.wrappedNodes[0]);
               if (d.data.wrappedNodes[0].bookmarked === true) {
                   classString += ' bookmarked';
+              }
+              else if (d.data.wrappedNodes[0].metadata.loaded === true) {
+                  classString += ' loaded';
               }
               if (isKeyNode(d.data.wrappedNodes[0])) {
                   classString += ' keynode';

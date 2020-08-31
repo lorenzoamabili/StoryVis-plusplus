@@ -12,7 +12,7 @@
     <div>
       <mat-form-field>
         <mat-label>Select Graph</mat-label>
-        <mat-select (selectionChange)="provenance.restoreGraph($event)">
+        <mat-select (selectionChange)="provenance.restoreGraph($event)" >
           <mat-option *ngFor="let graph of graphs" [value]="graph">
             {{ graph._id}}
           </mat-option>

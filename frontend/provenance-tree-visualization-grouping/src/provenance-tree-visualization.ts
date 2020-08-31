@@ -231,6 +231,7 @@ export class ProvenanceTreeVisualization {
    * @description Update the tree layout.
    */
   public update() {
+    console.log('si vola');
     const wrappedRoot = wrapNode(this.traverser.graph.root);
     aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
     const hierarchyRoot = d3.hierarchy(wrappedRoot); // Updated de treeRoot
@@ -340,6 +341,8 @@ export class ProvenanceTreeVisualization {
         // console.log(d.data.wrappedNodes[0]);
         if (d.data.wrappedNodes[0].bookmarked === true) {
           classString += ' bookmarked';
+        } else if (d.data.wrappedNodes[0].metadata.loaded === true) {
+          classString += ' loaded';
         }
         if (isKeyNode(d.data.wrappedNodes[0])) {
           classString += ' keynode';
@@ -365,12 +368,11 @@ export class ProvenanceTreeVisualization {
       .select('text.circle-label')
       .attr('visibility', (d: any) => (d.x === 0 ? 'visible' : 'hidden'));
 
+
     updateNodes.on('click', d => {
       this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
       this.update();
     });
-
-
 
 
     // set classes on node

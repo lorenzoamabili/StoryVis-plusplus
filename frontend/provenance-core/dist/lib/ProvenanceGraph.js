@@ -34,7 +34,7 @@ var ProvenanceGraph = /** @class */ (function () {
         else {
             this.root = {
                 id: utils_1.generateUUID(),
-                label: 'Root',
+                label: '',
                 metadata: {
                     createdBy: userid,
                     createdOn: utils_1.generateTimestamp()
@@ -132,6 +132,7 @@ exports.restoreProvenanceGraph = restoreProvenanceGraph;
 function serializeProvenanceGraph(graph) {
     var nodes = Object.keys(graph.nodes).map(function (nodeId) {
         var node = graph.getNode(nodeId);
+        node.metadata.loaded = true;
         var serializedNode = __assign({}, node);
         if (utils_1.isStateNode(node)) {
             serializedNode.parent = node.parent.id;

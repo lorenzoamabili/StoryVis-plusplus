@@ -215,7 +215,7 @@ var ProvenanceGraph = /** @class */ (function () {
         else {
             this.root = {
                 id: generateUUID(),
-                label: 'Root',
+                label: '',
                 metadata: {
                     createdBy: userid,
                     createdOn: generateTimestamp()
@@ -311,6 +311,7 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
 function serializeProvenanceGraph(graph) {
     var nodes = Object.keys(graph.nodes).map(function (nodeId) {
         var node = graph.getNode(nodeId);
+        node.metadata.loaded = true;
         var serializedNode = __assign({}, node);
         if (isStateNode(node)) {
             serializedNode.parent = node.parent.id;
@@ -377,6 +378,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             id: generateUUID(),
                             label: label,
                             metadata: {
+                                loaded: false,
                                 createdBy: _this.username,
                                 createdOn: generateTimestamp()
                             },

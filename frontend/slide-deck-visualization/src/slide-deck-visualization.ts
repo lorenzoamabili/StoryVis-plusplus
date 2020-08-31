@@ -27,7 +27,7 @@ export class SlideDeckVisualization {
     private _tableHeight = 125;
     private _tableWidth = 1800;
     private _minimumSlideDuration = 100;
-    private _barWidthTimeMultiplier = 0.05;
+    private _barWidthTimeMultiplier = 0.035;
     private _barPadding = 5;
     private _resizebarwidth = 3;
     private _previousSlideX = 0;
@@ -50,7 +50,6 @@ export class SlideDeckVisualization {
     // private _currentlyPlayingSlide: IProvenanceSlide | null = null;
     private _gridTimeStep = 1000;
     private _gridSnap = false;
-    private _colorScale = d3.scaleOrdinal(d3.schemeCategory10);
     private _playingID: any = -1;
     private _annotationContainer = new AnnotationDisplayContainer();
 
@@ -600,8 +599,7 @@ export class SlideDeckVisualization {
             .attr("class", "slides_transitionTime_rect")
             .attr("x", this._resizebarwidth)
             .attr("y", 0)
-            .attr("height", 60)
-            .on("click", this.onSelect);
+            .attr("height", 60);
 
         /* Removed slides_delay_resize and slides_delay_rect */
         let slideGroup = newNodes
@@ -609,7 +607,8 @@ export class SlideDeckVisualization {
             .attr("transform", "translate(5,0)")
             .attr("class", "slide_group")
             .on("mouseenter", this.onMouseEnter)
-            .on("mouseleave", this.onMouseLeave);
+            .on("mouseleave", this.onMouseLeave)
+            .on("click", this.onSelect);
 
         slideGroup
             .append("rect")
@@ -631,11 +630,11 @@ export class SlideDeckVisualization {
             .attr("font-size", 20)
             .attr("dy", ".35em");
 
-        slideGroup
-            .append("image")
-            .attr("class", "screenshot")
-            .attr("opacity", 0.8)
-            .on("click", this.onSelect); // changes made for single click select --Pushpanjali;
+        // slideGroup
+        //     .append("image")
+        //     .attr("class", "screenshot")
+        //     .attr("opacity", 0.8)
+        //     .on("click", this.onSelect); // changes made for single click select --Pushpanjali;
 
 
         const textPosition = this._resizebarwidth + 4 * this._barPadding + 68;
@@ -765,15 +764,22 @@ export class SlideDeckVisualization {
                 );
             });
 
-        slideGroup = allNodes.select("g.slide_group");
-        slideGroup
-            .select("rect.slides_rect")
-            .attr("fill", (slide: IProvenanceSlide, i) => {
-                const color = this._colorScale(i.toString());
-                if (slide.node) {
-                    slide.node.metadata.bgColor = color;
+            slideGroup = allNodes.select("g.slide_group");
+            slideGroup
+                .select("rect.slides_rect")
+                .attr("fill", (slide: IProvenanceSlide, i) => {
+                    var col = d3.scaleSequential(d3.interpolatePuBu)
+                    .domain([0, 10])(i).toString();
+                    if (slide.node){
+
+                    if (slide.node.metadata.bgColor) {
+                        col = slide.node.metadata.bgColor;
+                    }
+                    else {
+                        slide.node.metadata.bgColor = col;
+                    }
                 }
-                return color;
+                    return col;
             })
             .attr("selected", (slide: IProvenanceSlide) => {
                 return this._slideDeck.selectedSlide === slide;

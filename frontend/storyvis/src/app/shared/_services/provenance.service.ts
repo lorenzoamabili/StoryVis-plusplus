@@ -160,9 +160,12 @@ export class ProvenanceService {
     this.tree = (window as any).tree;
     this.tree._viz.setTraverser(this.traverser);
     this.tree._viz.update();
+    console.log(this.graph);
+    console.log(this.tree);
     let elem = document.getElementById('fake');
     elem.click();
   }
+
 
   public async restoreStory(input: MatSelectChange) {
     const storyInput = input.value;
@@ -205,3 +208,7 @@ export class ProvenanceService {
     this.init().then(() => this.initialized = true);
   }
 }
+
+
+
+

@@ -28,6 +28,11 @@ app-provenance-visualization {
   stroke-width: 1.2px;
 }
 
+.node circle.loaded {
+  stroke: blue;
+  stroke-width: 1.2px;
+}
+
 .node circle.intent_none {
   fill: white;
 }

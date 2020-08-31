@@ -11,7 +11,6 @@ import { User } from 'src/app/shared/_models';
 })
 export class ProvenanceVisualizationComponent implements OnInit {
   currentUser: User;
-m
   public _viz: ProvenanceTreeVisualization;
 
   constructor(public elementRef: ElementRef, public provenance: ProvenanceService, 
@@ -28,6 +27,7 @@ m
         this.currentUser.group
       );
   }
+
   // ngAfterViewChecked() {
   //   this._viz.setZoomExtent();
   // }

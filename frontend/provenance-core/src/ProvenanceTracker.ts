@@ -70,6 +70,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       id: generateUUID(),
       label: label,
       metadata: {
+        loaded: false,
         createdBy: this.username,
         createdOn: generateTimestamp()
       },

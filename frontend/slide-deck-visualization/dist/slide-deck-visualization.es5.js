@@ -1,4 +1,4 @@
-import { scaleOrdinal, schemeCategory10, select, event, selectAll, drag } from 'd3';
+import { select, event, selectAll, drag, scaleSequential, interpolatePuBu } from 'd3';
 import fs from 'fs';
 
 /*! *****************************************************************************
@@ -179,7 +179,7 @@ var ProvenanceGraph = /** @class */ (function () {
         else {
             this.root = {
                 id: generateUUID(),
-                label: 'Root',
+                label: '',
                 metadata: {
                     createdBy: userid,
                     createdOn: generateTimestamp()
@@ -268,13 +268,14 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
     }
     var graph = new ProvenanceGraph(serializedProvenanceGraph.application);
     graph._nodes = nodes;
-    graph._current = nodes[serializedProvenanceGraph.current];
+    graph._current = nodes[serializedProvenanceGraph.root];
     graph.root = nodes[serializedProvenanceGraph.root];
     return graph;
 }
 function serializeProvenanceGraph(graph) {
     var nodes = Object.keys(graph.nodes).map(function (nodeId) {
         var node = graph.getNode(nodeId);
+        node.metadata.loaded = true;
         var serializedNode = __assign({}, node);
         if (isStateNode(node)) {
             serializedNode.parent = node.parent.id;
@@ -282,7 +283,6 @@ function serializeProvenanceGraph(graph) {
         serializedNode.children = node.children.map(function (child) { return child.id; });
         return serializedNode;
     });
-    console.log("aaa" + nodes);
     return {
         nodes: nodes,
         root: graph.root.id,
@@ -342,6 +342,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             id: generateUUID(),
                             label: label,
                             metadata: {
+                                loaded: false,
                                 createdBy: _this.username,
                                 createdOn: generateTimestamp()
                             },
@@ -19688,7 +19689,7 @@ class SlideDeckVisualization {
         this._tableHeight = 125;
         this._tableWidth = 1800;
         this._minimumSlideDuration = 100;
-        this._barWidthTimeMultiplier = 0.05;
+        this._barWidthTimeMultiplier = 0.035;
         this._barPadding = 5;
         this._resizebarwidth = 3;
         this._previousSlideX = 0;
@@ -19710,7 +19711,6 @@ class SlideDeckVisualization {
         // private _currentlyPlayingSlide: IProvenanceSlide | null = null;
         this._gridTimeStep = 1000;
         this._gridSnap = false;
-        this._colorScale = scaleOrdinal(schemeCategory10);
         this._playingID = -1;
         this._annotationContainer = new AnnotationDisplayContainer();
         this.onDelete = (slide) => {
@@ -19912,7 +19912,6 @@ class SlideDeckVisualization {
             this._currentlyPlaying = false;
             clearInterval(this._playingID);
             this._playingID = -1;
-            console.log("aaa");
         };
         this.onForward = () => {
             this.stopPlaying();
@@ -20330,15 +20329,15 @@ class SlideDeckVisualization {
             .attr("class", "slides_transitionTime_rect")
             .attr("x", this._resizebarwidth)
             .attr("y", 0)
-            .attr("height", 60)
-            .on("click", this.onSelect);
+            .attr("height", 60);
         /* Removed slides_delay_resize and slides_delay_rect */
         let slideGroup = newNodes
             .append("g")
             .attr("transform", "translate(5,0)")
             .attr("class", "slide_group")
             .on("mouseenter", this.onMouseEnter)
-            .on("mouseleave", this.onMouseLeave);
+            .on("mouseleave", this.onMouseLeave)
+            .on("click", this.onSelect);
         slideGroup
             .append("rect")
             .attr("class", "slides_rect")
@@ -20354,11 +20353,11 @@ class SlideDeckVisualization {
             .attr("y", this._resizebarwidth + 2 * this._barPadding)
             .attr("font-size", 20)
             .attr("dy", ".35em");
-        slideGroup
-            .append("image")
-            .attr("class", "screenshot")
-            .attr("opacity", 0.8)
-            .on("click", this.onSelect); // changes made for single click select --Pushpanjali;
+        // slideGroup
+        //     .append("image")
+        //     .attr("class", "screenshot")
+        //     .attr("opacity", 0.8)
+        //     .on("click", this.onSelect); // changes made for single click select --Pushpanjali;
         const textPosition = this._resizebarwidth + 4 * this._barPadding + 68;
         /** Ends Appnded SVG for text ---Lorenzo */
         // TransitionTime Text --Lorenzo
@@ -20467,11 +20466,17 @@ class SlideDeckVisualization {
         slideGroup
             .select("rect.slides_rect")
             .attr("fill", (slide, i) => {
-            const color = this._colorScale(i.toString());
+            var col = scaleSequential(interpolatePuBu)
+                .domain([0, 10])(i).toString();
             if (slide.node) {
-                slide.node.metadata.bgColor = color;
+                if (slide.node.metadata.bgColor) {
+                    col = slide.node.metadata.bgColor;
+                }
+                else {
+                    slide.node.metadata.bgColor = col;
+                }
             }
-            return color;
+            return col;
         })
             .attr("selected", (slide) => {
             return this._slideDeck.selectedSlide === slide;

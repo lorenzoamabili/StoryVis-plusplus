@@ -90,6 +90,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             id: utils_1.generateUUID(),
                             label: label,
                             metadata: {
+                                loaded: false,
                                 createdBy: _this.username,
                                 createdOn: utils_1.generateTimestamp()
                             },

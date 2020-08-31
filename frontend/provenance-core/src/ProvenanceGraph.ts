@@ -40,7 +40,7 @@ export class ProvenanceGraph implements IProvenanceGraph {
     } else {
       this.root = {
         id: generateUUID(),
-        label: 'Root',
+        label: '',
         metadata: {
           createdBy: userid,
           createdOn: generateTimestamp()
@@ -137,13 +137,14 @@ export function restoreProvenanceGraph(
   (graph as any)._nodes = nodes;
   (graph as any)._current = nodes[serializedProvenanceGraph.root];
   (graph as any).root = nodes[serializedProvenanceGraph.root];
-
+  
   return graph;
 }
 
 export function serializeProvenanceGraph(graph: ProvenanceGraph): SerializedProvenanceGraph {
   const nodes = Object.keys(graph.nodes).map(nodeId => {
     const node = graph.getNode(nodeId);
+    node.metadata.loaded = true;
     const serializedNode: SerializedProvenanceNode = { ...node } as any;
     if (isStateNode(node)) {
       (serializedNode as SerializedStateNode).parent = node.parent.id;
