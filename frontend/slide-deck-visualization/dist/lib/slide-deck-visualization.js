@@ -12,7 +12,7 @@ function firstArgThis(f) {
 }
 class SlideDeckVisualization {
     constructor(slideDeck, elm) {
-        this._tableHeight = 125;
+        this._tableHeight = 100;
         this._tableWidth = 1800;
         this._minimumSlideDuration = 100;
         this._barWidthTimeMultiplier = 0.03;
@@ -316,11 +316,9 @@ class SlideDeckVisualization {
             this._slideTable.select("foreignObject.player_play").raise();
             this._slideTable.select("foreignObject.player_forward").raise();
         };
-        // private displayGridLevel = () => {
-        //     d3.select("text.grid_display").text(
-        //         "Grid step: " + (this._gridTimeStep / 1000).toFixed(2) + " Sec"
-        //     );
-        // }
+        this.displayGridLevel = () => {
+            d3.select("text.grid_display").text("Grid step: " + (this._gridTimeStep / 1000).toFixed(2) + " Sec");
+        };
         this.drawSeekBar = () => {
             const timeWidth = this._currentTime * this._barWidthTimeMultiplier;
             if (timeWidth >= this._placeholderX) {
@@ -344,7 +342,7 @@ class SlideDeckVisualization {
                 .attr("x2", shiftedPosition)
                 .attr("y2", 0)
                 .raise();
-        };
+        }; // to do: display time on seek bar
         this.adjustSlideAddObjectPosition = () => {
             this._slideTable
                 .select("foreignObject.slide_add")
@@ -373,15 +371,15 @@ class SlideDeckVisualization {
             .attr("y", 0)
             .attr("height", this._tableHeight)
             .attr("width", this._tableWidth);
-        this._slideTable
-            .append("line")
-            .attr("class", "vertical-line")
-            .attr("x1", this._lineX1)
-            .attr("y1", 0)
-            .attr("x2", this._lineX1)
-            .attr("y2", 100)
-            .attr("stroke", "gray")
-            .attr("stroke-width", 2);
+        // this._slideTable
+        //     .append("line")
+        //     .attr("class", "vertical-line")
+        //     .attr("x1", this._lineX1)
+        //     .attr("y1", 0)
+        //     .attr("x2", this._lineX1)
+        //     .attr("y2", 100)
+        //     .attr("stroke", "gray")
+        //     .attr("stroke-width", 2);
         this._slideTable
             .append("line")
             .attr("class", "horizontal-line")
@@ -524,6 +522,8 @@ class SlideDeckVisualization {
             .attr('id', 'addButton')
             .attr("type", "button")
             .attr("value", "Save")
+            .attr("x", 0)
+            .attr("y", 0)
             .on("click", this.addAnnotation);
         slideDeck.on("slideAdded", () => this.update());
         slideDeck.on("slideRemoved", () => this.update());
@@ -678,7 +678,7 @@ class SlideDeckVisualization {
             .append("text") // appended previous slides_text
             .attr("class", "slides_text")
             .attr("y", this._resizebarwidth + 2 * this._barPadding)
-            .attr("font-size", 14)
+            .attr("font-size", 15)
             .attr("dy", ".35em");
         // slideGroup
         //     .append("image")
@@ -703,18 +703,18 @@ class SlideDeckVisualization {
             .attr("y", textPosition)
             .attr("font-size", 16)
             .attr("dy", "-.65em");
-        newNodes
-            .append("circle")
-            .attr("class", "time")
-            .attr("cy", this._resizebarwidth + 60)
-            .attr("r", 4)
-            .attr("fill", "blue");
-        newNodes
-            .append("circle")
-            .attr("class", "transitionTime_time")
-            .attr("cy", this._resizebarwidth + 60)
-            .attr("r", 4)
-            .attr("fill", "blue");
+        // newNodes
+        //     .append("circle")
+        //     .attr("class", "time")
+        //     .attr("cy", this._resizebarwidth + 60)
+        //     .attr("r", 4)
+        //     .attr("fill", "blue");
+        // newNodes
+        //     .append("circle")
+        //     .attr("class", "transitionTime_time")
+        //     .attr("cy", this._resizebarwidth + 60)
+        //     .attr("r", 4)
+        //     .attr("fill", "blue");
         newNodes
             .append("rect")
             .attr("class", "slides_duration_resize")
@@ -795,8 +795,9 @@ class SlideDeckVisualization {
         slideGroup
             .select("rect.slides_rect")
             .attr("fill", (slide, i) => {
+            var j = i + 1;
             var col = d3.scaleSequential(d3.interpolatePuBu)
-                .domain([0, 10])(i).toString();
+                .domain([0, j])(i).toString();
             if (slide.node) {
                 if (slide.node.metadata.bgColor) {
                     col = slide.node.metadata.bgColor;
@@ -897,10 +898,12 @@ class SlideDeckVisualization {
                 1000).toFixed(2);
         });
         placeholder.attr("x", this._placeholderX + 80 - this._timelineShift);
-        this.adjustHorizontalLine();
+        // this.adjustHorizontalLine();
         this.adjustSlideAddObjectPosition();
         this.drawSeekBar();
-        this.drawGrid(this._placeholderX + this._originPosition - this._timelineShift);
+        // this.drawGrid(
+        //     this._placeholderX + this._originPosition - this._timelineShift
+        // );
         this.fixDrawingPriorities();
         // this.displayGridLevel();
         allExistingNodes.exit().remove();

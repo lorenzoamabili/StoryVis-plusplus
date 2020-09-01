@@ -28,14 +28,14 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field>
+      <!-- <mat-form-field>
         <mat-label>Select Report</mat-label>
         <mat-select (selectionChange)="provenance.restoreTextReport($event)">
           <mat-option *ngFor="let textReport of textReports" [value]="textReport">
             {{ textReport._id }}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
 
       <span>&nbsp;</span>
 
@@ -47,9 +47,9 @@
         <mat-icon>mms icon</mat-icon>
       </button>
 
-      <button class = "save" mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
+      <!-- <button class = "save" mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
         <mat-icon>library_books</mat-icon>
-      </button>
+      </button> -->
     </div>
 
     <span>&nbsp;</span>

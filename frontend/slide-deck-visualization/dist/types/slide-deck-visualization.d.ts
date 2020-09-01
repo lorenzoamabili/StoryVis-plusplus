@@ -72,6 +72,7 @@ export declare class SlideDeckVisualization {
     private adjustGridScale;
     private drawGrid;
     private fixDrawingPriorities;
+    private displayGridLevel;
     private drawSeekBar;
     private adjustSlideAddObjectPosition;
     private adjustHorizontalLine;

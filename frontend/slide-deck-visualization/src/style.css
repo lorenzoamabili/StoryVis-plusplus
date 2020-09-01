@@ -1,12 +1,13 @@
 @import "~font-awesome/css/font-awesome.css";
 
 body {
-    background-color: #e5e5e5;
+    background-color: transparent;
 }
 
 #slideDeck {
-    height: 150px;
-    overflow-y: scroll;
+    height: 100px;
+    /* overflow-y: scroll; */
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar {
@@ -21,6 +22,7 @@ div.slidedeck__slide {
 
 table.slides__table {
     width: 300px;
+    padding: 1%;
 }
 
 table.slides__table tr.selected {
@@ -46,23 +48,17 @@ div.slidedeck__slide[draggable="true"] {
 }
 
 .slides_duration_resize {
-    fill: rgb(155, 155, 255);
+    fill: rgb(0, 0, 0);
 }
 .slides_delay_resize {
     fill: rgb(255, 155, 155);
 }
 
-.slides_rect {
-    stroke: #dddddd;
+/* .slides_rect {
+    stroke: #2e2e2e;
     rx: 5px;
     ry: 5px;
-}
-
-.slides_rect[selected="true"] {
-    stroke: #000;
-    stroke-width: 5px;
-    stroke-dasharray: 5px;
-}
+} */
 
 .slides_text {
     fill: #000000;
@@ -97,7 +93,8 @@ div.slidedeck__slide[draggable="true"] {
 
 svg.annotation-area {
     position: absolute;
-    right: 0px;
+    right: 2%;
+    top: 2%;
 }
 
 rect.add_annotation {
@@ -108,16 +105,16 @@ rect.add_annotation {
 
 #textArea{
     overflow: hidden;
-    padding: 10px;
     width: 30%;
-    font-size: 10px;
+    height: 70%;
+    font-size: 12px;
     border-radius: 5px;
-    border: 5px solid #556677;
+
   }
 
   #addButton{
       position: absolute;
-      bottom: 2%;
+      bottom: 20%;
       right: 2%;
   }
 

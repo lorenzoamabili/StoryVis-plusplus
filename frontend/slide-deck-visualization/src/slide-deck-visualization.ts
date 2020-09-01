@@ -24,7 +24,7 @@ export class SlideDeckVisualization {
     private _slideDeck: IProvenanceSlidedeck;
     private _root: d3.Selection<HTMLDivElement, undefined, null, undefined>;
     private _slideTable: d3.Selection<SVGElement, undefined, null, undefined>;
-    private _tableHeight = 125;
+    private _tableHeight = 100;
     private _tableWidth = 1800;
     private _minimumSlideDuration = 100;
     private _barWidthTimeMultiplier = 0.03;
@@ -520,11 +520,11 @@ export class SlideDeckVisualization {
         this._slideTable.select("foreignObject.player_forward").raise();
     }
 
-    // private displayGridLevel = () => {
-    //     d3.select("text.grid_display").text(
-    //         "Grid step: " + (this._gridTimeStep / 1000).toFixed(2) + " Sec"
-    //     );
-    // }
+    private displayGridLevel = () => {
+        d3.select("text.grid_display").text(
+            "Grid step: " + (this._gridTimeStep / 1000).toFixed(2) + " Sec"
+        );
+    }
 
     private drawSeekBar = () => {
         const timeWidth = this._currentTime * this._barWidthTimeMultiplier;
@@ -552,8 +552,8 @@ export class SlideDeckVisualization {
             .attr("y1", 65)
             .attr("x2", shiftedPosition)
             .attr("y2", 0)
-            .raise();
-    }
+            .raise(); 
+                   }// to do: display time on seek bar
 
     private adjustSlideAddObjectPosition = () => {
         this._slideTable
@@ -659,19 +659,19 @@ export class SlideDeckVisualization {
             .attr("font-size", 16)
             .attr("dy", "-.65em");
 
-        newNodes
-            .append("circle")
-            .attr("class", "time")
-            .attr("cy", this._resizebarwidth + 60)
-            .attr("r", 4)
-            .attr("fill", "blue");
+        // newNodes
+        //     .append("circle")
+        //     .attr("class", "time")
+        //     .attr("cy", this._resizebarwidth + 60)
+        //     .attr("r", 4)
+        //     .attr("fill", "blue");
 
-        newNodes
-            .append("circle")
-            .attr("class", "transitionTime_time")
-            .attr("cy", this._resizebarwidth + 60)
-            .attr("r", 4)
-            .attr("fill", "blue");
+        // newNodes
+        //     .append("circle")
+        //     .attr("class", "transitionTime_time")
+        //     .attr("cy", this._resizebarwidth + 60)
+        //     .attr("r", 4)
+        //     .attr("fill", "blue");
 
         newNodes
             .append("rect")
@@ -771,8 +771,9 @@ export class SlideDeckVisualization {
         slideGroup
             .select("rect.slides_rect")
             .attr("fill", (slide: IProvenanceSlide, i) => {
+                var j = i + 1;
                 var col = d3.scaleSequential(d3.interpolatePuBu)
-                    .domain([0, 10])(i).toString();
+                    .domain([0, j])(i).toString();
                 if (slide.node) {
                     if (slide.node.metadata.bgColor) {
                         col = slide.node.metadata.bgColor;
@@ -896,15 +897,15 @@ export class SlideDeckVisualization {
 
         placeholder.attr("x", this._placeholderX + 80 - this._timelineShift);
 
-        this.adjustHorizontalLine();
+        // this.adjustHorizontalLine();
 
         this.adjustSlideAddObjectPosition();
 
         this.drawSeekBar();
 
-        this.drawGrid(
-            this._placeholderX + this._originPosition - this._timelineShift
-        );
+        // this.drawGrid(
+        //     this._placeholderX + this._originPosition - this._timelineShift
+        // );
 
         this.fixDrawingPriorities();
 
@@ -934,15 +935,15 @@ export class SlideDeckVisualization {
             .attr("height", this._tableHeight)
             .attr("width", this._tableWidth);
 
-        this._slideTable
-            .append("line")
-            .attr("class", "vertical-line")
-            .attr("x1", this._lineX1)
-            .attr("y1", 0)
-            .attr("x2", this._lineX1)
-            .attr("y2", 100)
-            .attr("stroke", "gray")
-            .attr("stroke-width", 2);
+        // this._slideTable
+        //     .append("line")
+        //     .attr("class", "vertical-line")
+        //     .attr("x1", this._lineX1)
+        //     .attr("y1", 0)
+        //     .attr("x2", this._lineX1)
+        //     .attr("y2", 100)
+        //     .attr("stroke", "gray")
+        //     .attr("stroke-width", 2);
 
         this._slideTable
             .append("line")
@@ -1102,6 +1103,8 @@ export class SlideDeckVisualization {
             .attr('id', 'addButton')
             .attr("type", "button")
             .attr("value", "Save")
+            .attr("x", 0)
+            .attr("y", 0)
             .on("click", this.addAnnotation);
 
         slideDeck.on("slideAdded", () => this.update());
