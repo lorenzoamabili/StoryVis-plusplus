@@ -27,7 +27,7 @@ export class SlideDeckVisualization {
     private _tableHeight = 125;
     private _tableWidth = 1800;
     private _minimumSlideDuration = 100;
-    private _barWidthTimeMultiplier = 0.035;
+    private _barWidthTimeMultiplier = 0.03;
     private _barPadding = 5;
     private _resizebarwidth = 3;
     private _previousSlideX = 0;
@@ -47,7 +47,7 @@ export class SlideDeckVisualization {
     private _currentlyPlaying = false;
     private _timelineShift = 0;
     private _timeIndexedSlides: IndexedSlide[] = [];
-    // private _currentlyPlayingSlide: IProvenanceSlide | null = null;
+    private _currentlyPlayingSlide: IProvenanceSlide | null = null;
     private _gridTimeStep = 1000;
     private _gridSnap = false;
     private _playingID: any = -1;
@@ -104,7 +104,7 @@ export class SlideDeckVisualization {
         toolbar.style.display = "none";
     }
 
-    private onAdd = () => {
+    public onAdd = () => {
         let slideDeck = this._slideDeck;
         const node = slideDeck.graph.current;
         const slide = new ProvenanceSlide(node.label, 5000, 0, [], node);
@@ -344,7 +344,7 @@ export class SlideDeckVisualization {
                 );
                 if (currentSlide !== this._slideDeck.selectedSlide) {
                     this.selectSlide(currentSlide);
-                    // this._currentlyPlayingSlide = currentSlide;
+                    this._currentlyPlayingSlide = currentSlide;
                 }
             }
             this.update();
@@ -627,7 +627,7 @@ export class SlideDeckVisualization {
             .append("text") // appended previous slides_text
             .attr("class", "slides_text")
             .attr("y", this._resizebarwidth + 2 * this._barPadding)
-            .attr("font-size", 20)
+            .attr("font-size", 15)
             .attr("dy", ".35em");
 
         // slideGroup
@@ -648,26 +648,6 @@ export class SlideDeckVisualization {
             .attr("dy", "-.65em");
         // Ends --TransitionTime Text --Lorenzo
         let toolbar = slideGroup.append("g").attr("class", "slide_toolbar");
-
-        toolbar
-            .append("svg:foreignObject")
-            .attr("class", "slides_delete_icon")
-            .attr("cursor", "pointer")
-            .attr("width", 20)
-            .attr("height", 20)
-            .append("xhtml:body")
-            .on("click", this.onDelete)
-            .html('<i class="fa fa-trash-o"></i>');
-
-        toolbar
-            .append("svg:foreignObject")
-            .attr("class", "slides_clone_icon")
-            .attr("cursor", "pointer")
-            .attr("width", 20)
-            .attr("height", 20)
-            .append("xhtml:body")
-            .on("click", this.onClone)
-            .html('<i class="fa fa-copy"></i>');
 
 
         const placeholder = this._slideTable.select("rect.slides_placeholder");
@@ -720,6 +700,29 @@ export class SlideDeckVisualization {
             );
         d3.select(".slide__table").on("wheel", this.rescaleTimeline);
 
+        newNodes.append("svg:foreignObject")
+            .attr("class", "slides_delete_icon")
+            .attr("cursor", "pointer")
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("x", 10)
+            .attr("y", 35)
+            .append("xhtml:body")
+            .on("click", this.onDelete)
+            .html('<i class="fa fa-trash-o"></i>');
+
+        newNodes.append("svg:foreignObject")
+            .attr("class", "slides_clone_icon")
+            .attr("cursor", "pointer")
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("x", 30)
+            .attr("y", 35)
+            .append("xhtml:body")
+            .on("click", this.onClone)
+            .html('<i class="fa fa-copy"></i>');
+
+
         // Update all nodes
 
         const allNodes = newNodes
@@ -764,14 +767,13 @@ export class SlideDeckVisualization {
                 );
             });
 
-            slideGroup = allNodes.select("g.slide_group");
-            slideGroup
-                .select("rect.slides_rect")
-                .attr("fill", (slide: IProvenanceSlide, i) => {
-                    var col = d3.scaleSequential(d3.interpolatePuBu)
+        slideGroup = allNodes.select("g.slide_group");
+        slideGroup
+            .select("rect.slides_rect")
+            .attr("fill", (slide: IProvenanceSlide, i) => {
+                var col = d3.scaleSequential(d3.interpolatePuBu)
                     .domain([0, 10])(i).toString();
-                    if (slide.node){
-
+                if (slide.node) {
                     if (slide.node.metadata.bgColor) {
                         col = slide.node.metadata.bgColor;
                     }
@@ -779,7 +781,7 @@ export class SlideDeckVisualization {
                         slide.node.metadata.bgColor = col;
                     }
                 }
-                    return col;
+                return col;
             })
             .attr("selected", (slide: IProvenanceSlide) => {
                 return this._slideDeck.selectedSlide === slide;

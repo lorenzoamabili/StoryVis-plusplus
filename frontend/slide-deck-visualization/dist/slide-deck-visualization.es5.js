@@ -19689,7 +19689,7 @@ class SlideDeckVisualization {
         this._tableHeight = 125;
         this._tableWidth = 1800;
         this._minimumSlideDuration = 100;
-        this._barWidthTimeMultiplier = 0.035;
+        this._barWidthTimeMultiplier = 0.03;
         this._barPadding = 5;
         this._resizebarwidth = 3;
         this._previousSlideX = 0;
@@ -19708,7 +19708,7 @@ class SlideDeckVisualization {
         this._currentlyPlaying = false;
         this._timelineShift = 0;
         this._timeIndexedSlides = [];
-        // private _currentlyPlayingSlide: IProvenanceSlide | null = null;
+        this._currentlyPlayingSlide = null;
         this._gridTimeStep = 1000;
         this._gridSnap = false;
         this._playingID = -1;
@@ -20258,7 +20258,7 @@ class SlideDeckVisualization {
                 let currentSlide = this._slideDeck.slideAtTime(this._currentTime);
                 if (currentSlide !== this._slideDeck.selectedSlide) {
                     this.selectSlide(currentSlide);
-                    // this._currentlyPlayingSlide = currentSlide;
+                    this._currentlyPlayingSlide = currentSlide;
                 }
             }
             this.update();
@@ -20351,7 +20351,7 @@ class SlideDeckVisualization {
             .append("text") // appended previous slides_text
             .attr("class", "slides_text")
             .attr("y", this._resizebarwidth + 2 * this._barPadding)
-            .attr("font-size", 20)
+            .attr("font-size", 14)
             .attr("dy", ".35em");
         // slideGroup
         //     .append("image")
@@ -20369,24 +20369,6 @@ class SlideDeckVisualization {
             .attr("dy", "-.65em");
         // Ends --TransitionTime Text --Lorenzo
         let toolbar = slideGroup.append("g").attr("class", "slide_toolbar");
-        toolbar
-            .append("svg:foreignObject")
-            .attr("class", "slides_delete_icon")
-            .attr("cursor", "pointer")
-            .attr("width", 20)
-            .attr("height", 20)
-            .append("xhtml:body")
-            .on("click", this.onDelete)
-            .html('<i class="fa fa-trash-o"></i>');
-        toolbar
-            .append("svg:foreignObject")
-            .attr("class", "slides_clone_icon")
-            .attr("cursor", "pointer")
-            .attr("width", 20)
-            .attr("height", 20)
-            .append("xhtml:body")
-            .on("click", this.onClone)
-            .html('<i class="fa fa-copy"></i>');
         const placeholder = this._slideTable.select("rect.slides_placeholder");
         newNodes
             .append("text")
@@ -20427,6 +20409,26 @@ class SlideDeckVisualization {
             .subject(firstArgThis(this.transitionTimeSubject))
             .on("drag", firstArgThis(this.transitionTimeDragged)));
         select(".slide__table").on("wheel", this.rescaleTimeline);
+        newNodes.append("svg:foreignObject")
+            .attr("class", "slides_delete_icon")
+            .attr("cursor", "pointer")
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("x", 10)
+            .attr("y", 35)
+            .append("xhtml:body")
+            .on("click", this.onDelete)
+            .html('<i class="fa fa-trash-o"></i>');
+        newNodes.append("svg:foreignObject")
+            .attr("class", "slides_clone_icon")
+            .attr("cursor", "pointer")
+            .attr("width", 15)
+            .attr("height", 15)
+            .attr("x", 30)
+            .attr("y", 35)
+            .append("xhtml:body")
+            .on("click", this.onClone)
+            .html('<i class="fa fa-copy"></i>');
         // Update all nodes
         const allNodes = newNodes
             .merge(allExistingNodes)

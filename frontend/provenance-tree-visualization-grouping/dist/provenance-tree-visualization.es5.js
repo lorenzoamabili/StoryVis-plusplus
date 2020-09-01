@@ -961,6 +961,7 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         this.caterpillarActivated = false;
         this.width = 0;
         this.traverser = traverser;
+        this._deckViz = window.slideDeck;
         this.colorScheme = scaleOrdinal(schemeAccent);
         this.container = select(elm)
             .append('div')
@@ -1086,7 +1087,6 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
      */
     ProvenanceTreeVisualization.prototype.update = function () {
         var _this = this;
-        console.log('si vola');
         var wrappedRoot = wrapNode(this.traverser.graph.root);
         aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
         var hierarchyRoot = hierarchy(wrappedRoot); // Updated de treeRoot
@@ -1165,6 +1165,7 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         updateNodes.on('contextmenu', function (d) {
             d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
             _this.update();
+            _this._deckViz.onAdd();
         });
         updateNodes
             .select('g')

@@ -32,7 +32,7 @@ export class ProvenanceService {
   public application: Application;
   public slideDeck: SlideDeckVisualization;
   public tree: ProvenanceVisualizationComponent;
-  public textReport: String; 
+  public textReport: String;
   public initialized = false;
 
   public userService: UserService;
@@ -72,10 +72,10 @@ export class ProvenanceService {
       );
   }
 
-  public async saveTextReport(IDcreator: Number) { 
-      const textArea = document.getElementById("textArea") as HTMLTextAreaElement;
-      this.textReport = textArea.value;
-      this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
+  public async saveTextReport(IDcreator: Number) {
+    const textArea = document.getElementById("textArea") as HTMLTextAreaElement;
+    this.textReport = textArea.value;
+    this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
       {
         textReport: this.textReport,
         IDcreator: IDcreator
@@ -151,7 +151,7 @@ export class ProvenanceService {
     this.loadGraph(graphInput);
   }
 
-  public loadGraph(graphInput: any){
+  public loadGraph(graphInput: any) {
     const dataGraph = JSON.parse(graphInput.serializedGraph);
     this.graph = restoreProvenanceGraph(dataGraph);
     this.registry = new ActionFunctionRegistry();
@@ -160,53 +160,51 @@ export class ProvenanceService {
     this.tree = (window as any).tree;
     this.tree._viz.setTraverser(this.traverser);
     this.tree._viz.update();
-    console.log(this.graph);
-    console.log(this.tree);
     let elem = document.getElementById('fake');
     elem.click();
   }
 
 
   public async restoreStory(input: MatSelectChange) {
-    const storyInput = input.value;
-    this.loadStory(storyInput);
-  }
+  const storyInput = input.value;
+  this.loadStory(storyInput);
+}
 
   public loadStory(storyInput: any){
-    const dataStory = JSON.parse(storyInput.story);
-    this.slideDeck = (window as any).slideDeck;
-    this.slideDeck.setDeck(this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.application));
-    this.slideDeck.update();
-  }
+  const dataStory = JSON.parse(storyInput.story);
+  this.slideDeck = (window as any).slideDeck;
+  this.slideDeck.setDeck(this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.application));
+  this.slideDeck.update();
+}
 
   public async restoreTextReport(input: MatSelectChange) {
-    const textReportInput = input.value;
-    this.loadTextReport(textReportInput);
-  }
+  const textReportInput = input.value;
+  this.loadTextReport(textReportInput);
+}
 
   public loadTextReport(textReportInput: any){
-    (document.getElementById("textArea") as HTMLTextAreaElement).value = textReportInput.textReport;
-  }
+  (document.getElementById("textArea") as HTMLTextAreaElement).value = textReportInput.textReport;
+}
 
-  async init() {
-    this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
-    this.registry = new ActionFunctionRegistry();
-    this.tracker = new ProvenanceTracker(this.registry, this.graph);
-    this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
-    this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
+async init() {
+  this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
+  this.registry = new ActionFunctionRegistry();
+  this.tracker = new ProvenanceTracker(this.registry, this.graph);
+  this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
+  this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
 
-    (window as any).prov = {
-      graph: this.graph,
-      registry: this.registry,
-      tracker: this.tracker,
-      traverser: this.traverser,
-      deck: this.deck
-    };
-  }
+  (window as any).prov = {
+    graph: this.graph,
+    registry: this.registry,
+    tracker: this.tracker,
+    traverser: this.traverser,
+    deck: this.deck
+  };
+}
 
-  constructor(private http: HttpClient) {
-    this.init().then(() => this.initialized = true);
-  }
+constructor(private http: HttpClient) {
+  this.init().then(() => this.initialized = true);
+}
 }
 
 

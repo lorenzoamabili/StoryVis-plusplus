@@ -27,6 +27,7 @@ import {
   findHierarchyNodeFromProvenanceNode
 } from './aggregation/aggregation';
 import { caterpillar } from './caterpillar';
+import { SlideDeckVisualization } from '../../slide-deck-visualization/src/slide-deck-visualization';
 
 var xScale = -20;
 var yScale = 20;
@@ -53,6 +54,7 @@ export class ProvenanceTreeVisualization {
   public colorScheme: any;
   public g: D3SVGGSelection;
   public svg: D3SVGSelection;
+  public _deckViz: SlideDeckVisualization
   public container: d3.Selection<HTMLDivElement, unknown, null, undefined>;
   public aggregation: IAggregation = {
     aggregator: rawData,
@@ -68,6 +70,7 @@ export class ProvenanceTreeVisualization {
 
   constructor(traverser: ProvenanceGraphTraverser, elm: HTMLDivElement, aggreg: string) {
     this.traverser = traverser;
+    this._deckViz = (window as any).slideDeck;
     this.colorScheme = d3.scaleOrdinal(d3.schemeAccent);
     this.container = d3
       .select(elm)
@@ -126,7 +129,6 @@ export class ProvenanceTreeVisualization {
     this.setZoomExtent();
     this.svg.call(this.zoomer);
     this.scaleToFit(this.width);
-
   }
 
   public setZoomExtent() {
@@ -231,7 +233,6 @@ export class ProvenanceTreeVisualization {
    * @description Update the tree layout.
    */
   public update() {
-    console.log('si vola');
     const wrappedRoot = wrapNode(this.traverser.graph.root);
     aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
     const hierarchyRoot = d3.hierarchy(wrappedRoot); // Updated de treeRoot
@@ -330,6 +331,7 @@ export class ProvenanceTreeVisualization {
     updateNodes.on('contextmenu', (d: any) => {
       d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
       this.update();
+      this._deckViz.onAdd();
     });
 
 

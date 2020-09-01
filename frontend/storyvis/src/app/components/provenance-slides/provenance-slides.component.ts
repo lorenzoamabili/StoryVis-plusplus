@@ -32,6 +32,5 @@ export class ProvenanceSlidesComponent implements OnInit {
     this._deck.autoScreenShot = true;
     (window as any).deck = this._deck;
     (window as any).slideDeck = this._deckViz;
-
   }
 }

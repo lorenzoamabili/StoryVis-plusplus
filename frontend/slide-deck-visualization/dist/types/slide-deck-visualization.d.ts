@@ -24,6 +24,7 @@ export declare class SlideDeckVisualization {
     private _currentlyPlaying;
     private _timelineShift;
     private _timeIndexedSlides;
+    private _currentlyPlayingSlide;
     private _gridTimeStep;
     private _gridSnap;
     private _playingID;
@@ -33,7 +34,7 @@ export declare class SlideDeckVisualization {
     private selectSlide;
     private onMouseEnter;
     private onMouseLeave;
-    private onAdd;
+    onAdd: () => void;
     private onClone;
     private moveDragStarted;
     private moveDragged;
