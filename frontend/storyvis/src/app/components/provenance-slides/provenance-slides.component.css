@@ -11,25 +11,3 @@ app-provenance-slides {
   display: flex;
   padding: 1%;
 }
-
-.slides_background_rect {
-  fill: #ffffff;
-  opacity: 0.01;
-  stroke: #aaaaaa;
-}
-
-/* .slides_rect {
-  opacity: 0.7;
-  stroke: #dddddd;
-} */
-
-.slides_delay_rect {
-  fill: #dddddd;
-  opacity: 0.7;
-  stroke: #dddddd;
-}
-
-.slides_rect[selected='true'] {
-  stroke: #000;
-  stroke-width: 1px;
- }

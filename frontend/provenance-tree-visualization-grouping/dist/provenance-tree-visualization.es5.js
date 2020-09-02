@@ -943,6 +943,9 @@ function caterpillar(updateNodes, treeNodes, updatedLinks, provenanceTreeVisuali
 var xScale = -20;
 var yScale = 20;
 var treeWidth = 0;
+var maxtreeWidth = 10;
+var treePaddingX = 15;
+var p = 3;
 var fontSize = 8;
 /**
  * @description Class used to create and manage a provenance tree visualization.
@@ -960,7 +963,6 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         };
         // public _aggregator: NodeAggregator<ProvenanceNode> = rawData; // changed from original
         this.caterpillarActivated = false;
-        this.width = 0;
         this.traverser = traverser;
         this._deckViz = window.slideDeck;
         this.colorScheme = scaleOrdinal(schemeAccent);
@@ -1001,13 +1003,13 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
             _this.update();
         });
         traverser.graph.on('nodeAdded', function () {
-            _this.scaleToFit(_this.width);
+            _this.scaleToFit(treeWidth);
         });
         this.update();
         this.zoomer = zoom();
         this.setZoomExtent();
         this.svg.call(this.zoomer);
-        this.scaleToFit(this.width);
+        this.scaleToFit(treeWidth);
     }
     ProvenanceTreeVisualization.prototype.setZoomExtent = function () {
         var _this = this;
@@ -1022,19 +1024,19 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         var maxScale = 2;
         var magicNumY = 0.75; // todo: get relevant number based on dimensions
         var magicNumX = 0.5; // todo: get relevant number based on dimensions
-        if (n !== undefined) {
-            this.width = n;
-            var scaleFactor = Math.min(maxScale, (magicNumY * sizeY) / (this.hierarchyRoot.height * yScale), (magicNumX * sizeX) / (this.width * -xScale));
+        var width = n !== undefined ? n : 0;
+        var scaleFactor = Math.min(maxScale, (magicNumY * sizeY) / (this.hierarchyRoot.height * yScale), (magicNumX * sizeX) / (width * -xScale));
+        if (scaleFactor === maxScale) {
+            var moveGraphOnX = sizeX / 2;
         }
         else {
-            var scaleFactor = Math.min(maxScale, (magicNumY * sizeY) / (this.hierarchyRoot.height * yScale), (magicNumX * sizeX) / (this.width * -xScale));
-            return scaleFactor;
+            moveGraphOnX = (sizeX + treePaddingX * treeWidth) / 2;
         }
         this.svg
             .transition()
             .duration(0)
             .call(this.zoomer.transform, function () {
-            return zoomIdentity.translate(sizeX / 2, 10).scale(scaleFactor);
+            return zoomIdentity.translate(moveGraphOnX, 10).scale(scaleFactor);
         });
     };
     ProvenanceTreeVisualization.prototype.linkPath = function (_a) {
@@ -1219,10 +1221,12 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
             .transition()
             .duration(500)
             .attr('transform', function (d) {
-            if (d.x > treeWidth) {
+            if (d.x > treeWidth && treeWidth <= maxtreeWidth) {
                 var classString = "translate(" + d.x * xScale + ", " + d.y * yScale + ")";
                 treeWidth = d.x;
-                _this.scaleToFit(d.x);
+                if (treeWidth % p) {
+                    _this.scaleToFit(d.x);
+                }
             }
             else {
                 var classString = "translate(" + d.x * xScale + ", " + d.y * yScale + ")";

@@ -19686,7 +19686,7 @@ function firstArgThis(f) {
 }
 class SlideDeckVisualization {
     constructor(slideDeck, elm) {
-        this._tableHeight = 80;
+        this._tableHeight = 100;
         this._tableWidth = 1800;
         this._minimumSlideDuration = 100;
         this._barWidthTimeMultiplier = 0.03;
@@ -20474,9 +20474,8 @@ class SlideDeckVisualization {
         slideGroup
             .select("rect.slides_rect")
             .attr("fill", (slide, i) => {
-            var j = i + 1;
             var col = scaleSequential(interpolatePuBu)
-                .domain([0, j])(i).toString();
+                .domain([0, 20])(i).toString();
             if (slide.node) {
                 if (slide.node.metadata.bgColor) {
                     col = slide.node.metadata.bgColor;

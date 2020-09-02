@@ -25,7 +25,7 @@ export class SlideDeckVisualization {
     private _slideDeck: IProvenanceSlidedeck;
     private _root: d3.Selection<HTMLDivElement, undefined, null, undefined>;
     private _slideTable: d3.Selection<SVGElement, undefined, null, undefined>;
-    private _tableHeight = 80;
+    private _tableHeight = 100;
     private _tableWidth = 1800;
     private _minimumSlideDuration = 100;
     private _barWidthTimeMultiplier = 0.03;
@@ -778,9 +778,8 @@ export class SlideDeckVisualization {
         slideGroup
             .select("rect.slides_rect")
             .attr("fill", (slide: IProvenanceSlide, i) => {
-                var j = i + 1;
                 var col = d3.scaleSequential(d3.interpolatePuBu)
-                    .domain([0, j])(i).toString();
+                    .domain([0, 20])(i).toString();
                 if (slide.node) {
                     if (slide.node.metadata.bgColor) {
                         col = slide.node.metadata.bgColor;
