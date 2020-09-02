@@ -2,7 +2,7 @@ app-provenance-visualization {
   height: 80%;
   width: 300px;
   display: block;
-  background-color: #fafafa;
+  background-color: snow;
 }
 .visualizationContainer {
   display: flex;
@@ -144,7 +144,8 @@ app-provenance-visualization {
 }
 .container {
   display: flex;
-  flex: 1
+  flex: 1;
+  background-color: snow;
 }
 #aggregationControls {
   flex: 1;
@@ -166,6 +167,7 @@ app-provenance-visualization {
   box-shadow: 0px 0px 4px #888;
   margin: 5px;
   height: 160px;
+  background-color: white;
 }
 .legend ul {
   list-style-type: none;

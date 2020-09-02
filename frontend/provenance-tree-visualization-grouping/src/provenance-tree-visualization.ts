@@ -31,6 +31,7 @@ import { SlideDeckVisualization } from '../../slide-deck-visualization/src/slide
 
 var xScale = -20;
 var yScale = 20;
+var treeWidth = 0;
 
 const fontSize = 8;
 
@@ -144,7 +145,6 @@ export class ProvenanceTreeVisualization {
     const maxScale = 2;
     const magicNumY = 0.75; // todo: get relevant number based on dimensions
     const magicNumX = 0.5; // todo: get relevant number based on dimensions
-
 
     if (n !== undefined) {
       this.width = n;
@@ -331,7 +331,7 @@ export class ProvenanceTreeVisualization {
     updateNodes.on('contextmenu', (d: any) => {
       d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
       this.update();
-      this._deckViz.onAdd();
+      this._deckViz.onAdd(d.data.wrappedNodes[0]);
     });
 
 
@@ -397,8 +397,9 @@ export class ProvenanceTreeVisualization {
       .attr(
         'transform',
         (d: any) => {
-          if (d.x > 0) {
+          if (d.x > treeWidth) {
             var classString = `translate(${d.x * xScale}, ${d.y * yScale})`;
+            treeWidth = d.x;
             this.scaleToFit(d.x);
           } else {
             var classString = `translate(${d.x * xScale}, ${d.y * yScale})`;

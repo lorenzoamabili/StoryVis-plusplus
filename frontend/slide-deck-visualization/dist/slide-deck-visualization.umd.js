@@ -19691,7 +19691,7 @@
   }
   class SlideDeckVisualization {
       constructor(slideDeck, elm) {
-          this._tableHeight = 100;
+          this._tableHeight = 80;
           this._tableWidth = 1800;
           this._minimumSlideDuration = 100;
           this._barWidthTimeMultiplier = 0.03;
@@ -19704,7 +19704,7 @@
           this._placeholderHeight = 60;
           this._toolbarX = 10;
           this._toolbarY = 35;
-          this._toolbarPadding = 20;
+          this._toolbarPadding = 10;
           // Upon dragging a slide, no matter where you click on it, the beginning of the slide jumps to the mouse position.
           // This next variable is calculated to adjust for that error, it is a workaround but it works
           this._draggedSlideReAdjustmentFactor = 0;
@@ -19751,10 +19751,16 @@
               this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
               this.update();
           };
-          this.onAdd = () => {
+          this.onAdd = (node) => {
               let slideDeck = this._slideDeck;
-              const node = slideDeck.graph.current;
-              const slide = new ProvenanceSlide(node.label, 5000, 0, [], node);
+              let nodeSlide = node;
+              if (node == undefined) {
+                  nodeSlide = slideDeck.graph.current;
+              }
+              else {
+                  nodeSlide = node;
+              }
+              const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, [], node);
               slideDeck.addSlide(slide, slideDeck.slides.length);
               // node.metadata.isSlideAdded = true;
               // slideDeck.graph.emitNodeChangedEvent(node);

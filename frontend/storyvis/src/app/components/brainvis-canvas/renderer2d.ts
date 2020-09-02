@@ -78,7 +78,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this._domElement.clientHeight,
       false
     );
-    this._renderer.domElement.setAttribute("style", "width:100%; height:100%");
+    this._renderer.domElement.setAttribute("style", "width:100%; height:100%;");
     this._renderer.setClearColor(0x121212, 1);
     this._renderer.domElement.id = this._targetID.toString(); // 0,1,2,3 view ID
     this._domElement.appendChild(this._renderer.domElement); // append canvas to main DOMelement
@@ -133,6 +133,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._stackHelper = new AMI.StackHelper(stack);
     this._stackHelper.bbox.visible = false;
     this._stackHelper.borderColor = this._sliceColor;
+    
     // this._stackHelper.slice._windowWidth = 1000;
     // console.log(this._stackHelper.slice);
     // console.log(this._stackHelper.slice._windowWidth);
@@ -270,7 +271,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._renderer.render(this._scene, this._camera);
 
     // mesh
-    this._renderer.clearDepth();
+    // this._renderer.clearDepth();
     // data.forEach(function(object, key) {
     //   object.materialFront.clippingPlanes = [clipPlane1];
     //   object.materialBack.clippingPlanes = [clipPlane1];

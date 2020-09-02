@@ -942,6 +942,7 @@ function caterpillar(updateNodes, treeNodes, updatedLinks, provenanceTreeVisuali
 
 var xScale = -20;
 var yScale = 20;
+var treeWidth = 0;
 var fontSize = 8;
 /**
  * @description Class used to create and manage a provenance tree visualization.
@@ -1165,7 +1166,7 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         updateNodes.on('contextmenu', function (d) {
             d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
             _this.update();
-            _this._deckViz.onAdd();
+            _this._deckViz.onAdd(d.data.wrappedNodes[0]);
         });
         updateNodes
             .select('g')
@@ -1218,8 +1219,9 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
             .transition()
             .duration(500)
             .attr('transform', function (d) {
-            if (d.x > 0) {
+            if (d.x > treeWidth) {
                 var classString = "translate(" + d.x * xScale + ", " + d.y * yScale + ")";
+                treeWidth = d.x;
                 _this.scaleToFit(d.x);
             }
             else {

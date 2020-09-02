@@ -34,7 +34,7 @@ export declare class SlideDeckVisualization {
     private selectSlide;
     private onMouseEnter;
     private onMouseLeave;
-    onAdd: () => void;
+    onAdd: (node?: import("@visualstorytelling/provenance-core").RootNode | import("@visualstorytelling/provenance-core").StateNode | undefined) => void;
     private onClone;
     private moveDragStarted;
     private moveDragged;

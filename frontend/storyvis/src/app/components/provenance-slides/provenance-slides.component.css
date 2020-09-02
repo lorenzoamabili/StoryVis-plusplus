@@ -1,10 +1,10 @@
 @import '~@visualstorytelling/slide-deck-visualization/dist/bundle.css';
 
 app-provenance-slides {
-  height: 100px;
+  height: 120;
   width: 100%;
   display: block;
-  background-color: ivory;
+  background-color: snow;
 }
 
 #slideDeck {

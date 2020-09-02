@@ -5,8 +5,8 @@ body {
 }
 
 #slideDeck {
-    height: 100px;
-    /* overflow-y: scroll; */
+    height: 120px;
+    overflow: hidden;
     border-radius: 5px;
 }
 
@@ -114,8 +114,8 @@ rect.add_annotation {
 
   #addButton{
       position: absolute;
-      bottom: 20%;
-      right: 2%;
+      bottom: 5%;
+      right: 1%;
   }
 
   /* .slides_delete_icon{
