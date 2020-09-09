@@ -37,6 +37,10 @@ export interface NodeMetadata {
      */
     createdOn: number;
     /**
+     * UNIX timestamp
+     */
+    creationOrder: number;
+    /**
      * Enable custom properties
      */
     [key: string]: any;
@@ -46,12 +50,12 @@ export interface NodeMetadata {
  */
 export interface Artifact {
     id: number;
-    type: string;
-    typeID: number;
+    measurementType: string;
     sliceIndex: number;
-    view: string;
+    viewName: string;
     elements: HTMLElement[] | null;
-    treeNodeID?: string;
+    elmHTML: any[] | null;
+    metadata: any[] | null;
     /**
      * Enable custom properties
      */
@@ -337,6 +341,7 @@ export interface IProvenanceSlide {
     id: string;
     node: ProvenanceNode | null;
     name: string;
+    nodeCreationOrder: number;
     duration: number;
     transitionTime: number;
     annotations: ISlideAnnotation[];
@@ -349,6 +354,7 @@ export interface IProvenanceSlide {
 export declare type SerializedProvenanceSlide = {
     node: string | null;
     name: string;
+    nodeCreationOrder: number;
     duration: number;
     transitionTime: number;
     mainAnnotation: string;

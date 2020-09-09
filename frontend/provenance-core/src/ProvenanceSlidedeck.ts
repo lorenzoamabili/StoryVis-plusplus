@@ -23,7 +23,7 @@ export class ProvenanceSlidedeck implements IProvenanceSlidedeck {
   private _screenShotProvider: IScreenShotProvider | null = null;
   private _autoScreenShot = false;
 
-  private _captainPlaceholder = new ProvenanceSlide('Captain Placeholder', 0, 0);
+  private _captainPlaceholder = new ProvenanceSlide('Captain Placeholder', 0, 0, 0);
 
   constructor(application: Application, traverser: IProvenanceGraphTraverser) {
     this._mitt = mitt();
@@ -53,7 +53,7 @@ export class ProvenanceSlidedeck implements IProvenanceSlidedeck {
     }
     if (!slide) {
       const node = this._graph.current;
-      slide = new ProvenanceSlide(node.label, 1, 0, [], node);
+      slide = new ProvenanceSlide(node.label, 1, 0, 0, [], node);
     }
     if (this.autoScreenShot && this.screenShotProvider) {
       try {

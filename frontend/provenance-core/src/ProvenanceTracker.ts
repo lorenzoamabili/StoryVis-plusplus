@@ -13,6 +13,7 @@ import {
 import { generateUUID, generateTimestamp } from './utils';
 import { ProvenanceGraph, serializeProvenanceGraph } from './ProvenanceGraph';
 
+var nodeCounter: number = 0;
 /**
  * Provenance Graph Tracker implementation
  *
@@ -65,14 +66,14 @@ export class ProvenanceTracker implements IProvenanceTracker {
     } else {
       label = action.do;
     }
-
     const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any): StateNode => ({
       id: generateUUID(),
       label: label,
       metadata: {
         loaded: false,
         createdBy: this.username,
-        createdOn: generateTimestamp()
+        createdOn: generateTimestamp(),
+        creationOrder: nodeCounter
       },
       action,
       actionResult,
@@ -85,9 +86,11 @@ export class ProvenanceTracker implements IProvenanceTracker {
     // Save the current node because the next block could be asynchronous
     const currentNode = this.graph.current;
 
+
     if (skipFirstDoFunctionCall) {
       newNode = createNewStateNode(this.graph.current, null);
-
+      nodeCounter = newNode.metadata.creationOrder + 1;
+      newNode.metadata.creationOrder = nodeCounter;
     } else {
       // Get the registered function from the action out of the registry
       const functionNameToExecute: string = action.do;
@@ -97,6 +100,8 @@ export class ProvenanceTracker implements IProvenanceTracker {
       const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args);
 
        newNode = createNewStateNode(currentNode, actionResult);
+       nodeCounter = newNode.metadata.creationOrder + 1;
+       newNode.metadata.creationOrder = nodeCounter;
     }
 
     if (this.autoScreenShot && this.screenShotProvider) {

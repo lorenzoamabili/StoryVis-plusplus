@@ -10,8 +10,8 @@ export default class Ruler {
   renderer: Renderer2D;
   index: any;
   pair: THREE.Vector3;
-
   artifact: Artifact;
+
   /**
    * "isNew" is set to false after creation is done (first mouse up event).
    */
@@ -19,12 +19,11 @@ export default class Ruler {
 
   // @Output() changed = new EventEmitter<{ oldPoints: IPointPair, newPoints: IPointPair }>();
   // @Output() created = new EventEmitter<IPointPair>();
-  @Output() changed = new EventEmitter<Artifact>();
-  @Output() created = new EventEmitter<Artifact>();
+
 
   constructor(renderer: Renderer2D, evt: MouseEvent | null = null) {
     this.renderer = renderer;
-    this.isNew = true;
+    this.isNew = false;
 
     const { stackHelper, controls } = renderer;
     const stack = stackHelper._stack;
@@ -32,6 +31,9 @@ export default class Ruler {
     this.index = renderer.stackHelper.index;
 
     let startPosition = new THREE.Vector3();
+
+
+
 
     if (evt) {
       /*
@@ -65,11 +67,13 @@ export default class Ruler {
 
     this.widget.update();
 
+
     // add eventlisteners for dragging etc.
     this.renderer.domElement.addEventListener('mouseup', this.onMouseUp);
     this.renderer.domElement.addEventListener('mousemove', this.onMouseMove);
     this.renderer.domElement.addEventListener('mousedown', this.onMouseDown);
   }
+
 
   remove() {
     this.renderer.domElement.removeEventListener('mouseup', this.onMouseUp);
@@ -81,6 +85,7 @@ export default class Ruler {
   onMouseUp = (evt) => {
     this.widget.onEnd(evt);
   }
+  
 
   //   if (this.isNew) {
   //     this.created.emit({
@@ -109,5 +114,11 @@ export default class Ruler {
 
   onMouseDown = (evt) => {
     this.widget.onStart(evt);
-  };
+  }
+
+  simulateRuler(down, move, up){
+    this.onMouseDown(down);
+    this.onMouseMove(move);
+    this.onMouseUp(up);
+  }
 }

@@ -7,7 +7,7 @@ import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
 export class AMIRenderer {
     protected _initialized = false;
-    protected _canvas: BrainvisCanvasComponent;
+    public _canvas: BrainvisCanvasComponent;
 
     protected _color = 0x121212;
     protected _targetID = 1;

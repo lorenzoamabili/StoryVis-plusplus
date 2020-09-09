@@ -1025,9 +1025,9 @@
           var sizeX = this.svg.node().clientWidth;
           var sizeY = this.svg.node().clientHeight;
           var maxScale = 2;
-          var magicNumY = 0.75; // todo: get relevant number based on dimensions
+          var magicNumY = 0.9; // todo: get relevant number based on dimensions
           var magicNumX = 0.5; // todo: get relevant number based on dimensions
-          var width = n !== undefined ? n : 0;
+          var width = (n !== undefined) ? n : 0;
           var scaleFactor = Math.min(maxScale, (magicNumY * sizeY) / (this.hierarchyRoot.height * yScale), (magicNumX * sizeX) / (width * -xScale));
           if (scaleFactor === maxScale) {
               var moveGraphOnX = sizeX / 2;
@@ -1135,8 +1135,8 @@
               .attr('class', 'circle-label')
               .text(function (d) { return groupNodeLabel(d.data); }) // .text(d => d.data.neighbour.toString())
               .attr('x', 7)
-              .attr('alignment-baseline', 'central')
-              .call(this.wrap, 70);
+              .attr('alignment-baseline', 'central');
+          // .call(this.wrap, 70);
           var updateNodes = newNodes.merge(oldNodes);
           updateNodes.selectAll('g.normal').remove();
           updateNodes.selectAll('g.bookmarked').remove();

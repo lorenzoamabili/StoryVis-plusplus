@@ -8,7 +8,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         this._slides = [];
         this._screenShotProvider = null;
         this._autoScreenShot = false;
-        this._captainPlaceholder = new ProvenanceSlide_1.ProvenanceSlide('Captain Placeholder', 0, 0);
+        this._captainPlaceholder = new ProvenanceSlide_1.ProvenanceSlide('Captain Placeholder', 0, 0, 0);
         this._mitt = mitt_1.default();
         this._application = application;
         this._graph = traverser.graph;
@@ -35,7 +35,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         }
         if (!slide) {
             var node = this._graph.current;
-            slide = new ProvenanceSlide_1.ProvenanceSlide(node.label, 1, 0, [], node);
+            slide = new ProvenanceSlide_1.ProvenanceSlide(node.label, 1, 0, 0, [], node);
         }
         if (this.autoScreenShot && this.screenShotProvider) {
             try {

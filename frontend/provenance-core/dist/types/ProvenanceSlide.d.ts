@@ -5,6 +5,7 @@ export declare class ProvenanceSlide implements IProvenanceSlide {
     private _id;
     private _node;
     private _name;
+    private _nodeCreationOrder;
     private _duration;
     private _transitionTime;
     private _annotations;
@@ -12,7 +13,7 @@ export declare class ProvenanceSlide implements IProvenanceSlide {
     private _xPosition;
     private _metadata;
     private _mainAnnotation;
-    constructor(name: string, duration: number, transitionTime: number, annotations?: SlideAnnotation[], node?: ProvenanceNode | null);
+    constructor(name: string, duration: number, nodeCreationOrder: number, transitionTime: number, annotations?: SlideAnnotation[], node?: ProvenanceNode | null);
     get mainAnnotation(): string;
     set mainAnnotation(annotation: string);
     get id(): string;
@@ -21,6 +22,8 @@ export declare class ProvenanceSlide implements IProvenanceSlide {
     set node(value: ProvenanceNode | null);
     get name(): string;
     set name(value: string);
+    get nodeCreationOrder(): number;
+    set nodeCreationOrder(value: number);
     get duration(): number;
     set duration(value: number);
     get transitionTime(): number;

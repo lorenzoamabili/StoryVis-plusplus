@@ -4,6 +4,7 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 import { Renderer2D } from '../renderer2d';
 import { registerActions } from './provenanceActions';
 import { Settings } from '../utils/settings';
+import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 
 export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
 
@@ -20,7 +21,6 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     addListeners(canvas.provenance.tracker, canvas);
     canvas.addEventListeners();
   }
-
 
   canvas.addEventListener('sliceOrientationChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
@@ -101,13 +101,13 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       let label = '';
       switch (startEvent.changes.sliceOrientation) {
         case 'axial':
-          label = 'Axial    #: ' + event.changes.newIndex;
+          label = 'A #' + event.changes.newIndex;
           break;
         case 'coronal':
-          label = 'Coronal  #: ' + event.changes.newIndex;
+          label = 'C #' + event.changes.newIndex;
           break;
         case 'sagittal':
-          label = 'Sagittal #: ' + event.changes.newIndex;
+          label = 'S #' + event.changes.newIndex;
           break;
         default:
           label = 'strange index?';
@@ -137,7 +137,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   const perspectiveZoomStartListener = (startEvent) => {
     canvas.removeEventListener('perspectiveCameraZoomChanged', perspectiveZoomEndListener);
     perspectiveZoomEndListener = debounce((event: any) => {
-      let label = 'P ZOOM:';
+      let label = '3D-zoom ';
       label += ' ' + event.orientation.position[0].toFixed(0);
       label += '/' + event.orientation.position[1].toFixed(0);
       label += '/' + event.orientation.position[2].toFixed(0);
@@ -162,7 +162,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   const perspectiveOrientationStartListener = (startEvent) => {
     canvas.removeEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
     perspectiveOrientationEndListener = debounce((event: any) => {
-      let label = 'P XYZ :';
+      let label = '3D-XYZ ';
       label += ' ' + event.orientation.position[0].toFixed(0);
       label += '/' + event.orientation.position[1].toFixed(0);
       label += '/' + event.orientation.position[2].toFixed(0);
@@ -198,11 +198,11 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       //   tracker.applyAction(action, true);
       // });
 
-      renderer.artifactCreated.subscribe((artifact) => {
+      renderer.artifactCreated.subscribe((artifact: Artifact) => {
         const action = {
           metadata: {
             userIntent: 'derivation',
-            label: artifact.type
+            label: artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndex
           },
           do: 'renderArtifact',
           doArguments: { args: [renderer.sliceOrientation, artifact] },
@@ -216,11 +216,11 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
-      renderer.annotationCreated.subscribe((artifact) => {
+      renderer.annotationCreated.subscribe((artifact: Artifact) => {
         const action = {
           metadata: {
             userIntent: 'annotation',
-            label: artifact.type
+            label: artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndex
           },
           do: 'renderArtifact',
           doArguments: { args: [renderer.sliceOrientation, artifact] },

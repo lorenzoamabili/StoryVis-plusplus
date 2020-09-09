@@ -18,12 +18,12 @@ export default class Voxelprobe {
    */
   isNew: boolean;
 
-  @Output() changed = new EventEmitter<Artifact>();
-  @Output() created = new EventEmitter<Artifact>();
+  // @Output() changed = new EventEmitter<Artifact>();
+  // @Output() created = new EventEmitter<Artifact>();
 
   constructor(renderer: Renderer2D, evt: MouseEvent | null = null) {
     this.renderer = renderer;
-    this.isNew = true;
+    this.isNew = false;
 
     const { stackHelper, controls } = renderer;
     const stack = stackHelper._stack;
@@ -62,7 +62,8 @@ export default class Voxelprobe {
     });
 
     this.widget.update();
-
+ 
+    
     // add eventlisteners for dragging etc.
     this.renderer.domElement.addEventListener('mouseup', this.onMouseUp);
     this.renderer.domElement.addEventListener('mousemove', this.onMouseMove);
@@ -78,6 +79,20 @@ export default class Voxelprobe {
 
   onMouseUp = (evt) => {
     this.widget.onEnd(evt);
+
+    // if (this.renderer.rulerChanged === true && !this.isNew) {
+    //   this.renderer.emitVoxelprobe(this); 
+    // }
+    // if (this.renderer.rulerChanged === true){
+    //   this.isNew = false;
+    // }
+    //   if (this.isNew){
+    //     this.renderer.rulerChanged = true;
+    // }
+
+
+
+
 
     // if (this.isNew) {
     //   this.created.emit({
@@ -107,5 +122,10 @@ export default class Voxelprobe {
 
   onMouseDown = (evt) => {
     this.widget.onStart(evt);
-  };
+  }
+  
+  simulateVoxelprobe(down, up){
+    this.onMouseDown(down);
+    this.onMouseUp(up);
+  }
 }

@@ -9,11 +9,13 @@ export declare class ProvenanceGraph implements IProvenanceGraph {
     application: Application;
     readonly root: RootNode;
     artifacts: Artifact[];
-    private _current;
+    _current: ProvenanceNode;
     private _mitt;
-    private _nodes;
+    _nodes: {
+        [key: string]: ProvenanceNode;
+    };
     id: string;
-    constructor(application: Application, userid?: string, rootNode?: RootNode);
+    constructor(application: Application, userid?: string, node?: RootNode);
     addNode(node: ProvenanceNode): void;
     getNode(id: NodeIdentifier): ProvenanceNode;
     get current(): ProvenanceNode;

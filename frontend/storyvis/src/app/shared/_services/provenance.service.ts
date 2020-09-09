@@ -34,11 +34,14 @@ export class ProvenanceService {
   public tree: ProvenanceVisualizationComponent;
   public textReport: String;
   public initialized = false;
+  public graphLoaded = false;
 
   public userService: UserService;
 
   public async saveGraph(IDcreator: Number) {
+    // this.tracker.getGraph().nodes.filter((x) => x.artifacts[0].type == 'annotation').forEach((x) => x.artifacts[0].elmAttributes[2] = );
     const sJson = JSON.stringify(this.tracker.getGraph());
+    console.log(sJson);
     this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
       {
         serializedGraph: sJson,
@@ -149,16 +152,24 @@ export class ProvenanceService {
   public async restoreGraph(input: MatSelectChange) {
     const graphInput = input.value;
     this.loadGraph(graphInput);
+    this.graphLoaded = true;
   }
 
   public loadGraph(graphInput: any) {
     const dataGraph = JSON.parse(graphInput.serializedGraph);
+    console.log(dataGraph);
     this.graph = restoreProvenanceGraph(dataGraph);
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
     this.tree = (window as any).tree;
-    this.tree._viz.setTraverser(this.traverser);
+
+    if(this.tree.currentUser.role === 'Author') {
+      this.tree.createTree(this.traverser);
+    } else {
+      this.tree._viz.setTraverser(this.traverser);
+    }
+
     this.tree._viz.update();
     let elem = document.getElementById('fake');
     elem.click();
@@ -187,7 +198,7 @@ export class ProvenanceService {
 }
 
 async init() {
-  this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
+this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, "originalGraph", undefined);
   this.registry = new ActionFunctionRegistry();
   this.tracker = new ProvenanceTracker(this.registry, this.graph);
   this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);

@@ -182,6 +182,19 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.settings.voxelprobeModeChange.subscribe(this.toggleVoxelprobeMode.bind(this));
     this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
     addListeners(this._provenance.tracker, this);
+    (window as any).renderer = {
+      r0: this._axialRenderer,
+      r1: this._perspectiveRenderer,
+      r2: this._coronalRenderer,
+      r3: this._sagittalRenderer
+    };
+        // (window as any).canvas = this;
+    // (window as any).views = {
+    //   r1: this.views[0],
+    //   r2: this.views[1],
+    //   r3: this.views[2],
+    //   r4: this.views[3]
+    // };
   }
 
   toggleRulerMode(isEnabled: boolean) {
@@ -427,25 +440,25 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
     changeSliceRemove(sliceOrientation: VIEWS, oldIndex: number) {
       if (sliceOrientation === 'axial') {
-        this._axialRenderer.changeSliceRemove(oldIndex);
+        this._axialRenderer.removeFromSliceChange(oldIndex);
       }
       else if (sliceOrientation === 'coronal' ) {
-        this._coronalRenderer.changeSliceRemove(oldIndex);
+        this._coronalRenderer.removeFromSliceChange(oldIndex);
       }
       else if (sliceOrientation === 'sagittal' ) {
-        this._sagittalRenderer.changeSliceRemove(oldIndex);
+        this._sagittalRenderer.removeFromSliceChange(oldIndex);
       }
     }
   
     changeSliceRender(sliceOrientation: VIEWS, newIndex: number) {
       if (sliceOrientation === 'axial') {
-        this._axialRenderer.changeSliceRender(newIndex);
+        this._axialRenderer.renderFromSliceChange(newIndex);
       }
       else if (sliceOrientation === 'coronal' ) {
-        this._coronalRenderer.changeSliceRender(newIndex);
+        this._coronalRenderer.renderFromSliceChange(newIndex);
       }
       else if (sliceOrientation === 'sagittal' ) {
-        this._sagittalRenderer.changeSliceRender(newIndex);
+        this._sagittalRenderer.renderFromSliceChange(newIndex);
       } 
     }
   

@@ -74,7 +74,9 @@
       <mat-icon class="example-icon">fingerprint</mat-icon>
     </mat-button-toggle>
 
-    <mat-button-toggle [checked]="canvas.settings.annotationMode"
+    <span>&nbsp;</span>
+
+    <mat-button-toggle class="annotation" [checked]="canvas.settings.annotationMode"
       (change)="canvas.settings.annotationMode = $event.source.checked" matTooltip="Create Annotation">
       <mat-icon class="example-icon">speaker_notes</mat-icon>
     </mat-button-toggle>

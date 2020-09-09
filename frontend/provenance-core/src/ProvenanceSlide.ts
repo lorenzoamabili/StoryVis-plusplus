@@ -8,6 +8,7 @@ export class ProvenanceSlide implements IProvenanceSlide {
   private _id: string;
   private _node: ProvenanceNode | null;
   private _name: string;
+  private _nodeCreationOrder: number;
   private _duration: number;
   private _transitionTime: number;
   private _annotations: SlideAnnotation[];
@@ -19,6 +20,7 @@ export class ProvenanceSlide implements IProvenanceSlide {
   constructor(
     name: string,
     duration: number,
+    nodeCreationOrder: number,
     transitionTime: number,
     annotations: SlideAnnotation[] = [],
     node: ProvenanceNode | null = null
@@ -26,6 +28,7 @@ export class ProvenanceSlide implements IProvenanceSlide {
     this._id = generateUUID();
     this._name = name;
     this._duration = duration;
+    this._nodeCreationOrder = nodeCreationOrder;
     this._annotations = annotations;
     this._node = node;
     this._transitionTime = transitionTime;
@@ -68,6 +71,14 @@ export class ProvenanceSlide implements IProvenanceSlide {
 
   public set name(value: string) {
     this._name = value;
+  }
+
+  public get nodeCreationOrder(): number {
+    return this._nodeCreationOrder;
+  }
+
+  public set nodeCreationOrder(value: number) {
+    this._nodeCreationOrder = value;
   }
 
   public get duration(): number {
@@ -128,7 +139,7 @@ export function restoreSlide(serialized: SerializedProvenanceSlide, graph: Prove
   serialized.annotations.forEach(annotation => {
     annotations.push(restoreAnnotation(annotation));
   });
-  let slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.transitionTime, annotations);
+  let slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.nodeCreationOrder, serialized.transitionTime, annotations);
   if(serialized.node != null){
     const node = graph.nodes[serialized.node];
     slide.node = node;
@@ -150,6 +161,7 @@ export function serializeSlide(slide: IProvenanceSlide) : SerializedProvenanceSl
   return {
     node: nodeId,
     name: slide.name, 
+    nodeCreationOrder: slide.nodeCreationOrder,
     transitionTime: slide.transitionTime,
     duration: slide.duration,
     annotations: annotations,

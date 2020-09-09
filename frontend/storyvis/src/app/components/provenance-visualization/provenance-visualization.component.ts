@@ -20,12 +20,24 @@ export class ProvenanceVisualizationComponent implements OnInit {
   }
 
   ngOnInit() {
-     (window as any).tree = this;
+    if (this.currentUser.role === 'Author'){
+      (window as any).tree = this;
+      // var traverser = this.provenance.traverser;
+      // this.createTree(traverser);
+    } else {
+      (window as any).tree = this;
+      var traverser = this.provenance.traverser;
+      this.createTree(traverser);
+    }
+  }
+
+
+  createTree(traverser){
       this._viz = new ProvenanceTreeVisualization(
-        this.provenance.traverser,
-        this.elementRef.nativeElement,
-        this.currentUser.group
-      );
+      traverser,
+      this.elementRef.nativeElement,
+      this.currentUser.group
+    );
   }
 
   // ngAfterViewChecked() {

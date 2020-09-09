@@ -7,18 +7,24 @@
 mat-button-toggle,
 
 button {
-  color: white;
-  background-color: #4a5268;
+  color: ivory;
+  background-color: #586072;
 }
 
 .save {
-  color: white;
   background-color: #586072;
 }
 
 mat-button-toggle.mat-button-toggle-checked {
   background-color: rgba(255, 255, 255, 0.4);
 }
+
+mat-button-toggle.annotation {
+  background-color: #444958;
+  border-width: 1px;
+  border-color: lightgray;
+}
+
 div.right {
   position: absolute;
   right: 1em;

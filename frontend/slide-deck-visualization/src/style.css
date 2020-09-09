@@ -7,7 +7,6 @@ body {
 #slideDeck {
     height: 120px;
     overflow: hidden;
-    border-radius: 5px;
 }
 
 ::-webkit-scrollbar {
@@ -99,7 +98,6 @@ rect.add_annotation {
     height: 70%;
     font-size: 12px;
     border-radius: 5px;
-
   }
 
   #addButton{
@@ -130,10 +128,12 @@ rect.add_annotation {
     stroke-width: 2px;
    }
 
-/* .slides_delete_icon{
-      background-color: transparent;
+  .slides_delete_icon{
+    color: black;
+    background-color: transparent;
   }
 
   .slides_clone_icon{
+    color: black;
     background-color: transparent;
-  } */
+  }

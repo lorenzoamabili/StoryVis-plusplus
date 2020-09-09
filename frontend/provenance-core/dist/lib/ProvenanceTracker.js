@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProvenanceTracker = void 0;
 var utils_1 = require("./utils");
 var ProvenanceGraph_1 = require("./ProvenanceGraph");
+var nodeCounter = 0;
 /**
  * Provenance Graph Tracker implementation
  *
@@ -92,7 +93,8 @@ var ProvenanceTracker = /** @class */ (function () {
                             metadata: {
                                 loaded: false,
                                 createdBy: _this.username,
-                                createdOn: utils_1.generateTimestamp()
+                                createdOn: utils_1.generateTimestamp(),
+                                creationOrder: nodeCounter
                             },
                             action: action,
                             actionResult: actionResult,
@@ -102,6 +104,8 @@ var ProvenanceTracker = /** @class */ (function () {
                         currentNode = this.graph.current;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
                         newNode = createNewStateNode(this.graph.current, null);
+                        nodeCounter = newNode.metadata.creationOrder + 1;
+                        newNode.metadata.creationOrder = nodeCounter;
                         return [3 /*break*/, 3];
                     case 1:
                         functionNameToExecute = action.do;
@@ -110,6 +114,8 @@ var ProvenanceTracker = /** @class */ (function () {
                     case 2:
                         actionResult = _a.sent();
                         newNode = createNewStateNode(currentNode, actionResult);
+                        nodeCounter = newNode.metadata.creationOrder + 1;
+                        newNode.metadata.creationOrder = nodeCounter;
                         _a.label = 3;
                     case 3:
                         if (this.autoScreenShot && this.screenShotProvider) {

@@ -21,32 +21,42 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   private _voxelprobeMode: boolean;
   private _annotationMode: boolean;
 
-  private _measurement:
-    | Ruler
-    | Angle
-    | Freehand
-    | Voxelprobe
-    | Annotation
-    | null;
-  public _measurements: Artifact[] = []; // measurements/artifacts created in the current branch
+  private _measurement: Ruler | Angle | Freehand | Voxelprobe | Annotation | null;
+
+  public _artifactsOnMasterBranch: Artifact[] = []; // measurements/artifacts created in the current branch
   public _oldMeasurements: Artifact[] = [];
   public _newMeasurements: Artifact[] = [];
-  public _currentArtifacts: Artifact[] = [];
 
-  public _pairs: THREE.Vector3[] = [];
-
-  private _artifactInit: boolean = true;
-
-  public tracker: ProvenanceTracker;
-
-  private _rulerID: number = -1;
-  private _angleID: number = -1;
-  private _freehandID: number = -1;
-  private _voxelprobeID: number = -1;
-  private _annotationID: number = -1;
+  private _artifactInit: boolean = false;
   public _artifactID: number = -1;
 
+  public tracker: ProvenanceTracker;
   public _view: View;
+
+  public annotationCounter: number = 0;
+
+  public mouseDownEvent = new MouseEvent('mousedown', {
+    clientX: 0,
+    clientY: 0,
+    bubbles: true,
+    cancelable: true
+  });
+
+  public mouseMoveEvent = new MouseEvent('mousemove', {
+    clientX: 0,
+    clientY: 0,
+    bubbles: true,
+    cancelable: true
+  });
+
+  public mouseUpEvent = new MouseEvent('mouseup', {
+    bubbles: true,
+    cancelable: true
+  });
+
+  // public rulerChanged: boolean = false;
+  // public rulerCreated: boolean = false;
+
 
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
@@ -116,11 +126,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // this.scene.add()
 
     this._measurement = null;
-    this._rulerMode = false;
-    this._angleMode = false;
-    // this._freehandMode = false;
-    this._voxelprobeMode = false;
-    this._annotationMode = false;
 
     this._initialized = true;
   }
@@ -133,7 +138,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._stackHelper = new AMI.StackHelper(stack);
     this._stackHelper.bbox.visible = false;
     this._stackHelper.borderColor = this._sliceColor;
-    
+
     // this._stackHelper.slice._windowWidth = 1000;
     // console.log(this._stackHelper.slice);
     // console.log(this._stackHelper.slice._windowWidth);
@@ -345,59 +350,113 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
 
-  changeSliceRemove(oldIndex) {
-    if (this._currentArtifacts.length !== 0) {
-      if (this._measurements.find((x) => x.sliceIndex == oldIndex)) {
-        this._oldMeasurements = this._measurements.filter(
-          (x) => x.sliceIndex == oldIndex);
-        this._oldMeasurements.forEach((x) => this.removeArtifactElms(x))
-      }
+  removeFromSliceChange(oldIndex) {
+    if (this._artifactsOnMasterBranch.find((x) => x.sliceIndex == oldIndex)) {
+      this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == oldIndex).forEach((x) => this.removeElms(x));
     }
+    // if (!this._canvas.provenance.graphLoaded && this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == oldIndex).filter((x) => x.measurementType == 'freehand')) {
+    //   (this._measurement as Freehand).widget.hide(); //id  push  in  window as any  store and retrieve t
+    // }
   }
 
-  changeSliceRender(newIndex) {
-    if (this._measurements.length !== 0) {
-      if (this._measurements.find((x) => x.sliceIndex == newIndex)) {
-        this._newMeasurements = this._measurements.filter(
-          (x) => x.sliceIndex == newIndex);
-        this._newMeasurements.forEach((x) => this.renderArtifactElms(x))
-      }
+  renderFromSliceChange(newIndex) {
+    if (this._artifactsOnMasterBranch.find((x) => x.sliceIndex == newIndex)) {
+      this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == newIndex).forEach((x) => this.renderElms(x));
     }
+    // if (!this._canvas.provenance.graphLoaded && this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == newIndex).filter((x) => x.measurementType == 'freehand')) {
+    //   (this._measurement as Freehand).widget.show();
+    // }
   }
 
 
-  renderArtifactElms(artifact: Artifact) {
-    if (!this._artifactInit && artifact) {
+  renderElms(artifact: Artifact) {
+    // if (!this._artifactInit && !this._canvas.provenance.graphLoaded && artifact.measurementType === 'freehand') {
+    //   (this._measurement as Freehand).widget.show();
+    // } else 
+    if (this._canvas.provenance.graphLoaded) {
+      this.renderRestoredElms(artifact);
+    } else if (!this._artifactInit && !this._canvas.provenance.graphLoaded) {
       for (let i = 0; i < artifact.elements.length; i++) {
         this._domElement.appendChild(artifact.elements[i]);
       }
     } else {
       this._artifactInit = false;
     }
-    this._currentArtifacts.push(artifact);
   }
 
-  removeArtifactElms(artifact: Artifact) {
-    if (this._domElement.childNodes && artifact) {
-      for (let i = 0; i < artifact.elements.length; i++) {
-        this._domElement.removeChild(artifact.elements[i]);
+
+  removeElms(artifact: Artifact) {
+    // if (artifact.measurementType === 'freehand') {
+    //   (this._measurement as Freehand).widget.hide();
+    // } else {
+      if (this._canvas.provenance.graphLoaded) {
+        this.removeRestoredElms(artifact);
+      } else {
+        for (let i = 0; i < artifact.elements.length; i++) {
+          if (artifact.elements[i].parentNode) {
+            this._domElement.removeChild(artifact.elements[i]);
+          }
+        }
       }
-      this._currentArtifacts.splice(-1, 1);
     }
-  }
+  // }
+
 
   addArtifact = (artifact: Artifact) => {
-    this.renderArtifactElms(artifact);
-    this._measurements.push(artifact);
-    console.log(artifact)
+    this.renderElms(artifact);
+    this._artifactsOnMasterBranch.push(artifact);
   };
 
   removeArtifact = (artifact: Artifact) => {
-    if (artifact && (this._currentArtifacts.length !== 0)) {
-      this.removeArtifactElms(artifact);
-      this._measurements.splice(-1, 1);
-    }
+    this.removeElms(artifact);
+    this._artifactsOnMasterBranch = this._artifactsOnMasterBranch.filter((x) => x.id !== artifact.id);
   };
+
+
+
+  renderRestoredElms(artifact: Artifact) {
+      if (artifact.measurementType === 'ruler') {
+        const ruler = new Ruler(this);
+        ruler.widget._handles[0].worldPosition = artifact.metadata[0];
+        ruler.widget._handles[1].worldPosition = artifact.metadata[1];
+        ruler.simulateRuler(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+
+      } else if (artifact.measurementType === 'angle') {
+        const angle = new Angle(this);
+        angle.widget._handles[0].worldPosition = artifact.metadata[0];
+        angle.widget._handles[1].worldPosition = artifact.metadata[1];
+        angle.simulateAngle(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+        angle.widget._handles[2].worldPosition = artifact.metadata[2];
+        angle.simulateAngle(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+
+      } else if (artifact.measurementType === 'voxelprobe') {
+        const voxelprobe = new Voxelprobe(this);
+        voxelprobe.widget.children[0].worldPosition = artifact.metadata[0];
+        voxelprobe.simulateVoxelprobe(this.mouseDownEvent, this.mouseUpEvent);
+
+      } else if (artifact.measurementType === 'annotation') {
+        const annotation = new Annotation(this);
+        annotation.widget.children[0].worldPosition = artifact.metadata[0];
+        annotation.widget.children[1].worldPosition = artifact.metadata[1];
+        annotation.simulateAnnotation(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+        document.getElementById('textBox ' + this.annotationCounter).innerText = artifact.metadata[2];
+
+      // } else if (artifact.measurementType === 'freehand') {
+      //   const freehand = new Freehand(this);
+      //   for (let i = 0; i < artifact.elmHTML.length; i++) {
+      //     freehand.widget._handles[i].worldPosition = artifact.metadata[i];
+      //     // freehand.simulateFreehand(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+      //   }
+      }
+  }
+
+  removeRestoredElms(artifact: Artifact) {
+    for (let i = 0; i < artifact.elements.length + 1; i++) {
+      if (this._domElement.children.length > 1) {
+        this._domElement.removeChild(this._domElement.lastChild);
+      }
+    }
+  }
 
 
 
@@ -406,162 +465,207 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   startRuler = (evt) => {
     this._measurement = new Ruler(this, evt);
-    this._pairs.push(this._measurement.pair);
-
     this._domElement.removeEventListener("mousedown", this.startRuler);
+    this.emitRuler(this._measurement);
+  };
 
-    // forward events
-    // this._ruler.created.subscribe(arg => this.rulerCreated.emit(arg));
-    // this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
-
-    // create artifact
+  emitRuler(measurement: Ruler) {
     this._artifactID = this._artifactID + 1;
-    this._rulerID = this._rulerID + 1;
-    this._measurement.artifact = {
+    measurement.artifact = {
       id: this._artifactID,
-      type: "ruler",
-      typeID: this._rulerID,
-      sliceIndex: this._measurement.index,
-      view: this._domID,
+      measurementType: "ruler",
+      sliceIndex: this._stackHelper.index,
+      viewName: this._domID,
       elements: [
-        this._measurement.widget._line,
-        this._measurement.widget._label,
-        this._measurement.widget.children[0]._dom,
-        this._measurement.widget.children[1]._dom,
+        measurement.widget._line,
+        measurement.widget._label,
+        measurement.widget.children[0]._dom,
+        measurement.widget.children[1]._dom,
       ],
+      elmHTML: [
+        measurement.widget._line.outerHTML,
+        measurement.widget._label.outerHTML,
+        measurement.widget.children[0]._dom.outerHTML,
+        measurement.widget.children[1]._dom.outerHTML
+      ],
+      metadata: [
+        measurement.widget._handles[0].worldPosition,
+        measurement.widget._handles[1].worldPosition
+      ]
     };
     this._artifactInit = true;
-    this.addArtifact(this._measurement.artifact);
-    this.artifactCreated.emit(this._measurement.artifact);
+    this.addArtifact(measurement.artifact);
+    this.artifactCreated.emit(measurement.artifact);
     this._canvas.settings.rulerMode = false;
-  };
+  }
+
 
   // Angle
 
   startAngle = (evt) => {
     this._measurement = new Angle(this, evt);
-
     this._domElement.removeEventListener("mousedown", this.startAngle);
+    this.emitAngle(this._measurement);
+  };
 
-    // create artifact
+  emitAngle(measurement: Angle) {
     this._artifactID = this._artifactID + 1;
-    this._angleID = this._angleID + 1;
-    this._measurement.artifact = {
+    measurement.artifact = {
       id: this._artifactID,
-      type: "angle",
-      typeID: this._angleID,
-      sliceIndex: this._measurement.index,
-      view: this._domID,
+      measurementType: "angle",
+      sliceIndex: this._stackHelper.index,
+      viewName: this._domID,
       elements: [
-        this._measurement.widget._line,
-        this._measurement.widget._label,
-        this._measurement.widget._line2,
-        this._measurement.widget.children[0]._dom,
-        this._measurement.widget.children[1]._dom,
-        this._measurement.widget.children[2]._dom,
+        measurement.widget._line,
+        measurement.widget._label,
+        measurement.widget._line2,
+        measurement.widget.children[0]._dom,
+        measurement.widget.children[1]._dom,
+        measurement.widget.children[2]._dom
       ],
+      elmHTML: [
+        measurement.widget._line.outerHTML,
+        measurement.widget._label.outerHTML,
+        measurement.widget._line2.outerHTML,
+        measurement.widget.children[0]._dom.outerHTML,
+        measurement.widget.children[1]._dom.outerHTML,
+        measurement.widget.children[2]._dom.outerHTML
+      ],
+      metadata: [
+        measurement.widget._handles[0].worldPosition,
+        measurement.widget._handles[1].worldPosition,
+        measurement.widget._handles[2].worldPosition
+      ]
     };
     this._artifactInit = true;
-    this.addArtifact(this._measurement.artifact);
-    this.artifactCreated.emit(this._measurement.artifact);
+    this.addArtifact(measurement.artifact);
+    this.artifactCreated.emit(measurement.artifact);
     this._canvas.settings.angleMode = false;
-  };
+  }
+
 
   // Freehand
 
   // startFreehand = (evt) => {
   //   this._measurement = new Freehand(this, evt);
-
   //   this._domElement.removeEventListener("mousedown", this.startFreehand);
+  //   this.emitFreehand(this._measurement);
+  // }
 
-  //   // create artifact
+  // emitFreehand(measurement: Freehand) {
   //   this._artifactID = this._artifactID + 1;
-  //   this._freehandID = this._freehandID + 1;
-  //   const handles = this._measurement.widget.children.filter((x) => x !== null);
+  //   const handles = measurement.widget.children.filter((x) => x !== null);
   //   for (
-  //     let i = 0, length = this._measurement.widget.children.length; i < length; i++ ) {
-  //     handles.push(this._measurement.widget.children[i]._dom);
+  //     let i = 0, length = measurement.widget.children.length; i < length; i++) {
+  //     handles.push(measurement.widget.children[i]._dom);
   //   }
   //   const elems = [
-  //     this._measurement.widget._label,
-  //     ...this._measurement.widget._lines,
+  //     measurement.widget._label,
+  //     ...measurement.widget._lines,
   //     ...handles
   //   ];
 
-  //   this._measurement.artifact = {
+  //   measurement.artifact = {
   //     id: this._artifactID,
-  //     type: "freehand",
-  //     typeID: this._freehandID,
-  //     sliceIndex: this._measurement.index,
-  //     view: this._domID,
-  //     elements: elems
+  //     measurementType: "freehand",
+  //     sliceIndex: measurement.index,
+  //     viewName: this._domID,
+  //     elements: elems,
+  //     elmHTML: [
+  //       ...handles
+  //     ],
+  //     metadata: [
+  //       ...handles
+  //     ]
   //   };
   //   this._artifactInit = true;
-  //   this.addArtifact(this._measurement.artifact);
-  //   this.artifactCreated.emit(this._measurement.artifact);
-  // };
+  //   this.addArtifact(measurement.artifact);
+  //   this.artifactCreated.emit(measurement.artifact);
+  //   this._canvas.settings.freehandMode = false;
+  // }
+
+
 
   // VoxelProbe
 
   startVoxelprobe = (evt) => {
     this._measurement = new Voxelprobe(this, evt);
-
     this._domElement.removeEventListener("mousedown", this.startVoxelprobe);
+    this.emitVoxelprobe(this._measurement);
+  }
 
-    // create artifact
+  emitVoxelprobe(measurement: Voxelprobe) {
     this._artifactID = this._artifactID + 1;
-    this._voxelprobeID = this._voxelprobeID + 1;
-    this._measurement.artifact = {
+    measurement.artifact = {
       id: this._artifactID,
-      type: "voxelprobe",
-      typeID: this._voxelprobeID,
-      sliceIndex: this._measurement.index,
-      view: this._domID,
+      measurementType: "voxelprobe",
+      sliceIndex: this._stackHelper.index,
+      viewName: this._domID,
       elements: [
-        this._measurement.widget._label,
-        this._measurement.widget.children[0]._dom,
+        measurement.widget._label,
+        measurement.widget.children[0]._dom
       ],
+      elmHTML: [
+        measurement.widget._label.outerHTML,
+        measurement.widget.children[0]._dom.outerHTML
+      ],
+      metadata: [
+        measurement.widget.children[0].worldPosition
+      ]
     };
     this._artifactInit = true;
-    this.addArtifact(this._measurement.artifact);
-    this.artifactCreated.emit(this._measurement.artifact);
+    this.addArtifact(measurement.artifact);
+    this.artifactCreated.emit(measurement.artifact);
     this._canvas.settings.voxelprobeMode = false;
-  };
+  }
+
 
   // Annotation
 
   startAnnotation = (evt) => {
     this._measurement = new Annotation(this, evt);
-
     this._domElement.removeEventListener("mousedown", this.startAnnotation);
+    this.emitAnnotation(this._measurement);
+  }
 
-    const handles = this._measurement.widget.children.filter((x) => x !== null);
+  emitAnnotation(measurement: Annotation) {
+    const handles = measurement.widget.children.filter((x) => x !== null);
     for (let i = 0, length = handles.length; i < length; i++) {
-      handles.push(this._measurement.widget.children[i]._dom);
+      handles.push(measurement.widget.children[i]._dom);
     }
     const elems = [
-      this._measurement.widget._line,
-      this._measurement.widget._label,
-      this._measurement.widget._dashline,
+      measurement.widget._line,
+      measurement.widget._label,
+      measurement.widget._dashline,
       ...handles
     ];
 
-    // create artifact
+    measurement.widget._label.id = 'textBox ' + this.annotationCounter;
+
     this._artifactID = this._artifactID + 1;
-    this._annotationID = this._annotationID + 1;
-    this._measurement.artifact = {
+    measurement.artifact = {
       id: this._artifactID,
-      type: "annotation",
-      typeID: this._annotationID,
-      sliceIndex: this._measurement.index,
-      view: this._domID,
-      elements: elems.filter((x) => x instanceof HTMLElement)
+      measurementType: "annotation",
+      sliceIndex: this._stackHelper.index,
+      viewName: this._domID,
+      elements: elems.filter((x) => x instanceof HTMLElement),
+      elmHTML: [
+        handles[0].outerHTML,
+        handles[1].outerHTML,
+        measurement.widget._label.outerHTML,
+        measurement.widget._dashline.outerHTML
+      ],
+      metadata: [
+        handles[0].worldPosition,
+        handles[1].worldPosition
+            ]
     };
     this._artifactInit = true;
-    this.addArtifact(this._measurement.artifact);
-    this.annotationCreated.emit(this._measurement.artifact);
+    this.addArtifact(measurement.artifact);
+    this.annotationCreated.emit(measurement.artifact);
     this._canvas.settings.annotationMode = false;
-  };
+  }
+
 
   get sliceOrientation() {
     return this._sliceOrientation;
@@ -572,10 +676,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener("mousedown", this.startRuler);
-      // this.domElement.addEventListener('shiftKey', this.deleteRuler);
+      // this.domElement.addEventListener('contextmenu', this.deleteRuler);
     } else {
       this.domElement.removeEventListener("mousedown", this.startRuler);
-      // this.domElement.removeEventListener('shiftKey', this.deleteRuler);
+      // this.domElement.removeEventListener('contextmenu', this.deleteRuler);
     }
   }
 
@@ -587,7 +691,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       // this.domElement.addEventListener('shiftKey', this.deleteAngle);
     } else {
       this.domElement.removeEventListener("mousedown", this.startAngle);
-      // this.domElement.removeEventListener('shiftKey', this.deleteAngle);
+      // this.domElement.removeEventListener('contextmenu', this.deleteAngle);
     }
   }
 
@@ -596,10 +700,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   //   if (isEnabled) {
   //     // create a ruler on first click
   //     this.domElement.addEventListener("mousedown", this.startFreehand);
-  //     // this.domElement.addEventListener('shiftKey', this.deleteFreehand);
+  //     // this.domElement.addEventListener('contextmenu', this.deleteFreehand);
   //   } else {
   //     this.domElement.removeEventListener("mousedown", this.startFreehand);
-  //     // this.domElement.removeEventListener('shiftKey', this.deleteFreehand);
+  //     // this.domElement.removeEventListener('contextmenu', this.deleteFreehand);
   //   }
   // }
 
@@ -608,10 +712,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener("mousedown", this.startVoxelprobe);
-      // this.domElement.addEventListener('shiftKey', this.deleteVoxelprobe);
+      // this.domElement.addEventListener('contextmenu', this.deleteVoxelprobe);
     } else {
       this.domElement.removeEventListener("mousedown", this.startVoxelprobe);
-      // this.domElement.removeEventListener('shiftKey', this.deleteVoxelprobe);
+      // this.domElement.removeEventListener('contextmenu', this.deleteVoxelprobe);
     }
   }
 
@@ -620,10 +724,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (isEnabled) {
       // create a ruler on first click
       this.domElement.addEventListener("mousedown", this.startAnnotation);
-      // this.domElement.addEventListener('shiftKey', this.deleteAnnotation);
+      // this.domElement.addEventListener('contextmenu', this.deleteAnnotation);
     } else {
       this.domElement.removeEventListener("mousedown", this.startAnnotation);
-      // this.domElement.removeEventListener('shiftKey', this.deleteAnnotation);
+      // this.domElement.removeEventListener('contextmenu', this.deleteAnnotation);
     }
   }
 }

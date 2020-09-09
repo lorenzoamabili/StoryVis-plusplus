@@ -5,6 +5,7 @@ import {
   NodeIdentifier,
   ProvenanceNode,
   RootNode,
+  StateNode,
   SerializedProvenanceGraph,
   SerializedProvenanceNode,
   SerializedStateNode,
@@ -25,29 +26,30 @@ export class ProvenanceGraph implements IProvenanceGraph {
   public application: Application;
   public readonly root: RootNode;
   public artifacts: Artifact[] = [];
-  private _current: ProvenanceNode;
+  public _current: ProvenanceNode;
   private _mitt: any;
-  private _nodes: { [key: string]: ProvenanceNode } = {};
+  public _nodes: { [key: string]: ProvenanceNode } = {};
   public id: string;
 
-  constructor(application: Application, userid: string = 'Unknown', rootNode?: RootNode) {
+  constructor(application: Application, userid: string = 'Unknown', node?: RootNode) {
     this.id = generateUUID();
     this._mitt = mitt();
     this.application = application;
 
-    if (rootNode) {
-      this.root = rootNode;
+    if (node){
+      this.root = node;
     } else {
-      this.root = {
-        id: generateUUID(),
-        label: '',
-        metadata: {
-          createdBy: userid,
-          createdOn: generateTimestamp()
-        },
-        children: []
-      } as RootNode;
-    }
+    this.root = {
+      id: generateUUID(),
+      label: 'Root',
+      metadata: {
+        createdBy: userid,
+        createdOn: generateTimestamp(),
+        creationOrder: 0
+      },
+      children: []
+    } 
+  }
     this.addNode(this.root);
     this._current = this.root;
   }
@@ -122,6 +124,7 @@ export function restoreProvenanceGraph(
   // restore nodes as key value
   for (const node of serializedProvenanceGraph.nodes) {
     nodes[node.id] = { ...node };
+    nodes[node.id].label = node.label;
   }
 
   // restore parent/children relations
@@ -133,11 +136,9 @@ export function restoreProvenanceGraph(
     }
   }
 
-  const graph = new ProvenanceGraph(serializedProvenanceGraph.application);
-  (graph as any)._nodes = nodes;
-  (graph as any)._current = nodes[serializedProvenanceGraph.root];
-  (graph as any).root = nodes[serializedProvenanceGraph.root];
-  
+  const graph = new ProvenanceGraph(serializedProvenanceGraph.application, 'restoredGraphUser', nodes[serializedProvenanceGraph.root]);
+  graph._nodes = nodes;
+  graph._current = nodes[serializedProvenanceGraph.root];
   return graph;
 }
 
@@ -152,7 +153,8 @@ export function serializeProvenanceGraph(graph: ProvenanceGraph): SerializedProv
     serializedNode.children = node.children.map(child => child.id);
     return serializedNode;
   });
-  
+
+
   return {
     nodes,
     root: graph.root.id,

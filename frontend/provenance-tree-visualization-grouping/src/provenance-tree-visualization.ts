@@ -127,7 +127,7 @@ export class ProvenanceTreeVisualization {
     });
 
     this.update();
-    this.zoomer = d3.zoom() as any;
+    this.zoomer = d3.zoom();
     this.setZoomExtent();
     this.svg.call(this.zoomer);
     this.scaleToFit(treeWidth);
@@ -144,10 +144,10 @@ export class ProvenanceTreeVisualization {
     const sizeX = this.svg.node()!.clientWidth;
     const sizeY = this.svg.node()!.clientHeight;
     const maxScale = 2;
-    const magicNumY = 0.5; // todo: get relevant number based on dimensions
+    const magicNumY = 0.9; // todo: get relevant number based on dimensions
     const magicNumX = 0.5; // todo: get relevant number based on dimensions
     
-    var width = n !== undefined ? n : 0;
+    var width = (n !== undefined) ? n : 0;
     var scaleFactor = Math.min(
       maxScale,
       (magicNumY * sizeY) / (this.hierarchyRoot!.height * yScale),
@@ -283,8 +283,8 @@ export class ProvenanceTreeVisualization {
     .attr('class', 'circle-label')
     .text(d => groupNodeLabel(d.data)) // .text(d => d.data.neighbour.toString())
     .attr('x', 7)
-    .attr('alignment-baseline', 'central')
-    .call(this.wrap, 70);
+    .attr('alignment-baseline', 'central');
+    // .call(this.wrap, 70);
 
   const updateNodes = newNodes.merge(oldNodes as any);
 

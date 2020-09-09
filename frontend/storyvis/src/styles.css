@@ -18,6 +18,10 @@ html, body {
   flex-direction: column;
 }
 
+div{
+  display: block;
+}
+
 div.cont {
   display: flex;
   flex: 1;

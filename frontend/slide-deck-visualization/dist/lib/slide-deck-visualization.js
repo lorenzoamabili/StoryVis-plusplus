@@ -10,6 +10,7 @@ function firstArgThis(f) {
         return f(this, ...args);
     };
 }
+var nodeCreationOrders = [];
 class SlideDeckVisualization {
     constructor(slideDeck, elm) {
         this._tableHeight = 100;
@@ -81,7 +82,8 @@ class SlideDeckVisualization {
             else {
                 nodeSlide = node;
             }
-            const slide = new provenance_core_1.ProvenanceSlide(nodeSlide.label, 5000, 0, [], node);
+            const slide = new provenance_core_1.ProvenanceSlide(nodeSlide.label, 5000, 0, 0, []);
+            slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
             slideDeck.addSlide(slide, slideDeck.slides.length);
             // node.metadata.isSlideAdded = true;
             // slideDeck.graph.emitNodeChangedEvent(node);
@@ -89,7 +91,7 @@ class SlideDeckVisualization {
         };
         this.onClone = (slide) => {
             let slideDeck = this._slideDeck;
-            const cloneSlide = new provenance_core_1.ProvenanceSlide(slide.name, 5000, 0, [], slide.node);
+            const cloneSlide = new provenance_core_1.ProvenanceSlide(slide.name, 5000, 0, 0, []);
             cloneSlide.mainAnnotation = slide.mainAnnotation;
             slideDeck.addSlide(cloneSlide, slideDeck.selectedSlide
                 ? slideDeck.slides.indexOf(slideDeck.selectedSlide) + 1
@@ -801,8 +803,9 @@ class SlideDeckVisualization {
         slideGroup
             .select("rect.slides_rect")
             .attr("fill", (slide, i) => {
+            nodeCreationOrders.push(slide.nodeCreationOrder);
             var col = d3.scaleSequential(d3.interpolatePuBu)
-                .domain([0, 20])(i).toString();
+                .domain([0, Math.max(...nodeCreationOrders)])(slide.nodeCreationOrder).toString();
             if (slide.node) {
                 if (slide.node.metadata.bgColor) {
                     col = slide.node.metadata.bgColor;

@@ -5,13 +5,14 @@ var utils_1 = require("./utils");
 var SlideAnnotation_1 = require("./SlideAnnotation");
 var mitt_1 = require("./mitt");
 var ProvenanceSlide = /** @class */ (function () {
-    function ProvenanceSlide(name, duration, transitionTime, annotations, node) {
+    function ProvenanceSlide(name, duration, nodeCreationOrder, transitionTime, annotations, node) {
         if (annotations === void 0) { annotations = []; }
         if (node === void 0) { node = null; }
         this._metadata = {};
         this._id = utils_1.generateUUID();
         this._name = name;
         this._duration = duration;
+        this._nodeCreationOrder = nodeCreationOrder;
         this._annotations = annotations;
         this._node = node;
         this._transitionTime = transitionTime;
@@ -62,6 +63,16 @@ var ProvenanceSlide = /** @class */ (function () {
         },
         set: function (value) {
             this._name = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ProvenanceSlide.prototype, "nodeCreationOrder", {
+        get: function () {
+            return this._nodeCreationOrder;
+        },
+        set: function (value) {
+            this._nodeCreationOrder = value;
         },
         enumerable: false,
         configurable: true
@@ -134,7 +145,7 @@ function restoreSlide(serialized, graph) {
     serialized.annotations.forEach(function (annotation) {
         annotations.push(SlideAnnotation_1.restoreAnnotation(annotation));
     });
-    var slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.transitionTime, annotations);
+    var slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.nodeCreationOrder, serialized.transitionTime, annotations);
     if (serialized.node != null) {
         var node = graph.nodes[serialized.node];
         slide.node = node;
@@ -157,6 +168,7 @@ function serializeSlide(slide) {
     return {
         node: nodeId,
         name: slide.name,
+        nodeCreationOrder: slide.nodeCreationOrder,
         transitionTime: slide.transitionTime,
         duration: slide.duration,
         annotations: annotations,

@@ -1,6 +1,6 @@
 ﻿export enum Role {
     Pilot = 'Pilot',
-    Study = 'Study',
+    Regular = 'Regular',
     Reader = 'Reader',
     Author = 'Author',
     Admin = 'Admin'

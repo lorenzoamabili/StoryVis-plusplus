@@ -166,23 +166,24 @@ function mitt(all) {
  *
  */
 var ProvenanceGraph = /** @class */ (function () {
-    function ProvenanceGraph(application, userid, rootNode) {
+    function ProvenanceGraph(application, userid, node) {
         if (userid === void 0) { userid = 'Unknown'; }
         this.artifacts = [];
         this._nodes = {};
         this.id = generateUUID();
         this._mitt = mitt();
         this.application = application;
-        if (rootNode) {
-            this.root = rootNode;
+        if (node) {
+            this.root = node;
         }
         else {
             this.root = {
                 id: generateUUID(),
-                label: '',
+                label: 'Root',
                 metadata: {
                     createdBy: userid,
-                    createdOn: generateTimestamp()
+                    createdOn: generateTimestamp(),
+                    creationOrder: 0
                 },
                 children: []
             };
@@ -256,6 +257,7 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
     for (var _i = 0, _a = serializedProvenanceGraph.nodes; _i < _a.length; _i++) {
         var node = _a[_i];
         nodes[node.id] = __assign({}, node);
+        nodes[node.id].label = node.label;
     }
     // restore parent/children relations
     for (var _b = 0, _c = Object.keys(nodes); _b < _c.length; _b++) {
@@ -266,10 +268,9 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
             node.parent = nodes[node.parent];
         }
     }
-    var graph = new ProvenanceGraph(serializedProvenanceGraph.application);
+    var graph = new ProvenanceGraph(serializedProvenanceGraph.application, 'restoredGraphUser', nodes[serializedProvenanceGraph.root]);
     graph._nodes = nodes;
     graph._current = nodes[serializedProvenanceGraph.root];
-    graph.root = nodes[serializedProvenanceGraph.root];
     return graph;
 }
 function serializeProvenanceGraph(graph) {
@@ -291,6 +292,7 @@ function serializeProvenanceGraph(graph) {
     };
 }
 
+var nodeCounter = 0;
 /**
  * Provenance Graph Tracker implementation
  *
@@ -344,7 +346,8 @@ var ProvenanceTracker = /** @class */ (function () {
                             metadata: {
                                 loaded: false,
                                 createdBy: _this.username,
-                                createdOn: generateTimestamp()
+                                createdOn: generateTimestamp(),
+                                creationOrder: nodeCounter
                             },
                             action: action,
                             actionResult: actionResult,
@@ -354,6 +357,8 @@ var ProvenanceTracker = /** @class */ (function () {
                         currentNode = this.graph.current;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
                         newNode = createNewStateNode(this.graph.current, null);
+                        nodeCounter = newNode.metadata.creationOrder + 1;
+                        newNode.metadata.creationOrder = nodeCounter;
                         return [3 /*break*/, 3];
                     case 1:
                         functionNameToExecute = action.do;
@@ -362,6 +367,8 @@ var ProvenanceTracker = /** @class */ (function () {
                     case 2:
                         actionResult = _a.sent();
                         newNode = createNewStateNode(currentNode, actionResult);
+                        nodeCounter = newNode.metadata.creationOrder + 1;
+                        newNode.metadata.creationOrder = nodeCounter;
                         _a.label = 3;
                     case 3:
                         if (this.autoScreenShot && this.screenShotProvider) {
@@ -468,13 +475,14 @@ function serializeAnnotation(annotation) {
 }
 
 var ProvenanceSlide = /** @class */ (function () {
-    function ProvenanceSlide(name, duration, transitionTime, annotations, node) {
+    function ProvenanceSlide(name, duration, nodeCreationOrder, transitionTime, annotations, node) {
         if (annotations === void 0) { annotations = []; }
         if (node === void 0) { node = null; }
         this._metadata = {};
         this._id = generateUUID();
         this._name = name;
         this._duration = duration;
+        this._nodeCreationOrder = nodeCreationOrder;
         this._annotations = annotations;
         this._node = node;
         this._transitionTime = transitionTime;
@@ -525,6 +533,16 @@ var ProvenanceSlide = /** @class */ (function () {
         },
         set: function (value) {
             this._name = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ProvenanceSlide.prototype, "nodeCreationOrder", {
+        get: function () {
+            return this._nodeCreationOrder;
+        },
+        set: function (value) {
+            this._nodeCreationOrder = value;
         },
         enumerable: false,
         configurable: true
@@ -596,7 +614,7 @@ function restoreSlide(serialized, graph) {
     serialized.annotations.forEach(function (annotation) {
         annotations.push(restoreAnnotation(annotation));
     });
-    var slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.transitionTime, annotations);
+    var slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.nodeCreationOrder, serialized.transitionTime, annotations);
     if (serialized.node != null) {
         var node = graph.nodes[serialized.node];
         slide.node = node;
@@ -618,6 +636,7 @@ function serializeSlide(slide) {
     return {
         node: nodeId,
         name: slide.name,
+        nodeCreationOrder: slide.nodeCreationOrder,
         transitionTime: slide.transitionTime,
         duration: slide.duration,
         annotations: annotations,
@@ -630,7 +649,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         this._slides = [];
         this._screenShotProvider = null;
         this._autoScreenShot = false;
-        this._captainPlaceholder = new ProvenanceSlide('Captain Placeholder', 0, 0);
+        this._captainPlaceholder = new ProvenanceSlide('Captain Placeholder', 0, 0, 0);
         this._mitt = mitt();
         this._application = application;
         this._graph = traverser.graph;
@@ -657,7 +676,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         }
         if (!slide) {
             var node = this._graph.current;
-            slide = new ProvenanceSlide(node.label, 1, 0, [], node);
+            slide = new ProvenanceSlide(node.label, 1, 0, 0, [], node);
         }
         if (this.autoScreenShot && this.screenShotProvider) {
             try {
@@ -19684,6 +19703,7 @@ function firstArgThis(f) {
         return f(this, ...args);
     };
 }
+var nodeCreationOrders = [];
 class SlideDeckVisualization {
     constructor(slideDeck, elm) {
         this._tableHeight = 100;
@@ -19755,7 +19775,8 @@ class SlideDeckVisualization {
             else {
                 nodeSlide = node;
             }
-            const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, [], node);
+            const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, []);
+            slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
             slideDeck.addSlide(slide, slideDeck.slides.length);
             // node.metadata.isSlideAdded = true;
             // slideDeck.graph.emitNodeChangedEvent(node);
@@ -19763,7 +19784,7 @@ class SlideDeckVisualization {
         };
         this.onClone = (slide) => {
             let slideDeck = this._slideDeck;
-            const cloneSlide = new ProvenanceSlide(slide.name, 5000, 0, [], slide.node);
+            const cloneSlide = new ProvenanceSlide(slide.name, 5000, 0, 0, []);
             cloneSlide.mainAnnotation = slide.mainAnnotation;
             slideDeck.addSlide(cloneSlide, slideDeck.selectedSlide
                 ? slideDeck.slides.indexOf(slideDeck.selectedSlide) + 1
@@ -20474,8 +20495,9 @@ class SlideDeckVisualization {
         slideGroup
             .select("rect.slides_rect")
             .attr("fill", (slide, i) => {
+            nodeCreationOrders.push(slide.nodeCreationOrder);
             var col = scaleSequential(interpolatePuBu)
-                .domain([0, 20])(i).toString();
+                .domain([0, Math.max(...nodeCreationOrders)])(slide.nodeCreationOrder).toString();
             if (slide.node) {
                 if (slide.node.metadata.bgColor) {
                     col = slide.node.metadata.bgColor;

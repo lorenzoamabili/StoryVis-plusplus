@@ -21,23 +21,24 @@ var mitt_1 = require("./mitt");
  *
  */
 var ProvenanceGraph = /** @class */ (function () {
-    function ProvenanceGraph(application, userid, rootNode) {
+    function ProvenanceGraph(application, userid, node) {
         if (userid === void 0) { userid = 'Unknown'; }
         this.artifacts = [];
         this._nodes = {};
         this.id = utils_1.generateUUID();
         this._mitt = mitt_1.default();
         this.application = application;
-        if (rootNode) {
-            this.root = rootNode;
+        if (node) {
+            this.root = node;
         }
         else {
             this.root = {
                 id: utils_1.generateUUID(),
-                label: '',
+                label: 'Root',
                 metadata: {
                     createdBy: userid,
-                    createdOn: utils_1.generateTimestamp()
+                    createdOn: utils_1.generateTimestamp(),
+                    creationOrder: 0
                 },
                 children: []
             };
@@ -112,6 +113,7 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
     for (var _i = 0, _a = serializedProvenanceGraph.nodes; _i < _a.length; _i++) {
         var node = _a[_i];
         nodes[node.id] = __assign({}, node);
+        nodes[node.id].label = node.label;
     }
     // restore parent/children relations
     for (var _b = 0, _c = Object.keys(nodes); _b < _c.length; _b++) {
@@ -122,10 +124,9 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
             node.parent = nodes[node.parent];
         }
     }
-    var graph = new ProvenanceGraph(serializedProvenanceGraph.application);
+    var graph = new ProvenanceGraph(serializedProvenanceGraph.application, 'restoredGraphUser', nodes[serializedProvenanceGraph.root]);
     graph._nodes = nodes;
     graph._current = nodes[serializedProvenanceGraph.root];
-    graph.root = nodes[serializedProvenanceGraph.root];
     return graph;
 }
 exports.restoreProvenanceGraph = restoreProvenanceGraph;

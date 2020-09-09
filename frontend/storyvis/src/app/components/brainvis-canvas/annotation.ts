@@ -18,12 +18,13 @@ export default class Annotation {
    */
   isNew: boolean;
 
-  @Output() changed = new EventEmitter<Artifact>();
-  @Output() created = new EventEmitter<Artifact>();
+  // @Output() changed = new EventEmitter<Artifact>();
+  // @Output() created = new EventEmitter<Artifact>();
 
   constructor(renderer: Renderer2D, evt: MouseEvent | null = null) {
     this.renderer = renderer;
-    this.isNew = true;
+    this.isNew = false;
+    this.renderer.annotationCounter = this.renderer.annotationCounter + 1;
 
     const { stackHelper, controls } = renderer;
     const stack = stackHelper._stack;
@@ -61,8 +62,15 @@ export default class Annotation {
       // ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
       worldPosition: startPosition
     });
+    
+
 
     this.widget.update();
+
+    if(this.renderer._canvas.provenance.graphLoaded){
+      this.widget._labeltext = 'empty';
+      this.widget._label.id = 'textBox ' + this.renderer.annotationCounter;
+    }
 
     // add eventlisteners for dragging etc.
     this.renderer.domElement.addEventListener('mouseup', this.onMouseUp);
@@ -79,6 +87,9 @@ export default class Annotation {
 
   onMouseUp = (evt) => {
     this.widget.onEnd(evt);
+    if(!this.renderer._canvas.provenance.graphLoaded){
+      this.artifact.metadata.push(document.getElementById('textBox ' + this.renderer.annotationCounter).innerHTML);
+    }
 
   //   if (this.isNew) {
   //     this.created.emit({
@@ -108,5 +119,11 @@ export default class Annotation {
 
   onMouseDown = (evt) => {
     this.widget.onStart(evt);
-  };
+  }
+
+  simulateAnnotation(down, move, up){
+    this.onMouseDown(down);
+    this.onMouseMove(move);
+    this.onMouseUp(up);
+  }
 }
