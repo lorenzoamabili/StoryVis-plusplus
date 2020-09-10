@@ -12,7 +12,7 @@ import { IntroComponent } from 'src/app/pages/shared/intro/intro.component';
 })
 export class MenuBarComponent implements OnInit {
   @Input() canvas: BrainvisCanvasComponent;
-  @Input() IDcreator: IntroComponent;
+  @Input() IDcreator: number;
 
   public now: string;
 

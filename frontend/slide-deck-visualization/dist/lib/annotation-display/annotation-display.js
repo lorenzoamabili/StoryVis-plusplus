@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnnotationDisplay = exports.defaultOptions = void 0;
 const easymde_1 = require("easymde");
 require("./easymde.css");
 require("./style.css");
@@ -17,7 +16,7 @@ class AnnotationDisplay {
     constructor(annotation, options = {}) {
         this._editable = false;
         this._annotation = annotation;
-        this._options = Object.assign(Object.assign({}, exports.defaultOptions), options);
+        this._options = Object.assign({}, exports.defaultOptions, options);
         if (!annotation.data) {
             throw Error("No annotation data");
         }

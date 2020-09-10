@@ -4,7 +4,6 @@ import { BrainvisCanvasControlsComponent } from './brainvis-canvas-controls/brai
 import { ProvenanceVisualizationComponent } from './provenance-visualization/provenance-visualization.component';
 import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
 import { StyledSliderComponent } from './brainvis-canvas-controls/styled-slider/styled-slider.component';
-import { ProvenanceTaskListComponent } from './provenance-task-list/provenance-task-list.component';
 import { SlidesContainerComponent } from './slides-container/slides-container.component';
 import { TextReportComponent } from './text-report/text-report.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
@@ -43,7 +42,6 @@ import { HttpClientModule } from '@angular/common/http';
         ProvenanceVisualizationComponent,
         ProvenanceSlidesComponent,
         StyledSliderComponent,
-        ProvenanceTaskListComponent,
         SlidesContainerComponent,
         TextReportComponent,
         MenuBarComponent
@@ -54,7 +52,6 @@ import { HttpClientModule } from '@angular/common/http';
         ProvenanceVisualizationComponent,
         ProvenanceSlidesComponent,
         StyledSliderComponent,
-        ProvenanceTaskListComponent,
         SlidesContainerComponent,
         MenuBarComponent,
         TextReportComponent

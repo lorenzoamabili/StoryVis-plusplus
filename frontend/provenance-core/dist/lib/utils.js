@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isReversibleAction = exports.isStateNode = exports.generateTimestamp = exports.generateUUID = void 0;
 function generateUUID() {
     // Public Domain/MIT
     var d = new Date().getTime();

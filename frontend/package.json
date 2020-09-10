@@ -4,7 +4,6 @@
     "packages": [
       "provenance-core",
       "provenance-tree-visualization-grouping",
-      "provenance-task-list",
       "slide-deck-visualization",
       "ami",
       "storyvis"

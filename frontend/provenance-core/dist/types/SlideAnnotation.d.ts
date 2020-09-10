@@ -5,9 +5,8 @@ export declare class SlideAnnotation implements ISlideAnnotation {
     private _data;
     private _mitt;
     constructor(data: any);
-    get id(): string;
-    set data(value: AnnotationData | null);
-    get data(): AnnotationData;
+    readonly id: string;
+    data: AnnotationData | null;
     on(type: string, handler: Handler): void;
     off(type: string, handler: Handler): void;
 }

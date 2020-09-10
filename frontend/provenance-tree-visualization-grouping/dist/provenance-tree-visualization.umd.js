@@ -960,6 +960,7 @@
   var ProvenanceTreeVisualization = /** @class */ (function () {
       function ProvenanceTreeVisualization(traverser, elm, aggreg) {
           var _this = this;
+          // d3.Selection<HTMLDivElement, unknown, null, undefined>;
           this.aggregation = {
               aggregator: rawData,
               arg: 1

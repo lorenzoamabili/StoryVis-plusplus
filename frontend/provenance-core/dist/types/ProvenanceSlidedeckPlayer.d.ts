@@ -12,11 +12,10 @@ export declare class ProvenanceSlidedeckPlayer<T extends ISlide> {
     private _status;
     constructor(slides: T[], selectCallback: (slide: T) => any);
     setSlideIndex(slideIndex: number): void;
-    get slides(): T[];
-    get currentSlideIndex(): number;
-    set currentSlideIndex(index: number);
+    readonly slides: T[];
+    currentSlideIndex: number;
     play(): Promise<void>;
     next(): void;
-    get status(): STATUS;
+    readonly status: STATUS;
     stop(): void;
 }

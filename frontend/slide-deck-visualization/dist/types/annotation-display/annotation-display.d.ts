@@ -25,7 +25,6 @@ export declare class AnnotationDisplay {
     setPosition(): void;
     constructor(annotation: SlideAnnotation, options?: Partial<Options>);
     remove(): void;
-    get editable(): boolean;
-    set editable(editable: boolean);
-    get rootElement(): HTMLElement;
+    editable: boolean;
+    readonly rootElement: HTMLElement;
 }

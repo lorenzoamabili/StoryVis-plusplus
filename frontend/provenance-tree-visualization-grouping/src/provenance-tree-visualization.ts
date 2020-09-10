@@ -57,8 +57,9 @@ export class ProvenanceTreeVisualization {
   public colorScheme: any;
   public g: D3SVGGSelection;
   public svg: D3SVGSelection;
-  public _deckViz: SlideDeckVisualization
-  public container: d3.Selection<HTMLDivElement, unknown, null, undefined>;
+  public _deckViz: SlideDeckVisualization;
+  public container: any;
+  // d3.Selection<HTMLDivElement, unknown, null, undefined>;
   public aggregation: IAggregation = {
     aggregator: rawData,
     arg: 1
@@ -74,8 +75,7 @@ export class ProvenanceTreeVisualization {
     this.traverser = traverser;
     this._deckViz = (window as any).slideDeck;
     this.colorScheme = d3.scaleOrdinal(d3.schemeAccent);
-    this.container = d3
-      .select(elm)
+    this.container = d3.select(elm)
       .append('div')
       .attr('class', 'visualizationContainer')
       .attr('style', 'height:' + `${window.innerHeight - 178}` + 'px');

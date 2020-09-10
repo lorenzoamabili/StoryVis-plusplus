@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeAnnotation = exports.restoreAnnotation = exports.SlideAnnotation = void 0;
 var utils_1 = require("./utils");
 var mitt_1 = require("./mitt");
 var SlideAnnotation = /** @class */ (function () {
@@ -13,7 +12,7 @@ var SlideAnnotation = /** @class */ (function () {
         get: function () {
             return this._id;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(SlideAnnotation.prototype, "data", {
@@ -24,7 +23,7 @@ var SlideAnnotation = /** @class */ (function () {
             this._data = value;
             this._mitt.emit('change', value);
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     SlideAnnotation.prototype.on = function (type, handler) {

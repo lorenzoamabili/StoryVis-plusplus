@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serializeSlide = exports.restoreSlide = exports.ProvenanceSlide = void 0;
 var utils_1 = require("./utils");
 var SlideAnnotation_1 = require("./SlideAnnotation");
 var mitt_1 = require("./mitt");
@@ -27,14 +26,14 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (annotation) {
             this._mainAnnotation = annotation;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "id", {
         get: function () {
             return this._id;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "node", {
@@ -44,7 +43,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._node = value;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "nodeId", {
@@ -54,7 +53,7 @@ var ProvenanceSlide = /** @class */ (function () {
             }
             return null;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "name", {
@@ -64,7 +63,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._name = value;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "nodeCreationOrder", {
@@ -74,7 +73,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._nodeCreationOrder = value;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "duration", {
@@ -84,7 +83,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._duration = value;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "transitionTime", {
@@ -94,7 +93,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._transitionTime = value;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     ProvenanceSlide.prototype.addAnnotation = function (annotation) {
@@ -110,7 +109,7 @@ var ProvenanceSlide = /** @class */ (function () {
         get: function () {
             return this._annotations;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     ProvenanceSlide.prototype.on = function (type, handler) {
@@ -126,14 +125,14 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._xPosition = value;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "metadata", {
         get: function () {
             return this._metadata;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     return ProvenanceSlide;

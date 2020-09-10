@@ -1,10 +1,9 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -36,7 +35,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProvenanceTracker = void 0;
 var utils_1 = require("./utils");
 var ProvenanceGraph_1 = require("./ProvenanceGraph");
 var nodeCounter = 0;
@@ -142,7 +140,7 @@ var ProvenanceTracker = /** @class */ (function () {
         set: function (provider) {
             this._screenShotProvider = provider;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceTracker.prototype, "autoScreenShot", {
@@ -155,7 +153,7 @@ var ProvenanceTracker = /** @class */ (function () {
                 console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     ProvenanceTracker.prototype.getGraph = function () {

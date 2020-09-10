@@ -1,10 +1,9 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -36,7 +35,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProvenanceSlidedeckPlayer = exports.STATUS = void 0;
 var STATUS;
 (function (STATUS) {
     STATUS[STATUS["IDLE"] = 0] = "IDLE";
@@ -57,7 +55,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._slides;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "currentSlideIndex", {
@@ -67,7 +65,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         set: function (index) {
             this._currentSlideIndex = index;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.play = function () {
@@ -112,7 +110,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._status;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.stop = function () {
