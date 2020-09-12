@@ -1,6 +1,6 @@
 ﻿<div style="margin: 5%;  text-align: center;">
 
-    <div *ngIf="isAuthor">
+    <div *ngIf="isAuthor || isRegular">
         <p>A short tutorial about how to perform an image assessment and how to create a text report and visual data
             story
             with the StoryVis tool will be shown.
@@ -31,7 +31,7 @@
     </div>
 
 
-    <div *ngIf="isAuthor && isNoProvGraph">
+    <div *ngIf="(isAuthor || isRegular) && isNoProvGraph">
 
         <video controls>
             <source src="movie.mp4" type="video/mp4">
@@ -40,7 +40,7 @@
     </div>
 
 
-    <div *ngIf="isAuthor && isProvGraph">
+    <div *ngIf="(isAuthor || isRegular) && isProvGraph">
 
         <video controls>
             <source src="movie.mp4" type="video/mp4">
@@ -49,7 +49,7 @@
     </div>
 
 
-    <div *ngIf="isAuthor && isPlotTrimmerG">
+    <div *ngIf="(isAuthor || isRegular) && isPlotTrimmerG">
 
         <video controls>
             <source src="movie.mp4" type="video/mp4">
@@ -57,7 +57,7 @@
             Please, ask for assistance. </video>
     </div>
 
-    <div *ngIf="isAuthor && isPlotTrimmerC">
+    <div *ngIf="(isAuthor || isRegular) && isPlotTrimmerC">
 
         <video controls>
             <source src="movie.mp4" type="video/mp4">
@@ -65,7 +65,7 @@
             Please, ask for assistance. </video>
     </div>
 
-    <div class="buttonLink" *ngIf="isAuthor || isAdmin">
+    <div class="buttonLink" *ngIf="(isAuthor || isRegular) || isAdmin">
         <b><a routerLink='/intro-prac'>NEXT</a></b>
     </div>
 

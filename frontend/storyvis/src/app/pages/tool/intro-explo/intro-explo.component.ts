@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../../../shared/_models';
+import { User, Role } from '../../../shared/_models';
 import { AuthenticationService, ProvenanceService } from '../../../shared/_services';
 
 @Component({ templateUrl: 'intro-explo.component.html' })
@@ -17,5 +17,21 @@ export class IntroExploComponent implements OnInit {
 
     ngOnInit() {
 
+    }
+
+    get isAdmin() {
+        return this.currentUser && this.currentUser.role === Role.Admin;
+    }
+
+    get isAuthor() {
+        return this.currentUser && this.currentUser.role === Role.Author;
+    }
+
+    get isRegular() {
+        return this.currentUser && this.currentUser.role === Role.Regular;
+    }
+
+    get isReader() {
+        return this.currentUser && this.currentUser.role === Role.Reader;
     }
 }

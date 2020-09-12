@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 
 import { CommonModule } from "@angular/common";
 import { PracticeComponent } from './practice.component';
-import { ComponentsModule } from 'src/app/components/components.module';
+import { ComponentsModule } from '../../../components/components.module';
 
 import {
     MatIconModule, MatSidenavModule, MatSlideToggleModule, MatSliderModule, MatButtonModule, MatFormFieldModule,
@@ -22,7 +22,7 @@ import {
 
 import { Ng5SliderModule } from 'ng5-slider';
 import { RouterModule, Routes } from '@angular/router';
-import { BrainvisCanvasComponent } from 'src/app/components/brainvis-canvas/brainvis-canvas.component';
+import { BrainvisCanvasComponent } from '../../../components/brainvis-canvas/brainvis-canvas.component';
 
 const routes: Routes = [
     { path: '', component: PracticeComponent }

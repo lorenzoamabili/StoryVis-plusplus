@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 
 import { CommonModule } from "@angular/common";
 import { ReadingStoryComponent } from './reading-story.component';
-import { ComponentsModule } from 'src/app/components/components.module';
+import { ComponentsModule } from '../../../components/components.module';
 
 import {
     MatIconModule, MatSidenavModule, MatSlideToggleModule, MatSliderModule, MatButtonModule, MatFormFieldModule,

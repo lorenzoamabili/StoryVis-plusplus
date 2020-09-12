@@ -9,7 +9,7 @@ import { ProvenanceService } from '../../../shared/_services';
 import { FormsModule } from '@angular/forms';
 
 import { CommonModule } from "@angular/common";
-import { ComponentsModule } from 'src/app/components/components.module';
+import { ComponentsModule } from '../../../components/components.module';
 
 import {
     MatIconModule, MatSidenavModule, MatSlideToggleModule, MatSliderModule, MatButtonModule, MatFormFieldModule,
@@ -20,6 +20,7 @@ import {
     MatStepperModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule, MatTreeModule, MatTabGroup, MatTab
 } from '@angular/material';
 
+import { BrainvisCanvasComponent } from '../../../components/brainvis-canvas/brainvis-canvas.component';
 import { Ng5SliderModule } from 'ng5-slider';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -45,7 +46,7 @@ const routes: Routes = [
 
     ],
     declarations: [ExplorationComponent],
-    providers: [ProvenanceService],
+    providers: [ProvenanceService, BrainvisCanvasComponent],
     exports: [ExplorationComponent]
 })
   

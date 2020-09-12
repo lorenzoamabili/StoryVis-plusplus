@@ -2,8 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
 import { ProvenanceService, UserService } from '../../shared/_services';
-import { Role, Provenance, Story, TextReport, User } from 'src/app/shared/_models';
-import { IntroComponent } from 'src/app/pages/shared/intro/intro.component';
+import { Role, Provenance, Story, TextReport, User } from '../../shared/_models';
 
 @Component({
   selector: 'app-menu-bar',

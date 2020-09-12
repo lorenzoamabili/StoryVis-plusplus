@@ -4,19 +4,20 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 export class Settings {
     public static instance: Settings;
     public canvas: BrainvisCanvasComponent;
+    public dataInit: boolean = false;
 
-    private _colorMap = 'grayscale';
+    public _colorMap = 'grayscale';
     public _thresholdValueW = 20;
     public _thresholdValueC = 20;
     public _thresholdLowerBoundW = 0;
     public _thresholdUpperBoundW = 1426;
     public _thresholdLowerBoundC = 0;
     public _thresholdUpperBoundC = 1426;
-    private _rulerMode = false;
-    private _angleMode = false;
-    private _freehandMode = false;
-    private _voxelprobeMode = false;
-    private _annotationMode = false;
+    public _rulerMode = false;
+    public _angleMode = false;
+    // public _freehandMode = false;
+    public _voxelprobeMode = false;
+    public _annotationMode = false;
 
     get colorMap() { return Settings.instance._colorMap; }
     get thresholdValueW() { return Settings.instance._thresholdValueW; }
@@ -27,11 +28,12 @@ export class Settings {
     get thresholdUpperBoundC() { return Settings.instance._thresholdUpperBoundC; }
     get rulerMode() { return Settings.instance._rulerMode; }
     get angleMode() { return Settings.instance._angleMode; }
-    get freehandMode() { return Settings.instance._freehandMode; }
+    // get freehandMode() { return Settings.instance._freehandMode; }
     get voxelprobeMode() { return Settings.instance._voxelprobeMode; }
     get annotationMode() { return Settings.instance._annotationMode; }
 
-    private constructor() { }
+    private constructor() {
+     }
 
     // set thresholdLowerBoundW(value: number) {
     //     Settings.instance._thresholdLowerBoundW = value;
@@ -50,12 +52,11 @@ export class Settings {
     // }
 
     @Input() set thresholdValueW(value: number) {
-        Settings.instance._thresholdValueW = value;
+        this.canvas = (window as any).canvas;
+
         const oldValue: number = this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth;
+        if (value !== oldValue && this.dataInit && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
 
-        if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
-
-            if (this.canvas._thresholdValueSetManually && this.canvas._dataLoaded) {
                 this.canvas.dispatchEvent({
                     type: 'thresholdValueChangeStartW',
                     changes: {
@@ -70,22 +71,21 @@ export class Settings {
                     }
                 });
                 this.canvas.setWindowLevelW(value);
-            }
         }
-        this.canvas._dataLoaded = true;
+        this.dataInit = true;
     }
 
 
     @Input() set thresholdValueC(value: number) {
-        Settings.instance._thresholdValueC = value;
+        this.canvas = (window as any).canvas;
+
         const oldValue: number = this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter;
-        if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+        if (value !== oldValue && this.dataInit && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
 
             // Settings.instance.stackHelper.slice.thicknessMethod = 1;
             // Settings.instance.stackHelper.slice.thickness = 2;
             // Settings.instance.stackHelper.slice.steps = 2;
 
-            if (this.canvas._thresholdValueSetManually && this.canvas._dataLoaded) {
                 this.canvas.dispatchEvent({
                     type: 'thresholdValueChangeStartC',
                     changes: {
@@ -101,8 +101,7 @@ export class Settings {
                 });
                 this.canvas.setWindowLevelC(value);
             }
-        }
-        this.canvas._dataLoaded = true;
+            this.dataInit = true;
     }
 
 
@@ -136,14 +135,14 @@ export class Settings {
     // @Output() thresholdValueChangeC = new EventEmitter<number[]>();
 
 
-    @Input() set colorMap(value: string) {
-        Settings.instance._colorMap = value;
-        if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
-            Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.colorMap = Settings.instance._colorMap;
-        }
-        Settings.instance.colorMapValueChange.emit(value);
-    }
-    @Output() colorMapValueChange = new EventEmitter<string>();
+    // @Input() set colorMap(value: string) {
+    //     Settings.instance._colorMap = value;
+    //     if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+    //         Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.colorMap = Settings.instance._colorMap;
+    //     }
+    //     Settings.instance.colorMapValueChange.emit(value);
+    // }
+    // @Output() colorMapValueChange = new EventEmitter<string>();
 
     @Input() set rulerMode(rulerMode: boolean) {
         Settings.instance._rulerMode = rulerMode;
@@ -157,11 +156,11 @@ export class Settings {
     }
     @Output() angleModeChange = new EventEmitter<boolean>();
 
-    @Input() set freehandMode(freehandMode: boolean) {
-        Settings.instance._freehandMode = freehandMode;
-        Settings.instance.freehandModeChange.emit(freehandMode);
-    }
-    @Output() freehandModeChange = new EventEmitter<boolean>();
+    // @Input() set freehandMode(freehandMode: boolean) {
+    //     Settings.instance._freehandMode = freehandMode;
+    //     Settings.instance.freehandModeChange.emit(freehandMode);
+    // }
+    // @Output() freehandModeChange = new EventEmitter<boolean>();
 
     @Input() set voxelprobeMode(voxelprobeMode: boolean) {
         Settings.instance._voxelprobeMode = voxelprobeMode;

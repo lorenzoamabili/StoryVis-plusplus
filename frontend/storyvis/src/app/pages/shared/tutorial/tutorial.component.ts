@@ -30,6 +30,10 @@ export class TutorialComponent implements OnInit {
         return this.currentUser && this.currentUser.role === Role.Reader;
     }
 
+    get isRegular() {
+        return this.currentUser && this.currentUser.role === Role.Regular;
+    }
+
     get isProvGraph() {
         return this.currentUser && this.currentUser.group === "ProvGraph";
     }

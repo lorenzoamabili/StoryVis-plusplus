@@ -120,7 +120,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
         do: 'setSliceIndex',
         doArguments: {
           args: [startEvent.changes.sliceOrientation, event.changes.newIndex, startEvent.changes.oldIndex, event.changes.newIndex]
-                },
+        },
         undo: 'setSliceIndex',
         undoArguments: {
           args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, startEvent.changes.newIndex, event.changes.oldIndex]
@@ -232,6 +232,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }
   });
 
+
   // Window Level Changes Listener - Debounced
   let wLChangeEndListenerC: EventListener = null;
   const wLChangeListenerC = (startEvent) => {
@@ -283,4 +284,5 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     canvas.addEventListener('thresholdValueChangedW', wLChangeEndListenerW);
   };
   canvas.addEventListener('thresholdValueChangeStartW', debounce(wLChangeListenerW, 500, { leading: true }));
+
 }

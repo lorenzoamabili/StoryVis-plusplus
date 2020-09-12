@@ -15,14 +15,14 @@ export class ExplorationComponent implements OnInit {
 
     constructor(
         private authenticationService: AuthenticationService,
-        public provenance: ProvenanceService,
+        public provenance: ProvenanceService
     ) {
         this.currentUser = this.authenticationService.currentUserValue;
         this.IDcreator = this.currentUser.username;
     }
 
     ngOnInit() {
-        this.practiceSession = this.practiceSession;
+
     }
 
     get isProvGraph() {

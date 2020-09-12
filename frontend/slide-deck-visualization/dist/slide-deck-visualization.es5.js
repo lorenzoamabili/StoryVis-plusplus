@@ -1,5 +1,5 @@
 import { select, event, selectAll, drag, scaleSequential, interpolatePuBu } from 'd3';
-import fs from 'fs';
+// import fs from 'fs';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.

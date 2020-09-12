@@ -27,7 +27,7 @@ export class BrainvisCanvasControlsComponent {
 
   change(event) {
     if(event.isUserInput) {
-      this.canvas.settings.colorMap = event.source.value;
+      this.canvas.settings._colorMap = event.source.value;
     }
   }
 }

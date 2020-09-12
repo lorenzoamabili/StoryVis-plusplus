@@ -10,19 +10,18 @@ export class PracticeComponent implements OnInit {
     title = 'practice';
 
     currentUser: User;
-    practiceSession: boolean = false;
+    practiceSession: boolean = true;
     IDcreator: number;
 
     constructor(
         private authenticationService: AuthenticationService,
-        public provenance: ProvenanceService,
+        public provenance: ProvenanceService
     ) {
         this.currentUser = this.authenticationService.currentUserValue;
         this.IDcreator = this.currentUser.username;
     }
 
     ngOnInit() {
-        this.practiceSession = !this.practiceSession;
     }
 
     get isProvGraph() {

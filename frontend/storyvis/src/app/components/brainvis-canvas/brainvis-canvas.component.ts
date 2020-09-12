@@ -26,10 +26,7 @@ export enum VIEWS {
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
   @Input('practiceSession') practiceSession: boolean;
-
-  public _thresholdValueSetManually = true;
   public _initialized = false;
-  public _dataLoaded = false;
   public settings = Settings.getInstance(this);
   private elem: Element;
   public views: View[] = [
@@ -151,7 +148,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   ngOnInit() {
     // todo: remove object from window
-    // (window as any).canvas = this;
+    (window as any).canvas = this;
 
     this._axialRenderer = new Renderer2D(this.views[0], this);
     this._perspectiveRenderer = new Renderer3D(this.views[1], this);
@@ -166,9 +163,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     //   :
     // 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_slice.nii.gz');
 
-      this.loadData( (this.practiceSession == false) ?
-      'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' :
-      'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
+      this.loadData( (this.practiceSession) ?
+      'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz':
+      'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz');
 
     // this.loadData(
     //   'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
@@ -227,15 +224,20 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._coronalRenderer.annotationMode = isEnabled;
   }
 
-  async loadData(url: string) {
-    let loader = new AMI.VolumeLoader();
-
+  removeScene(){
     this.renderers.forEach(renderer => {
       const scene = renderer.scene;
       while (scene.children.length > 0) {
         scene.remove(scene.children[0]);
       }
     });
+  }
+
+
+  async loadData(url: string) {
+    let loader = new AMI.VolumeLoader();
+
+     this.removeScene();
 
     try {
       await loader.load(url);
@@ -268,14 +270,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         this._perspectiveRenderer.scene.add(renderer.scene);
       });
 
-      // Set initial threshold values for white balance
-
+      // // Set initial threshold values for white balance
       this.settings._thresholdLowerBoundW = this._axialRenderer.stackHelper.stack.minMax[0];
       this.settings._thresholdUpperBoundW = this._axialRenderer.stackHelper.stack.minMax[1];
       this.settings._thresholdLowerBoundC = this._axialRenderer.stackHelper.stack.minMax[0];
       this.settings._thresholdUpperBoundC = this._axialRenderer.stackHelper.stack.minMax[1];
       this.settings._thresholdValueW = 2000;
       this.settings._thresholdValueC = 20;
+
 
       // Init render to texture target
       this.textureTarget = new THREE.WebGLRenderTarget(
@@ -356,7 +358,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   setWindowLevelW(value) {
-    this.settings._thresholdValueW = value;
     this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = value;
     this._axialRenderer.stackHelper.slice._stack._windowWidth = value;
     this._coronalRenderer.stackHelper.slice._stack._windowWidth = value;
@@ -366,7 +367,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   setWindowLevelC(value) {
-    this.settings._thresholdValueC = value;
     this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = value;
     this._axialRenderer.stackHelper.slice._stack._windowCenter = value;
     this._coronalRenderer.stackHelper.slice._stack._windowCenter = value;
@@ -379,6 +379,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._axialRenderer.stackHelper.index = this._axialRenderer.stackHelper.index;
     this._coronalRenderer.stackHelper.index = this._coronalRenderer.stackHelper.index;
     this._sagittalRenderer.stackHelper.index = this._sagittalRenderer.stackHelper.index;
+
     this.onAxialChanged();
     this.onCoronalChanged();
     this.onSagittalChanged();

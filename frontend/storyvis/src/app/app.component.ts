@@ -20,7 +20,6 @@ export class AppComponent {
     ) {
         this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
         this.currentUser = this.authenticationService.currentUserValue;
-
     }
 
     get isAdmin() {
@@ -29,6 +28,10 @@ export class AppComponent {
 
     get isAuthor() {
         return this.currentUser && this.currentUser.role === Role.Author;
+    }
+
+    get isRegular() {
+        return this.currentUser && this.currentUser.role === Role.Regular;
     }
 
     get isReader() {

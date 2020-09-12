@@ -24,11 +24,9 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
     canvas.changeSliceRender(sliceOrientation, newIndexArt);
   },
   setWindowLevelC: async (value) => {
-    canvas._thresholdValueSetManually = false,
     canvas.setWindowLevelC(value)
     },
   setWindowLevelW: async (value) => { 
-    canvas._thresholdValueSetManually = false,
     canvas.setWindowLevelW(value)
   },
 

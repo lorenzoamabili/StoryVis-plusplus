@@ -17,7 +17,7 @@ import { environment } from '../../../environments/environment';
 import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
 import { UserService } from './user.service';
 import { MatSelectChange } from '@angular/material';
-import { ProvenanceVisualizationComponent } from 'src/app/components/provenance-visualization/provenance-visualization.component';
+import { ProvenanceVisualizationComponent } from '../../components/provenance-visualization/provenance-visualization.component';
 
 @Injectable({
   providedIn: 'root'
@@ -157,14 +157,13 @@ export class ProvenanceService {
 
   public loadGraph(graphInput: any) {
     const dataGraph = JSON.parse(graphInput.serializedGraph);
-    console.log(dataGraph);
     this.graph = restoreProvenanceGraph(dataGraph);
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
     this.tree = (window as any).tree;
 
-    if(this.tree.currentUser.role === 'Author') {
+    if (this.tree.currentUser.role === 'Author') {
       this.tree.createTree(this.traverser);
     } else {
       this.tree._viz.setTraverser(this.traverser);
@@ -177,45 +176,45 @@ export class ProvenanceService {
 
 
   public async restoreStory(input: MatSelectChange) {
-  const storyInput = input.value;
-  this.loadStory(storyInput);
-}
+    const storyInput = input.value;
+    this.loadStory(storyInput);
+  }
 
-  public loadStory(storyInput: any){
-  const dataStory = JSON.parse(storyInput.story);
-  this.slideDeck = (window as any).slideDeck;
-  this.slideDeck.setDeck(this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.application));
-  this.slideDeck.update();
-}
+  public loadStory(storyInput: any) {
+    const dataStory = JSON.parse(storyInput.story);
+    this.slideDeck = (window as any).slideDeck;
+    this.slideDeck.setDeck(this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.application));
+    this.slideDeck.update();
+  }
 
   public async restoreTextReport(input: MatSelectChange) {
-  const textReportInput = input.value;
-  this.loadTextReport(textReportInput);
-}
+    const textReportInput = input.value;
+    this.loadTextReport(textReportInput);
+  }
 
-  public loadTextReport(textReportInput: any){
-  (document.getElementById("textArea") as HTMLTextAreaElement).value = textReportInput.textReport;
-}
+  public loadTextReport(textReportInput: any) {
+    (document.getElementById("textArea") as HTMLTextAreaElement).value = textReportInput.textReport;
+  }
 
-async init() {
-this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, "originalGraph", undefined);
-  this.registry = new ActionFunctionRegistry();
-  this.tracker = new ProvenanceTracker(this.registry, this.graph);
-  this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
-  this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
+  async init() {
+    this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, "originalGraph", undefined);
+    this.registry = new ActionFunctionRegistry();
+    this.tracker = new ProvenanceTracker(this.registry, this.graph);
+    this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
+    this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
 
-  (window as any).prov = {
-    graph: this.graph,
-    registry: this.registry,
-    tracker: this.tracker,
-    traverser: this.traverser,
-    deck: this.deck
-  };
-}
+    (window as any).prov = {
+      graph: this.graph,
+      registry: this.registry,
+      tracker: this.tracker,
+      traverser: this.traverser,
+      deck: this.deck
+    };
+  }
 
-constructor(private http: HttpClient) {
-  this.init().then(() => this.initialized = true);
-}
+  constructor(private http: HttpClient) {
+    this.init().then(() => this.initialized = true);
+  }
 }
 
 
