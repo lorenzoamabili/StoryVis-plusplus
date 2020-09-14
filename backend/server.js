@@ -29,7 +29,9 @@ app.use(errorHandler);
 // const port = process.env.PORT || 8080;
 const port = 
 // process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) :
- 4000;
+ 27017;
 const server = app.listen(port, function () {
     console.log('Server listening on port ' + port);
 });
+
+// const server = require('http').createServer();

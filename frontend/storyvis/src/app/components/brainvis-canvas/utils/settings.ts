@@ -4,15 +4,16 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 export class Settings {
     public static instance: Settings;
     public canvas: BrainvisCanvasComponent;
-    public dataInit: boolean = false;
+    public _dataInitC: boolean = false;
+    public _dataInitW: boolean = false;
 
     public _colorMap = 'grayscale';
     public _thresholdValueW = 20;
     public _thresholdValueC = 20;
     public _thresholdLowerBoundW = 0;
-    public _thresholdUpperBoundW = 1426;
+    public _thresholdUpperBoundW = 2500;
     public _thresholdLowerBoundC = 0;
-    public _thresholdUpperBoundC = 1426;
+    public _thresholdUpperBoundC = 2500;
     public _rulerMode = false;
     public _angleMode = false;
     // public _freehandMode = false;
@@ -53,9 +54,9 @@ export class Settings {
 
     @Input() set thresholdValueW(value: number) {
         this.canvas = (window as any).canvas;
-
+        this._dataInitW = this.canvas.practiceSession ? this.canvas._dataInit : this._dataInitW;
         const oldValue: number = this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth;
-        if (value !== oldValue && this.dataInit && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+        if (value !== oldValue && this._dataInitW && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
 
                 this.canvas.dispatchEvent({
                     type: 'thresholdValueChangeStartW',
@@ -72,15 +73,19 @@ export class Settings {
                 });
                 this.canvas.setWindowLevelW(value);
         }
-        this.dataInit = true;
+        if(this.canvas.practiceSession = true) {
+            this.canvas._dataInit = true;
+        } else {
+            this._dataInitW = true;
+        }
     }
 
 
     @Input() set thresholdValueC(value: number) {
         this.canvas = (window as any).canvas;
-
+        this._dataInitC = this.canvas.practiceSession ? this.canvas._dataInit : this._dataInitC;
         const oldValue: number = this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter;
-        if (value !== oldValue && this.dataInit && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+        if (value !== oldValue && this._dataInitC && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
 
             // Settings.instance.stackHelper.slice.thicknessMethod = 1;
             // Settings.instance.stackHelper.slice.thickness = 2;
@@ -101,8 +106,12 @@ export class Settings {
                 });
                 this.canvas.setWindowLevelC(value);
             }
-            this.dataInit = true;
-    }
+            if(this.canvas.practiceSession = true) {
+                this.canvas._dataInit = true;
+            } else {
+                this._dataInitC = true;
+            }    
+        }
 
 
     // @Input() set thresholdValueW(value: number) {

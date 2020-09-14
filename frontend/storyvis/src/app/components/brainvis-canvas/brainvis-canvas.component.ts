@@ -27,6 +27,7 @@ export enum VIEWS {
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
   @Input('practiceSession') practiceSession: boolean;
   public _initialized = false;
+  public _dataInit = false;
   public settings = Settings.getInstance(this);
   private elem: Element;
   public views: View[] = [
@@ -235,6 +236,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
 
   async loadData(url: string) {
+    this._dataInit = false;
     let loader = new AMI.VolumeLoader();
 
      this.removeScene();
@@ -275,7 +277,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.settings._thresholdUpperBoundW = this._axialRenderer.stackHelper.stack.minMax[1];
       this.settings._thresholdLowerBoundC = this._axialRenderer.stackHelper.stack.minMax[0];
       this.settings._thresholdUpperBoundC = this._axialRenderer.stackHelper.stack.minMax[1];
-      this.settings._thresholdValueW = 2000;
+      this.settings._thresholdValueW = 1000;
       this.settings._thresholdValueC = 20;
 
 

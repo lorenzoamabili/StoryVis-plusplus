@@ -10,16 +10,16 @@ function jwt() {
         path: [
             // public routes that don't require authentication
             '/users/authenticate',
-            '/users/register',
-            '/provGraphs/provenance',
-            '/stories/story',
-            '/provGraphsPractice/provenance',
-            '/storiesPractice/story',
-            '/provGraphs',
-            '/stories',
-            '/textReports',
-            '/textReportsPractice/textReport',
-            '/textReports/textReport'
+            '/users/register'
+            // '/provGraphs/provenance',
+            // '/stories/story',
+            // '/provGraphsPractice/provenance',
+            // '/storiesPractice/story',
+            // '/provGraphs',
+            // '/stories',
+            // '/textReports',
+            // '/textReportsPractice/textReport',
+            // '/textReports/textReport'
         ]
     });
 }
