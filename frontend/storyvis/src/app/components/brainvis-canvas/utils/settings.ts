@@ -2,23 +2,29 @@ import { Input, Output, EventEmitter } from '@angular/core';
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 
 export class Settings {
+    @Input('studyStarted') studyStarted: boolean;
+
     public static instance: Settings;
     public canvas: BrainvisCanvasComponent;
-    public _dataInitC: boolean = false;
-    public _dataInitW: boolean = false;
+    public valueChanged: boolean = false;
+    public valueSetManually: boolean = true;
+    public slider: string = "none";
+    public token: boolean = true;
+    public initW: boolean = false;
+    public initC: boolean = false;
 
     public _colorMap = 'grayscale';
-    public _thresholdValueW = 20;
-    public _thresholdValueC = 20;
-    public _thresholdLowerBoundW = 0;
-    public _thresholdUpperBoundW = 2500;
-    public _thresholdLowerBoundC = 0;
-    public _thresholdUpperBoundC = 2500;
-    public _rulerMode = false;
-    public _angleMode = false;
-    // public _freehandMode = false;
-    public _voxelprobeMode = false;
-    public _annotationMode = false;
+    public _thresholdValueW = 5119;
+    public _thresholdValueC = 512;
+    public _thresholdLowerBoundW = -6000;
+    public _thresholdUpperBoundW = 6000;
+    public _thresholdLowerBoundC = -1000;
+    public _thresholdUpperBoundC = 1000;
+    private _rulerMode = false;
+    private _angleMode = false;
+    private _freehandMode = false;
+    private _voxelprobeMode = false;
+    private _annotationMode = false;
 
     get colorMap() { return Settings.instance._colorMap; }
     get thresholdValueW() { return Settings.instance._thresholdValueW; }
@@ -29,7 +35,7 @@ export class Settings {
     get thresholdUpperBoundC() { return Settings.instance._thresholdUpperBoundC; }
     get rulerMode() { return Settings.instance._rulerMode; }
     get angleMode() { return Settings.instance._angleMode; }
-    // get freehandMode() { return Settings.instance._freehandMode; }
+    get freehandMode() { return Settings.instance._freehandMode; }
     get voxelprobeMode() { return Settings.instance._voxelprobeMode; }
     get annotationMode() { return Settings.instance._annotationMode; }
 
@@ -52,66 +58,86 @@ export class Settings {
     //     Settings.instance._thresholdUpperBoundC = value;
     // }
 
-    @Input() set thresholdValueW(value: number) {
-        this.canvas = (window as any).canvas;
-        this._dataInitW = this.canvas.practiceSession ? this.canvas._dataInit : this._dataInitW;
-        const oldValue: number = this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth;
-        if (value !== oldValue && this._dataInitW && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+    @Input() set thresholdValueW(valueW: number) {
+        this.slider = 'sliderW';
 
+        if (this.canvas._axialRenderer.stackHelper) {
+            const oldValueC: number = this.initC ? this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter : this._thresholdValueC;
+            const oldValueW: number = this.initW ? this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth : this._thresholdValueW;
+            this.valueChanged = (valueW !== oldValueW) ? true : false;
+
+            if (this.valueChanged) {
                 this.canvas.dispatchEvent({
                     type: 'thresholdValueChangeStartW',
                     changes: {
-                        value: oldValue
+                        valueW: oldValueW,
+                        valueC: oldValueC,
+                        slider: this.slider
                     }
                 });
 
                 this.canvas.dispatchEvent({
                     type: 'thresholdValueChangedW',
                     changes: {
-                        value: value
+                        valueW: valueW,
+                        valueC: oldValueC,
+                        slider: this.slider
                     }
                 });
-                this.canvas.setWindowLevelW(value);
-        }
-        if(this.canvas.practiceSession = true) {
-            this.canvas._dataInit = true;
-        } else {
-            this._dataInitW = true;
+                if (!this.valueSetManually && !this.token) {
+                }
+                else {
+                    this.canvas.setWindowLevel(valueW, oldValueC, this.slider);
+                }
+                this.valueSetManually = !this.valueSetManually;
+                this.token = true;
+                this.initW = true;
+            }
         }
     }
 
 
-    @Input() set thresholdValueC(value: number) {
-        this.canvas = (window as any).canvas;
-        this._dataInitC = this.canvas.practiceSession ? this.canvas._dataInit : this._dataInitC;
-        const oldValue: number = this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter;
-        if (value !== oldValue && this._dataInitC && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+    @Input() set thresholdValueC(valueC: number) {
+        // Settings.instance.stackHelper.slice.thicknessMethod = 1;
+        // Settings.instance.stackHelper.slice.thickness = 2;
+        // Settings.instance.stackHelper.slice.steps = 2;
+        this.slider = 'sliderC';
 
-            // Settings.instance.stackHelper.slice.thicknessMethod = 1;
-            // Settings.instance.stackHelper.slice.thickness = 2;
-            // Settings.instance.stackHelper.slice.steps = 2;
+        if (this.canvas._axialRenderer.stackHelper) {
+            const oldValueC: number = this.initC ? this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter : this._thresholdValueC;
+            const oldValueW: number = this.initW ? this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth : this._thresholdValueW;
+            this.valueChanged = (valueC !== oldValueC) ? true : false;
 
+            if (this.valueChanged) {
                 this.canvas.dispatchEvent({
                     type: 'thresholdValueChangeStartC',
                     changes: {
-                        value: oldValue
+                        valueW: oldValueW,
+                        valueC: oldValueC,
+                        slider: this.slider
                     }
                 });
 
                 this.canvas.dispatchEvent({
                     type: 'thresholdValueChangedC',
                     changes: {
-                        value: value
+                        valueW: oldValueW,
+                        valueC: valueC,
+                        slider: this.slider
                     }
                 });
-                this.canvas.setWindowLevelC(value);
+                if (!this.valueSetManually && !this.token) {
+                } else {
+                    this.canvas.setWindowLevel(oldValueW, valueC, this.slider);
+                }
+                this.valueSetManually = !this.valueSetManually;
+                this.token = true;
+                this.initC = true;
             }
-            if(this.canvas.practiceSession = true) {
-                this.canvas._dataInit = true;
-            } else {
-                this._dataInitC = true;
-            }    
         }
+    }
+
+
 
 
     // @Input() set thresholdValueW(value: number) {
@@ -144,14 +170,14 @@ export class Settings {
     // @Output() thresholdValueChangeC = new EventEmitter<number[]>();
 
 
-    // @Input() set colorMap(value: string) {
-    //     Settings.instance._colorMap = value;
-    //     if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
-    //         Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.colorMap = Settings.instance._colorMap;
-    //     }
-    //     Settings.instance.colorMapValueChange.emit(value);
-    // }
-    // @Output() colorMapValueChange = new EventEmitter<string>();
+    @Input() set colorMap(value: string) {
+        Settings.instance._colorMap = value;
+        if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+            Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.colorMap = Settings.instance._colorMap;
+        }
+        Settings.instance.colorMapValueChange.emit(value);
+    }
+    @Output() colorMapValueChange = new EventEmitter<string>();
 
     @Input() set rulerMode(rulerMode: boolean) {
         Settings.instance._rulerMode = rulerMode;
@@ -165,11 +191,11 @@ export class Settings {
     }
     @Output() angleModeChange = new EventEmitter<boolean>();
 
-    // @Input() set freehandMode(freehandMode: boolean) {
-    //     Settings.instance._freehandMode = freehandMode;
-    //     Settings.instance.freehandModeChange.emit(freehandMode);
-    // }
-    // @Output() freehandModeChange = new EventEmitter<boolean>();
+    @Input() set freehandMode(freehandMode: boolean) {
+        Settings.instance._freehandMode = freehandMode;
+        Settings.instance.freehandModeChange.emit(freehandMode);
+    }
+    @Output() freehandModeChange = new EventEmitter<boolean>();
 
     @Input() set voxelprobeMode(voxelprobeMode: boolean) {
         Settings.instance._voxelprobeMode = voxelprobeMode;
@@ -191,6 +217,14 @@ export class Settings {
         }
 
         return Settings.instance;
+    }
+
+    // getNewInstance(){
+    //     Settings.instance = new Settings();
+    // }
+
+    ngOnInit(){
+
     }
 
 }

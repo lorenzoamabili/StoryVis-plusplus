@@ -10,7 +10,7 @@ export class ExplorationComponent implements OnInit {
     title = 'exploration';
 
     currentUser: User;
-    practiceSession: boolean = false;
+    studyStarted: boolean = true;
     IDcreator: number;
 
     constructor(

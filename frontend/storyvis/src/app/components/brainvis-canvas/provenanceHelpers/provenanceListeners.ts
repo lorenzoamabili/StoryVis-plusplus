@@ -119,11 +119,11 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
         },
         do: 'setSliceIndex',
         doArguments: {
-          args: [startEvent.changes.sliceOrientation, event.changes.newIndex, startEvent.changes.oldIndex, event.changes.newIndex]
+          args: [startEvent.changes.sliceOrientation, event.changes.newIndex, startEvent.changes.oldIndex]
         },
         undo: 'setSliceIndex',
         undoArguments: {
-          args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, startEvent.changes.newIndex, event.changes.oldIndex]
+          args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, event.changes.newIndex]
         }
       }
       tracker.applyAction(action);
@@ -182,22 +182,22 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   canvas.addEventListener('perspectiveCameraOrientationChangeStart', debounce(perspectiveOrientationStartListener, 500, { leading: true }));
 
 
+  // renderer.rulerRemoved.subscribe((args) => {
+  //   const action = {
+  //     metadata: {
+  //       userIntent: 'measurement',
+  //       label: 'delete ruler'
+  //     },
+  //     do: 'deleteRuler',
+  //     doArguments: [renderer.sliceOrientation],
+  //     undo: 'createRuler',
+  //     undoArguments: [renderer.sliceOrientation, args],
+  //   };
+  //   tracker.applyAction(action, true);
+  // });
+
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
-      // renderer.rulerRemoved.subscribe((args) => {
-      //   const action = {
-      //     metadata: {
-      //       userIntent: 'measurement',
-      //       label: 'delete ruler'
-      //     },
-      //     do: 'deleteRuler',
-      //     doArguments: [renderer.sliceOrientation],
-      //     undo: 'createRuler',
-      //     undoArguments: [renderer.sliceOrientation, args],
-      //   };
-      //   tracker.applyAction(action, true);
-      // });
-
       renderer.artifactCreated.subscribe((artifact: Artifact) => {
         const action = {
           metadata: {
@@ -241,15 +241,15 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       const action: Action = {
         metadata: {
           userIntent: 'configuration',
-          label: 'WL C' + event.changes.value
+          label: event.changes.valueW + 'W' + ' , ' + event.changes.valueC + 'C*'
         },
-        do: 'setWindowLevelC',
+        do: 'setWindowLevel',
         doArguments: {
-          args: [event.changes.value]
+          args: [event.changes.valueW, event.changes.valueC, event.changes.slider]
         },
-        undo: 'setWindowLevelC',
+        undo: 'setWindowLevel',
         undoArguments: {
-          args: [startEvent.changes.value]
+          args: [startEvent.changes.valueW, startEvent.changes.valueC, startEvent.changes.slider]
         }
       }
       tracker.applyAction(action, true);
@@ -268,15 +268,15 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       const action: Action = {
         metadata: {
           userIntent: 'configuration',
-          label: 'WL W' + event.changes.value
+          label: event.changes.valueW + 'W*' + ' , ' + event.changes.valueC + 'C'
         },
-        do: 'setWindowLevelW',
+        do: 'setWindowLevel',
         doArguments: {
-          args: [event.changes.value]
+          args: [event.changes.valueW, event.changes.valueC, event.changes.slider]
         },
-        undo: 'setWindowLevelW',
+        undo: 'setWindowLevel',
         undoArguments: {
-          args: [startEvent.changes.value]
+          args: [startEvent.changes.valueW, startEvent.changes.valueC, startEvent.changes.slider]
         }
       }
       tracker.applyAction(action, true);

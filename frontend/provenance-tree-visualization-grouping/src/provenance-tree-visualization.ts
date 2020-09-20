@@ -448,6 +448,8 @@ export class ProvenanceTreeVisualization {
 }
 }
 
+
+// to make the right click possible without opening the context menu
 (function () {
   var blockContextMenu;
 

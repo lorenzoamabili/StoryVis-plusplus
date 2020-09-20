@@ -6,7 +6,7 @@
      
       <mat-sidenav position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
 
-        <button id="sidenav-trigger" color="primary" style="color: orange" mat-icon-button (click)="sidenav.toggle()">
+        <button id="sidenav-trigger" mat-icon-button (click)="sidenav.toggle()">
           <mat-icon>menu</mat-icon>
         </button>
   
@@ -23,7 +23,7 @@
       </mat-sidenav>
   
       <mat-sidenav-content>
-        <app-brainvis-canvas #canvas [practiceSession]="practiceSession"></app-brainvis-canvas>
+        <app-brainvis-canvas #canvas [studyStarted]="studyStarted"></app-brainvis-canvas>
         <div id="bottom-container">
           <app-slides-container>
             <app-provenance-slides [canvas]="canvas" #slides></app-provenance-slides>
@@ -32,15 +32,13 @@
           </div>
         <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->
         <!--<p></p>-->
+        <a id="next-button" (click)="provenance.saveGraphPractice(IDcreator); provenance.saveStoryPractice(IDcreator); 
+        provenance.saveTextReportPractice(IDcreator);" routerLink='/questionnaire'>
+          <mat-icon><b>NEXT</b></mat-icon>
+        </a>
+
+
       </mat-sidenav-content>
     </mat-sidenav-container>
   </ng-container>
 </div>
-
-<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="currentUser">
-    <div class="navbar-nav">
-        <a routerLink='/questionnaire'
-        (click)="provenance.saveGraph(IDcreator); provenance.saveStory(IDcreator); 
-        provenance.saveTextReport(IDcreator);" class="nav-item nav-link"><b>NEXT</b></a>
-    </div>
-  </nav>

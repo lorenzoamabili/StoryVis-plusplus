@@ -34,3 +34,10 @@
     position: absolute;
     left: -50px;
   }
+
+  #next-button {
+    color: orange;
+    position: absolute;
+    right: 50px;
+    bottom: 10px;
+  }

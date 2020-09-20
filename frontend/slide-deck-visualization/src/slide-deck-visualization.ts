@@ -50,7 +50,7 @@ export class SlideDeckVisualization {
     private _currentlyPlaying = false;
     private _timelineShift = 0;
     private _timeIndexedSlides: IndexedSlide[] = [];
-    private _currentlyPlayingSlide: IProvenanceSlide | null = null;
+    // private _currentlyPlayingSlide: IProvenanceSlide | null = null;
     private _gridTimeStep = 1000;
     private _gridSnap = false;
     private _playingID: any = -1;
@@ -115,7 +115,7 @@ export class SlideDeckVisualization {
         } else {
              nodeSlide = node;
         }
-        const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, []);
+        const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, [], nodeSlide);
         slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
         slideDeck.addSlide(slide, slideDeck.slides.length);
         // node.metadata.isSlideAdded = true;
@@ -130,7 +130,8 @@ export class SlideDeckVisualization {
             5000,
             0,
             0,
-            []
+            [],
+            slide.node
             );
         cloneSlide.mainAnnotation = slide.mainAnnotation;
         slideDeck.addSlide(
@@ -354,7 +355,7 @@ export class SlideDeckVisualization {
                 );
                 if (currentSlide !== this._slideDeck.selectedSlide) {
                     this.selectSlide(currentSlide);
-                    this._currentlyPlayingSlide = currentSlide;
+                    // this._currentlyPlayingSlide = currentSlide;
                 }
             }
             this.update();
@@ -784,14 +785,6 @@ export class SlideDeckVisualization {
                 nodeCreationOrders.push(slide.nodeCreationOrder);
                 var col = d3.scaleSequential(d3.interpolatePuBu)
                     .domain([0, Math.max(...nodeCreationOrders)])(slide.nodeCreationOrder).toString();
-                if (slide.node) {
-                    if (slide.node.metadata.bgColor) {
-                        col = slide.node.metadata.bgColor;
-                    }
-                    else {
-                        slide.node.metadata.bgColor = col;
-                    }
-                }
                 return col;
             })
             .attr("selected", (slide: IProvenanceSlide) => {
@@ -819,14 +812,14 @@ export class SlideDeckVisualization {
 
         toolbar = allNodes.select("g.slide_toolbar");
 
-        // toolbar
-        //     .select("foreignObject.slides_delete_icon")
-        //     .attr("y", (slide: IProvenanceSlide) => {
-        //         return this._toolbarY;
-        //     })
-        //     .attr("x", (slide: IProvenanceSlide) => {
-        //         return this._toolbarX + this.barTransitionTimeWidth(slide) - 3;
-        //     });
+        toolbar
+            .select("foreignObject.slides_delete_icon")
+            .attr("y", (slide: IProvenanceSlide) => {
+                return this._toolbarY;
+            })
+            .attr("x", (slide: IProvenanceSlide) => {
+                return this._toolbarX + this.barTransitionTimeWidth(slide) - 3;
+            });
 
         toolbar
             .select("foreignObject.slides_clone_icon")
@@ -930,6 +923,7 @@ export class SlideDeckVisualization {
         this._slideDeck = slideDeck;
         this._root = d3.select(elm);
         const that = this;
+        (window as any).slideDeck = this;
 
         this._slideTable = this._root
             .append<SVGElement>("svg")
@@ -1057,13 +1051,7 @@ export class SlideDeckVisualization {
             .attr("height", 20)
             .append("xhtml:body")
             .html('<i class="fa fa-play"></i>')
-            .on("click", function () {
-                if (document.getElementsByClassName("i.fa.fa-play")) {
-                    that.onPlay();
-                } else {
-                    that.onPause();
-                }
-            });
+            .on("click", document.getElementsByClassName("i.fa.fa-play") ? this.onPlay : this.onPause);
 
         this._slideTable
             .append("svg:foreignObject")

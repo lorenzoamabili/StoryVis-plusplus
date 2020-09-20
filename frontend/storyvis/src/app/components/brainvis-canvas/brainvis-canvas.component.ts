@@ -4,13 +4,13 @@ import * as AMI from 'ami.js';
 import { Component, ElementRef, HostListener, OnInit, Input } from '@angular/core';
 import { IOrientation, ISlicePosition, View } from './utils/types';
 import SliceManipulatorWidget from './utils/sliceManipulatorWidget';
-import { ProvenanceService } from '../../shared/_services';
 import { registerActions } from './provenanceHelpers/provenanceActions';
 import { addListeners } from './provenanceHelpers/provenanceListeners';
 import { Settings } from './utils/settings';
 import { Renderer2D } from './renderer2d';
 import { Renderer3D } from './renderer3d';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
+import { ProvenanceService } from 'src/app/shared/_services';
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -25,9 +25,8 @@ export enum VIEWS {
   styleUrls: ['./brainvis-canvas.component.css']
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
-  @Input('practiceSession') practiceSession: boolean;
+  @Input('studyStarted') studyStarted: boolean;
   public _initialized = false;
-  public _dataInit = false;
   public settings = Settings.getInstance(this);
   private elem: Element;
   public views: View[] = [
@@ -149,7 +148,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   ngOnInit() {
     // todo: remove object from window
-    (window as any).canvas = this;
+    // (window as any).canvas = this;
 
     this._axialRenderer = new Renderer2D(this.views[0], this);
     this._perspectiveRenderer = new Renderer3D(this.views[1], this);
@@ -159,14 +158,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.renderers.forEach(renderer => renderer.init());
 
 
-    // this.loadData( (this.practiceSession == false) ?
+    // this.loadData( (this.studyStarted === false) ?
     // 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz'
     //   :
     // 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_slice.nii.gz');
 
-      this.loadData( (this.practiceSession) ?
-      'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz':
-      'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz');
+    this.loadData(this.studyStarted ?
+      'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' :
+      'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
 
     // this.loadData(
     //   'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
@@ -186,7 +185,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       r2: this._coronalRenderer,
       r3: this._sagittalRenderer
     };
-        // (window as any).canvas = this;
+    // (window as any).canvas = this;
     // (window as any).views = {
     //   r1: this.views[0],
     //   r2: this.views[1],
@@ -225,21 +224,15 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._coronalRenderer.annotationMode = isEnabled;
   }
 
-  removeScene(){
+  async loadData(url: string) {
+    let loader = new AMI.VolumeLoader();
+
     this.renderers.forEach(renderer => {
       const scene = renderer.scene;
       while (scene.children.length > 0) {
         scene.remove(scene.children[0]);
       }
     });
-  }
-
-
-  async loadData(url: string) {
-    this._dataInit = false;
-    let loader = new AMI.VolumeLoader();
-
-     this.removeScene();
 
     try {
       await loader.load(url);
@@ -271,14 +264,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         renderer.initHelpersStack(stack);
         this._perspectiveRenderer.scene.add(renderer.scene);
       });
-
-      // // Set initial threshold values for white balance
-      this.settings._thresholdLowerBoundW = this._axialRenderer.stackHelper.stack.minMax[0];
-      this.settings._thresholdUpperBoundW = this._axialRenderer.stackHelper.stack.minMax[1];
-      this.settings._thresholdLowerBoundC = this._axialRenderer.stackHelper.stack.minMax[0];
-      this.settings._thresholdUpperBoundC = this._axialRenderer.stackHelper.stack.minMax[1];
-      this.settings._thresholdValueW = 1000;
-      this.settings._thresholdValueC = 20;
 
 
       // Init render to texture target
@@ -322,6 +307,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         { plane: plane2, color: new THREE.Color(this._coronalRenderer.stackHelper.borderColor) },
       ]);
 
+      this.setInitValuesWL();
+
       // // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
       this._initialized = true;
@@ -329,6 +316,16 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       window.console.log('oops... something went wrong...');
       window.console.log(error);
     }
+  }
+
+  setInitValuesWL() {
+    // Set initial threshold values for white balance
+    this.settings._thresholdLowerBoundW = (this._axialRenderer.stackHelper.stack.minMax[0]);
+    this.settings._thresholdUpperBoundW = (this._axialRenderer.stackHelper.stack.minMax[1]);
+    this.settings._thresholdLowerBoundC = (this._axialRenderer.stackHelper.stack.minMax[0]);
+    this.settings._thresholdUpperBoundC = (this._axialRenderer.stackHelper.stack.minMax[1]);
+    this.settings._thresholdValueW = !this.studyStarted ? 5119 : 2710;
+    this.settings._thresholdValueC = !this.studyStarted ? 512 : 331;
   }
 
   onAxialChanged() {
@@ -359,23 +356,32 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.onSagittalChanged();
   }
 
-  setWindowLevelW(value) {
-    this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = value;
-    this._axialRenderer.stackHelper.slice._stack._windowWidth = value;
-    this._coronalRenderer.stackHelper.slice._stack._windowWidth = value;
-    this._sagittalRenderer.stackHelper.slice._stack._windowWidth = value;
+  setWindowLevel(valueW, valueC, slider) {
 
-    this.updateWindowLevel();
+    if (slider === 'sliderW') {
+      this.settings.token = false;
+      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueW;
+      this._axialRenderer.stackHelper.slice._stack._windowWidth = valueW;
+      this._coronalRenderer.stackHelper.slice._stack._windowWidth = valueW;
+      this._sagittalRenderer.stackHelper.slice._stack._windowWidth = valueW;
+      this.updateWindowLevel();
+
+      (window as any).slider.setValueW(valueW);
+
+    } else if (slider === 'sliderC') {
+      this.settings.token = false;
+      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueC;
+      this._axialRenderer.stackHelper.slice._stack._windowCenter = valueC;
+      this._coronalRenderer.stackHelper.slice._stack._windowCenter = valueC;
+      this._sagittalRenderer.stackHelper.slice._stack._windowCenter = valueC;
+      this.updateWindowLevel();
+
+      (window as any).slider.setValueC(valueC);
+
+    }
+
   }
 
-  setWindowLevelC(value) {
-    this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = value;
-    this._axialRenderer.stackHelper.slice._stack._windowCenter = value;
-    this._coronalRenderer.stackHelper.slice._stack._windowCenter = value;
-    this._sagittalRenderer.stackHelper.slice._stack._windowCenter = value;
-
-    this.updateWindowLevel();
-  }
 
   updateWindowLevel() {
     this._axialRenderer.stackHelper.index = this._axialRenderer.stackHelper.index;
@@ -441,55 +447,46 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     renderer.stackHelper.index = newIndex;
   }
 
-    changeSliceRemove(sliceOrientation: VIEWS, oldIndex: number) {
-      if (sliceOrientation === 'axial') {
-        this._axialRenderer.removeFromSliceChange(oldIndex);
-      }
-      else if (sliceOrientation === 'coronal' ) {
-        this._coronalRenderer.removeFromSliceChange(oldIndex);
-      }
-      else if (sliceOrientation === 'sagittal' ) {
-        this._sagittalRenderer.removeFromSliceChange(oldIndex);
-      }
+  changeSliceRemove(sliceOrientation: VIEWS, oldIndex: number) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.removeFromSliceChange(oldIndex, sliceOrientation);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.removeFromSliceChange(oldIndex, sliceOrientation);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.removeFromSliceChange(oldIndex, sliceOrientation);
     }
-  
-    changeSliceRender(sliceOrientation: VIEWS, newIndex: number) {
-      if (sliceOrientation === 'axial') {
-        this._axialRenderer.renderFromSliceChange(newIndex);
-      }
-      else if (sliceOrientation === 'coronal' ) {
-        this._coronalRenderer.renderFromSliceChange(newIndex);
-      }
-      else if (sliceOrientation === 'sagittal' ) {
-        this._sagittalRenderer.renderFromSliceChange(newIndex);
-      } 
+  }
+
+  changeSliceRender(sliceOrientation: VIEWS, newIndex: number) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.renderFromSliceChange(newIndex, sliceOrientation);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.renderFromSliceChange(newIndex, sliceOrientation);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.renderFromSliceChange(newIndex, sliceOrientation);
     }
-  
-    removeArtifact(view: VIEWS, artifact: Artifact) {
-        if (view === 'axial') {
-          this._axialRenderer.removeArtifact(artifact);
-        }
-        else if (view === 'coronal') {
-          this._coronalRenderer.removeArtifact(artifact);
-        }
-        else if (view === 'sagittal') {
-          this._sagittalRenderer.removeArtifact(artifact);
-        
-      }
+  }
+
+  removeArtifact(sliceOrientation: VIEWS, artifact: Artifact) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.removeArtifact(artifact);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.removeArtifact(artifact);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.removeArtifact(artifact);
     }
-  
-    renderArtifact(view: VIEWS, artifact: Artifact) {
-        if (view === 'axial') {
-          this._axialRenderer.addArtifact(artifact);
-        }
-        else if (view === 'coronal') {
-          this._coronalRenderer.addArtifact(artifact);
-        }
-        else if (view === 'sagittal') {
-          this._sagittalRenderer.addArtifact(artifact);
-      }
+  }
+
+  renderArtifact(sliceOrientation: VIEWS, artifact: Artifact) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.addArtifact(artifact);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.addArtifact(artifact);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.addArtifact(artifact);
     }
-  
+  }
+
 
   setPerspectiveCameraZoom(args: IOrientation, transitionTime: number) {
     this._perspectiveRenderer.setCameraOrientation(args, transitionTime);

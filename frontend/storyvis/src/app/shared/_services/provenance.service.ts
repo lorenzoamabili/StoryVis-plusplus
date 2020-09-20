@@ -39,9 +39,7 @@ export class ProvenanceService {
   public userService: UserService;
 
   public async saveGraph(IDcreator: Number) {
-    // this.tracker.getGraph().nodes.filter((x) => x.artifacts[0].type == 'annotation').forEach((x) => x.artifacts[0].elmAttributes[2] = );
     const sJson = JSON.stringify(this.tracker.getGraph());
-    console.log(sJson);
     this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
       {
         serializedGraph: sJson,

@@ -17,21 +17,22 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
     canvas.setSagittalZoom({ position, direction }, transitionTime),
   setCoronalZoom: async (position, direction, transitionTime) =>
     canvas.setCoronalZoom({ position, direction }, transitionTime),
-  setSliceIndex: async (sliceOrientation, newIndex, oldIndexArt, newIndexArt) => 
-  { 
-    canvas.changeSliceRemove(sliceOrientation, oldIndexArt);
+  setSliceIndex: async (sliceOrientation, newIndex, oldIndex) => {
+    canvas.changeSliceRemove(sliceOrientation, oldIndex);
     canvas.setSliceIndex(sliceOrientation, newIndex);
-    canvas.changeSliceRender(sliceOrientation, newIndexArt);
+    canvas.changeSliceRender(sliceOrientation, newIndex);
   },
-  setWindowLevelC: async (value) => {
-    canvas.setWindowLevelC(value)
-    },
-  setWindowLevelW: async (value) => { 
-    canvas.setWindowLevelW(value)
+  removeArtifact: async (view, artifact) => {
+    canvas.removeArtifact(view, artifact);
   },
-
+  renderArtifact: async (view, artifact) => {
+    canvas.renderArtifact(view, artifact);
+  },
+  setWindowLevel: async (valueW, valueC, slider) => {
+    canvas.setWindowLevel(valueW, valueC, slider)
+  },
   setPerspectiveCameraZoomLevel: async (args, transitionTime) => canvas.setPerspectiveCameraZoom(args, transitionTime),
-  setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime),
+  setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime)
 
   // createRuler: async (view, { p0, p1 }: IPointPair) => {
   //   const renderer = canvas.getRenderer(view);
@@ -46,12 +47,7 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
   //   }
   // },
 
-  removeArtifact: async (view, artifact) => {
-      canvas.removeArtifact(view, artifact);
-  },
-  renderArtifact: async (view, artifact) => {
-    canvas.renderArtifact(view, artifact);
-}
+
 });
 
 export const registerActions = (registry: ActionFunctionRegistry, canvas: BrainvisCanvasComponent) => {

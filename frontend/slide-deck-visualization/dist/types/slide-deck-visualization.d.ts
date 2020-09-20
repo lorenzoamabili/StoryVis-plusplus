@@ -24,7 +24,6 @@ export declare class SlideDeckVisualization {
     private _currentlyPlaying;
     private _timelineShift;
     private _timeIndexedSlides;
-    private _currentlyPlayingSlide;
     private _gridTimeStep;
     private _gridSnap;
     private _playingID;

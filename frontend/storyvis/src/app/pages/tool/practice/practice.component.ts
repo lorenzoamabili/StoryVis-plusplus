@@ -10,7 +10,7 @@ export class PracticeComponent implements OnInit {
     title = 'practice';
 
     currentUser: User;
-    practiceSession: boolean = true;
+    studyStarted: boolean = false;
     IDcreator: number;
 
     constructor(

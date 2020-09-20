@@ -1,5 +1,5 @@
 import { select, event, selectAll, drag, scaleSequential, interpolatePuBu } from 'd3';
-// import fs from 'fs';
+import fs from 'fs';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -19728,7 +19728,7 @@ class SlideDeckVisualization {
         this._currentlyPlaying = false;
         this._timelineShift = 0;
         this._timeIndexedSlides = [];
-        this._currentlyPlayingSlide = null;
+        // private _currentlyPlayingSlide: IProvenanceSlide | null = null;
         this._gridTimeStep = 1000;
         this._gridSnap = false;
         this._playingID = -1;
@@ -19775,7 +19775,7 @@ class SlideDeckVisualization {
             else {
                 nodeSlide = node;
             }
-            const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, []);
+            const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, [], nodeSlide);
             slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
             slideDeck.addSlide(slide, slideDeck.slides.length);
             // node.metadata.isSlideAdded = true;
@@ -19784,7 +19784,7 @@ class SlideDeckVisualization {
         };
         this.onClone = (slide) => {
             let slideDeck = this._slideDeck;
-            const cloneSlide = new ProvenanceSlide(slide.name, 5000, 0, 0, []);
+            const cloneSlide = new ProvenanceSlide(slide.name, 5000, 0, 0, [], slide.node);
             cloneSlide.mainAnnotation = slide.mainAnnotation;
             slideDeck.addSlide(cloneSlide, slideDeck.selectedSlide
                 ? slideDeck.slides.indexOf(slideDeck.selectedSlide) + 1
@@ -20059,7 +20059,7 @@ class SlideDeckVisualization {
         window.addEventListener("resize", this.resizeTable);
         this._slideDeck = slideDeck;
         this._root = select(elm);
-        const that = this;
+        window.slideDeck = this;
         this._slideTable = this._root
             .append("svg")
             .attr("class", "slide__table")
@@ -20172,14 +20172,7 @@ class SlideDeckVisualization {
             .attr("height", 20)
             .append("xhtml:body")
             .html('<i class="fa fa-play"></i>')
-            .on("click", function () {
-            if (document.getElementsByClassName("i.fa.fa-play")) {
-                that.onPlay();
-            }
-            else {
-                that.onPause();
-            }
-        });
+            .on("click", document.getElementsByClassName("i.fa.fa-play") ? this.onPlay : this.onPause);
         this._slideTable
             .append("svg:foreignObject")
             .attr("class", "player_forward")
@@ -20285,7 +20278,7 @@ class SlideDeckVisualization {
                 let currentSlide = this._slideDeck.slideAtTime(this._currentTime);
                 if (currentSlide !== this._slideDeck.selectedSlide) {
                     this.selectSlide(currentSlide);
-                    this._currentlyPlayingSlide = currentSlide;
+                    // this._currentlyPlayingSlide = currentSlide;
                 }
             }
             this.update();
@@ -20498,14 +20491,6 @@ class SlideDeckVisualization {
             nodeCreationOrders.push(slide.nodeCreationOrder);
             var col = scaleSequential(interpolatePuBu)
                 .domain([0, Math.max(...nodeCreationOrders)])(slide.nodeCreationOrder).toString();
-            if (slide.node) {
-                if (slide.node.metadata.bgColor) {
-                    col = slide.node.metadata.bgColor;
-                }
-                else {
-                    slide.node.metadata.bgColor = col;
-                }
-            }
             return col;
         })
             .attr("selected", (slide) => {
@@ -20530,14 +20515,14 @@ class SlideDeckVisualization {
             return this.barDurationWidth(slide) - 5;
         });
         toolbar = allNodes.select("g.slide_toolbar");
-        // toolbar
-        //     .select("foreignObject.slides_delete_icon")
-        //     .attr("y", (slide: IProvenanceSlide) => {
-        //         return this._toolbarY;
-        //     })
-        //     .attr("x", (slide: IProvenanceSlide) => {
-        //         return this._toolbarX + this.barTransitionTimeWidth(slide) - 3;
-        //     });
+        toolbar
+            .select("foreignObject.slides_delete_icon")
+            .attr("y", (slide) => {
+            return this._toolbarY;
+        })
+            .attr("x", (slide) => {
+            return this._toolbarX + this.barTransitionTimeWidth(slide) - 3;
+        });
         toolbar
             .select("foreignObject.slides_clone_icon")
             .attr("y", (slide) => {

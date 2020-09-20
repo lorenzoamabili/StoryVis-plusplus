@@ -64,7 +64,7 @@ export interface Artifact {
   id: number;
   measurementType: string;
   sliceIndex: number;
-  viewName: string; 
+  sliceOrientation: string; 
   elements: HTMLElement[] | null;
   elmHTML: any[] | null;
   metadata: any[] | null;

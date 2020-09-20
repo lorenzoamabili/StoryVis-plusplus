@@ -144,8 +144,9 @@ app-provenance-visualization {
 }
 .container {
   display: flex;
-  flex: 1;
+  flex: 0;
   background-color: snow;
+  bottom: 10px;
 }
 #aggregationControls {
   flex: 1;
@@ -163,7 +164,7 @@ app-provenance-visualization {
 /*Legend CSS*/
 
 .legend {
-  flex: 1;
+  flex: 0;
   box-shadow: 0px 0px 4px #888;
   margin: 5px;
   height: 160px;

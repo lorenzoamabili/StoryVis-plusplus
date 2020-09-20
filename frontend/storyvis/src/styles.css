@@ -10,13 +10,13 @@ html, body {
   overflow-x: hidden;
   overflow-y: hidden;
   font-family: Times;
-  font-size: larger;
 }
 
 #app {
   display: flex;
   flex: 1;
   flex-direction: column;
+  font-size: larger;
 }
 
 div{
@@ -27,6 +27,7 @@ div.cont {
   display: flex;
   flex: 1;
   flex-direction: column;
+  padding-bottom: 1px;
 }
 
 

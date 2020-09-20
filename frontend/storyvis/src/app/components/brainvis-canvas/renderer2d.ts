@@ -23,7 +23,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   private _measurement: Ruler | Angle | Freehand | Voxelprobe | Annotation | null;
 
-  public _artifactsOnMasterBranch: Artifact[] = []; // measurements/artifacts created in the current branch
+  // measurements/artifacts created in the current branch
+  // not strictly necessary for each view. However, they can be used for an extension of the code.
+  public _artifacts: Artifact[] = [];
+  public _artifactsAxial: Artifact[] = [];
+  public _artifactsSagittal: Artifact[] = [];
+  public _artifactsCoronal: Artifact[] = [];
+
   public _oldMeasurements: Artifact[] = [];
   public _newMeasurements: Artifact[] = [];
 
@@ -350,20 +356,41 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
 
-  removeFromSliceChange(oldIndex) {
-    if (this._artifactsOnMasterBranch.find((x) => x.sliceIndex == oldIndex)) {
-      this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == oldIndex).forEach((x) => this.removeElms(x));
+  removeFromSliceChange(oldIndex, sliceOrientation) {
+    if (sliceOrientation === 'axial') {
+      if (this._artifactsAxial.find((x) => x.sliceIndex === oldIndex)) {
+        this._artifactsAxial.filter((x) => x.sliceIndex === oldIndex).forEach((x) => this.removeElms(x));
+      }
+    } else if (sliceOrientation === 'coronal') {
+      if (this._artifactsCoronal.find((x) => x.sliceIndex === oldIndex)) {
+        this._artifactsCoronal.filter((x) => x.sliceIndex === oldIndex).forEach((x) => this.removeElms(x));
+      }
+    } else if (sliceOrientation === 'sagittal') {
+      if (this._artifactsSagittal.find((x) => x.sliceIndex === oldIndex)) {
+        this._artifactsSagittal.filter((x) => x.sliceIndex === oldIndex).forEach((x) => this.removeElms(x));
+      }
     }
-    // if (!this._canvas.provenance.graphLoaded && this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == oldIndex).filter((x) => x.measurementType == 'freehand')) {
+
+    // if (!this._canvas.provenance.graphLoaded && this._artifacts.filter((x) => x.sliceIndex === oldIndex).filter((x) => x.measurementType === 'freehand')) {
     //   (this._measurement as Freehand).widget.hide(); //id  push  in  window as any  store and retrieve t
     // }
   }
 
-  renderFromSliceChange(newIndex) {
-    if (this._artifactsOnMasterBranch.find((x) => x.sliceIndex == newIndex)) {
-      this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == newIndex).forEach((x) => this.renderElms(x));
+  renderFromSliceChange(newIndex, sliceOrientation) {
+    if (sliceOrientation === 'axial') {
+      if (this._artifactsAxial.find((x) => x.sliceIndex === newIndex)) {
+        this._artifactsAxial.filter((x) => x.sliceIndex === newIndex).forEach((x) => this.renderElms(x));
+      }
+    } else if (sliceOrientation === 'coronal') {
+      if (this._artifactsCoronal.find((x) => x.sliceIndex === newIndex)) {
+        this._artifactsCoronal.filter((x) => x.sliceIndex === newIndex).forEach((x) => this.renderElms(x));
+      }
+    } else if (sliceOrientation === 'sagittal') {
+      if (this._artifactsSagittal.find((x) => x.sliceIndex === newIndex)) {
+        this._artifactsSagittal.filter((x) => x.sliceIndex === newIndex).forEach((x) => this.renderElms(x));
+      }
     }
-    // if (!this._canvas.provenance.graphLoaded && this._artifactsOnMasterBranch.filter((x) => x.sliceIndex == newIndex).filter((x) => x.measurementType == 'freehand')) {
+    // if (!this._canvas.provenance.graphLoaded && this._artifacts.filter((x) => x.sliceIndex === newIndex).filter((x) => x.measurementType === 'freehand')) {
     //   (this._measurement as Freehand).widget.show();
     // }
   }
@@ -375,12 +402,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // } else 
     if (this._canvas.provenance.graphLoaded) {
       this.renderRestoredElms(artifact);
-    } else if (!this._artifactInit && !this._canvas.provenance.graphLoaded) {
+    } else if (this._artifactInit && !this._canvas.provenance.graphLoaded) {
       for (let i = 0; i < artifact.elements.length; i++) {
         this._domElement.appendChild(artifact.elements[i]);
       }
-    } else {
-      this._artifactInit = false;
     }
   }
 
@@ -389,57 +414,75 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // if (artifact.measurementType === 'freehand') {
     //   (this._measurement as Freehand).widget.hide();
     // } else {
-      if (this._canvas.provenance.graphLoaded) {
-        this.removeRestoredElms(artifact);
-      } else {
+    if (this._canvas.provenance.graphLoaded) {
+      this.removeRestoredElms(artifact);
+    } else {
         for (let i = 0; i < artifact.elements.length; i++) {
           if (artifact.elements[i].parentNode) {
             this._domElement.removeChild(artifact.elements[i]);
           }
         }
-      }
+      // }
+
     }
+  }
   // }
 
 
   addArtifact = (artifact: Artifact) => {
     this.renderElms(artifact);
-    this._artifactsOnMasterBranch.push(artifact);
+    this._artifacts.push(artifact);
+
+    if (artifact.sliceOrientation === 'axial') {
+      this._artifactsAxial.push(artifact);
+    } else if (artifact.sliceOrientation === 'coronal') {
+      this._artifactsCoronal.push(artifact);
+    } else if (artifact.sliceOrientation === 'sagittal') {
+      this._artifactsSagittal.push(artifact);
+    }
   };
 
   removeArtifact = (artifact: Artifact) => {
     this.removeElms(artifact);
-    this._artifactsOnMasterBranch = this._artifactsOnMasterBranch.filter((x) => x.id !== artifact.id);
+    this._artifacts = this._artifacts.filter((x) => x.id !== artifact.id);
+
+    if (artifact.sliceOrientation === 'axial') {
+      this._artifactsAxial = this._artifactsAxial.filter((x) => x.id !== artifact.id);
+    } else if (artifact.sliceOrientation === 'coronal') {
+      this._artifactsCoronal = this._artifactsCoronal.filter((x) => x.id !== artifact.id);
+    } else if (artifact.sliceOrientation === 'sagittal') {
+      this._artifactsSagittal = this._artifactsSagittal.filter((x) => x.id !== artifact.id);
+    }
   };
 
 
 
   renderRestoredElms(artifact: Artifact) {
-      if (artifact.measurementType === 'ruler') {
-        const ruler = new Ruler(this);
-        ruler.widget._handles[0].worldPosition = artifact.metadata[0];
-        ruler.widget._handles[1].worldPosition = artifact.metadata[1];
-        ruler.simulateRuler(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+    if (artifact.measurementType === 'ruler') {
+      const ruler = new Ruler(this);
+      ruler.widget._handles[0].worldPosition = artifact.metadata[0];
+      ruler.widget._handles[1].worldPosition = artifact.metadata[1];
+      ruler.simulateRuler(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
 
-      } else if (artifact.measurementType === 'angle') {
-        const angle = new Angle(this);
-        angle.widget._handles[0].worldPosition = artifact.metadata[0];
-        angle.widget._handles[1].worldPosition = artifact.metadata[1];
-        angle.simulateAngle(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
-        angle.widget._handles[2].worldPosition = artifact.metadata[2];
-        angle.simulateAngle(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+    } else if (artifact.measurementType === 'angle') {
+      const angle = new Angle(this);
+      angle.widget._handles[0].worldPosition = artifact.metadata[0];
+      angle.widget._handles[1].worldPosition = artifact.metadata[1];
+      angle.simulateAngle(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+      angle.widget._handles[2].worldPosition = artifact.metadata[2];
+      angle.simulateAngle(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
 
-      } else if (artifact.measurementType === 'voxelprobe') {
-        const voxelprobe = new Voxelprobe(this);
-        voxelprobe.widget.children[0].worldPosition = artifact.metadata[0];
-        voxelprobe.simulateVoxelprobe(this.mouseDownEvent, this.mouseUpEvent);
+    } else if (artifact.measurementType === 'voxelprobe') {
+      const voxelprobe = new Voxelprobe(this);
+      voxelprobe.widget.children[0].worldPosition = artifact.metadata[0];
+      voxelprobe.simulateVoxelprobe(this.mouseDownEvent, this.mouseUpEvent);
 
-      } else if (artifact.measurementType === 'annotation') {
-        const annotation = new Annotation(this);
-        annotation.widget.children[0].worldPosition = artifact.metadata[0];
-        annotation.widget.children[1].worldPosition = artifact.metadata[1];
-        annotation.simulateAnnotation(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
-        document.getElementById('textBox ' + this.annotationCounter).innerText = artifact.metadata[2];
+    } else if (artifact.measurementType === 'annotation') {
+      const annotation = new Annotation(this);
+      annotation.widget.children[0].worldPosition = artifact.metadata[0];
+      annotation.widget.children[1].worldPosition = artifact.metadata[1];
+      annotation.simulateAnnotation(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
+      document.getElementById('textBox ' + this.annotationCounter).innerText = artifact.metadata[2];
 
       // } else if (artifact.measurementType === 'freehand') {
       //   const freehand = new Freehand(this);
@@ -447,7 +490,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       //     freehand.widget._handles[i].worldPosition = artifact.metadata[i];
       //     // freehand.simulateFreehand(this.mouseDownEvent, this.mouseMoveEvent, this.mouseUpEvent);
       //   }
-      }
+    }
   }
 
   removeRestoredElms(artifact: Artifact) {
@@ -475,7 +518,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       id: this._artifactID,
       measurementType: "ruler",
       sliceIndex: this._stackHelper.index,
-      viewName: this._domID,
+      sliceOrientation: this._sliceOrientation,
       elements: [
         measurement.widget._line,
         measurement.widget._label,
@@ -493,10 +536,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         measurement.widget._handles[1].worldPosition
       ]
     };
-    this._artifactInit = true;
     this.addArtifact(measurement.artifact);
     this.artifactCreated.emit(measurement.artifact);
     this._canvas.settings.rulerMode = false;
+    this._artifactInit = true;
   }
 
 
@@ -514,7 +557,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       id: this._artifactID,
       measurementType: "angle",
       sliceIndex: this._stackHelper.index,
-      viewName: this._domID,
+      sliceOrientation: this._sliceOrientation,
       elements: [
         measurement.widget._line,
         measurement.widget._label,
@@ -537,10 +580,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         measurement.widget._handles[2].worldPosition
       ]
     };
-    this._artifactInit = true;
     this.addArtifact(measurement.artifact);
     this.artifactCreated.emit(measurement.artifact);
     this._canvas.settings.angleMode = false;
+    this._artifactInit = true;
   }
 
 
@@ -600,7 +643,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       id: this._artifactID,
       measurementType: "voxelprobe",
       sliceIndex: this._stackHelper.index,
-      viewName: this._domID,
+      sliceOrientation: this._sliceOrientation,
       elements: [
         measurement.widget._label,
         measurement.widget.children[0]._dom
@@ -613,10 +656,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         measurement.widget.children[0].worldPosition
       ]
     };
-    this._artifactInit = true;
     this.addArtifact(measurement.artifact);
     this.artifactCreated.emit(measurement.artifact);
     this._canvas.settings.voxelprobeMode = false;
+    this._artifactInit = true;
   }
 
 
@@ -647,7 +690,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       id: this._artifactID,
       measurementType: "annotation",
       sliceIndex: this._stackHelper.index,
-      viewName: this._domID,
+      sliceOrientation: this._sliceOrientation,
       elements: elems.filter((x) => x instanceof HTMLElement),
       elmHTML: [
         handles[0].outerHTML,
@@ -658,12 +701,12 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       metadata: [
         handles[0].worldPosition,
         handles[1].worldPosition
-            ]
+      ]
     };
-    this._artifactInit = true;
     this.addArtifact(measurement.artifact);
     this.annotationCreated.emit(measurement.artifact);
     this._canvas.settings.annotationMode = false;
+    this._artifactInit = true;
   }
 
 

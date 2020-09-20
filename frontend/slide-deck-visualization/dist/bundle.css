@@ -96,7 +96,7 @@ rect.add_annotation {
     overflow: hidden;
     width: 30%;
     height: 70%;
-    font-size: 12px;
+    font-size: 16px;
     border-radius: 5px;
   }
 
@@ -104,6 +104,8 @@ rect.add_annotation {
       position: absolute;
       bottom: 5%;
       right: 1%;
+      border-radius: 5px;
+      border-width: 1px;
   }
 
   .slides_background_rect {
