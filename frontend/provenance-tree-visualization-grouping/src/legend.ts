@@ -1,11 +1,5 @@
-import * as d3 from 'd3';
 const legendData = {
   legends: [
-    // {
-    //   name: 'Provenance Node',
-    //   color: '#fff',
-    //   shape: 'circle'
-    // },
     {
       name: 'bookmark',
       color: '#fff',
@@ -48,10 +42,28 @@ const legendData = {
       shape: 'circle',
       opacity: 0.3
     }
+  ],
+  commands: [
+    'HOW TO PERFORM SOME INTERACTIONS:',
+    '- RIGHT CLICK+MOUSE MOVE on imaging data = To zoom the imaging data',
+    '- SHIFT+CLICK on imaging data = To magnify a view', 
+    '- ALT+RIGHT CLICK on measurements = To delete a measurement',
+    '- RIGHT CLICK on graph nodes = To bookmark a node',
+    '- SCROLL on graph = To zoom the graph',
+    '- SCROLL on storyline = To scale the graph',
+    '- SCROLL+SHIFT on storyline = To slide the graph'
+  ],
+  instructions: [
+    'TASKS TO BE PERFORMED:',
+    '- TASK 1 = Explore the imaging data to find all nodules/anomalies in it.',
+    '- TASK 2 = Measure the diameter of all the nodules/anomalies found in the imaging data.', 
+    '- TASK 3 = Create annotations and/or make additional measurements on the nodules/anomalies found in the imaging data.',
+    '- TASK 4 = Create a report to communicate your findings to collaborators.'
   ]
 };
+
 export function addLegend(elm: any) {
-  const legendContainer = elm.append('div').attr('class', 'legend');
+  const legendContainer = elm.append('div').attr('class', 'legend').attr('id', 'legendContainer').attr('style', 'display: none;');
   const legendList = legendContainer.append('ul');
   const listItem = legendList
     .selectAll('li')
@@ -60,10 +72,51 @@ export function addLegend(elm: any) {
     .append('li');
   listItem
     .append('div')
-    // .attr('class', (d: any) => (d.shape === 'circle' ? 'circle' : 'rect'))
-    .attr('class', (d: any) => (d.name === 'bookmark' ? 'bookmark' : 'circle'))
+    .attr('class', (d: any) => {
+      if (d.name === 'bookmark') {
+        return 'bookmark';
+      } else if (d.name === 'story') {
+        return 'story';
+      } else if (d.name === 'loaded') {
+        return 'loaded';
+      } else {
+        return 'circle';
+      }
+    })
     .attr('style', (d: any) => `background-color:${d.color}`);
   listItem.append('span').text((d: any) => {
     return d.name;
   });
 }
+
+export function addCommandsList(elm: any) {
+  const commandsContainer = elm.append('div').attr('class', 'legend')
+    .attr('id', 'commandsContainer').attr('style', 'display: none;');
+  const commandsList = commandsContainer.append('ul');
+  const commandsListItem = commandsList
+    .selectAll('li')
+    .data(legendData.commands)
+    .enter()
+    .append('li');
+  commandsListItem
+    .append('div')
+
+  commandsListItem.append('span').text((d: any) => {
+    return d;
+  });
+}
+  export function addInstructionsList(elm: any) {
+    const instructionsContainer = elm.append('div').attr('class', 'legend')
+      .attr('id', 'instructionsContainer').attr('style', 'margin-bottom: 50px; display: none;');
+    const instructionsList = instructionsContainer.append('ul');
+    const instructionsListItem = instructionsList
+      .selectAll('li')
+      .data(legendData.instructions)
+      .enter()
+      .append('li');
+      instructionsListItem
+      .append('div')
+    instructionsListItem.append('span').text((d: any) => {
+      return d;
+    });
+  }

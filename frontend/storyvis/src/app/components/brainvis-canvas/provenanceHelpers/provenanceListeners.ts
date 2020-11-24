@@ -1,13 +1,13 @@
 import { ProvenanceTracker, Action } from '@visualstorytelling/provenance-core';
-import { debounce } from 'lodash';
-import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
+import { debounce } from 'lodash-es';
 import { Renderer2D } from '../renderer2d';
 import { registerActions } from './provenanceActions';
-import { Settings } from '../utils/settings';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
+import { Settings } from '../utils/settings';
 
-export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
-
+export const addListeners = (tracker: ProvenanceTracker) => {
+  let settings = Settings.getInstance(this);
+  let canvas = settings.canvas;
 
   // Naive way to reset the canvas after restoring a provenance graph 
   let elem = document.createElement('button');
@@ -18,80 +18,9 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   function resetCanvas(e: Event) {
     registerActions(canvas.provenance.registry, canvas);
-    addListeners(canvas.provenance.tracker, canvas);
+    addListeners(canvas.provenance.tracker);
     canvas.addEventListeners();
   }
-
-  canvas.addEventListener('sliceOrientationChanged', (event: any) => {
-    const { position, direction, oldPosition, oldDirection } = event.changes;
-    tracker.applyAction({
-      metadata: { userIntent: 'exploration' },
-      do: 'setSlicePlaneOrientation',
-      doArguments: { args: [position, direction] },
-      undo: 'setSlicePlaneOrientation',
-      undoArguments: { args: [oldPosition, oldDirection] }
-    });
-  });
-
-  canvas.addEventListener('sliceZoomChanged', (event: any) => {
-    const { position, direction, oldPosition, oldDirection } = event.changes;
-    tracker.applyAction({
-      metadata: { userIntent: 'exploration' },
-      do: 'setSlicePlaneZoom',
-      doArguments: { args: [position, direction] },
-      undo: 'setSlicePlaneZoom',
-      undoArguments: { args: [oldPosition, oldDirection] }
-    }, true);
-  });
-
-
-  canvas.addEventListener('AxialZoomChanged', (event: any) => {
-    const { position, direction, oldPosition, oldDirection } = event.changes;
-    tracker.applyAction({
-      metadata: { userIntent: 'exploration' },
-      do: 'setAxialZoom',
-      doArguments: { args: [position, direction] },
-      undo: 'setAxialZoom',
-      undoArguments: { args: [oldPosition, oldDirection] }
-    }, true);
-  });
-
-
-  canvas.addEventListener('SagittalZoomChanged', (event: any) => {
-    const { position, direction, oldPosition, oldDirection } = event.changes;
-    tracker.applyAction({
-      metadata: { userIntent: 'exploration' },
-      do: 'setSagittalZoom',
-      doArguments: { args: [position, direction] },
-      undo: 'setSagittalZoom',
-      undoArguments: { args: [oldPosition, oldDirection] }
-    }, true);
-  });
-
-
-  canvas.addEventListener('CoronalZoomChanged', (event: any) => {
-    const { position, direction, oldPosition, oldDirection } = event.changes;
-    tracker.applyAction({
-      metadata: { userIntent: 'exploration' },
-      do: 'setCoronalZoom',
-      doArguments: { args: [position, direction] },
-      undo: 'setCoronalZoom',
-      undoArguments: { args: [oldPosition, oldDirection] }
-    }, true);
-  });
-
-
-  // canvas.settings.alignModeChange.subscribe(val => {
-  //   tracker.applyAction({
-  //     metadata: {userIntent: 'configuration'},
-  //     do: 'alignMode',
-  //     doArguments: [val],
-  //     undo: 'alignMode',
-  //     undoArguments: [!val],
-  //   }, true);
-  // });
-
-
 
   // Slice Index Listener for all orientations - Debounced
   let sliceIndexEndListener: EventListener = null;
@@ -171,9 +100,9 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
           userIntent: 'exploration',
           label: label
         },
-        do: 'setPerspectiveCameraOrientation',
+        do: 'setPerspectiveCameraZoomLevel',
         doArguments: { args: [event.orientation] },
-        undo: 'setPerspectiveCameraOrientation',
+        undo: 'setPerspectiveCameraZoomLevel',
         undoArguments: { args: [startEvent.orientation] }
       }, true);
     }, 500, { trailing: true });
@@ -182,26 +111,93 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   canvas.addEventListener('perspectiveCameraOrientationChangeStart', debounce(perspectiveOrientationStartListener, 500, { leading: true }));
 
 
-  // renderer.rulerRemoved.subscribe((args) => {
-  //   const action = {
-  //     metadata: {
-  //       userIntent: 'measurement',
-  //       label: 'delete ruler'
-  //     },
-  //     do: 'deleteRuler',
-  //     doArguments: [renderer.sliceOrientation],
-  //     undo: 'createRuler',
-  //     undoArguments: [renderer.sliceOrientation, args],
-  //   };
-  //   tracker.applyAction(action, true);
-  // });
+  // Slice Index Listener for all orientations - Debounced
+  let sliceDragEndListener: EventListener = null;
+  const sliceDragStartListener = (startEvent) => {
+    canvas.removeEventListener('sliceDragChanged', sliceDragEndListener);
+    sliceDragEndListener = debounce((event: any) => {
+      let label = '';
+      switch (startEvent.changes.sliceOrientation) {
+        case 'axial':
+          label = 'A #';
+          label += ' ' + event.changes.newSlicePosition.position[0].toFixed(0);
+          label += '/' + event.changes.newSlicePosition.position[1].toFixed(0);
+          label += '/' + event.changes.newSlicePosition.position[2].toFixed(0);
+          break;
+        case 'coronal':
+          label = 'C #';
+          label += ' ' + event.changes.newSlicePosition.position[0].toFixed(0);
+          label += '/' + event.changes.newSlicePosition.position[1].toFixed(0);
+          label += '/' + event.changes.newSlicePosition.position[2].toFixed(0);
+          break;
+        case 'sagittal':
+          label = 'S #';
+          label += ' ' + event.changes.newSlicePosition.position[0].toFixed(0);
+          label += '/' + event.changes.newSlicePosition.position[1].toFixed(0);
+          label += '/' + event.changes.newSlicePosition.position[2].toFixed(0);
+          break;
+        default:
+          label = 'strange index?';
+      }
+      tracker.applyAction({
+        metadata: {
+          userIntent: 'exploration',
+          label: label
+        },
+        do: 'setSliceDrag',
+        doArguments: { args: [event.changes.newSlicePosition, startEvent.changes.sliceOrientation] },
+        undo: 'setSliceDrag',
+        undoArguments: { args: [startEvent.changes.oldSlicePosition, startEvent.changes.sliceOrientation] }
+      }, true);
+    }, 500, { trailing: true });
+    canvas.addEventListener('sliceDragChanged', sliceDragEndListener);
+  };
+  canvas.addEventListener('sliceDragChangeStart', debounce(sliceDragStartListener, 500, { leading: true }));
+
+
+  // Slice Index Listener for all orientations - Debounced
+  let sliceZoomEndListener: EventListener = null;
+  const sliceZoomStartListener = (startEvent) => {
+    canvas.removeEventListener('sliceZoomChanged', sliceZoomEndListener);
+    sliceZoomEndListener = debounce((event: any) => {
+      let label = '';
+      switch (startEvent.changes.sliceOrientation) {
+        case 'axial':
+          label = 'A-zoom';
+          label += ' ' + event.changes.newZoom.toFixed(2);
+          break;
+        case 'coronal':
+          label = 'C-zoom';
+          label += ' ' + event.changes.newZoom.toFixed(2);
+          break;
+        case 'sagittal':
+          label = 'S-zoom';
+          label += ' ' + event.changes.newZoom.toFixed(2);
+          break;
+        default:
+          label = 'strange index?';
+      }
+      tracker.applyAction({
+        metadata: {
+          userIntent: 'exploration',
+          label: label
+        },
+        do: 'setSliceZoom',
+        doArguments: { args: [event.changes.newZoom, startEvent.changes.sliceOrientation] },
+        undo: 'setSliceZoom',
+        undoArguments: { args: [startEvent.changes.oldZoom, startEvent.changes.sliceOrientation] }
+      }, true);
+    }, 500, { trailing: true });
+    canvas.addEventListener('sliceZoomChanged', sliceZoomEndListener);
+  };
+  canvas.addEventListener('sliceZoomChangeStart', debounce(sliceZoomStartListener, 500, { leading: true }));
 
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
       renderer.artifactCreated.subscribe((artifact: Artifact) => {
         const action = {
           metadata: {
-            userIntent: 'derivation',
+            userIntent: artifact.measurementType === 'annotation' ? 'annotation' : 'derivation',
             label: artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndex
           },
           do: 'renderArtifact',
@@ -214,17 +210,18 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }
   });
 
+
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
-      renderer.annotationCreated.subscribe((artifact: Artifact) => {
+      renderer.artifactDeleted.subscribe((artifact: Artifact) => {
         const action = {
           metadata: {
-            userIntent: 'annotation',
-            label: artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndex
+            userIntent: artifact.measurementType === 'annotation' ? 'annotation' : 'derivation',
+            label: artifact.measurementType + ' - deleted'
           },
-          do: 'renderArtifact',
+          do: 'deleteArtifact',
           doArguments: { args: [renderer.sliceOrientation, artifact] },
-          undo: 'removeArtifact',
+          undo: 'renderArtifact',
           undoArguments: { args: [renderer.sliceOrientation, artifact] }
         };
         tracker.applyAction(action, true);
@@ -285,4 +282,37 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   };
   canvas.addEventListener('thresholdValueChangeStartW', debounce(wLChangeListenerW, 500, { leading: true }));
 
+
+
+  canvas.renderers.forEach(renderer => {
+    renderer.magnificationCreated.subscribe((domID: any) => {
+      const action = {
+        metadata: {
+          userIntent: 'configuration',
+          label: 'oneView' + ' - ' + (domID ? domID : '3D view')
+        },
+        do: 'magnifyView',
+        doArguments: { args: [domID] },
+        undo: 'reduceView',
+        undoArguments: { args: [domID] }
+      };
+      tracker.applyAction(action, true);
+    })
+  });
+
+  canvas.renderers.forEach(renderer => {
+    renderer.reductionCreated.subscribe((domID: any) => {
+      const action = {
+        metadata: {
+          userIntent: 'configuration',
+          label: '4Views'
+        },
+        do: 'reduceView',
+        doArguments: { args: [domID] },
+        undo: 'magnifyView',
+        undoArguments: { args: [domID] }
+      };
+      tracker.applyAction(action, true);
+    })
+  });
 }

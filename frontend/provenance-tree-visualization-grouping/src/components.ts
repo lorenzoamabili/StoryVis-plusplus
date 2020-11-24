@@ -1,16 +1,6 @@
 import * as d3 from 'd3';
-import {
-  aggregationObjects,
-  aggregationObjectsUI1,
-  aggregationObjectsUI2,
-  wrapNode
-} from './aggregation/aggregation-objects';
-import {
-  connectivity,
-  maxDepth
-} from './aggregation/aggregation-implementations';
 import { ProvenanceTreeVisualization } from './provenance-tree-visualization';
-import { addLegend } from './legend';
+import { addLegend, addCommandsList, addInstructionsList} from './legend';
 /**
  * @description Show the title of the data aggregation algorithm used.
  */
@@ -38,95 +28,60 @@ export function setTitle(elm: HTMLDivSelection, onClick: () => any) {
  */
 export function addAggregationButtons(
   elm: HTMLDivSelection,
-  provenanceTreeVisualization: ProvenanceTreeVisualization,
-  aggreg: string
+  provenanceTreeVisualization: ProvenanceTreeVisualization
 ) {
   const container = elm.append('div').attr('class', 'container');
 
-  const holder = container.append('div');
+  // const holder = container.append('div');
   addLegend(container);
-  holder.attr('id', 'aggregationControls');
+  addCommandsList(container);
+  addInstructionsList(container);
 
-  if (aggreg == "ProvGraph") { }
-  else {
-  
-    // Data aggregation Div
-    const dataDiv = holder.append('div').attr('class', 'dataAggregation-Box');
-    // Combobox
-    if (aggreg == "PlotTrimmerG") {
-      const select = dataDiv
-        .append('select')
-        .attr('style', 'font-size: 14px')
-        .on('change', () => {
-          const selectedValue = d3.select('select').property('value');
-          provenanceTreeVisualization.aggregation.aggregator = aggregationObjectsUI1.find(
-            aggr => aggr.name === selectedValue
-          )!;
+    // legendButton
 
-          showSlider(selectedValue);
-          provenanceTreeVisualization.update();
-          provenanceTreeVisualization.scaleToFit();
-        });
-
-      select
-        .selectAll('option')
-        .data(aggregationObjectsUI1)
-        .enter()
-        .append('option')
-        .text(function (d) {
-          return d.name;
-        });
-    } else if (aggreg == "PlotTrimmerC") {
-      const select = dataDiv
-        .append('select')
-        .attr('style', 'font-size: 14px')
-        .on('change', () => {
-          const selectedValue = d3.select('select').property('value');
-          provenanceTreeVisualization.aggregation.aggregator = aggregationObjectsUI2.find(
-            aggr => aggr.name === selectedValue
-          )!;
-
-          showSlider(selectedValue);
-          provenanceTreeVisualization.update();
-          provenanceTreeVisualization.scaleToFit();
-        });
-
-      select
-        .selectAll('option')
-        .data(aggregationObjectsUI2)
-        .enter()
-        .append('option')
-        .text(function (d) {
-          return d.name;
-        });
-    }
-    // Arguments Div
-    const argDiv = holder.append('div').attr('class', 'dataAggregation-Box');
-
-    addSlider(argDiv, val => {
-      provenanceTreeVisualization.aggregation.arg = val;
-      provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
+    const legendButton = provenanceTreeVisualization.container
+    .append('button')
+    .attr('id', 'minimap-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; color: orange; z-index: 1; bottom: 2px; background-color: snow;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => {
+      const visible = d3.select("#legendContainer").style('display') === 'block';
+      if (visible) {
+        d3.select("#legendContainer").style('display', 'none');
+        d3.select("#commandsContainer").style('display', 'none');
+        d3.select("#instructionsContainer").style('display', 'none');
+        provenanceTreeVisualization.update();
+        // provenanceTreeVisualization.scaleToFit();
+      } else {
+        d3.select("#legendContainer").style('display', 'block');
+        d3.select("#commandsContainer").style('display', 'block');
+        d3.select("#instructionsContainer").style('display', 'block');
+        provenanceTreeVisualization.update();
+        // provenanceTreeVisualization.scaleToFit();
+      }
     });
-    const buttonsHolder = holder
-      .append('div')
-      .attr('class', 'dataAggregation-Box');
-  }
 
-  // // Caterpillar Label
-  // buttonsHolder
-  //   .append('span')
-  //   .text('Caterpillar :')
-  //   .attr('style', 'float:left');
-  // const caterpillarButton = buttonsHolder
-  //   .append('input')
-  //   .attr('type', 'checkbox')
-  //   .attr('class', 'caterpillar')
-  //   .on('change', () => {
-  //     provenanceTreeVisualization.caterpillarActivated = !provenanceTreeVisualization.caterpillarActivated;
-  //     provenanceTreeVisualization.update();
-  //     provenanceTreeVisualization.scaleToFit();
-  //   });
+  legendButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('list');
+
+  legendButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+  legendButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
 }
 
 /**

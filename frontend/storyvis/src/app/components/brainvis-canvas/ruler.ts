@@ -74,6 +74,11 @@ export default class Ruler {
     this.renderer.domElement.addEventListener('mousedown', this.onMouseDown);
   }
 
+  removeListeners() {
+    this.renderer.domElement.removeEventListener('mouseup', this.onMouseUp);
+    this.renderer.domElement.removeEventListener('mousemove', this.onMouseMove);
+    this.renderer.domElement.removeEventListener('mousedown', this.onMouseDown);
+  }
 
   remove() {
     this.renderer.domElement.removeEventListener('mouseup', this.onMouseUp);

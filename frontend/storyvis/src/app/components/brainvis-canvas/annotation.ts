@@ -66,16 +66,23 @@ export default class Annotation {
 
 
     this.widget.update();
+    this.widget._labeltext = 'DOUBLE CLICK HERE to change this';
 
-    if(this.renderer._canvas.provenance.graphLoaded){
-      this.widget._labeltext = 'empty';
-      this.widget._label.id = 'textBox ' + this.renderer.annotationCounter;
-    }
+    // if(this.renderer._canvas.provenance.graphLoaded){
+    //   this.widget._labeltext = 'empty';
+    //   this.widget._label.id = 'textBox ' + this.renderer.annotationCounter;
+    // }
 
     // add eventlisteners for dragging etc.
     this.renderer.domElement.addEventListener('mouseup', this.onMouseUp);
     this.renderer.domElement.addEventListener('mousemove', this.onMouseMove);
     this.renderer.domElement.addEventListener('mousedown', this.onMouseDown);
+  }
+
+  removeListeners() {
+    this.renderer.domElement.removeEventListener('mouseup', this.onMouseUp);
+    this.renderer.domElement.removeEventListener('mousemove', this.onMouseMove);
+    this.renderer.domElement.removeEventListener('mousedown', this.onMouseDown);
   }
 
   remove() {
@@ -87,9 +94,9 @@ export default class Annotation {
 
   onMouseUp = (evt) => {
     this.widget.onEnd(evt);
-    if(!this.renderer._canvas.provenance.graphLoaded){
-      this.artifact.metadata.push(document.getElementById('textBox ' + this.renderer.annotationCounter).innerHTML);
-    }
+    // if(!this.renderer._canvas.provenance.graphLoaded){
+    //   this.artifact.metadata.push(document.getElementById('textBox ' + this.renderer.annotationCounter).innerHTML);
+    // }
 
   //   if (this.isNew) {
   //     this.created.emit({

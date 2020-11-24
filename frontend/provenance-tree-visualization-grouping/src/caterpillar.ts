@@ -205,7 +205,7 @@ export function caterpillar(
         const newLinksCat = oldLinksCat
           .enter()
           .insert("path", "g")
-          .attr("d", provenanceTreeVisualization.linkPath);
+          .attr("d", provenanceTreeVisualization.linkPath as any);
         oldLinksCat
           .merge(newLinksCat as any)
           .attr("class", "link linkCat")

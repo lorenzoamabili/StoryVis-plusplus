@@ -20,15 +20,8 @@ export class ProvenanceVisualizationComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.currentUser.role === 'Author'){
-      (window as any).tree = this;
-      // var traverser = this.provenance.traverser;
-      // this.createTree(traverser);
-    } else {
-      (window as any).tree = this;
-      var traverser = this.provenance.traverser;
-      this.createTree(traverser);
-    }
+    var traverser = this.provenance.traverser;
+    this.createTree(traverser);
   }
 
 
@@ -36,12 +29,18 @@ export class ProvenanceVisualizationComponent implements OnInit {
       this._viz = new ProvenanceTreeVisualization(
       traverser,
       this.elementRef.nativeElement,
-      this.currentUser.group
+      "ProvGraph"
     );
   }
-
-  // ngAfterViewChecked() {
-  //   this._viz.setZoomExtent();
-  // }
-
 }
+
+
+(function () {
+  var blockContextMenu;
+
+  blockContextMenu = function (evt: any) {
+    evt.preventDefault();
+  };
+
+  window.addEventListener('contextmenu', blockContextMenu);
+})();

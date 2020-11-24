@@ -2,19 +2,19 @@ import * as THREE from 'three';
 import * as AMI from 'ami.js';
 import { IAMIRenderer, View, IOrientation } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
-import { BrainvisCanvasComponent } from './brainvis-canvas.component';
 import { Trackball } from './utils/trackball';
 import { UninitializedError } from './utils/exceptions';
-import { Renderer2D } from './renderer2d';
+import { Component } from '@angular/core';
+
+@Component({
+  template: ''
+})
 
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
-  private renderer2D: Renderer2D;
-  private _dom: HTMLDivElement;
-
-  constructor(view: View, canvas: BrainvisCanvasComponent) {
-    super(view, canvas);
-    // this._domElement = document.getElementById(view.domId);
+  constructor(view: View) {
+    super(view);
+    this._domElement = document.getElementById(view.domId);
     this._color = view.color; // 0x121212
     this._sliceColor = view.sliceColor; // 0xff1744
     this._targetID = view.targetID; // 1
@@ -44,8 +44,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._camera = new THREE.PerspectiveCamera(
       45,
       this._domElement.clientWidth / this._domElement.clientHeight,
-      0.1,
-      100000
+      10,
+      10000
     );
     this._camera.position.x = 250;
     this._camera.position.y = 250;
@@ -86,28 +86,11 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._stackHelper = new AMI.StackHelper(stack);
     this._stackHelper.bbox.visible = false;
     this._stackHelper.borderColor = this._sliceColor;
-    // this._stackHelper.slice._windowWidth = 100;
-    // console.log(this._stackHelper.slice);
-    // console.log(this._stackHelper.slice._windowWidth);
-    // this._stackHelper.slice._windowCenter = 100;
-    this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
-    this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
 
     this._stackHelper.orientation = this._camera.stackOrientation;
     this._stackHelper.index = Math.floor(
       this._stackHelper.orientationMaxIndex / 2
     );
-
-    // this.renderer2D._pairs.forEach(function (coord) {
-    //   this._dom = document.createElement('div');
-    //   this._dom.style.position = "absolute";
-    //   this._dom.style.left = coord[0] + 'px';
-    //   this._dom.style.top = coord[1] + 'px';
-    //   this._dom.style.top = coord[1] + 'px';
-    //   this._dom.className = 'widgets-handle';
-    //   this._canvas.appendChild(this._dom);
-    // });
-
   }
 
   updateArtifact() {}
@@ -179,6 +162,10 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
         orientation
       });
     });
+  }
+
+  onShiftClick(event) {
+    super.onShiftClick(event);
   }
 
   onScroll(event) {

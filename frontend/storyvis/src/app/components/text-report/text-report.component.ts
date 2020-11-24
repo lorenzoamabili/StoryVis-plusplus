@@ -8,15 +8,15 @@ import { trigger, style, animate, transition, state } from '@angular/animations'
   animations: [
     trigger('textReport', [
       state('true', style({
-        transform: 'translateX(0)'
+        transform: 'translateX(2%)'
       })),
       state('false', style({
         transform: 'translateX(-100%)'
       })),
-      transition('0 <=> 1', animate(100)),
-    ])
-  ]
-})
+      transition('0 <=> 1', animate(100))
+    ])]
+  })
+
 
 export class TextReportComponent {
   @Input() opened = false;

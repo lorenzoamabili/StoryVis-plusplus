@@ -7,8 +7,8 @@ module.exports = {
     User: require('../users/user.model'),
     Provenance: require('../provGraphs/provenance.model'),
     Story: require('../stories/story.model'),
-    ProvenancePractice: require('../provGraphsPractice/provenancePractice.model'),
-    StoryPractice: require('../storiesPractice/storyPractice.model'),
+    ProvenanceStudy: require('../provGraphsStudy/provenanceStudy.model'),
+    StoryStudy: require('../storiesStudy/storyStudy.model'),
     TextReport: require('../textReports/textReport.model'),
-    TextReportPractice: require('../textReportsPractice/textReportPractice.model')
+    TextReportStudy: require('../textReportsStudy/textReportStudy.model')
 };

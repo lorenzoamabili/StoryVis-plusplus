@@ -3,8 +3,16 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     serializedGraph: String,
-    serializedRegistry: String,
     IDcreator: Number,
+    findingsCoord: [{
+        coordinates: [{x: Number, y: Number, z: Number}],
+        sliceIndex: Number,
+        measurementID: Number,
+        viewName: String,
+        measurementType: String
+    }],
+    timeStart: Number,
+    timeEnd: Number,    
     createdDate: { type: Date, default: Date.now }
 });
 

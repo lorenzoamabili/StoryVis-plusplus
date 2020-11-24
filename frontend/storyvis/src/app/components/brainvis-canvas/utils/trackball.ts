@@ -13,6 +13,7 @@
  */
 
 import * as THREE from 'three';
+import { Settings } from './settings';
 
 export enum STATE {
   NONE = -1,
@@ -26,6 +27,7 @@ export enum STATE {
 }
 
 export class Trackball extends THREE.EventDispatcher {
+  public settings = Settings.getInstance(this);
   private state: STATE = STATE.NONE;
   private previousState: STATE = STATE.NONE;
   public camera: THREE.Camera;
@@ -260,9 +262,11 @@ export class Trackball extends THREE.EventDispatcher {
       this.eye.multiplyScalar(factor);
     } else {
       factor = 1.0 + (this.zoomEnd.y - this.zoomStart.y) * this.zoomSpeed;
-
-      if (factor !== 1.0 && factor > 0.0) {
-        this.eye.multiplyScalar(factor);
+      if (factor !== 1.0 && factor > 0.0) {        
+        if (!((Math.abs(this.eye.x) > 1000 || Math.abs(this.eye.y) > 1000 || Math.abs(this.eye.z) > 1000) && factor > 1) &&
+        !((Math.abs(this.eye.x) < 50 || Math.abs(this.eye.y) < 50 || Math.abs(this.eye.z) < 50) && factor < 1)) {
+          this.eye.multiplyScalar(factor);
+        }
 
         if (this.staticMoving) {
           this.zoomStart.copy(this.zoomEnd);
@@ -443,101 +447,130 @@ export class Trackball extends THREE.EventDispatcher {
   }
 
   private mousedown = (event) => {
-    if (this.enabled === false) { return; }
+    if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && 
+        // !this.settings.freehandOn && 
+        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+        if (this.enabled === false) { return; }
 
-    // if (!this.inScope(event.pageX, event.pageY)) { return; }
+        // if (!this.inScope(event.pageX, event.pageY)) { return; }
 
-    this.isDragging = true;
+        this.isDragging = true;
 
-    event.preventDefault();
-    event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
-    if (this.state === STATE.NONE) {
-      this.state = event.button;
+        if (this.state === STATE.NONE) {
+          this.state = event.button;
+        }
+
+        if (this.state === STATE.ROTATE && !this.noRotate) {
+          this.moveCurr.copy(this.getMouseOnCircle(event.pageX, event.pageY));
+          this.movePrev.copy(this.moveCurr);
+        } else if (this.state === STATE.ZOOM && !this.noZoom) {
+          this.zoomStart.copy(this.getMouseOnScreen(event.pageX, event.pageY));
+          this.zoomEnd.copy(this.zoomStart);
+        } else if (this.state === STATE.PAN && !this.noPan) {
+          this.panStart.copy(this.getMouseOnScreen(event.pageX, event.pageY));
+          this.panEnd.copy(this.panStart);
+        } else if (this.state === STATE.CUSTOM && !this.noCustom) {
+          this.customStart.copy(this.getMouseOnScreen(event.pageX, event.pageY));
+          this.customEnd.copy(this.panStart);
+        }
+
+        this.dispatchEvent({ type: 'start' });
+      }
     }
-
-    if (this.state === STATE.ROTATE && !this.noRotate) {
-      this.moveCurr.copy(this.getMouseOnCircle(event.pageX, event.pageY));
-      this.movePrev.copy(this.moveCurr);
-    } else if (this.state === STATE.ZOOM && !this.noZoom) {
-      this.zoomStart.copy(this.getMouseOnScreen(event.pageX, event.pageY));
-      this.zoomEnd.copy(this.zoomStart);
-    } else if (this.state === STATE.PAN && !this.noPan) {
-      this.panStart.copy(this.getMouseOnScreen(event.pageX, event.pageY));
-      this.panEnd.copy(this.panStart);
-    } else if (this.state === STATE.CUSTOM && !this.noCustom) {
-      this.customStart.copy(this.getMouseOnScreen(event.pageX, event.pageY));
-      this.customEnd.copy(this.panStart);
-    }
-
-    this.dispatchEvent({ type: 'start' });
   }
+
 
   private mousemove = (event) => {
-    if (this.enabled === false || !this.isDragging) { return; }
+    if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && 
+        // !this.settings.freehandOn && 
+        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+        if (this.enabled === false || !this.isDragging) { return; }
 
-    event.preventDefault();
-    event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
-    if (this.state === STATE.ROTATE && !this.noRotate) {
-      this.movePrev.copy(this.moveCurr);
-      this.moveCurr.copy(this.getMouseOnCircle(event.pageX, event.pageY));
-    } else if (this.state === STATE.ZOOM && !this.noZoom) {
-      this.zoomEnd.copy(this.getMouseOnScreen(event.pageX, event.pageY));
-    } else if (this.state === STATE.PAN && !this.noPan) {
-      this.panEnd.copy(this.getMouseOnScreen(event.pageX, event.pageY));
-    } else if (this.state === STATE.CUSTOM && !this.noCustom) {
-      this.customEnd.copy(this.getMouseOnScreen(event.pageX, event.pageY));
+        if (this.state === STATE.ROTATE && !this.noRotate) {
+          this.movePrev.copy(this.moveCurr);
+          this.moveCurr.copy(this.getMouseOnCircle(event.pageX, event.pageY));
+        } else if (this.state === STATE.ZOOM && !this.noZoom) {
+          this.zoomEnd.copy(this.getMouseOnScreen(event.pageX, event.pageY));
+        } else if (this.state === STATE.PAN && !this.noPan) {
+          this.panEnd.copy(this.getMouseOnScreen(event.pageX, event.pageY));
+        } else if (this.state === STATE.CUSTOM && !this.noCustom) {
+          this.customEnd.copy(this.getMouseOnScreen(event.pageX, event.pageY));
+        }
+      }
     }
   }
 
+
   private mouseup = (event) => {
-    if (this.enabled === false || !this.isDragging) { return; }
+    if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && 
+        // !this.settings.freehandOn && 
+        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+        if (this.enabled === false || !this.isDragging) { return; }
 
-    this.isDragging = false;
+        this.isDragging = false;
 
-    event.preventDefault();
-    event.stopPropagation();
-    const previousState = this.state;
-    if (this.forceState === -1) {
-      this.state = STATE.NONE;
+        event.preventDefault();
+        event.stopPropagation();
+        const previousState = this.state;
+        if (this.forceState === -1) {
+          this.state = STATE.NONE;
+        }
+
+        this.dispatchEvent({
+          type: 'end',
+          state: previousState,
+          newTarget: this.target,
+          newPosition: this.camera.position,
+          newUp: this.camera.up
+        });
+      }
     }
-
-    this.dispatchEvent({
-      type: 'end',
-      state: previousState,
-      newTarget: this.target,
-      newPosition: this.camera.position,
-      newUp: this.camera.up
-    });
   }
 
   private mousewheel = (event) => {
-    if (this.enabled === false) { return; }
+    if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && 
+        // !this.settings.freehandOn && 
+        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+        if (this.enabled === false) { return; }
 
-    event.preventDefault();
-    event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
-    let delta = 0;
+        let delta = 0;
 
-    if (event.wheelDelta) {
-      //  WebKit / Opera / Explorer 9
+        if (event.wheelDelta) {
+          //  WebKit / Opera / Explorer 9
 
-      delta = event.wheelDelta / 40;
-    } else if (event.detail) {
-      //  Firefox
+          delta = event.wheelDelta / 40;
+        } else if (event.detail) {
+          //  Firefox
 
-      delta = -event.detail / 3;
+          delta = -event.detail / 3;
+        }
+
+        if (this.state !== STATE.CUSTOM) {
+          this.zoomStart.y += delta * 0.01;
+        } else if (this.state === STATE.CUSTOM) {
+          this.customStart.y += delta * 0.01;
+        }
+
+        if (!(Math.abs(this.eye.x) > 1000 || Math.abs(this.eye.y) > 1000 || Math.abs(this.eye.z) > 1000) &&
+        !(Math.abs(this.eye.x) < 50 || Math.abs(this.eye.y) < 50 || Math.abs(this.eye.z) < 50)) {
+          this.dispatchEvent({ type: 'zoomstart' });
+          this.dispatchEvent({ type: 'zoomend', state: STATE.ZOOM, newTarget: this.target, newPosition: this.target, newUp: this.target });
+        }
+      }
     }
-
-    if (this.state !== STATE.CUSTOM) {
-      this.zoomStart.y += delta * 0.01;
-    } else if (this.state === STATE.CUSTOM) {
-      this.customStart.y += delta * 0.01;
-    }
-
-    this.dispatchEvent({ type: 'zoomstart' });
-    this.dispatchEvent({ type: 'zoomend', state: STATE.ZOOM, newTarget: this.target, newPosition: this.target, newUp: this.target });
   }
 
   touchstart(event) {

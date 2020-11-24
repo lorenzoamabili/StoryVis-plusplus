@@ -109,6 +109,14 @@
       }
   }
 
+  function __spreadArrays() {
+      for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+      for (var r = Array(s), k = 0, i = 0; i < il; i++)
+          for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+              r[k] = a[j];
+      return r;
+  }
+
   function generateUUID() {
       // Public Domain/MIT
       var d = new Date().getTime();
@@ -253,14 +261,14 @@
               this._current = node;
               this._mitt.emit('currentChanged', node);
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceGraph.prototype, "nodes", {
           get: function () {
               return this._nodes;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {
@@ -429,7 +437,7 @@
           set: function (provider) {
               this._screenShotProvider = provider;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceTracker.prototype, "autoScreenShot", {
@@ -442,7 +450,7 @@
                   console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
               }
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceTracker.prototype.getGraph = function () {
@@ -477,7 +485,7 @@
       }
       else if (currentNode) {
           // Map the StateNodes in the children StateEdges
-          var nodesToCheck = currentNode.children.slice();
+          var nodesToCheck = __spreadArrays(currentNode.children);
           // Add the parent node to that same list
           /* istanbul ignore else */
           if (isStateNode(currentNode)) {
@@ -683,7 +691,7 @@
           get: function () {
               return this._id;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(SlideAnnotation.prototype, "data", {
@@ -694,7 +702,7 @@
               this._data = value;
               this._mitt.emit('change', value);
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       SlideAnnotation.prototype.on = function (type, handler) {
@@ -739,14 +747,14 @@
           set: function (annotation) {
               this._mainAnnotation = annotation;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "id", {
           get: function () {
               return this._id;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "node", {
@@ -756,7 +764,7 @@
           set: function (value) {
               this._node = value;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "nodeId", {
@@ -766,7 +774,7 @@
               }
               return null;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "name", {
@@ -776,7 +784,7 @@
           set: function (value) {
               this._name = value;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "nodeCreationOrder", {
@@ -786,7 +794,7 @@
           set: function (value) {
               this._nodeCreationOrder = value;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "duration", {
@@ -796,7 +804,7 @@
           set: function (value) {
               this._duration = value;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "transitionTime", {
@@ -806,7 +814,7 @@
           set: function (value) {
               this._transitionTime = value;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlide.prototype.addAnnotation = function (annotation) {
@@ -822,7 +830,7 @@
           get: function () {
               return this._annotations;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlide.prototype.on = function (type, handler) {
@@ -838,14 +846,14 @@
           set: function (value) {
               this._xPosition = value;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlide.prototype, "metadata", {
           get: function () {
               return this._metadata;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       return ProvenanceSlide;
@@ -902,7 +910,7 @@
           get: function () {
               return this._application;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlidedeck.prototype.addSlide = function (slide, index) {
@@ -957,7 +965,7 @@
               this._selectedSlide = slide;
               this._mitt.emit('slideSelected', slide);
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlidedeck.prototype.moveSlide = function (indexFrom, indexTo) {
@@ -1000,7 +1008,7 @@
           get: function () {
               return this._slides;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlidedeck.prototype.next = function () {
@@ -1031,7 +1039,7 @@
           get: function () {
               return this._graph;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlidedeck.prototype, "screenShotProvider", {
@@ -1041,7 +1049,7 @@
           set: function (provider) {
               this._screenShotProvider = provider;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlidedeck.prototype, "autoScreenShot", {
@@ -1054,7 +1062,7 @@
                   console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
               }
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlidedeck.prototype.on = function (type, handler) {
@@ -1113,7 +1121,7 @@
           get: function () {
               return this._slides;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "currentSlideIndex", {
@@ -1123,7 +1131,7 @@
           set: function (index) {
               this._currentSlideIndex = index;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlidedeckPlayer.prototype.play = function () {
@@ -1168,7 +1176,7 @@
           get: function () {
               return this._status;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
       });
       ProvenanceSlidedeckPlayer.prototype.stop = function () {
@@ -1184,16 +1192,13 @@
   exports.ProvenanceSlidedeck = ProvenanceSlidedeck;
   exports.ProvenanceSlidedeckPlayer = ProvenanceSlidedeckPlayer;
   exports.ProvenanceTracker = ProvenanceTracker;
-  exports.SlideAnnotation = SlideAnnotation;
   exports.generateTimestamp = generateTimestamp;
   exports.generateUUID = generateUUID;
   exports.isReversibleAction = isReversibleAction;
   exports.isStateNode = isStateNode;
-  exports.restoreAnnotation = restoreAnnotation;
   exports.restoreProvenanceGraph = restoreProvenanceGraph;
   exports.restoreSlide = restoreSlide;
   exports.restoreSlideDeck = restoreSlideDeck;
-  exports.serializeAnnotation = serializeAnnotation;
   exports.serializeProvenanceGraph = serializeProvenanceGraph;
   exports.serializeSlide = serializeSlide;
   exports.serializeSlideDeck = serializeSlideDeck;

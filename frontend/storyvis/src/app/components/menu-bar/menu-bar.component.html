@@ -1,15 +1,7 @@
 <mat-toolbar color="primary" style="width: 100%">
   <mat-toolbar-row>
-    <!-- <button mat-raised-button matTooltip="Initialize the app" onClick="window.location.reload()">
-      <mat-icon>refresh</mat-icon>
-    </button>
-    <span>&nbsp;</span>
-    <span>StoryVis</span>
-    <span>&nbsp;</span>
-    <span>&nbsp;</span>
-    <span>&nbsp;</span> -->
-
-    <div>
+    
+    <div *ngIf="isAdmin">
       <mat-form-field>
         <mat-label>Select Graph</mat-label>
         <mat-select (selectionChange)="provenance.restoreGraph($event)" >
@@ -39,6 +31,8 @@
 
       <span>&nbsp;</span>
 
+
+      
       <button class = "save" mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
         <mat-icon>backup</mat-icon>
       </button>
@@ -54,48 +48,39 @@
 
     <span>&nbsp;</span>
 
-    <mat-button-toggle [checked]="canvas.settings.rulerMode"
-      (change)="canvas.settings.rulerMode = $event.source.checked" matTooltip="Ruler">
+    <mat-button-toggle [checked]="settings.rulerMode"
+      (change)="settings.rulerMode = $event.source.checked" matTooltip="Distance Measurement">
       <mat-icon class="example-icon">space_bar</mat-icon>
     </mat-button-toggle>
 
-    <mat-button-toggle [checked]="canvas.settings.angleMode"
-      (change)="canvas.settings.angleMode = $event.source.checked" matTooltip="Angle Measurement">
+    <mat-button-toggle [checked]="settings.angleMode"
+      (change)="settings.angleMode = $event.source.checked" matTooltip="Angle Measurement">
       <mat-icon class="example-icon">launch</mat-icon>
     </mat-button-toggle>
 
-    <!-- <mat-button-toggle [checked]="canvas.settings.freehandMode"
-      (change)="canvas.settings.freehandMode = $event.source.checked" matTooltip="Freehand Measurement">
+    <!-- <mat-button-toggle [checked]="settings.freehandMode"
+      (change)="settings.freehandMode = $event.source.checked" matTooltip="Freehand Measurement">
       <mat-icon class="example-icon">pan_tool</mat-icon>
     </mat-button-toggle> -->
 
-    <mat-button-toggle [checked]="canvas.settings.voxelprobeMode"
-      (change)="canvas.settings.voxelprobeMode = $event.source.checked" matTooltip="VoxelProbe">
+    <mat-button-toggle [checked]="settings.voxelprobeMode"
+      (change)="settings.voxelprobeMode = $event.source.checked" matTooltip="Density Measurement">
       <mat-icon class="example-icon">fingerprint</mat-icon>
     </mat-button-toggle>
 
     <span>&nbsp;</span>
 
-    <mat-button-toggle class="annotation" [checked]="canvas.settings.annotationMode"
-      (change)="canvas.settings.annotationMode = $event.source.checked" matTooltip="Create Annotation">
+    <mat-button-toggle class="annotation" [checked]="settings.annotationMode"
+      (change)="settings.annotationMode = $event.source.checked" matTooltip="Text Annotation">
       <mat-icon class="example-icon">speaker_notes</mat-icon>
     </mat-button-toggle>
 
-    <!-- <mat-menu #appMenu="matMenu"> -->
-    <app-styled-slider [canvas]="canvas"></app-styled-slider>
-    <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
-    <!-- </mat-menu> -->
-    <!-- <button matTooltip="Thresholds" mat-raised-button [matMenuTriggerFor]="appMenu">
-      <mat-icon>exposure</mat-icon>
-    </button> -->
+    <app-styled-slider-practice *ngIf="!studyStarted"></app-styled-slider-practice>
+    <app-styled-slider-exploration *ngIf="studyStarted"></app-styled-slider-exploration>
 
-    <div *ngIf="isAdmin">
-      <a>{{IDcreator}}</a>
-    </div>
-
-    <!-- <div id="right">
-      {{ now }}
-    </div> -->
+    <div *ngIf="isAdmin" style="position: absolute; right: 0px;">
+      <a class="nav-item nav-link" (click)="logout()">LOGOUT</a>
+  </div>
 
   </mat-toolbar-row>
 </mat-toolbar>

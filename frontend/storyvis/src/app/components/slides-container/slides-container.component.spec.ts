@@ -1,25 +1,19 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from "@angular/core/testing";
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SlidesContainerComponent } from './slides-container.component';
 
-describe('SlidesContainerComponent', () => {
-  let component: SlidesContainerComponent;
-  let fixture: ComponentFixture<SlidesContainerComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ SlidesContainerComponent ]
-    })
-    .compileComponents();
+describe('SlidesContainerComponent', () => {
+  beforeEach(() => TestBed.configureTestingModule({
+    imports: [HttpClientTestingModule], 
+    providers: [SlidesContainerComponent]
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(SlidesContainerComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
   it('should create', () => {
+    TestBed.configureTestingModule({declarations: [SlidesContainerComponent]});
+    const fixture = TestBed.createComponent(SlidesContainerComponent);
+    const component = fixture.componentInstance;
+    expect(component).toBeDefined();
     expect(component).toBeTruthy();
   });
 });

@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ProvenanceVisualizationComponent } from './provenance-visualization.component';
 
 describe('ProvenanceVisualizationComponent', () => {
@@ -8,6 +8,7 @@ describe('ProvenanceVisualizationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [ ProvenanceVisualizationComponent ]
     })
     .compileComponents();

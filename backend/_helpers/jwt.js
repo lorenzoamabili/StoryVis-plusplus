@@ -13,12 +13,12 @@ function jwt() {
             '/users/register',
             '/provGraphs/provenance',
             '/stories/story',
-            '/provGraphsPractice/provenance',
-            '/storiesPractice/story',
+            '/provGraphsStudy/provenance',
+            '/storiesStudy/story',
             '/provGraphs',
             '/stories',
             '/textReports',
-            '/textReportsPractice/textReport',
+            '/textReportsStudy/textReport',
             '/textReports/textReport'
         ]
     });

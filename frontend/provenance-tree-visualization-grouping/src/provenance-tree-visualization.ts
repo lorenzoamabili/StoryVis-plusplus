@@ -6,6 +6,7 @@ import {
 } from '@visualstorytelling/provenance-core';
 
 import gratzl from './gratzl';
+import { IHierarchyPointNodeWithMaxDepth } from './gratzl';
 import { IGroupedTreeNode } from './utils';
 import { NodeAggregator } from './aggregation/aggregation-implementations';
 
@@ -19,21 +20,18 @@ import {
   plotTrimmerG
 } from './aggregation/aggregation-objects';
 import {
-  addAggregationButtons,
-  setTitle
+  addAggregationButtons
 } from './components';
 import {
   aggregateNodes,
   findHierarchyNodeFromProvenanceNode
 } from './aggregation/aggregation';
 import { caterpillar } from './caterpillar';
-import { SlideDeckVisualization } from '../../slide-deck-visualization/src/slide-deck-visualization';
 
 var xScale = -20;
 var yScale = 20;
 var treeWidth = 0;
 var maxtreeWidth = 10;
-var treePaddingX = 15;
 var p = 3;
 const fontSize = 8;
 
@@ -57,23 +55,23 @@ export class ProvenanceTreeVisualization {
   public colorScheme: any;
   public g: D3SVGGSelection;
   public svg: D3SVGSelection;
-  public _deckViz: SlideDeckVisualization;
   public container: any;
-  // d3.Selection<HTMLDivElement, unknown, null, undefined>;
   public aggregation: IAggregation = {
     aggregator: rawData,
     arg: 1
   };
-  // public _aggregator: NodeAggregator<ProvenanceNode> = rawData; // changed from original
   public caterpillarActivated = false;
   private hierarchyRoot:
-    | d3.HierarchyPointNode<IGroupedTreeNode<ProvenanceNode>>
+    | IHierarchyPointNodeWithMaxDepth<IGroupedTreeNode<ProvenanceNode>>
     | undefined;
-  private zoomer: any;
+
+    private zoomer: any;
+    private zoom = 1;
+  
+    private brushPos: { x: number, y: number } = { x: 10, y: 10 };
 
   constructor(traverser: ProvenanceGraphTraverser, elm: HTMLDivElement, aggreg: string) {
     this.traverser = traverser;
-    this._deckViz = (window as any).slideDeck;
     this.colorScheme = d3.scaleOrdinal(d3.schemeAccent);
     this.container = d3.select(elm)
       .append('div')
@@ -90,15 +88,6 @@ export class ProvenanceTreeVisualization {
       this.aggregation.aggregator = plotTrimmerC;
     }
 
-    // Add title too root elm
-    // setTitle(this.container, () => {
-    //   window.alert(
-    //     this.aggregation.aggregator.name.toUpperCase() +
-    //     ': \n' +
-    //     this.aggregation.aggregator.description
-    //   );
-    // });
-
     // Append svg element
     this.svg = this.container
       .append('div')
@@ -112,7 +101,7 @@ export class ProvenanceTreeVisualization {
     this.g = this.svg.append('g');
 
     // Append grouping buttons
-    addAggregationButtons(this.container, this, aggreg);
+    addAggregationButtons(this.container, this);
 
     traverser.graph.on('currentChanged', () => {
       this.update();
@@ -122,51 +111,32 @@ export class ProvenanceTreeVisualization {
       this.update();
     });
 
-    traverser.graph.on('nodeAdded', () => {
-      this.scaleToFit(treeWidth);
-    });
+    // traverser.graph.on('nodeAdded', () => {
+    // });
 
     this.update();
-    this.zoomer = d3.zoom();
-    this.setZoomExtent();
+    this.zoomer = d3.zoom().scaleExtent([0.01, 2]).on('zoom', () => this.zoomed());
     this.svg.call(this.zoomer);
-    this.scaleToFit(treeWidth);
+    this.setView([this.svg.node()!.clientWidth/2, this.brushPos.y], 2 / this.zoom);
   }
 
-  public setZoomExtent() {
-    this.zoomer.scaleExtent([0.1, 2]).on('zoom', () => {
-      this.g.attr('transform', d3.event.transform);
-    });
-    this.scaleToFit();
+  private zoomed(): void {
+    this.g.attr('transform', (d3 as any).event.transform);
   }
 
-  public scaleToFit(n?: number) {
-    const sizeX = this.svg.node()!.clientWidth;
-    const sizeY = this.svg.node()!.clientHeight;
-    const maxScale = 2;
-    const magicNumY = 0.9; // todo: get relevant number based on dimensions
-    const magicNumX = 0.5; // todo: get relevant number based on dimensions
-    
-    var width = (n !== undefined) ? n : 0;
-    var scaleFactor = Math.min(
-      maxScale,
-      (magicNumY * sizeY) / (this.hierarchyRoot!.height * yScale),
-      (magicNumX * sizeX) / (width * -xScale)
-    );
-
-    if (scaleFactor === maxScale) {
-      var moveGraphOnX = sizeX / 2;
-    } else {
-      moveGraphOnX = (sizeX + treePaddingX * treeWidth) / 2;
+  public updateZoomExtent(extent: [number, number]) {
+    this.zoomer.scaleExtent(extent);
+  }
+  
+  public setView(t: [number, number], s: number): void {
+    const [x, y] = t;
+    const transform = d3.zoomIdentity.translate(x, y).scale(s);
+    if (this.zoomer) {
+      this.svg
+        .call(this.zoomer.transform, transform)
+        .call(this.zoomer);
     }
-
-    this.svg
-      .transition()
-      .duration(0)
-      .call(this.zoomer.transform, () =>
-        d3.zoomIdentity.translate(moveGraphOnX, 10).scale(scaleFactor)
-      );
-}
+  }
 
   public linkPath({
   source,
@@ -240,7 +210,7 @@ export class ProvenanceTreeVisualization {
   );
 
   const tree = gratzl(hierarchyRoot, currentHierarchyNode);
-  this.hierarchyRoot = tree;
+  this.hierarchyRoot = tree ;
 
   const treeNodes = tree.descendants();
   const oldNodes = this.g.selectAll('g.node').data(treeNodes, (d: any) => {
@@ -258,24 +228,6 @@ export class ProvenanceTreeVisualization {
       'transform',
       (d: any) => `translate(${d.x * xScale}, ${d.y * yScale})`
     );
-  // newNodes.append('rect')
-  //   .attr('width', 40)
-  //   .attr('height', 20)
-  //   .attr('x', (d: any) => d.x - 20)
-  //   .attr('y', (d: any) => -10)
-  //   .attr('stroke', 'none')
-  //   .attr('fill', (d: any) => d.data.wrappedNodes[0].action ? this.colorScheme(d.data.wrappedNodes[0].action.metadata.taskId) : 'none')
-  //   .attr('fill-opacity', 0.8)
-  //   .on('mouseover', (d: any) => {
-  //     newNodes.append('text')
-  //       .attr('class', 'taskName')
-  //       .attr('x', (data) => data.x - 30)
-  //       .attr('y', (data) => data.y - 5)
-  //       .text(d.data.wrappedNodes[0].action.metadata.taskName);
-  //   })
-  //   .on('mouseout', () => {
-  //     d3.select('.taskName').remove();
-  //   });
 
   // node label
   newNodes
@@ -297,25 +249,6 @@ export class ProvenanceTreeVisualization {
     return Math.min(2.7 + 0.3 * node.wrappedNodes.length, 7);
   };
 
-
-  // set nodes containing Slides to square
-  // updateNodes
-  //   .filter((d: any) => {
-  //     return d.data.wrappedNodes.some(
-  //       (node: ProvenanceNode) => node.metadata.isSlideAdded
-  //     );
-  //   })
-  //   .append('g')
-  //   .attr('class', 'bookmarked')
-  //   .append('rect')
-  //   .attr('fill', (d: any) => {
-  //     return d.data.wrappedNodes[0].metadata.bgColor;
-  //   })
-  //   .attr('width', (d: any) => 2 * getNodeSize(d.data))
-  //   .attr('height', (d: any) => 2 * getNodeSize(d.data))
-  //   .attr('x', (d: any) => -getNodeSize(d.data))
-  //   .attr('y', (d: any) => -getNodeSize(d.data));
-
   // other nodes to circle
   updateNodes
     .filter((d: any) => {
@@ -329,7 +262,7 @@ export class ProvenanceTreeVisualization {
   updateNodes.on('contextmenu', (d: any) => {
     d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
     this.update();
-    this._deckViz.onAdd(d.data.wrappedNodes[0]);
+    // this._deckViz.onAdd(d.data.wrappedNodes[0]);
   });
 
 
@@ -353,16 +286,6 @@ export class ProvenanceTreeVisualization {
     })
     .attr('r', (d: any) => getNodeSize(d.data));
 
-
-  // set node size text in circles / rects
-  updateNodes
-    .select('g')
-    .append('text')
-    .attr('class', 'circle-text')
-    .attr('text-anchor', 'middle')
-    .attr('alignment-baseline', 'central')
-    .text((d: any) => d.data.wrappedNodes.length.toString());
-
   // hide labels not in branch
   updateNodes
     .select('text.circle-label')
@@ -381,13 +304,19 @@ export class ProvenanceTreeVisualization {
     .filter((d: any) => d.data.neighbour === true)
     .attr('class', 'node branch-active neighbour');
 
-  // set node-active class if node contains current provenance node
-  updateNodes
-    .filter((d: any) =>
-      d.data.wrappedNodes.includes(this.traverser.graph.current)
-    )
-    .attr('class', 'node branch-active neighbour node-active');
 
+  updateNodes
+  .filter((d: any) => {
+      const ref = d.data.wrappedNodes.includes(this.traverser.graph.current);
+      if (ref) {
+          this.brushPos.x = this.svg.node()!.clientWidth/2;
+          this.brushPos.y = (d.y * yScale * 2) < this.svg.node()!.clientHeight/4*3 ? 
+          10 : 10 + (this.svg.node()!.clientHeight/4*3 ) - (d.y * yScale * 2) ;
+      }
+      return ref;
+  })
+  .attr('class', 'node branch-active neighbour node-active');
+    
   updateNodes
     .data(treeNodes)
     .transition()
@@ -399,7 +328,6 @@ export class ProvenanceTreeVisualization {
           var classString = `translate(${d.x * xScale}, ${d.y * yScale})`;
           treeWidth = d.x;
           if (treeWidth % p) {
-            this.scaleToFit(d.x);
           }
         } else {
           var classString = `translate(${d.x * xScale}, ${d.y * yScale})`;
@@ -419,7 +347,7 @@ export class ProvenanceTreeVisualization {
   const newLinks = oldLinks
     .enter()
     .insert('path', 'g')
-    .attr('d', this.linkPath);
+      .attr('d', (d: any) => this.linkPath(d));
 
   oldLinks
     .merge(newLinks as any)
@@ -431,7 +359,7 @@ export class ProvenanceTreeVisualization {
     .merge(newLinks as any)
     .transition()
     .duration(500)
-    .attr('d', this.linkPath);
+    .attr('d', (d: any) => this.linkPath(d));
 
   const updatedLinks = oldLinks.merge(newLinks as any);
 
@@ -439,23 +367,10 @@ export class ProvenanceTreeVisualization {
     caterpillar(updateNodes, treeNodes, updatedLinks, this);
   }
 
-  // Update title
-  d3.select('#DataAggregation').text(this.aggregation.aggregator.name);
+  this.setView([this.brushPos.x, this.brushPos.y], 2 / this.zoom);
 } // end update
 
   public getTraverser(): ProvenanceGraphTraverser {
   return this.traverser;
 }
 }
-
-
-// to make the right click possible without opening the context menu
-(function () {
-  var blockContextMenu;
-
-  blockContextMenu = function (evt: any) {
-    evt.preventDefault();
-  };
-
-  window.addEventListener('contextmenu', blockContextMenu);
-})();

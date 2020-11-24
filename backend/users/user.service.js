@@ -49,6 +49,7 @@ async function create(userParam) {
     await user.save();
 }
 
+
 async function _delete(id) {
     await User.findByIdAndRemove(id);
 }

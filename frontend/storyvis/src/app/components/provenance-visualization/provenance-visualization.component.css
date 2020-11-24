@@ -2,15 +2,15 @@ app-provenance-visualization {
   height: 80%;
   width: 300px;
   display: block;
-  background-color: snow;
+  background-color: #fffafa;
 }
 .visualizationContainer {
   display: flex;
   flex-direction: column;
 }
 .node {
-  fill: white;
-  stroke: black;
+  fill: #ffffff;
+  stroke: #000000;
   cursor: pointer;
 }
 
@@ -24,17 +24,17 @@ app-provenance-visualization {
 }
 
 .node circle.bookmarked {
-  stroke: red;
+  stroke: #ff0000;
   stroke-width: 1.2px;
 }
 
 .node circle.loaded {
-  stroke: blue;
+  stroke: #0000ff;
   stroke-width: 1.2px;
 }
 
 .node circle.intent_none {
-  fill: white;
+  fill: #ffffff;
 }
 
 .node circle.intent_exploration {
@@ -62,14 +62,14 @@ app-provenance-visualization {
 }
 
 .node circle.intent_wrapped {
-  fill: white;
-  stroke: black;
+  fill: #ffffff;
+  stroke: #000000;
   stroke-dasharray: 3;
   stroke-width: 0.6px;
 }
 
 .node.branch-active {
-  background-color: #ccc;
+  background-color: #cccccc;
 }
 
 .node.branch-active text {
@@ -85,13 +85,13 @@ app-provenance-visualization {
 }
 
 .node.node-active circle {
-  stroke: black;
+  stroke: #000000;
   stroke-width: 1.5px;
 }
 
 .node text {
   /* fill: white; */
-  fill: #000;
+  fill: #000000;
   stroke-width: 0;
   font-family: Times;
 }
@@ -99,13 +99,13 @@ app-provenance-visualization {
 .link {
   fill: none;
   /* stroke: white; */
-  stroke: #000;
+  stroke: #000000;
   stroke-width: 0.2px;
 }
 
 .link.active {
   /* stroke: white; */
-  stroke: #000;
+  stroke: #000000;
   stroke-width: 0.8px;
 }
 
@@ -133,6 +133,7 @@ app-provenance-visualization {
 .circle-text {
   font-size: 6px;
   display: block;
+  dominant-baseline: central;  /* for firefox */
 }
 
 .circle-label {
@@ -143,11 +144,11 @@ app-provenance-visualization {
   display: none;
 }
 .container {
-  display: flex;
-  flex: 0;
-  background-color: snow;
-  bottom: 10px;
+  background-color: #fffafa;
+  position: absolute;
+  bottom: 0px;
 }
+
 #aggregationControls {
   flex: 1;
   display: flex;
@@ -164,11 +165,10 @@ app-provenance-visualization {
 /*Legend CSS*/
 
 .legend {
-  flex: 0;
-  box-shadow: 0px 0px 4px #888;
+  display: -webkit-inline-box;
+  box-shadow: 0px 0px 4px #888888;
   margin: 5px;
-  height: 160px;
-  background-color: white;
+  background-color: #ffffff;
 }
 .legend ul {
   list-style-type: none;
@@ -200,6 +200,6 @@ app-provenance-visualization {
   width: 10px;
   height: 10px;
   border: 1.5px solid;
-  border-color: red;
+  border-color: #ff0000;
   border-radius: 6px;
 }

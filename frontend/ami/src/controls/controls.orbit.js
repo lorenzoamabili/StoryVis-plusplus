@@ -523,6 +523,7 @@ var OrbitControls = function ( object, domElement ) {
 		panStart.copy( panEnd );
 
 		scope.update();
+		console.log('here');
 
 	}
 

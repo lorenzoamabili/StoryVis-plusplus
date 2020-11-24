@@ -1,9 +1,9 @@
-import { ProvenanceGraph, ProvenanceGraphTraverser, ProvenanceTracker, , ProvenanceSlidedeck, ProvenanceSlide } from "@visualstorytelling/provenance-core";
+import { ProvenanceGraph, ProvenanceGraphTraverser, ProvenanceTracker, ProvenanceSlidedeck, ProvenanceSlide, ActionFunctionRegistry } from "@visualstorytelling/provenance-core";
 import { SlideDeckVisualization } from '../src/slide-deck-visualization';
 
 let graph: ProvenanceGraph;
 let tracker: ProvenanceTracker;
-let registry: ;
+let registry: ActionFunctionRegistry;
 let slideDeck: ProvenanceSlidedeck;
 let traverser: ProvenanceGraphTraverser;
 
@@ -25,9 +25,9 @@ class Calculator {
 
 let calculator: Calculator;
 
-const slide1 = new ProvenanceSlide('slide1', 1, 0);
-const slide2 = new ProvenanceSlide('slide2', 1, 0);
-const slide3 = new ProvenanceSlide('slide3', 1, 0);
+const slide1 = new ProvenanceSlide('slide1', 1, 0, 0);
+const slide2 = new ProvenanceSlide('slide2', 1, 0, 0);
+const slide3 = new ProvenanceSlide('slide3', 1, 0, 0);
 
 const slides = [slide1, slide2, slide3];
 
@@ -47,7 +47,7 @@ describe('ProvenanceTreeSlidedeck', () => {
       { name: 'calculator', version: '1.0.0' },
       username
     );
-    registry = new ();
+    registry = new ActionFunctionRegistry();
     registry.register('add', calculator.add, calculator);
     registry.register('subtract', calculator.subtract, calculator);
     tracker = new ProvenanceTracker(registry, graph, username);

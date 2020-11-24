@@ -27,8 +27,10 @@ export declare class ProvenanceTracker implements IProvenanceTracker {
      *        it will only be called when traversing.
      */
     applyAction(action: Action, skipFirstDoFunctionCall?: boolean): Promise<StateNode>;
-    screenShotProvider: IScreenShotProvider | null;
-    autoScreenShot: boolean;
+    get screenShotProvider(): IScreenShotProvider | null;
+    set screenShotProvider(provider: IScreenShotProvider | null);
+    get autoScreenShot(): boolean;
+    set autoScreenShot(value: boolean);
     getGraph(): SerializedProvenanceGraph;
     restoreGraph(sgraph: any): void;
 }

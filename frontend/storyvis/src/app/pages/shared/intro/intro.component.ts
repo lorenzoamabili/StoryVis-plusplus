@@ -27,10 +27,6 @@ export class IntroComponent implements OnInit {
         return this.currentUser && this.currentUser.role === Role.Author;
     }
 
-    get isRegular() {
-        return this.currentUser && this.currentUser.role === Role.Regular;
-    }
-
     get isReader() {
         return this.currentUser && this.currentUser.role === Role.Reader;
     }

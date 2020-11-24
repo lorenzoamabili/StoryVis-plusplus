@@ -103,6 +103,14 @@ function __generator(thisArg, body) {
     }
 }
 
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
 function generateUUID() {
     // Public Domain/MIT
     var d = new Date().getTime();
@@ -247,14 +255,14 @@ var ProvenanceGraph = /** @class */ (function () {
             this._current = node;
             this._mitt.emit('currentChanged', node);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceGraph.prototype, "nodes", {
         get: function () {
             return this._nodes;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {
@@ -423,7 +431,7 @@ var ProvenanceTracker = /** @class */ (function () {
         set: function (provider) {
             this._screenShotProvider = provider;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceTracker.prototype, "autoScreenShot", {
@@ -436,7 +444,7 @@ var ProvenanceTracker = /** @class */ (function () {
                 console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceTracker.prototype.getGraph = function () {
@@ -471,7 +479,7 @@ function findPathToTargetNode(currentNode, targetNode, track, comingFromNode) {
     }
     else if (currentNode) {
         // Map the StateNodes in the children StateEdges
-        var nodesToCheck = currentNode.children.slice();
+        var nodesToCheck = __spreadArrays(currentNode.children);
         // Add the parent node to that same list
         /* istanbul ignore else */
         if (isStateNode(currentNode)) {
@@ -677,7 +685,7 @@ var SlideAnnotation = /** @class */ (function () {
         get: function () {
             return this._id;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(SlideAnnotation.prototype, "data", {
@@ -688,7 +696,7 @@ var SlideAnnotation = /** @class */ (function () {
             this._data = value;
             this._mitt.emit('change', value);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     SlideAnnotation.prototype.on = function (type, handler) {
@@ -733,14 +741,14 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (annotation) {
             this._mainAnnotation = annotation;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "id", {
         get: function () {
             return this._id;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "node", {
@@ -750,7 +758,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._node = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "nodeId", {
@@ -760,7 +768,7 @@ var ProvenanceSlide = /** @class */ (function () {
             }
             return null;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "name", {
@@ -770,7 +778,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._name = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "nodeCreationOrder", {
@@ -780,7 +788,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._nodeCreationOrder = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "duration", {
@@ -790,7 +798,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._duration = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "transitionTime", {
@@ -800,7 +808,7 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._transitionTime = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlide.prototype.addAnnotation = function (annotation) {
@@ -816,7 +824,7 @@ var ProvenanceSlide = /** @class */ (function () {
         get: function () {
             return this._annotations;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlide.prototype.on = function (type, handler) {
@@ -832,14 +840,14 @@ var ProvenanceSlide = /** @class */ (function () {
         set: function (value) {
             this._xPosition = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlide.prototype, "metadata", {
         get: function () {
             return this._metadata;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     return ProvenanceSlide;
@@ -896,7 +904,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._application;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.addSlide = function (slide, index) {
@@ -951,7 +959,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
             this._selectedSlide = slide;
             this._mitt.emit('slideSelected', slide);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.moveSlide = function (indexFrom, indexTo) {
@@ -994,7 +1002,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._slides;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.next = function () {
@@ -1025,7 +1033,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         get: function () {
             return this._graph;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeck.prototype, "screenShotProvider", {
@@ -1035,7 +1043,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         set: function (provider) {
             this._screenShotProvider = provider;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeck.prototype, "autoScreenShot", {
@@ -1048,7 +1056,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
                 console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeck.prototype.on = function (type, handler) {
@@ -1108,7 +1116,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._slides;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "currentSlideIndex", {
@@ -1118,7 +1126,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         set: function (index) {
             this._currentSlideIndex = index;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.play = function () {
@@ -1163,7 +1171,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._status;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.stop = function () {
@@ -1172,5 +1180,5 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
     return ProvenanceSlidedeckPlayer;
 }());
 
-export { ActionFunctionRegistry, ProvenanceGraph, ProvenanceGraphTraverser, ProvenanceSlide, ProvenanceSlidedeck, ProvenanceSlidedeckPlayer, ProvenanceTracker, STATUS, SlideAnnotation, generateTimestamp, generateUUID, isReversibleAction, isStateNode, restoreAnnotation, restoreProvenanceGraph, restoreSlide, restoreSlideDeck, serializeAnnotation, serializeProvenanceGraph, serializeSlide, serializeSlideDeck };
+export { ActionFunctionRegistry, ProvenanceGraph, ProvenanceGraphTraverser, ProvenanceSlide, ProvenanceSlidedeck, ProvenanceSlidedeckPlayer, ProvenanceTracker, STATUS, generateTimestamp, generateUUID, isReversibleAction, isStateNode, restoreProvenanceGraph, restoreSlide, restoreSlideDeck, serializeProvenanceGraph, serializeSlide, serializeSlideDeck };
 //# sourceMappingURL=provenance-core.es5.js.map

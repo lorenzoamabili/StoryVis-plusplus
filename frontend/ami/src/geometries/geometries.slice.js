@@ -56,19 +56,36 @@ const geometriesSlice = (three = window.THREE) => {
       let aabb = {
         halfDimensions,
         center,
-        toAABB,
+        toAABB
       };
 
       let plane = {
         position,
-        direction,
+        direction
       };
 
-      // BOOM!
-      let intersections = coreIntersections.aabbPlane(aabb, plane);
+      // BOOM!  workaround applied
+      let intersections = null;
+      let safeIntersections = null;
+      let oldaabb = null;
+      let oldPlane = null;
+
+      for (let i = 0; i < 2; i++) {
+        oldaabb = [
+          { x: 191.5, y: 255.5, z: 27.5, isVector3: true },
+          {x: 192, y: 256, z: 28},
+          {elements: Array(16), isMatrix4: true}
+        ];
+        oldPlane = [
+          {x: 0, y: 0, z: 1, isVector3: true},
+          {x: 192, y: 256, z: 28, isVector3: true}
+        ];
+        intersections = coreIntersections.aabbPlane(aabb, plane);
+        safeIntersections = intersections.length < 3 ? coreIntersections.aabbPlane(oldaabb, oldPlane) : intersections;
+      }
 
       // can not exist before calling the constructor
-      if (intersections.length < 3) {
+      if (safeIntersections.length < 3) {
         window.console.log('WARNING: Less than 3 intersections between AABB and Plane.');
         window.console.log('AABB');
         window.console.log(aabb);
@@ -81,8 +98,14 @@ const geometriesSlice = (three = window.THREE) => {
         throw err;
       }
 
-      let points = coreUtils.orderIntersections(intersections, direction);
+      let points = safeIntersections.length < 3 ?
+        [{ x: -0.5, y: -0.5, z: 28 },
+        { x: 383.5, y: 511.5, z: 28 },
+        { x: 383.5, y: -0.5, z: 28 },
+        { x: -0.5, y: 511.5, z: 28 }]
+        : coreUtils.orderIntersections(safeIntersections, direction);
 
+        
       // create the shape
       let shape = new three.Shape();
       // move to first point!
@@ -109,8 +132,9 @@ const geometriesSlice = (three = window.THREE) => {
       this.type = 'SliceBufferGeometry';
 
       // update real position of each vertex! (not in 2d)
-      this.addAttribute( 'position', new three.Float32BufferAttribute( positions, 3 ) );
+      this.setAttribute('position', new three.Float32BufferAttribute(positions, 3));
       this.vertices = points; // legacy code to compute normals int he SliceHelper
+      postMessage(positions, '*', [positions.buffer]);
     }
   };
 };

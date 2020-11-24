@@ -59,7 +59,7 @@ const helpersBorder = (three = window.THREE) => {
       if (!this._material) {
         this._material = new three.LineBasicMaterial({
           color: this._color,
-          linewidth: 1,
+          linewidth: 1
         });
       }
 
@@ -74,16 +74,17 @@ const helpersBorder = (three = window.THREE) => {
       const positions = new Float32Array((nbOfVertices + 1) * 3);
       positions.set(this._helpersSlice.geometry.attributes.position.array, 0);
       positions.set(this._helpersSlice.geometry.vertices[0].toArray(), nbOfVertices * 3);
-      this._geometry.addAttribute( 'position', new three.Float32BufferAttribute( positions, 3 ) );
+      this._geometry.setAttribute( 'position', new three.Float32BufferAttribute( positions, 3 ) );
 
       this._mesh = new three.Line(this._geometry, this._material);
       if (this._helpersSlice.aabbSpace === 'IJK') {
-        this._mesh.applyMatrix(this._helpersSlice.stack.ijk2LPS);
+        this._mesh.applyMatrix4(this._helpersSlice.stack.ijk2LPS);
       }
       this._mesh.visible = this._visible;
 
       // and add it!
       this.add(this._mesh);
+      postMessage(positions, '*', [positions.buffer]);
     }
 
     _update() {

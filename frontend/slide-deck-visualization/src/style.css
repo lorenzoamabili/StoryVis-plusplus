@@ -16,7 +16,7 @@ body {
 div.slidedeck__slide {
     background-color: #ccc;
     margin-bottom: 0.5em;
-    border: 1px solid gray;
+    border: 1px solid #808080;
 }
 
 table.slides__table {
@@ -37,12 +37,12 @@ div.slidedeck__slide[draggable="true"] {
 }
 
 .slides_duration_resize {
-    fill: rgb(255, 155, 155);
-}
-.slides_delay_resize {
-    fill: rgb(155, 155, 255);
+    fill: #fc8d59;
 }
 
+.slides_transitionTime_resize{
+    fill: #91bfdb;
+}
 
 .slides_text {
     fill: #000000;
@@ -50,7 +50,7 @@ div.slidedeck__slide[draggable="true"] {
 
 .slides_transitionTime_rect {
     fill: #aaaaaa;
-    fill-opacity: 0.3;
+    fill-opacity: 0.2;
 }
 
 .slides_delete_rect {
@@ -62,7 +62,7 @@ div.slidedeck__slide[draggable="true"] {
     ry: 5px;
     stroke-dasharray: 5;
     fill-opacity: 0.1;
-    stroke: gray;
+    stroke: #808080;
     stroke-width: 1px;
 }
 
@@ -70,8 +70,14 @@ div.slidedeck__slide[draggable="true"] {
     font-weight: 600;
 }
 
-#player_placeholder {
-    stroke-dasharray: none;
+#playerPlaceholder {
+    display: grid;
+    padding: 5px 8px;
+    border-radius: 5px;
+    fill-opacity: 0.1;
+    stroke: #d3d3d3;
+    stroke-width: 1px;
+    background-color: #dcdcdc;
 }
 
 #annotation-box {
@@ -88,7 +94,7 @@ svg.annotation-area {
 
 rect.add_annotation {
     position: absolute;
-    stroke: black;
+    stroke: #000000;
     stroke-width: 1px;
 }
 
@@ -98,44 +104,45 @@ rect.add_annotation {
     height: 70%;
     font-size: 16px;
     border-radius: 5px;
-  }
+}
 
-  #addButton{
+#addButton{
       position: absolute;
       bottom: 5%;
       right: 1%;
       border-radius: 5px;
       border-width: 1px;
-  }
+}
 
-  .slides_background_rect {
+.slides_background_rect {
     fill: #ffffff;
     opacity: 0.01;
     stroke: #aaaaaa;
-  }
+}
   
-  .slides_rect {
-    stroke: gray;
-    stroke-width: 0.5px;
-  }
+.slides_rect {
+    stroke: #d3d3d3;
+    stroke-width: 1px;
+}
   
-  .slides_delay_rect {
+.slides_delay_rect {
     fill: #dddddd;
     opacity: 0.7;
     stroke: #dddddd;
-  }
+}
   
-  .slides_rect[selected='true'] {
-    stroke: red;
-    stroke-width: 2px;
-   }
+.slides_rect[selected='true'] {
+    stroke: #000000;
+    stroke-width: 3px;
+    opacity: 0.2;
+}
 
-  .slides_delete_icon{
-    color: black;
+.slides_delete_icon{
+    color: #000000;
     background-color: transparent;
-  }
+}
 
-  .slides_clone_icon{
-    color: black;
+.slides_clone_icon{
+    color: #000000;
     background-color: transparent;
-  }
+}

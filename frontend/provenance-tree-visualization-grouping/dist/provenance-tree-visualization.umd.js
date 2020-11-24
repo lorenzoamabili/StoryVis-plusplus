@@ -215,8 +215,8 @@
   var testAll = function (tests, node1, node2) {
       var result = true;
       for (var _i = 0, tests_1 = tests; _i < tests_1.length; _i++) {
-          var test = tests_1[_i];
-          result = test(node1, node2);
+          var test_1 = tests_1[_i];
+          result = test_1(node1, node2);
           if (!result) {
               break;
           }
@@ -441,15 +441,6 @@
    * @param b {IGroupedTreeNode<ProvenanceNode>} - Node to be tested.
    */
   var testIsIntervalNode = function (a, b) { return b.children.length === 1; };
-  //////// Objects that represent the different data aggregation algorithms///////////
-  /**Default Option as Raw Data */
-  var defaultData = {
-      name: "Select Aggregation",
-      tests: [testNothing],
-      algorithm: doNothing,
-      arg: false,
-      description: "No algorithm is applied. The full provenance data is shown."
-  };
   /**
    * @description Object of the interface DataAggregation<ProvenanceNode>.
    */
@@ -480,24 +471,9 @@
       arg: true,
       description: "Lorem Ipsum"
   };
-  var aggregationObjectsUI1 = [
-      defaultData,
-      rawData,
-      plotTrimmerG
-  ];
-  var aggregationObjectsUI2 = [
-      defaultData,
-      rawData,
-      plotTrimmerC
-  ];
 
   var legendData = {
       legends: [
-          // {
-          //   name: 'Provenance Node',
-          //   color: '#fff',
-          //   shape: 'circle'
-          // },
           {
               name: 'bookmark',
               color: '#fff',
@@ -540,10 +516,27 @@
               shape: 'circle',
               opacity: 0.3
           }
+      ],
+      commands: [
+          'HOW TO PERFORM SOME INTERACTIONS:',
+          '- RIGHT CLICK+MOUSE MOVE on imaging data = To zoom the imaging data',
+          '- SHIFT+CLICK on imaging data = To magnify a view',
+          '- ALT+RIGHT CLICK on measurements = To delete a measurement',
+          '- RIGHT CLICK on graph nodes = To bookmark a node',
+          '- SCROLL on graph = To zoom the graph',
+          '- SCROLL on storyline = To scale the graph',
+          '- SCROLL+SHIFT on storyline = To slide the graph'
+      ],
+      instructions: [
+          'TASKS TO BE PERFORMED:',
+          '- TASK 1 = Explore the imaging data to find all nodules/anomalies in it.',
+          '- TASK 2 = Measure the diameter of all the nodules/anomalies found in the imaging data.',
+          '- TASK 3 = Create annotations and/or make additional measurements on the nodules/anomalies found in the imaging data.',
+          '- TASK 4 = Create a report to communicate your findings to collaborators.'
       ]
   };
   function addLegend(elm) {
-      var legendContainer = elm.append('div').attr('class', 'legend');
+      var legendContainer = elm.append('div').attr('class', 'legend').attr('id', 'legendContainer').attr('style', 'display: none;');
       var legendList = legendContainer.append('ul');
       var listItem = legendList
           .selectAll('li')
@@ -552,127 +545,107 @@
           .append('li');
       listItem
           .append('div')
-          // .attr('class', (d: any) => (d.shape === 'circle' ? 'circle' : 'rect'))
-          .attr('class', function (d) { return (d.name === 'bookmark' ? 'bookmark' : 'circle'); })
+          .attr('class', function (d) {
+          if (d.name === 'bookmark') {
+              return 'bookmark';
+          }
+          else if (d.name === 'story') {
+              return 'story';
+          }
+          else if (d.name === 'loaded') {
+              return 'loaded';
+          }
+          else {
+              return 'circle';
+          }
+      })
           .attr('style', function (d) { return "background-color:" + d.color; });
       listItem.append('span').text(function (d) {
           return d.name;
+      });
+  }
+  function addCommandsList(elm) {
+      var commandsContainer = elm.append('div').attr('class', 'legend')
+          .attr('id', 'commandsContainer').attr('style', 'display: none;');
+      var commandsList = commandsContainer.append('ul');
+      var commandsListItem = commandsList
+          .selectAll('li')
+          .data(legendData.commands)
+          .enter()
+          .append('li');
+      commandsListItem
+          .append('div');
+      commandsListItem.append('span').text(function (d) {
+          return d;
+      });
+  }
+  function addInstructionsList(elm) {
+      var instructionsContainer = elm.append('div').attr('class', 'legend')
+          .attr('id', 'instructionsContainer').attr('style', 'margin-bottom: 50px; display: none;');
+      var instructionsList = instructionsContainer.append('ul');
+      var instructionsListItem = instructionsList
+          .selectAll('li')
+          .data(legendData.instructions)
+          .enter()
+          .append('li');
+      instructionsListItem
+          .append('div');
+      instructionsListItem.append('span').text(function (d) {
+          return d;
       });
   }
 
   /**
    * @description Show the buttons of the user interface.
    */
-  function addAggregationButtons(elm, provenanceTreeVisualization, aggreg) {
+  function addAggregationButtons(elm, provenanceTreeVisualization) {
       var container = elm.append('div').attr('class', 'container');
-      var holder = container.append('div');
+      // const holder = container.append('div');
       addLegend(container);
-      holder.attr('id', 'aggregationControls');
-      if (aggreg == "ProvGraph") ;
-      else {
-          // Data aggregation Div
-          var dataDiv = holder.append('div').attr('class', 'dataAggregation-Box');
-          // Combobox
-          if (aggreg == "PlotTrimmerG") {
-              var select = dataDiv
-                  .append('select')
-                  .attr('style', 'font-size: 14px')
-                  .on('change', function () {
-                  var selectedValue = d3.select('select').property('value');
-                  provenanceTreeVisualization.aggregation.aggregator = aggregationObjectsUI1.find(function (aggr) { return aggr.name === selectedValue; });
-                  showSlider(selectedValue);
-                  provenanceTreeVisualization.update();
-                  provenanceTreeVisualization.scaleToFit();
-              });
-              select
-                  .selectAll('option')
-                  .data(aggregationObjectsUI1)
-                  .enter()
-                  .append('option')
-                  .text(function (d) {
-                  return d.name;
-              });
-          }
-          else if (aggreg == "PlotTrimmerC") {
-              var select = dataDiv
-                  .append('select')
-                  .attr('style', 'font-size: 14px')
-                  .on('change', function () {
-                  var selectedValue = d3.select('select').property('value');
-                  provenanceTreeVisualization.aggregation.aggregator = aggregationObjectsUI2.find(function (aggr) { return aggr.name === selectedValue; });
-                  showSlider(selectedValue);
-                  provenanceTreeVisualization.update();
-                  provenanceTreeVisualization.scaleToFit();
-              });
-              select
-                  .selectAll('option')
-                  .data(aggregationObjectsUI2)
-                  .enter()
-                  .append('option')
-                  .text(function (d) {
-                  return d.name;
-              });
-          }
-          // Arguments Div
-          var argDiv = holder.append('div').attr('class', 'dataAggregation-Box');
-          addSlider(argDiv, function (val) {
-              provenanceTreeVisualization.aggregation.arg = val;
+      addCommandsList(container);
+      addInstructionsList(container);
+      // legendButton
+      var legendButton = provenanceTreeVisualization.container
+          .append('button')
+          .attr('id', 'minimap-trigger')
+          .attr('class', 'mat-icon-button mat-button-base mat-primary')
+          .attr('color', 'primary')
+          .attr('style', 'position: absolute; color: orange; z-index: 1; bottom: 2px; background-color: snow;')
+          .attr('ng-reflect-color', 'primary')
+          .on('mousedown', function () {
+          var visible = d3.select("#legendContainer").style('display') === 'block';
+          if (visible) {
+              d3.select("#legendContainer").style('display', 'none');
+              d3.select("#commandsContainer").style('display', 'none');
+              d3.select("#instructionsContainer").style('display', 'none');
               provenanceTreeVisualization.update();
-              provenanceTreeVisualization.scaleToFit();
-          });
-          var buttonsHolder = holder
-              .append('div')
-              .attr('class', 'dataAggregation-Box');
-      }
-      // // Caterpillar Label
-      // buttonsHolder
-      //   .append('span')
-      //   .text('Caterpillar :')
-      //   .attr('style', 'float:left');
-      // const caterpillarButton = buttonsHolder
-      //   .append('input')
-      //   .attr('type', 'checkbox')
-      //   .attr('class', 'caterpillar')
-      //   .on('change', () => {
-      //     provenanceTreeVisualization.caterpillarActivated = !provenanceTreeVisualization.caterpillarActivated;
-      //     provenanceTreeVisualization.update();
-      //     provenanceTreeVisualization.scaleToFit();
-      //   });
-  }
-  /**
-   * @description Slider for Arguments in simple HTML
-   */
-  function addSlider(elem, onChange) {
-      var container = elem.append('div');
-      container.attr('class', 'sliderContainer');
-      container.attr('style', 'visibility: hidden');
-      var slider = container
-          .append('input')
-          .attr('id', 'arg')
-          .attr('type', 'range')
-          .attr('min', 0)
-          .attr('max', 10)
-          .attr('value', '0')
-          .attr('class', 'slider');
-      var currentValue = container.append('span').text(0);
-      slider.on('change', function () {
-          var val = parseInt(slider.node().value, 10);
-          currentValue.text(val);
-          onChange(val);
+              // provenanceTreeVisualization.scaleToFit();
+          }
+          else {
+              d3.select("#legendContainer").style('display', 'block');
+              d3.select("#commandsContainer").style('display', 'block');
+              d3.select("#instructionsContainer").style('display', 'block');
+              provenanceTreeVisualization.update();
+              // provenanceTreeVisualization.scaleToFit();
+          }
       });
-  }
-  function showSlider(value) {
-      var slider = d3.select('.sliderContainer');
-      switch (value) {
-          case 'Pruning':
-          case 'PlotTrimmer':
-          case 'PlotTrimmer C':
-          case 'PlotTrimmer G':
-              slider.attr('style', 'display:block');
-              break;
-          default:
-              slider.attr('style', 'display: none');
-      }
+      legendButton
+          .append('span')
+          .attr('class', 'mat-button-wrapper')
+          .append('mat-icon')
+          .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+          .attr('role', 'img')
+          .attr('aria-hidden', 'true')
+          .text('list');
+      legendButton
+          .append('div')
+          .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+          .attr('ng-reflect-centered', 'true')
+          .attr('ng-reflect-disabled', 'false')
+          .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+      legendButton
+          .append('div')
+          .attr('class', 'mat-button-focus-overlay');
   }
 
   /**
@@ -947,8 +920,6 @@
   var yScale = 20;
   var treeWidth = 0;
   var maxtreeWidth = 10;
-  var treePaddingX = 15;
-  var p = 3;
   var fontSize = 8;
   /**
    * @description Class used to create and manage a provenance tree visualization.
@@ -960,15 +931,14 @@
   var ProvenanceTreeVisualization = /** @class */ (function () {
       function ProvenanceTreeVisualization(traverser, elm, aggreg) {
           var _this = this;
-          // d3.Selection<HTMLDivElement, unknown, null, undefined>;
           this.aggregation = {
               aggregator: rawData,
               arg: 1
           };
-          // public _aggregator: NodeAggregator<ProvenanceNode> = rawData; // changed from original
           this.caterpillarActivated = false;
+          this.zoom = 1;
+          this.brushPos = { x: 10, y: 10 };
           this.traverser = traverser;
-          this._deckViz = window.slideDeck;
           this.colorScheme = d3.scaleOrdinal(d3.schemeAccent);
           this.container = d3.select(elm)
               .append('div')
@@ -983,14 +953,6 @@
           else if (aggreg == "PlotTrimmerC") {
               this.aggregation.aggregator = plotTrimmerC;
           }
-          // Add title too root elm
-          // setTitle(this.container, () => {
-          //   window.alert(
-          //     this.aggregation.aggregator.name.toUpperCase() +
-          //     ': \n' +
-          //     this.aggregation.aggregator.description
-          //   );
-          // });
           // Append svg element
           this.svg = this.container
               .append('div')
@@ -999,49 +961,34 @@
               .attr('style', "overflow: visible; width: 100%; height: 100%; font-size: " + fontSize + "px; line-height: " + fontSize + "px");
           this.g = this.svg.append('g');
           // Append grouping buttons
-          addAggregationButtons(this.container, this, aggreg);
+          addAggregationButtons(this.container, this);
           traverser.graph.on('currentChanged', function () {
               _this.update();
           });
           traverser.graph.on('nodeChanged', function () {
               _this.update();
           });
-          traverser.graph.on('nodeAdded', function () {
-              _this.scaleToFit(treeWidth);
-          });
+          // traverser.graph.on('nodeAdded', () => {
+          // });
           this.update();
-          this.zoomer = d3.zoom();
-          this.setZoomExtent();
+          this.zoomer = d3.zoom().scaleExtent([0.01, 2]).on('zoom', function () { return _this.zoomed(); });
           this.svg.call(this.zoomer);
-          this.scaleToFit(treeWidth);
+          this.setView([this.svg.node().clientWidth / 2, this.brushPos.y], 2 / this.zoom);
       }
-      ProvenanceTreeVisualization.prototype.setZoomExtent = function () {
-          var _this = this;
-          this.zoomer.scaleExtent([0.1, 2]).on('zoom', function () {
-              _this.g.attr('transform', d3.event.transform);
-          });
-          this.scaleToFit();
+      ProvenanceTreeVisualization.prototype.zoomed = function () {
+          this.g.attr('transform', d3.event.transform);
       };
-      ProvenanceTreeVisualization.prototype.scaleToFit = function (n) {
-          var sizeX = this.svg.node().clientWidth;
-          var sizeY = this.svg.node().clientHeight;
-          var maxScale = 2;
-          var magicNumY = 0.9; // todo: get relevant number based on dimensions
-          var magicNumX = 0.5; // todo: get relevant number based on dimensions
-          var width = (n !== undefined) ? n : 0;
-          var scaleFactor = Math.min(maxScale, (magicNumY * sizeY) / (this.hierarchyRoot.height * yScale), (magicNumX * sizeX) / (width * -xScale));
-          if (scaleFactor === maxScale) {
-              var moveGraphOnX = sizeX / 2;
+      ProvenanceTreeVisualization.prototype.updateZoomExtent = function (extent) {
+          this.zoomer.scaleExtent(extent);
+      };
+      ProvenanceTreeVisualization.prototype.setView = function (t, s) {
+          var x = t[0], y = t[1];
+          var transform = d3.zoomIdentity.translate(x, y).scale(s);
+          if (this.zoomer) {
+              this.svg
+                  .call(this.zoomer.transform, transform)
+                  .call(this.zoomer);
           }
-          else {
-              moveGraphOnX = (sizeX + treePaddingX * treeWidth) / 2;
-          }
-          this.svg
-              .transition()
-              .duration(0)
-              .call(this.zoomer.transform, function () {
-              return d3.zoomIdentity.translate(moveGraphOnX, 10).scale(scaleFactor);
-          });
       };
       ProvenanceTreeVisualization.prototype.linkPath = function (_a) {
           var source = _a.source, target = _a.target;
@@ -1112,24 +1059,6 @@
               .append('g')
               .attr('class', 'node')
               .attr('transform', function (d) { return "translate(" + d.x * xScale + ", " + d.y * yScale + ")"; });
-          // newNodes.append('rect')
-          //   .attr('width', 40)
-          //   .attr('height', 20)
-          //   .attr('x', (d: any) => d.x - 20)
-          //   .attr('y', (d: any) => -10)
-          //   .attr('stroke', 'none')
-          //   .attr('fill', (d: any) => d.data.wrappedNodes[0].action ? this.colorScheme(d.data.wrappedNodes[0].action.metadata.taskId) : 'none')
-          //   .attr('fill-opacity', 0.8)
-          //   .on('mouseover', (d: any) => {
-          //     newNodes.append('text')
-          //       .attr('class', 'taskName')
-          //       .attr('x', (data) => data.x - 30)
-          //       .attr('y', (data) => data.y - 5)
-          //       .text(d.data.wrappedNodes[0].action.metadata.taskName);
-          //   })
-          //   .on('mouseout', () => {
-          //     d3.select('.taskName').remove();
-          //   });
           // node label
           newNodes
               .append('text')
@@ -1145,23 +1074,6 @@
           var getNodeSize = function (node) {
               return Math.min(2.7 + 0.3 * node.wrappedNodes.length, 7);
           };
-          // set nodes containing Slides to square
-          // updateNodes
-          //   .filter((d: any) => {
-          //     return d.data.wrappedNodes.some(
-          //       (node: ProvenanceNode) => node.metadata.isSlideAdded
-          //     );
-          //   })
-          //   .append('g')
-          //   .attr('class', 'bookmarked')
-          //   .append('rect')
-          //   .attr('fill', (d: any) => {
-          //     return d.data.wrappedNodes[0].metadata.bgColor;
-          //   })
-          //   .attr('width', (d: any) => 2 * getNodeSize(d.data))
-          //   .attr('height', (d: any) => 2 * getNodeSize(d.data))
-          //   .attr('x', (d: any) => -getNodeSize(d.data))
-          //   .attr('y', (d: any) => -getNodeSize(d.data));
           // other nodes to circle
           updateNodes
               .filter(function (d) {
@@ -1172,7 +1084,7 @@
           updateNodes.on('contextmenu', function (d) {
               d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
               _this.update();
-              _this._deckViz.onAdd(d.data.wrappedNodes[0]);
+              // this._deckViz.onAdd(d.data.wrappedNodes[0]);
           });
           updateNodes
               .select('g')
@@ -1193,14 +1105,6 @@
               return classString;
           })
               .attr('r', function (d) { return getNodeSize(d.data); });
-          // set node size text in circles / rects
-          updateNodes
-              .select('g')
-              .append('text')
-              .attr('class', 'circle-text')
-              .attr('text-anchor', 'middle')
-              .attr('alignment-baseline', 'central')
-              .text(function (d) { return d.data.wrappedNodes.length.toString(); });
           // hide labels not in branch
           updateNodes
               .select('text.circle-label')
@@ -1214,10 +1118,15 @@
               .attr('class', 'node branch-active')
               .filter(function (d) { return d.data.neighbour === true; })
               .attr('class', 'node branch-active neighbour');
-          // set node-active class if node contains current provenance node
           updateNodes
               .filter(function (d) {
-              return d.data.wrappedNodes.includes(_this.traverser.graph.current);
+              var ref = d.data.wrappedNodes.includes(_this.traverser.graph.current);
+              if (ref) {
+                  _this.brushPos.x = _this.svg.node().clientWidth / 2;
+                  _this.brushPos.y = (d.y * yScale * 2) < _this.svg.node().clientHeight / 4 * 3 ?
+                      10 : 10 + (_this.svg.node().clientHeight / 4 * 3) - (d.y * yScale * 2);
+              }
+              return ref;
           })
               .attr('class', 'node branch-active neighbour node-active');
           updateNodes
@@ -1228,9 +1137,6 @@
               if (d.x > treeWidth && treeWidth <= maxtreeWidth) {
                   var classString = "translate(" + d.x * xScale + ", " + d.y * yScale + ")";
                   treeWidth = d.x;
-                  if (treeWidth % p) {
-                      _this.scaleToFit(d.x);
-                  }
               }
               else {
                   var classString = "translate(" + d.x * xScale + ", " + d.y * yScale + ")";
@@ -1246,7 +1152,7 @@
           var newLinks = oldLinks
               .enter()
               .insert('path', 'g')
-              .attr('d', this.linkPath);
+              .attr('d', function (d) { return _this.linkPath(d); });
           oldLinks
               .merge(newLinks)
               .attr('class', 'link')
@@ -1256,27 +1162,18 @@
               .merge(newLinks)
               .transition()
               .duration(500)
-              .attr('d', this.linkPath);
+              .attr('d', function (d) { return _this.linkPath(d); });
           var updatedLinks = oldLinks.merge(newLinks);
           if (this.caterpillarActivated) {
               caterpillar(updateNodes, treeNodes, updatedLinks, this);
           }
-          // Update title
-          d3.select('#DataAggregation').text(this.aggregation.aggregator.name);
+          this.setView([this.brushPos.x, this.brushPos.y], 2 / this.zoom);
       }; // end update
       ProvenanceTreeVisualization.prototype.getTraverser = function () {
           return this.traverser;
       };
       return ProvenanceTreeVisualization;
   }());
-  // to make the right click possible without opening the context menu
-  (function () {
-      var blockContextMenu;
-      blockContextMenu = function (evt) {
-          evt.preventDefault();
-      };
-      window.addEventListener('contextmenu', blockContextMenu);
-  })();
 
   exports.ProvenanceTreeVisualization = ProvenanceTreeVisualization;
 

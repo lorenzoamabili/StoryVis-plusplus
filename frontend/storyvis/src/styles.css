@@ -17,6 +17,7 @@ html, body {
   flex: 1;
   flex-direction: column;
   font-size: larger;
+  padding-bottom: 1px;
 }
 
 div{
@@ -27,7 +28,6 @@ div.cont {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding-bottom: 1px;
 }
 
 
@@ -67,7 +67,7 @@ h1 {
   margin: 0.67em 0;
 }
 
-/* Grouping content
+/* grouping content
    ========================================================================== */
 
 /**

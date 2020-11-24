@@ -18,17 +18,13 @@ export class IntroExploComponent implements OnInit {
     ngOnInit() {
 
     }
-
+    
     get isAdmin() {
         return this.currentUser && this.currentUser.role === Role.Admin;
     }
 
     get isAuthor() {
         return this.currentUser && this.currentUser.role === Role.Author;
-    }
-
-    get isRegular() {
-        return this.currentUser && this.currentUser.role === Role.Regular;
     }
 
     get isReader() {

@@ -94,8 +94,10 @@ const widgetsHandle = (three = window.THREE) => {
 
     hoverMesh() {
       // check raycast intersection, do we want to hover on mesh or just css?
-      let intersectsHandle = this._raycaster.intersectObject(this._mesh);
-      this._meshHovered = intersectsHandle.length > 0;
+      if (this._geometry) {
+        let intersectsHandle = this._raycaster.intersectObject(this._mesh);
+        this._meshHovered = intersectsHandle.length > 0;
+      }
     }
 
     hoverDom(evt) {
@@ -115,9 +117,11 @@ const widgetsHandle = (three = window.THREE) => {
         this._controls.enabled = false;
 
         if (this._targetMesh) {
-          let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
-          if (intersectsTarget.length > 0) {
-            this._offset.copy(intersectsTarget[0].point).sub(this._worldPosition);
+          if (this._geometry) {
+            let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
+            if (intersectsTarget.length > 0) {
+              this._offset.copy(intersectsTarget[0].point).sub(this._worldPosition);
+            }
           }
         } else {
           this._plane.position.copy(this._worldPosition);
@@ -148,16 +152,21 @@ const widgetsHandle = (three = window.THREE) => {
       if (this._active || forced) {
         this._dragged = true;
 
-        if (this._targetMesh !== null) {
-          let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
-          if (intersectsTarget.length > 0) {
-            this._worldPosition.copy(intersectsTarget[0].point.sub(this._offset));
+        if (this._targetMesh) {
+          try {
+            let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
+            if (intersectsTarget.length > 0) {
+              this._worldPosition.copy(intersectsTarget[0].point.sub(this._offset));
+            }
+          }
+          catch (e) {
           }
         } else {
           if (this._plane.direction.length() === 0) {
+            var vector = new THREE.Vector3();
             // free mode!this._targetMesh
             this._plane.position.copy(this._worldPosition);
-            this._plane.direction.copy(this._camera.getWorldDirection());
+            this._plane.direction.copy(this._camera.getWorldDirection(vector));
           }
 
           let intersection = CoreIntersections.rayPlane(this._raycaster.ray, this._plane);

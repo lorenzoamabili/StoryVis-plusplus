@@ -105,7 +105,7 @@ export default class {
     // box: {halfDimensions, center}
     let box = {
       center: stack.worldCenter().clone(),
-      halfDimensions: new Vector3(lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10),
+      halfDimensions: new Vector3(lpsDims.x + 20, lpsDims.y + 20, lpsDims.z + 20),
     };
 
     // init and zoom

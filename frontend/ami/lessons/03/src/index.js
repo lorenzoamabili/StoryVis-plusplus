@@ -18,7 +18,7 @@ const camera = new AMI.OrthographicCamera(
   container.clientHeight / 2,
   container.clientHeight / -2,
   0.1,
-  10000
+  1000 //10000
 );
 
 // Setup controls
@@ -65,7 +65,7 @@ loader
 
     const box = {
       center: stack.worldCenter().clone(),
-      halfDimensions: new THREE.Vector3(lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10),
+      halfDimensions: new THREE.Vector3(lpsDims.x + 20, lpsDims.y + 20, lpsDims.z + 20),
     };
 
     // init and zoom

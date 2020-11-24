@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 
 import { environment } from '../../../environments/environment';
-import { User, Provenance, Story, ProvenancePractice, StoryPractice, TextReport, TextReportPractice } from '../_models';
+import { User, Provenance, Story, ProvenanceStudy, StoryStudy, TextReport, TextReportStudy } from '../_models';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -48,28 +48,28 @@ export class UserService {
     deleteStories(id: string) {
         return this.http.delete<Story>(`${environment.apiUrl}/stories/${id}`);
     }
-    getAllGraphsPractice() {
-        return this.http.get<ProvenancePractice[]>(`${environment.apiUrl}/provGraphsPractice`);
+    getAllGraphsStudy() {
+        return this.http.get<ProvenanceStudy[]>(`${environment.apiUrl}/provGraphsStudy`);
     }
 
-    getByIdGraphsPractice(id: string) {
-        return this.http.get<ProvenancePractice>(`${environment.apiUrl}/provGraphsPractice/${id}`);
+    getByIdGraphsStudy(id: string) {
+        return this.http.get<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/${id}`);
     }
 
-    deleteGraphsPractice(id: string) {
-        return this.http.delete<ProvenancePractice>(`${environment.apiUrl}/provGraphsPractice/${id}`);
+    deleteGraphsStudy(id: string) {
+        return this.http.delete<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/${id}`);
     }
 
-    getAllStoriesPractice() {
-        return this.http.get<StoryPractice[]>(`${environment.apiUrl}/storiesPractice`);
+    getAllStoriesStudy() {
+        return this.http.get<StoryStudy[]>(`${environment.apiUrl}/storiesStudy`);
     }
 
-    getByIdStoriesPractice(id: string) {
-        return this.http.get<StoryPractice>(`${environment.apiUrl}/storiesPractice/${id}`);
+    getByIdStoriesStudy(id: string) {
+        return this.http.get<StoryStudy>(`${environment.apiUrl}/storiesStudy/${id}`);
     }
 
-    deleteStoriesPractice(id: string) {
-        return this.http.delete<StoryPractice>(`${environment.apiUrl}/storiesPractice/${id}`);
+    deleteStoriesStudy(id: string) {
+        return this.http.delete<StoryStudy>(`${environment.apiUrl}/storiesStudy/${id}`);
     }
 
     getAllTextReports() {
@@ -84,15 +84,15 @@ export class UserService {
         return this.http.delete<TextReport>(`${environment.apiUrl}/textReports/${id}`);
     }
 
-    getAllTextReportsPractice() {
-        return this.http.get<TextReportPractice[]>(`${environment.apiUrl}/textReportsPractice`);
+    getAllTextReportsStudy() {
+        return this.http.get<TextReportStudy[]>(`${environment.apiUrl}/textReportsStudy`);
     }
 
-    getByIdTextReportsPractice(id: string) {
-        return this.http.get<TextReportPractice>(`${environment.apiUrl}/textReportsPractice/${id}`);
+    getByIdTextReportsStudy(id: string) {
+        return this.http.get<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/${id}`);
     }
 
-    deleteTextReportsPractice(id: string) {
-        return this.http.delete<TextReportPractice>(`${environment.apiUrl}/textReportsPractice/${id}`);
+    deleteTextReportsStudy(id: string) {
+        return this.http.delete<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/${id}`);
     }
 }

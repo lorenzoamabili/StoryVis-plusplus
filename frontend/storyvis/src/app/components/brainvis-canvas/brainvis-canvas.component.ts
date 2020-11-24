@@ -1,22 +1,27 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
 
-import { Component, ElementRef, HostListener, OnInit, Input } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, Input, 
+  // RendererType2, EventEmitter, Output 
+} from '@angular/core';
 import { IOrientation, ISlicePosition, View } from './utils/types';
-import SliceManipulatorWidget from './utils/sliceManipulatorWidget';
+// import SliceManipulatorWidget from './utils/sliceManipulatorWidget';
 import { registerActions } from './provenanceHelpers/provenanceActions';
 import { addListeners } from './provenanceHelpers/provenanceListeners';
 import { Settings } from './utils/settings';
 import { Renderer2D } from './renderer2d';
 import { Renderer3D } from './renderer3d';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
-import { ProvenanceService } from 'src/app/shared/_services';
+import { ProvenanceService } from '../../shared/_services/provenance.service';
+import { StyledSliderPracticeComponent } from '../styled-slider-practice/styled-slider-practice.component';
+import { StyledSliderExplorationComponent } from '../styled-slider-exploration/styled-slider-exploration.component';
+
 
 export enum VIEWS {
   AXIAL = 'axial',
   SAGITTAL = 'sagittal',
   CORONAL = 'coronal',
-  FREEFORM = 'freeform',
+  FREEFORM = 'freeform'
 }
 
 @Component({
@@ -25,9 +30,15 @@ export enum VIEWS {
   styleUrls: ['./brainvis-canvas.component.css']
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
-  @Input('studyStarted') studyStarted: boolean;
+  @Input() studyStarted: boolean;
+
   public _initialized = false;
   public settings = Settings.getInstance(this);
+
+  private stack: any;
+  public sliderPractice: StyledSliderPracticeComponent;
+  public sliderExploration: StyledSliderExplorationComponent;
+
   private elem: Element;
   public views: View[] = [
     { // Left top view (TOP/AXIAL): Patient's top side towards camera, patient's right side to the left
@@ -81,7 +92,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       sliceOrientation: VIEWS.SAGITTAL,
       sliceColor: 0xffea00,
       targetID: 3
-    },
+    }
   ];
 
   private textureTarget: THREE.WebGLRenderTarget;
@@ -98,7 +109,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private clipPlaneCoronal = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
   private clipPlaneSagittal = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
 
-  private sliceManipulator: SliceManipulatorWidget;
+  // private sliceManipulator: SliceManipulatorWidget;
 
   private _provenance: ProvenanceService;
 
@@ -107,8 +118,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     registerActions(provenance.registry, this);
     this._provenance = provenance;
     this.elem = elem.nativeElement;
-
-  }
+    this.settings.canvas = this;
+    }
 
   get perspectiveRenderer() {
     return this._perspectiveRenderer;
@@ -133,8 +144,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this._axialRenderer,
       this._perspectiveRenderer,
       this._coronalRenderer,
-      this._sagittalRenderer
-    ];
+      this._sagittalRenderer];
   }
 
   @HostListener('window:resize', ['$event'])
@@ -150,25 +160,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     // todo: remove object from window
     // (window as any).canvas = this;
 
-    this._axialRenderer = new Renderer2D(this.views[0], this);
-    this._perspectiveRenderer = new Renderer3D(this.views[1], this);
-    this._coronalRenderer = new Renderer2D(this.views[2], this);
-    this._sagittalRenderer = new Renderer2D(this.views[3], this);
+    this._axialRenderer = new Renderer2D(this.views[0]);
+    this._perspectiveRenderer = new Renderer3D(this.views[1]);
+    this._coronalRenderer = new Renderer2D(this.views[2]);
+    this._sagittalRenderer = new Renderer2D(this.views[3]);
 
     this.renderers.forEach(renderer => renderer.init());
 
+    this.loadData((this.studyStarted) ?
+      // 'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' : 
+      'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' :
+      'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz');
 
-    // this.loadData( (this.studyStarted === false) ?
-    // 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz'
-    //   :
-    // 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_slice.nii.gz');
-
-    this.loadData(this.studyStarted ?
-      'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' :
-      'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
-
-    // this.loadData(
-    //   'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz');
 
     this.addEventListeners();
     this.animate();
@@ -178,61 +181,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     // this.settings.freehandModeChange.subscribe(this.toggleFreehandMode.bind(this));
     this.settings.voxelprobeModeChange.subscribe(this.toggleVoxelprobeMode.bind(this));
     this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
-    addListeners(this._provenance.tracker, this);
-    (window as any).renderer = {
-      r0: this._axialRenderer,
-      r1: this._perspectiveRenderer,
-      r2: this._coronalRenderer,
-      r3: this._sagittalRenderer
-    };
-    // (window as any).canvas = this;
-    // (window as any).views = {
-    //   r1: this.views[0],
-    //   r2: this.views[1],
-    //   r3: this.views[2],
-    //   r4: this.views[3]
-    // };
+
+    addListeners(this._provenance.tracker);
   }
 
-  toggleRulerMode(isEnabled: boolean) {
-    this._axialRenderer.rulerMode = isEnabled;
-    this._sagittalRenderer.rulerMode = isEnabled;
-    this._coronalRenderer.rulerMode = isEnabled;
-  }
-
-  toggleAngleMode(isEnabled: boolean) {
-    this._axialRenderer.angleMode = isEnabled;
-    this._sagittalRenderer.angleMode = isEnabled;
-    this._coronalRenderer.angleMode = isEnabled;
-  }
-
-  // toggleFreehandMode(isEnabled: boolean) {
-  //   this._axialRenderer.freehandMode = isEnabled;
-  //   this._sagittalRenderer.freehandMode = isEnabled;
-  //   this._coronalRenderer.freehandMode = isEnabled;
-  // }
-
-  toggleVoxelprobeMode(isEnabled: boolean) {
-    this._axialRenderer.voxelprobeMode = isEnabled;
-    this._sagittalRenderer.voxelprobeMode = isEnabled;
-    this._coronalRenderer.voxelprobeMode = isEnabled;
-  }
-
-  toggleAnnotationMode(isEnabled: boolean) {
-    this._axialRenderer.annotationMode = isEnabled;
-    this._sagittalRenderer.annotationMode = isEnabled;
-    this._coronalRenderer.annotationMode = isEnabled;
-  }
+  async resize() {
+    this.renderers.forEach(renderer => renderer.onWindowResize());
+ }
 
   async loadData(url: string) {
     let loader = new AMI.VolumeLoader();
 
-    this.renderers.forEach(renderer => {
-      const scene = renderer.scene;
-      while (scene.children.length > 0) {
-        scene.remove(scene.children[0]);
-      }
-    });
+    this.removeScene();
 
     try {
       await loader.load(url);
@@ -241,163 +201,83 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       loader.free();
       loader = null;
 
-      const stack = series.stack[0];
-      stack.prepare();
+      this.stack = series.stack[0];
+      this.stack.prepare();
 
-      // center 3d camera/control on the stack
-      const centerLPS = stack.worldCenter();
-      const perspectiveCamera = <THREE.PerspectiveCamera>this._perspectiveRenderer.camera;
-      perspectiveCamera.lookAt(new THREE.Vector3(centerLPS.x, centerLPS.y, centerLPS.z));
-      perspectiveCamera.updateProjectionMatrix();
+      // set camera and scene
+      this.prepareCamera(this._perspectiveRenderer);
+      this.prepareScene(this._axialRenderer);
 
-      const perspectiveControls = this._perspectiveRenderer.controls;
-      perspectiveControls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
-
-      // bounding box
-      const boxHelper = new AMI.BoundingBoxHelper(stack);
-      this._perspectiveRenderer.scene.add(boxHelper);
-
-      // Freeform slice
-      this._perspectiveRenderer.initHelpersStack(stack);
-
-      [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
-        renderer.initHelpersStack(stack);
-        this._perspectiveRenderer.scene.add(renderer.scene);
-      });
-
-
-      // Init render to texture target
-      this.textureTarget = new THREE.WebGLRenderTarget(
-        this._axialRenderer.domElement.clientWidth,
-        this._axialRenderer.domElement.clientHeight,
-        {
-          minFilter: THREE.LinearFilter,
-          magFilter: THREE.NearestFilter,
-          format: THREE.RGBAFormat,
-        }
-      );
-
-      this.contourHelper = new AMI.ContourHelper(stack, this._axialRenderer.stackHelper.slice.geometry);
-      this.contourHelper.canvasWidth = this.textureTarget.width;
-      this.contourHelper.canvasHeight = this.textureTarget.height;
-      this.contourHelper.textureToFilter = this.textureTarget.texture;
-      this.contourScene = new THREE.Scene();
-      this.contourScene.add(this.contourHelper);
-
-      // create new mesh with Localizer shaders
-      const plane1 = this._axialRenderer.stackHelper.slice.cartesianEquation();
-      const plane2 = this._coronalRenderer.stackHelper.slice.cartesianEquation();
-      const plane3 = this._sagittalRenderer.stackHelper.slice.cartesianEquation();
-
-      // localizer axial slice
-      this._axialRenderer.initHelpersLocalizer(stack, plane1, [
-        { plane: plane2, color: new THREE.Color(this._coronalRenderer.stackHelper.borderColor) },
-        { plane: plane3, color: new THREE.Color(this._sagittalRenderer.stackHelper.borderColor) },
-      ]);
-
-      // localizer coronal slice
-      this._coronalRenderer.initHelpersLocalizer(stack, plane2, [
-        { plane: plane1, color: new THREE.Color(this._axialRenderer.stackHelper.borderColor) },
-        { plane: plane3, color: new THREE.Color(this._sagittalRenderer.stackHelper.borderColor) },
-      ]);
-
-      // localizer sagittal slice
-      this._sagittalRenderer.initHelpersLocalizer(stack, plane3, [
-        { plane: plane1, color: new THREE.Color(this._axialRenderer.stackHelper.borderColor) },
-        { plane: plane2, color: new THREE.Color(this._coronalRenderer.stackHelper.borderColor) },
-      ]);
-
-      this.setInitValuesWL();
 
       // // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
       this._initialized = true;
+      this.resize();
     } catch (error) {
       window.console.log('oops... something went wrong...');
       window.console.log(error);
     }
   }
 
-  setInitValuesWL() {
-    // Set initial threshold values for white balance
-    this.settings._thresholdLowerBoundW = (this._axialRenderer.stackHelper.stack.minMax[0]);
-    this.settings._thresholdUpperBoundW = (this._axialRenderer.stackHelper.stack.minMax[1]);
-    this.settings._thresholdLowerBoundC = (this._axialRenderer.stackHelper.stack.minMax[0]);
-    this.settings._thresholdUpperBoundC = (this._axialRenderer.stackHelper.stack.minMax[1]);
-    this.settings._thresholdValueW = !this.studyStarted ? 5119 : 2710;
-    this.settings._thresholdValueC = !this.studyStarted ? 512 : 331;
+  removeScene() {
+    this.renderers.forEach(renderer => {
+      const scene = renderer.scene;
+      while (scene.children.length > 0) {
+        scene.remove(scene.children[0]);
+      }
+    });
   }
 
-  onAxialChanged() {
-    this._axialRenderer.updateLocalizer([this._coronalRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
-    this._axialRenderer.updateClipPlane(this.clipPlaneAxial);
-    if (this.contourHelper) {
-      this.contourHelper.geometry = this._axialRenderer.stackHelper.slice.geometry;
-    }
+  prepareCamera(renderer3D: Renderer3D) {
+    // center 3d camera/control on the stack
+    const centerLPS = this.stack.worldCenter();
+    const perspectiveCamera = <THREE.PerspectiveCamera>renderer3D.camera;
+    perspectiveCamera.lookAt(new THREE.Vector3(centerLPS.x, centerLPS.y, centerLPS.z));
+    perspectiveCamera.updateProjectionMatrix();
+
+    const perspectiveControls = renderer3D.controls;
+    perspectiveControls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
   }
 
-  onCoronalChanged() {
-    this._coronalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
-    this._coronalRenderer.updateClipPlane(this.clipPlaneCoronal);
+  prepareScene(renderer: Renderer2D) {
+    // bounding box
+    const boxHelper = new AMI.BoundingBoxHelper(this.stack);
+    this._perspectiveRenderer.scene.add(boxHelper);
+
+    // Freeform slice
+    this._perspectiveRenderer.initHelpersStack(this.stack);
+
+    [this._axialRenderer, this._coronalRenderer, this._sagittalRenderer].forEach(renderer => {
+      renderer.initHelpersStack(this.stack);
+      this._perspectiveRenderer.scene.add(renderer.scene);
+    });
+
+
+    // Init render to texture target
+    this.textureTarget = new THREE.WebGLRenderTarget(
+      renderer.domElement.clientWidth,
+      renderer.domElement.clientHeight,
+      {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.NearestFilter,
+        format: THREE.RGBAFormat,
+      }
+    );
+
+    this.contourHelper = new AMI.ContourHelper(this.stack, renderer.stackHelper.slice.geometry);
+    this.contourHelper.canvasWidth = this.textureTarget.width;
+    this.contourHelper.canvasHeight = this.textureTarget.height;
+    this.contourHelper.textureToFilter = this.textureTarget.texture;
+    this.contourScene = new THREE.Scene();
+    this.contourScene.add(this.contourHelper);
   }
 
-  onSagittalChanged() {
-    this._sagittalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._coronalRenderer.localizerHelper]);
-    this._sagittalRenderer.updateClipPlane(this.clipPlaneSagittal);
-  }
-
-  adjustLocalizersOnDoubleClick(ijk: any) {
-    this._axialRenderer.stackHelper.index = ijk.getComponent((this._axialRenderer.stackHelper.orientation + 2) % 3);
-    this._coronalRenderer.stackHelper.index = ijk.getComponent((this._coronalRenderer.stackHelper.orientation + 2) % 3);
-    this._sagittalRenderer.stackHelper.index = ijk.getComponent((this._sagittalRenderer.stackHelper.orientation + 2) % 3);
-
-    this.onAxialChanged();
-    this.onCoronalChanged();
-    this.onSagittalChanged();
-  }
-
-  setWindowLevel(valueW, valueC, slider) {
-
-    if (slider === 'sliderW') {
-      this.settings.token = false;
-      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueW;
-      this._axialRenderer.stackHelper.slice._stack._windowWidth = valueW;
-      this._coronalRenderer.stackHelper.slice._stack._windowWidth = valueW;
-      this._sagittalRenderer.stackHelper.slice._stack._windowWidth = valueW;
-      this.updateWindowLevel();
-
-      (window as any).slider.setValueW(valueW);
-
-    } else if (slider === 'sliderC') {
-      this.settings.token = false;
-      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueC;
-      this._axialRenderer.stackHelper.slice._stack._windowCenter = valueC;
-      this._coronalRenderer.stackHelper.slice._stack._windowCenter = valueC;
-      this._sagittalRenderer.stackHelper.slice._stack._windowCenter = valueC;
-      this.updateWindowLevel();
-
-      (window as any).slider.setValueC(valueC);
-
-    }
-
-  }
-
-
-  updateWindowLevel() {
-    this._axialRenderer.stackHelper.index = this._axialRenderer.stackHelper.index;
-    this._coronalRenderer.stackHelper.index = this._coronalRenderer.stackHelper.index;
-    this._sagittalRenderer.stackHelper.index = this._sagittalRenderer.stackHelper.index;
-
-    this.onAxialChanged();
-    this.onCoronalChanged();
-    this.onSagittalChanged();
-  }
 
   addEventListeners() {
   }
 
   animate = () => {
-    requestAnimationFrame(this.animate);
+    requestAnimationFrame(this.animate.bind(this));
     if (this._initialized) {
       this.render();
     }
@@ -407,38 +287,141 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.renderers.forEach(renderer => renderer.render());
   }
 
-  setSlicePlanePosition(positions: ISlicePosition, within: number) {
-    if (this._perspectiveRenderer.stackHelper) {
-      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
-        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
+  // setInitValuesWL() {
+  // }
+
+  displayOneView(viewID: string) {
+    const oldPerspectiveRenderer = this._perspectiveRenderer;
+    const oldStackIndexA = this._axialRenderer.stackHelper.index;
+    const oldStackIndexC = this._coronalRenderer.stackHelper.index;
+    const oldStackIndexS = this._sagittalRenderer.stackHelper.index;
+
+    if (!this.settings.isOneView) {
+      this.createOneView(viewID);
+    } else {
+      this.create4Views(viewID);
+    }
+
+    this.removeScene();
+
+    this.prepareCamera(this._perspectiveRenderer);
+    this._perspectiveRenderer.setCameraOrientation(oldPerspectiveRenderer.getCameraOrientation(), 10);
+    this.prepareScene(this._axialRenderer);
+
+    this.setSliceIndex(VIEWS.AXIAL, oldStackIndexA);
+    this.setSliceIndex(VIEWS.CORONAL, oldStackIndexC);
+    this.setSliceIndex(VIEWS.SAGITTAL, oldStackIndexS);
+  }
+
+
+  createOneView(viewID: string) {
+    document.getElementById('main').setAttribute('class', 'visualizerOne');
+
+    this.renderers.forEach(renderer => renderer.domElement.setAttribute('style', 'display: none;'));
+
+    document.getElementById(viewID).setAttribute('class', 'rendererOne');
+    document.getElementById(viewID).setAttribute('style', 'display: block;');
+
+    this.settings.isOneView = true;
+  }
+
+
+  create4Views(viewID: string) {
+    document.getElementById('main').setAttribute('class', 'visualizer');
+    document.getElementById(viewID).setAttribute('class', 'renderer');
+
+    this.renderers.forEach(renderer => renderer.domElement.setAttribute('style', 'display: block;'));
+
+    this.settings.isOneView = false;
+  }
+
+
+  onAxialChanged() {
+    // this._axialRenderer.updateLocalizer([this._coronalRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
+    this._axialRenderer.updateClipPlane(this.clipPlaneAxial);
+    if (this.contourHelper) {
+      this.contourHelper.geometry = this._axialRenderer.stackHelper.slice.geometry;
     }
   }
 
-  setSlicePlaneZoom(positions: ISlicePosition, within: number) {
-    if (this._perspectiveRenderer.stackHelper) {
-      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
-        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
+  onCoronalChanged() {
+    // this._coronalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
+    this._coronalRenderer.updateClipPlane(this.clipPlaneCoronal);
+  }
+
+  onSagittalChanged() {
+    // this._sagittalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._coronalRenderer.localizerHelper]);
+    this._sagittalRenderer.updateClipPlane(this.clipPlaneSagittal);
+  }
+
+  // setInitValuesWL() {
+  //   // this.settings._thresholdLowerBoundC = (this._axialRenderer.stackHelper.stack.minMax[0]);
+  //   // this.settings._thresholdUpperBoundC = (this._axialRenderer.stackHelper.stack.minMax[1]);
+  // }
+
+  
+  setWindowLevel(valueW, valueC, slider) {
+
+    if (slider === 'sliderW') {
+      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueW;
+      this._axialRenderer.stackHelper.slice._stack._windowWidth = valueW;
+      this._coronalRenderer.stackHelper.slice._stack._windowWidth = valueW;
+      this._sagittalRenderer.stackHelper.slice._stack._windowWidth = valueW;
+
+      if(this.studyStarted){
+        this.sliderExploration.setValueW(valueW);
+      } else {
+        this.sliderPractice.setValueW(valueW);
+      }
+
+    } else if (slider === 'sliderC') {
+      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueC;
+      this._axialRenderer.stackHelper.slice._stack._windowCenter = valueC;
+      this._coronalRenderer.stackHelper.slice._stack._windowCenter = valueC;
+      this._sagittalRenderer.stackHelper.slice._stack._windowCenter = valueC;
+
+      if(this.studyStarted){
+        this.sliderExploration.setValueC(valueC);
+      } else {
+        this.sliderPractice.setValueC(valueC);
+      }
+    }
+
+    this._axialRenderer.stackHelper.index = this._axialRenderer.stackHelper.index;
+    this._coronalRenderer.stackHelper.index = this._coronalRenderer.stackHelper.index;
+    this._sagittalRenderer.stackHelper.index = this._sagittalRenderer.stackHelper.index;
+
+    this.onAxialChanged();
+    this.onCoronalChanged();
+    this.onSagittalChanged();
+  }
+
+
+  setPerspectiveCameraZoom(args: IOrientation, transitionTime: number) {
+    this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
+  }
+
+  setPerspectiveCameraOrientation(args: IOrientation, transitionTime: number) {
+    this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
+  }
+
+  setSliceZoom(sliceZoom: number, sliceOrientation: string, transitionTime: number) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.setSliceZoom(sliceZoom, transitionTime);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.setSliceZoom(sliceZoom, transitionTime);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.setSliceZoom(sliceZoom, transitionTime);
     }
   }
 
-  setAxialZoom(positions: ISlicePosition, within: number) {
-    if (this._axialRenderer.stackHelper) {
-      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
-        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
-    }
-  }
-
-  setSagittalZoom(positions: ISlicePosition, within: number) {
-    if (this._sagittalRenderer.stackHelper) {
-      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
-        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
-    }
-  }
-
-  setCoronalZoom(positions: ISlicePosition, within: number) {
-    if (this._coronalRenderer.stackHelper) {
-      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
-        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within >= 0 ? within : 1000);
+  setSliceDrag(slicePosition: ISlicePosition, sliceOrientation: string, transitionTime: number) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.setSlicePosition(slicePosition, transitionTime);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.setSlicePosition(slicePosition, transitionTime);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.setSlicePosition(slicePosition, transitionTime);
     }
   }
 
@@ -487,17 +470,44 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     }
   }
 
-
-  setPerspectiveCameraZoom(args: IOrientation, transitionTime: number) {
-    this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
+  deleteArtifact(sliceOrientation: VIEWS, artifact: Artifact) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.deleteArtifact(artifact);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.deleteArtifact(artifact);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.deleteArtifact(artifact);
+    }
   }
 
-  setPerspectiveCameraOrientation(args: IOrientation, transitionTime: number) {
-    this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
+
+  toggleRulerMode(isEnabled: boolean) {
+    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
+      renderer.rulerMode = isEnabled;
+    });
   }
 
-  getScreenShot() {
-    // return this._sagittalRenderer.renderer.domElement.toDataURL();
-    return this._perspectiveRenderer.renderer.domElement.toDataURL();
+  toggleAngleMode(isEnabled: boolean) {
+    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
+      renderer.angleMode = isEnabled;
+    });
+  }
+
+  // toggleFreehandMode(isEnabled: boolean) {
+  //   [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
+  //     renderer.freehandMode = isEnabled;
+  //   });
+  // }
+
+  toggleVoxelprobeMode(isEnabled: boolean) {
+    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
+      renderer.voxelprobeMode = isEnabled;
+    });
+  }
+
+  toggleAnnotationMode(isEnabled: boolean) {
+    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
+      renderer.annotationMode = isEnabled;
+    });
   }
 }

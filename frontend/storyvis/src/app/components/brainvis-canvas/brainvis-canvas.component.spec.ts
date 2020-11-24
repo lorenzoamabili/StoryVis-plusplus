@@ -1,25 +1,19 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from "@angular/core/testing";
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 
 describe('BrainvisCanvasComponent', () => {
-  let component: BrainvisCanvasComponent;
-  let fixture: ComponentFixture<BrainvisCanvasComponent>;
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ BrainvisCanvasComponent ]
-    })
-    .compileComponents();
+  beforeEach(() => TestBed.configureTestingModule({
+    imports: [HttpClientTestingModule], 
+    providers: [BrainvisCanvasComponent]
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(BrainvisCanvasComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
   it('should create', () => {
+    TestBed.configureTestingModule({declarations: [BrainvisCanvasComponent]});
+    const fixture = TestBed.createComponent(BrainvisCanvasComponent);
+    const component = fixture.componentInstance;
+    expect(component).toBeDefined();
     expect(component).toBeTruthy();
   });
 });

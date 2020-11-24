@@ -21,13 +21,18 @@ import { trigger, style, animate, transition, state } from '@angular/animations'
 export class SlidesContainerComponent {
   @Input() opened = false;
 
+  constructor() {
+  }
+
   toggleBottomDrawer() {
     this.opened = !this.opened;
     var cont = document.getElementById("textRep");
-    if (this.opened) {
-      cont.style.zIndex = "-1"
-    } else {
-      cont.style.zIndex = "11"
+    if(cont){
+      if (this.opened) {
+        cont.style.zIndex = "-1"
+      } else {
+        cont.style.zIndex = "11"
+      }
     }
   }
 }

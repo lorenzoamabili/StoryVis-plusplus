@@ -1,5 +1,5 @@
 import "./style.css";
-import { IProvenanceSlidedeck } from "@visualstorytelling/provenance-core";
+import { IProvenanceSlide, IProvenanceSlidedeck } from "@visualstorytelling/provenance-core";
 export declare class SlideDeckVisualization {
     private _slideDeck;
     private _root;
@@ -27,12 +27,11 @@ export declare class SlideDeckVisualization {
     private _gridTimeStep;
     private _gridSnap;
     private _playingID;
-    private _annotationContainer;
-    private onDelete;
+    _slidesInDeck: number;
+    constructor(slideDeck: IProvenanceSlidedeck, elm: HTMLDivElement);
+    onDelete: (slide: IProvenanceSlide) => void;
     private onSelect;
     private selectSlide;
-    private onMouseEnter;
-    private onMouseLeave;
     onAdd: (node?: import("@visualstorytelling/provenance-core").RootNode | import("@visualstorytelling/provenance-core").StateNode | undefined) => void;
     private onClone;
     private moveDragStarted;
@@ -50,12 +49,12 @@ export declare class SlideDeckVisualization {
     private updateTimeIndices;
     private rescaleTimeline;
     private onBackward;
+    private onForward;
     private playTimeline;
     private onPlay;
     private onPause;
     private startPlaying;
     private stopPlaying;
-    private onForward;
     private seekStarted;
     private seekDragged;
     private resizeTable;
@@ -68,15 +67,10 @@ export declare class SlideDeckVisualization {
      * Add a new annotation to the currently selected slide, and then display it.
      */
     private addAnnotation;
-    private adjustGridScale;
-    private drawGrid;
     private fixDrawingPriorities;
-    private displayGridLevel;
     private drawSeekBar;
     private adjustSlideAddObjectPosition;
-    private adjustHorizontalLine;
     update(): void;
-    constructor(slideDeck: IProvenanceSlidedeck, elm: HTMLDivElement);
     setDeck(deck: IProvenanceSlidedeck): void;
     getDeck(): IProvenanceSlidedeck;
 }

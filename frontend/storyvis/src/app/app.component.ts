@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProvenanceService } from './shared/_services';
 
@@ -9,7 +9,7 @@ import { User, Role } from './shared/_models';
     selector: 'app',
     templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
     currentUser: User;
     title = 'app';
 
@@ -28,10 +28,6 @@ export class AppComponent {
 
     get isAuthor() {
         return this.currentUser && this.currentUser.role === Role.Author;
-    }
-
-    get isRegular() {
-        return this.currentUser && this.currentUser.role === Role.Regular;
     }
 
     get isReader() {
@@ -54,8 +50,7 @@ export class AppComponent {
         return this.currentUser && this.currentUser.group === "NoProvGraph";
     }
 
-    logout() {
-        this.authenticationService.logout();
-        this.router.navigateByUrl('/login');
-    }
+    ngOnInit() {
+        console.log('init?');
+      }
 }

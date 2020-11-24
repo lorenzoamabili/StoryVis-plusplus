@@ -16,7 +16,6 @@ export class IntroPracComponent implements OnInit {
         }
 
     ngOnInit() {
-
     }
 
 
@@ -26,10 +25,6 @@ export class IntroPracComponent implements OnInit {
 
     get isAuthor() {
         return this.currentUser && this.currentUser.role === Role.Author;
-    }
-
-    get isRegular() {
-        return this.currentUser && this.currentUser.role === Role.Regular;
     }
 
     get isReader() {

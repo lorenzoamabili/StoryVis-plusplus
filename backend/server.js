@@ -18,9 +18,9 @@ app.use('/users', require('./users/users.controller'));
 app.use('/provGraphs', require('./provGraphs/provGraphs.controller'));
 app.use('/textReports', require('./textReports/textReports.controller'));
 app.use('/stories', require('./stories/stories.controller'));
-app.use('/provGraphsPractice', require('./provGraphsPractice/provGraphsPractice.controller'));
-app.use('/storiesPractice', require('./storiesPractice/storiesPractice.controller'));
-app.use('/textReportsPractice', require('./textReportsPractice/textReportsPractice.controller'));
+app.use('/provGraphsStudy', require('./provGraphsStudy/provGraphsStudy.controller'));
+app.use('/storiesStudy', require('./storiesStudy/storiesStudy.controller'));
+app.use('/textReportsStudy', require('./textReportsStudy/textReportsStudy.controller'));
 
 // global error handler
 app.use(errorHandler);
@@ -31,5 +31,3 @@ const port =  process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) :
 const server = app.listen(port, function () {
     console.log('Server listening on port ' + port);
 });
-
-// const server = require('http').createServer();
