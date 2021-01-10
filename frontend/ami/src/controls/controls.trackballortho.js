@@ -90,7 +90,7 @@ const trackballOrtho = (three = window.THREE) => {
 
       // methods
 
-      this.handleResize = function() {
+      this.handleResize = function () {
         if (this.domElement === document) {
           this.screen.left = 0;
           this.screen.top = 0;
@@ -114,13 +114,13 @@ const trackballOrtho = (three = window.THREE) => {
         this.bottom0 = this.object.bottom;
       };
 
-      this.handleEvent = function(event) {
+      this.handleEvent = function (event) {
         if (typeof this[event.type] == 'function') {
           this[event.type](event);
         }
       };
 
-      let getMouseOnScreen = (function() {
+      let getMouseOnScreen = (function () {
         let vector = new three.Vector2();
 
         return function getMouseOnScreen(pageX, pageY) {
@@ -133,7 +133,7 @@ const trackballOrtho = (three = window.THREE) => {
         };
       })();
 
-      this.zoomCamera = function() {
+      this.zoomCamera = function () {
         if (_state === STATE.TOUCH_ZOOM_PAN) {
           var factor = _touchZoomDistanceEnd / _touchZoomDistanceStart;
           _touchZoomDistanceStart = _touchZoomDistanceEnd;
@@ -158,7 +158,7 @@ const trackballOrtho = (three = window.THREE) => {
         }
       };
 
-      this.panCamera = (function() {
+      this.panCamera = (function () {
         let mouseChange = new three.Vector2(),
           objectUp = new three.Vector3(),
           pan = new three.Vector3();
@@ -197,7 +197,7 @@ const trackballOrtho = (three = window.THREE) => {
         };
       })();
 
-      this.update = function() {
+      this.update = function () {
         _eye.subVectors(_this.object.position, _this.target);
 
         if (!_this.noZoom) {
@@ -223,7 +223,7 @@ const trackballOrtho = (three = window.THREE) => {
         }
       };
 
-      this.reset = function() {
+      this.reset = function () {
         _state = STATE.NONE;
         _prevState = STATE.NONE;
 
@@ -292,7 +292,6 @@ const trackballOrtho = (three = window.THREE) => {
           _panEnd.copy(_panStart);
         }
 
-        document.addEventListener('mousemove', mousemove, false);
         document.addEventListener('mouseup', mouseup, false);
 
         _this.dispatchEvent(startEvent);
@@ -300,16 +299,16 @@ const trackballOrtho = (three = window.THREE) => {
 
       function mousemove(event) {
         if (_this.enabled === false) return;
+      
+          event.preventDefault();
+          event.stopPropagation();
 
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (_state === STATE.ROTATE && !_this.noRotate) {
-        } else if (_state === STATE.ZOOM && !_this.noZoom) {
-          _zoomEnd.copy(getMouseOnScreen(event.pageX, event.pageY));
-        } else if (_state === STATE.PAN && !_this.noPan) {
-          _panEnd.copy(getMouseOnScreen(event.pageX, event.pageY));
-        }
+          if (_state === STATE.ROTATE && !_this.noRotate) {
+          } else if (_state === STATE.ZOOM && !_this.noZoom) {
+            _zoomEnd.copy(getMouseOnScreen(event.pageX, event.pageY));
+          } else if (_state === STATE.PAN && !_this.noPan) {
+            _panEnd.copy(getMouseOnScreen(event.pageX, event.pageY));
+          }
       }
 
       function mouseup(event) {
@@ -320,7 +319,6 @@ const trackballOrtho = (three = window.THREE) => {
 
         _state = STATE.NONE;
 
-        document.removeEventListener('mousemove', mousemove);
         document.removeEventListener('mouseup', mouseup);
         _this.dispatchEvent(endEvent);
       }
@@ -424,9 +422,10 @@ const trackballOrtho = (three = window.THREE) => {
         event.preventDefault();
       }
 
-      this.dispose = function() {
+      this.dispose = function () {
         this.domElement.removeEventListener('contextmenu', contextmenu, false);
         this.domElement.removeEventListener('mousedown', mousedown, false);
+        this.domElement.removeEventListener('mousemove', mousemove, false);
         this.domElement.removeEventListener('wheel', mousewheel, false);
 
         this.domElement.removeEventListener('touchstart', touchstart, false);
@@ -439,6 +438,7 @@ const trackballOrtho = (three = window.THREE) => {
 
       this.domElement.addEventListener('contextmenu', contextmenu, false);
       this.domElement.addEventListener('mousedown', mousedown, false);
+      this.domElement.addEventListener('mousemove', mousemove, false);
       this.domElement.addEventListener('wheel', mousewheel, false);
 
       this.domElement.addEventListener('touchstart', touchstart, false);

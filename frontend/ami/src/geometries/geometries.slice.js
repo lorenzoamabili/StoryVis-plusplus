@@ -64,47 +64,66 @@ const geometriesSlice = (three = window.THREE) => {
         direction
       };
 
-      // BOOM!  workaround applied
-      let intersections = null;
-      let safeIntersections = null;
-      let oldaabb = null;
-      let oldPlane = null;
+      // // BOOM!  workaround applied
+      // let intersections = null;
+      // let safeIntersections = null;
+      // let oldaabb = null;
+      // let oldPlane = null;
 
-      for (let i = 0; i < 2; i++) {
-        oldaabb = [
-          { x: 191.5, y: 255.5, z: 27.5, isVector3: true },
-          {x: 192, y: 256, z: 28},
-          {elements: Array(16), isMatrix4: true}
-        ];
-        oldPlane = [
-          {x: 0, y: 0, z: 1, isVector3: true},
-          {x: 192, y: 256, z: 28, isVector3: true}
-        ];
-        intersections = coreIntersections.aabbPlane(aabb, plane);
-        safeIntersections = intersections.length < 3 ? coreIntersections.aabbPlane(oldaabb, oldPlane) : intersections;
-      }
+      // for (let i = 0; i < 2; i++) {
+      //   oldaabb = [
+      //     {x: 191.5, y: 256, z: 27.5, isVector3: true },
+      //     {x: 192, y: 256, z: 28},
+      //     {elements: Array(16), isMatrix4: true}
+      //   ];
+      //   oldPlane = [
+      //     {x: 0, y: 0, z: 1, isVector3: true},
+      //     {x: 192, y: 256, z: 28, isVector3: true}
+      //   ];
+      //   intersections = coreIntersections.aabbPlane(aabb, plane);
+      //   safeIntersections = intersections.length < 3 ? coreIntersections.aabbPlane(oldaabb, oldPlane) : intersections;
+      // }
 
-      // can not exist before calling the constructor
-      if (safeIntersections.length < 3) {
-        window.console.log('WARNING: Less than 3 intersections between AABB and Plane.');
-        window.console.log('AABB');
-        window.console.log(aabb);
-        window.console.log('Plane');
-        window.console.log(plane);
-        window.console.log('exiting...');
-        const err = new Error(
-          'geometries.slice has less than 3 intersections, can not create a valid geometry.'
-        );
-        throw err;
-      }
+      // // can not exist before calling the constructor
+      // if (safeIntersections.length < 3) {
+      //   window.console.log('WARNING: Less than 3 intersections between AABB and Plane.');
+      //   window.console.log('AABB');
+      //   window.console.log(aabb);
+      //   window.console.log('Plane');
+      //   window.console.log(plane);
+      //   window.console.log('exiting...');
+      //   const err = new Error(
+      //     'geometries.slice has less than 3 intersections, can not create a valid geometry.'
+      //   );
+      //   throw err;
+      // }
 
-      let points = safeIntersections.length < 3 ?
-        [{ x: -0.5, y: -0.5, z: 28 },
-        { x: 383.5, y: 511.5, z: 28 },
-        { x: 383.5, y: -0.5, z: 28 },
-        { x: -0.5, y: 511.5, z: 28 }]
-        : coreUtils.orderIntersections(safeIntersections, direction);
+      // let points = safeIntersections.length < 3 ?
+      //   [{ x: -0.5, y: -0.5, z: 28 },
+      //   { x: 383.5, y: 511.5, z: 28 },
+      //   { x: 383.5, y: -0.5, z: 28 },
+      //   { x: -0.5, y: 511.5, z: 28 }]
+      // : coreUtils.orderIntersections(safeIntersections, direction);
 
+
+            // BOOM!
+            let intersections = coreIntersections.aabbPlane(aabb, plane);
+
+            // can not exist before calling the constructor
+            if (intersections.length < 3) {
+              window.console.log('WARNING: Less than 3 intersections between AABB and Plane.');
+              window.console.log('AABB');
+              window.console.log(aabb);
+              window.console.log('Plane');
+              window.console.log(plane);
+              window.console.log('exiting...');
+              const err = new Error(
+                'geometries.slice has less than 3 intersections, can not create a valid geometry.'
+              );
+              throw err;
+            }
+      
+            let points = coreUtils.orderIntersections(intersections, direction);
         
       // create the shape
       let shape = new three.Shape();

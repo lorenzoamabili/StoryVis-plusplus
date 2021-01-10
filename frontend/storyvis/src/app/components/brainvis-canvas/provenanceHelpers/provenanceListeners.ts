@@ -4,6 +4,7 @@ import { Renderer2D } from '../renderer2d';
 import { registerActions } from './provenanceActions';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 import { Settings } from '../utils/settings';
+import { ISlicePosition } from '../utils/types';
 
 export const addListeners = (tracker: ProvenanceTracker) => {
   let settings = Settings.getInstance(this);
@@ -27,6 +28,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
   const sliceIndexStartListener = (startEvent) => {
     canvas.removeEventListener('sliceIndexChanged', sliceIndexEndListener);
     sliceIndexEndListener = debounce((event: any) => {
+      if (startEvent.changes.sliceOrientation === event.changes.sliceOrientation) {
       let label = '';
       switch (startEvent.changes.sliceOrientation) {
         case 'axial':
@@ -55,7 +57,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
           args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, event.changes.newIndex]
         }
       }
-      tracker.applyAction(action);
+      tracker.applyAction(action); }
     }, 500, { trailing: true });
     canvas.addEventListener('sliceIndexChanged', sliceIndexEndListener);
   };
@@ -67,9 +69,10 @@ export const addListeners = (tracker: ProvenanceTracker) => {
     canvas.removeEventListener('perspectiveCameraZoomChanged', perspectiveZoomEndListener);
     perspectiveZoomEndListener = debounce((event: any) => {
       let label = '3D-zoom ';
-      label += ' ' + event.orientation.position[0].toFixed(0);
-      label += '/' + event.orientation.position[1].toFixed(0);
-      label += '/' + event.orientation.position[2].toFixed(0);
+      // label += ' ' + event.orientation.position[0].toFixed(0);
+      // label += '/' + event.orientation.position[1].toFixed(0);
+      // label += '/' + event.orientation.position[2].toFixed(0);
+      label += ' #' + event.number;
 
       tracker.applyAction({
         metadata: {
@@ -92,9 +95,11 @@ export const addListeners = (tracker: ProvenanceTracker) => {
     canvas.removeEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
     perspectiveOrientationEndListener = debounce((event: any) => {
       let label = '3D-XYZ ';
-      label += ' ' + event.orientation.position[0].toFixed(0);
-      label += '/' + event.orientation.position[1].toFixed(0);
-      label += '/' + event.orientation.position[2].toFixed(0);
+      // label += ' ' + event.orientation.position[0].toFixed(0);
+      // label += '/' + event.orientation.position[1].toFixed(0);
+      // label += '/' + event.orientation.position[2].toFixed(0);
+      label += ' #' + event.number;
+
       tracker.applyAction({
         metadata: {
           userIntent: 'exploration',
@@ -315,4 +320,19 @@ export const addListeners = (tracker: ProvenanceTracker) => {
       tracker.applyAction(action, true);
     })
   });
+
+
+  canvas.slicesLocationCreated.subscribe((parameters) => {
+      const action = {
+        metadata: {
+          userIntent: 'configuration',
+          label: 'slices relocation'
+        },
+        do: 'resetBackSlicesLocation',
+        doArguments: { args: [] },
+        undo: 'changeSlicesLocation',
+        undoArguments: { args: [parameters] }
+      };
+      tracker.applyAction(action, true);
+    });
 }

@@ -12,6 +12,9 @@ import { Component } from '@angular/core';
 
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
+  public interactionNumber: number = 0;
+  public zoomNumber: number = 0;
+  
   constructor(view: View) {
     super(view);
     this._domElement = document.getElementById(view.domId);
@@ -121,8 +124,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     const position = this._controls.camera.position.toArray();
     const target = this._controls.target.toArray();
     const up = this._controls.camera.up.toArray();
-    const orientation = { position, target, up };
-
+    const orientation = { position, target, up };    
     return orientation;
   }
 
@@ -132,7 +134,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraZoomChangeStart',
-        orientation
+        orientation,
+        number: this.zoomNumber + 1
       });
     });
 
@@ -141,7 +144,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraZoomChanged',
-        orientation
+        orientation,
+        number: this.zoomNumber + 1
       });
     });
 
@@ -150,7 +154,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraOrientationChangeStart',
-        orientation
+        orientation,
+        number: this.interactionNumber + 1
       });
     });
 
@@ -159,7 +164,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraOrientationChanged',
-        orientation
+        orientation,
+        number: this.interactionNumber + 1
       });
     });
   }

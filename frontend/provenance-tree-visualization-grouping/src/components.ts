@@ -82,6 +82,80 @@ export function addAggregationButtons(
   legendButton
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+  const upwardButton = provenanceTreeVisualization.container
+    .append('button')
+    .attr('id', 'upward-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; z-index: 1; top: 2px; background-color: snow;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => {
+      if((window as any).prov.graph.current.parent){
+      provenanceTreeVisualization.traverser.toStateNode((window as any).prov.graph.current.parent.id, 250);
+      provenanceTreeVisualization.update();
+    }
+    });
+
+  upwardButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('arrow_upward');
+
+  upwardButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+  upwardButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+  const downwardButton = provenanceTreeVisualization.container
+    .append('button')
+    .attr('id', 'downward-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; z-index: 1; top: 45px; background-color: snow;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => {
+      if(provenanceTreeVisualization.traverser.graph.current.children[0]){
+        provenanceTreeVisualization.traverser.toStateNode(provenanceTreeVisualization.traverser.graph.current.children[0].id, 250);
+        provenanceTreeVisualization.update();
+      }
+    });
+
+  downwardButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('arrow_downward');
+
+  downwardButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+  downwardButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
 }
 
 /**

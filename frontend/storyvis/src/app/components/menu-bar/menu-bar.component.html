@@ -1,10 +1,10 @@
 <mat-toolbar color="primary" style="width: 100%">
   <mat-toolbar-row>
-    
+
     <div *ngIf="isAdmin">
       <mat-form-field>
         <mat-label>Select Graph</mat-label>
-        <mat-select (selectionChange)="provenance.restoreGraph($event)" >
+        <mat-select (selectionChange)="provenance.restoreGraph($event)">
           <mat-option *ngFor="let graph of graphs" [value]="graph">
             {{ graph._id}}
           </mat-option>
@@ -32,29 +32,31 @@
       <span>&nbsp;</span>
 
 
-      
-      <button class = "save" mat-raised-button matTooltip="Save provenance graph in cloud" (click)="provenance.saveGraph(IDcreator)">
+
+      <button class="save" mat-raised-button matTooltip="Save provenance graph in cloud"
+        (click)="provenance.saveGraph(IDcreator)">
         <mat-icon>backup</mat-icon>
       </button>
 
-      <button class = "save" mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
+      <button class="save" mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
         <mat-icon>mms icon</mat-icon>
       </button>
 
-      <button class = "save" mat-raised-button matTooltip="Save text report in cloud" (click)="provenance.saveTextReport(IDcreator)">
+      <button class="save" mat-raised-button matTooltip="Save text report in cloud"
+        (click)="provenance.saveTextReport(IDcreator)">
         <mat-icon>library_books</mat-icon>
       </button>
     </div>
 
     <span>&nbsp;</span>
 
-    <mat-button-toggle [checked]="settings.rulerMode"
-      (change)="settings.rulerMode = $event.source.checked" matTooltip="Distance Measurement">
+    <mat-button-toggle [checked]="settings.rulerMode" (change)="settings.rulerMode = $event.source.checked"
+      matTooltip="Distance Measurement">
       <mat-icon class="example-icon">space_bar</mat-icon>
     </mat-button-toggle>
 
-    <mat-button-toggle [checked]="settings.angleMode"
-      (change)="settings.angleMode = $event.source.checked" matTooltip="Angle Measurement">
+    <mat-button-toggle [checked]="settings.angleMode" (change)="settings.angleMode = $event.source.checked"
+      matTooltip="Angle Measurement">
       <mat-icon class="example-icon">launch</mat-icon>
     </mat-button-toggle>
 
@@ -63,8 +65,8 @@
       <mat-icon class="example-icon">pan_tool</mat-icon>
     </mat-button-toggle> -->
 
-    <mat-button-toggle [checked]="settings.voxelprobeMode"
-      (change)="settings.voxelprobeMode = $event.source.checked" matTooltip="Density Measurement">
+    <mat-button-toggle [checked]="settings.voxelprobeMode" (change)="settings.voxelprobeMode = $event.source.checked"
+      matTooltip="Density Measurement">
       <mat-icon class="example-icon">fingerprint</mat-icon>
     </mat-button-toggle>
 
@@ -78,9 +80,42 @@
     <app-styled-slider-practice *ngIf="!studyStarted"></app-styled-slider-practice>
     <app-styled-slider-exploration *ngIf="studyStarted"></app-styled-slider-exploration>
 
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    
+    <button class="slicesLocation" mat-raised-button matTooltip="Set default window level - Lung"
+      (click)="settings.canvas.resetWindowLevel1()">
+      <mat-icon>settings_brightness</mat-icon>
+    </button>
+
+    <span>&nbsp;</span>
+
+    <button class="slicesLocation" style="background-color: slategray;" mat-raised-button
+      matTooltip="Set default window level - Mediastinum" (click)="settings.canvas.resetWindowLevel2()">
+      <mat-icon>settings_brightness</mat-icon>
+    </button>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <button class="slicesLocation" mat-raised-button matTooltip="Restore the original slices position in all the views"
+      (click)="settings.canvas.resetSlicesLocation()">
+      <mat-icon>settings_overscan</mat-icon>
+    </button>
+
+    <div *ngIf="!studyStarted" style="position: absolute; right: 0px;">
+      <a class="nav-item nav-link">PRACTICE SESSION</a>
+    </div>
+
+    <div *ngIf="studyStarted" style="position: absolute; right: 0px;">
+      <a class="nav-item nav-link">EVALUATION SESSION</a>
+    </div>
+
     <div *ngIf="isAdmin" style="position: absolute; right: 0px;">
       <a class="nav-item nav-link" (click)="logout()">LOGOUT</a>
-  </div>
+    </div>
 
   </mat-toolbar-row>
 </mat-toolbar>

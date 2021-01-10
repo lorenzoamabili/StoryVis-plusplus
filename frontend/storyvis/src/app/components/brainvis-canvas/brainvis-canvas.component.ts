@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
 
-import { Component, ElementRef, HostListener, OnInit, Input, 
+import {
+  Component, ElementRef, HostListener, OnInit, Input, EventEmitter, Output,
   // RendererType2, EventEmitter, Output 
 } from '@angular/core';
 import { IOrientation, ISlicePosition, View } from './utils/types';
@@ -31,6 +32,7 @@ export enum VIEWS {
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
   @Input() studyStarted: boolean;
+  @Output() slicesLocationCreated = new EventEmitter<{ slicesPosition: ISlicePosition[], slicesCameraZoom: number[] }>();
 
   public _initialized = false;
   public settings = Settings.getInstance(this);
@@ -104,6 +106,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   public _coronalRenderer: Renderer2D;
   public _sagittalRenderer: Renderer2D;
 
+  private oldStackDragA: ISlicePosition;
+  private oldStackDragC: ISlicePosition;
+  private oldStackDragS: ISlicePosition;
+  private oldStackZoomA: number;
+  private oldStackZoomC: number;
+  private oldStackZoomS: number;
+
   // extra variables to show mesh plane intersections in 2D renderers
   private clipPlaneAxial = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
   private clipPlaneCoronal = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
@@ -119,7 +128,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._provenance = provenance;
     this.elem = elem.nativeElement;
     this.settings.canvas = this;
-    }
+  }
 
   get perspectiveRenderer() {
     return this._perspectiveRenderer;
@@ -143,6 +152,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     return [
       this._axialRenderer,
       this._perspectiveRenderer,
+      this._coronalRenderer,
+      this._sagittalRenderer];
+  }
+
+  get renderers2D() {
+    return [
+      this._axialRenderer,
       this._coronalRenderer,
       this._sagittalRenderer];
   }
@@ -187,7 +203,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   async resize() {
     this.renderers.forEach(renderer => renderer.onWindowResize());
- }
+  }
 
   async loadData(url: string) {
     let loader = new AMI.VolumeLoader();
@@ -292,11 +308,22 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   displayOneView(viewID: string) {
     const oldPerspectiveRenderer = this._perspectiveRenderer;
+
     const oldStackIndexA = this._axialRenderer.stackHelper.index;
     const oldStackIndexC = this._coronalRenderer.stackHelper.index;
     const oldStackIndexS = this._sagittalRenderer.stackHelper.index;
 
+
     if (!this.settings.isOneView) {
+      
+      this.oldStackDragA = this._axialRenderer.getSlicePosition();
+      this.oldStackDragC = this._coronalRenderer.getSlicePosition();
+      this.oldStackDragS = this._sagittalRenderer.getSlicePosition();
+  
+      this.oldStackZoomA = this._axialRenderer.camera.zoom;
+      this.oldStackZoomC = this._coronalRenderer.camera.zoom;
+      this.oldStackZoomS = this._sagittalRenderer.camera.zoom;
+
       this.createOneView(viewID);
     } else {
       this.create4Views(viewID);
@@ -311,6 +338,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.setSliceIndex(VIEWS.AXIAL, oldStackIndexA);
     this.setSliceIndex(VIEWS.CORONAL, oldStackIndexC);
     this.setSliceIndex(VIEWS.SAGITTAL, oldStackIndexS);
+
+
+    if (!this.settings.isOneView) {
+    this.setSliceDrag(this.oldStackDragA, VIEWS.AXIAL, 10);
+    this.setSliceDrag(this.oldStackDragC, VIEWS.CORONAL, 10);
+    this.setSliceDrag(this.oldStackDragS, VIEWS.SAGITTAL, 10);
+
+    this.setSliceZoom(this.oldStackZoomA, VIEWS.AXIAL, 10);
+    this.setSliceZoom(this.oldStackZoomC, VIEWS.CORONAL, 10);
+    this.setSliceZoom(this.oldStackZoomS, VIEWS.SAGITTAL, 10);
+    }
+
   }
 
 
@@ -359,37 +398,77 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   //   // this.settings._thresholdUpperBoundC = (this._axialRenderer.stackHelper.stack.minMax[1]);
   // }
 
-  
+  resetWindowLevel1() {
+    this.setWindowLevel(1500, 600, 'both');
+  }
+
+  resetWindowLevel2() {
+    this.setWindowLevel(350, 50, 'both');
+  }
+
+  resetSlicesLocation() {
+    let slicesPosition: ISlicePosition[] = [];
+    slicesPosition.push(this._axialRenderer.oldSlicePosition);
+    slicesPosition.push(this._coronalRenderer.oldSlicePosition);
+    slicesPosition.push(this._sagittalRenderer.oldSlicePosition);
+
+    let slicesCameraZoom: number[] = [];
+    slicesCameraZoom.push(this._axialRenderer.oldCameraZoom);
+    slicesCameraZoom.push(this._coronalRenderer.oldCameraZoom);
+    slicesCameraZoom.push(this._sagittalRenderer.oldCameraZoom);
+
+    const parameters = { slicesPosition, slicesCameraZoom };
+
+    this.resetBackSlicesLocation();
+    this.slicesLocationCreated.emit(parameters);
+  }
+
+  resetBackSlicesLocation() {
+    this.renderers2D.forEach(renderer => renderer.setSlicePosition(renderer.originalSlicePosition, 1));
+    this.renderers2D.forEach(renderer => renderer.setSliceZoom(renderer.originalCameraZoom, 1));
+  }
+
+  changeSlicesLocation(parameters: { slicesPosition: ISlicePosition[], slicesCameraZoom: number[] }) {
+    this._axialRenderer.setSlicePosition(parameters.slicesPosition[0], 1);
+    this._coronalRenderer.setSlicePosition(parameters.slicesPosition[1], 1);
+    this._sagittalRenderer.setSlicePosition(parameters.slicesPosition[2], 1);
+
+    this._axialRenderer.setSliceZoom(parameters.slicesCameraZoom[0], 1);
+    this._coronalRenderer.setSliceZoom(parameters.slicesCameraZoom[1], 1);
+    this._sagittalRenderer.setSliceZoom(parameters.slicesCameraZoom[2], 1);
+  }
+
   setWindowLevel(valueW, valueC, slider) {
-
     if (slider === 'sliderW') {
-      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueW;
-      this._axialRenderer.stackHelper.slice._stack._windowWidth = valueW;
-      this._coronalRenderer.stackHelper.slice._stack._windowWidth = valueW;
-      this._sagittalRenderer.stackHelper.slice._stack._windowWidth = valueW;
+      this.renderers2D.forEach(renderer => renderer.stackHelper.slice._stack._windowWidth = valueW);
 
-      if(this.studyStarted){
+      if (this.studyStarted) {
         this.sliderExploration.setValueW(valueW);
       } else {
         this.sliderPractice.setValueW(valueW);
       }
 
     } else if (slider === 'sliderC') {
-      this.settings.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = valueC;
-      this._axialRenderer.stackHelper.slice._stack._windowCenter = valueC;
-      this._coronalRenderer.stackHelper.slice._stack._windowCenter = valueC;
-      this._sagittalRenderer.stackHelper.slice._stack._windowCenter = valueC;
+      this.renderers2D.forEach(renderer => renderer.stackHelper.slice._stack._windowCenter = valueC);
 
-      if(this.studyStarted){
+      if (this.studyStarted) {
         this.sliderExploration.setValueC(valueC);
       } else {
         this.sliderPractice.setValueC(valueC);
       }
+
+    } else if (slider === 'both') {
+      
+      if (this.studyStarted) {
+        this.sliderExploration.setValueW(valueW);
+        this.sliderExploration.setValueC(valueC);
+      } else {
+        this.sliderPractice.setValueW(valueW);
+        this.sliderPractice.setValueC(valueC);
+      }
     }
 
-    this._axialRenderer.stackHelper.index = this._axialRenderer.stackHelper.index;
-    this._coronalRenderer.stackHelper.index = this._coronalRenderer.stackHelper.index;
-    this._sagittalRenderer.stackHelper.index = this._sagittalRenderer.stackHelper.index;
+    this.renderers2D.forEach(renderer => renderer.stackHelper.index = renderer.stackHelper.index);
 
     this.onAxialChanged();
     this.onCoronalChanged();

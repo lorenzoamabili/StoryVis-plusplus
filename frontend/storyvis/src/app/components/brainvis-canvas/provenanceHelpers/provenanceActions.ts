@@ -26,6 +26,7 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
   setWindowLevel: async (valueW, valueC, slider) => {
     canvas.setWindowLevel(valueW, valueC, slider);
   },
+
   setPerspectiveCameraZoomLevel: async (args, transitionTime) => canvas.setPerspectiveCameraZoom(args, transitionTime),
   setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime),
 
@@ -34,6 +35,13 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
   },
   reduceView: async (domID) => {
     canvas.create4Views(domID);
+  },
+
+  changeSlicesLocation: async (parameters) => {
+    canvas.changeSlicesLocation(parameters);
+  },
+  resetBackSlicesLocation: async () => {
+    canvas.resetSlicesLocation();
   }
 });
 

@@ -16,7 +16,7 @@ class SlideDeckVisualization {
         this._tableHeight = 100;
         this._tableWidth = 1800;
         this._minimumSlideDuration = 100;
-        this._barWidthTimeMultiplier = 0.03;
+        this._barWidthTimeMultiplier = 0.025;
         this._barPadding = 5;
         this._resizebarwidth = 5;
         this._previousSlideX = 0;
@@ -172,31 +172,39 @@ class SlideDeckVisualization {
             let wheelDirectionY = d3.event.deltaY < 0 ? "up" : "down";
             let wheelDirectionX = d3.event.deltaX < 0 ? "up" : "down";
             if (d3.event.shiftKey) {
-                let shiftAmount = 75;
-                if (wheelDirectionX === "down") {
-                    this._timelineShift += shiftAmount;
-                }
-                else {
-                    this._timelineShift -= shiftAmount;
-                }
-            }
-            else {
                 let correctedShiftAmount = d3.event.x - (this._originPosition - this._timelineShift);
-                if (wheelDirectionY === "down") {
-                    let scalingFactor = 0.2;
+                let scalingFactor = 0.2;
+                if (wheelDirectionX === "down") {
                     if (this._placeholderX > this._tableWidth / 5) {
                         this._barWidthTimeMultiplier *= 1 - scalingFactor;
                         this._timelineShift -= correctedShiftAmount * scalingFactor;
                     }
                 }
                 else {
-                    let scalingFactor = 0.25;
-                    this._barWidthTimeMultiplier *= 1 + scalingFactor;
+                    this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
                     if (!(this._placeholderX - this._timelineShift < d3.event.x)) {
-                        this._timelineShift += correctedShiftAmount * scalingFactor;
+                        this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
                     }
                 }
+                this.update();
             }
+            else {
+                if (wheelDirectionY === "down") {
+                    this.slideSliceLeft();
+                }
+                else {
+                    this.slideSliceRight();
+                }
+            }
+        };
+        this.slideSliceRight = () => {
+            let shiftAmount = 75;
+            this._timelineShift -= shiftAmount;
+            this.update();
+        };
+        this.slideSliceLeft = () => {
+            let shiftAmount = 75;
+            this._timelineShift < this._placeholderX ? this._timelineShift += shiftAmount : this._timelineShift;
             this.update();
         };
         this.onBackward = () => {
@@ -420,9 +428,25 @@ class SlideDeckVisualization {
             .attr("rows", 4);
         d3.select("#slideDeck")
             .append("input")
+            .attr('id', 'slideLeft')
+            .attr("type", "button")
+            .attr("value", "<")
+            .attr("x", 0)
+            .attr("y", 0)
+            .on("click", this.slideSliceLeft);
+        d3.select("#slideDeck")
+            .append("input")
+            .attr('id', 'slideRight')
+            .attr("type", "button")
+            .attr("value", ">")
+            .attr("x", 0)
+            .attr("y", 0)
+            .on("click", this.slideSliceRight);
+        d3.select("#slideDeck")
+            .append("input")
             .attr('id', 'addButton')
             .attr("type", "button")
-            .attr("value", "Save")
+            .attr("value", "Annotate")
             .attr("x", 0)
             .attr("y", 0)
             .on("click", this.addAnnotation);
@@ -523,7 +547,7 @@ class SlideDeckVisualization {
             .append("text") // appended previous slides_text
             .attr("class", "slides_text")
             .attr("y", this._resizebarwidth + 2 * this._barPadding)
-            .attr("font-size", 15)
+            .attr("font-size", 13)
             .attr("dy", ".35em");
         newNodes
             .append("svg:foreignObject")

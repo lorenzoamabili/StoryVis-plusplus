@@ -75,12 +75,12 @@ export class AMIRenderer {
 
 
     protected onScroll(event) {
-        if (this._initialized) {
+        // if (this._initialized) {
 
-            this._canvas.onAxialChanged();
-            this._canvas.onCoronalChanged();
-            this._canvas.onSagittalChanged();
-        }
+        //     this._canvas.onAxialChanged();
+        //     this._canvas.onCoronalChanged();
+        //     this._canvas.onSagittalChanged();
+        // }
     }
 
 

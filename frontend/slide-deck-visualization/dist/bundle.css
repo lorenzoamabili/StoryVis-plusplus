@@ -114,6 +114,22 @@ rect.add_annotation {
       border-width: 1px;
 }
 
+#slideLeft{
+    position: absolute;
+    bottom: 5%;
+    right: 7%;
+    border-radius: 5px;
+    border-width: 1px;
+}
+
+#slideRight{
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    border-radius: 5px;
+    border-width: 1px;
+}
+
 .slides_background_rect {
     fill: #ffffff;
     opacity: 0.01;

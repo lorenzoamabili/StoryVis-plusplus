@@ -11,8 +11,8 @@ import { Settings } from '../brainvis-canvas/utils/settings';
 
 export class StyledSliderExplorationComponent implements DoCheck {
   public settings = Settings.getInstance(this);
-  public valueW = 3071 + 2048;
-  public valueC = (3071 - 2048) / 2;
+  public valueW = 3070 + 2048;
+  public valueC = (3070 - 2048) / 2;
 
   constructor() {
     this.settings.canvas.sliderExploration = this;
@@ -22,15 +22,15 @@ export class StyledSliderExplorationComponent implements DoCheck {
   }
 
   optionsW: Options = {
-    floor: -2048 - 3071 + 2048 + 1,
-    ceil: 3071 + 3071 + 2048,
+    floor: -2048 - 3070 + 2048 + 1,
+    ceil: 3070 + 3070 + 2048,
     step: 1,
     showTicks: false
   };
 
   optionsC: Options = {
-    floor: -2048 - (3071 - 2048) / 2 + 1,
-    ceil: 3071 + (3071 - 2048) / 2,
+    floor: -2048 - (3070 - 2048) / 2 + 1,
+    ceil: 3070 + (3070 - 2048) / 2,
     step: 1,
     showTicks: false
   };

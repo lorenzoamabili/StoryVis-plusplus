@@ -48,6 +48,8 @@ export declare class SlideDeckVisualization {
     private previousSlidesWidth;
     private updateTimeIndices;
     private rescaleTimeline;
+    private slideSliceRight;
+    private slideSliceLeft;
     private onBackward;
     private onForward;
     private playTimeline;

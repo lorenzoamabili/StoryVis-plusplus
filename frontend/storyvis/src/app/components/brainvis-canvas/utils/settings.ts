@@ -3,9 +3,9 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 
 @Component({
     template: ''
-  })
+})
 
-  export class Settings {
+export class Settings {
     @Input('studyStarted') studyStarted: boolean;
 
     public static instance: Settings;
@@ -15,7 +15,7 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
     public _colorMap = 'grayscale';
 
     public _thresholdValueW;
-    public _thresholdValueC; 
+    public _thresholdValueC;
     public _thresholdLowerBoundW;
     public _thresholdUpperBoundW;
     public _thresholdLowerBoundC;
@@ -63,73 +63,73 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
     // }
 
     @Input() set thresholdValueW(valueW: number) {
-        if(valueW){
-        const slider = 'sliderW'
+        if (valueW) {
+            const slider = 'sliderW'
 
-        if (this.canvas._axialRenderer.stackHelper) {
-            const oldValueC: number = this.initC ? this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter : this._thresholdValueC;
-            const oldValueW: number = this.initW ? this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth : this._thresholdValueW;
-            this.valueChanged = (valueW !== oldValueW) ? true : false;
+            if (this.canvas._axialRenderer.stackHelper) {
+                const oldValueC: number = this.initC ? this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter : this._thresholdValueC;
+                const oldValueW: number = this.initW ? this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth : this._thresholdValueW;
+                this.valueChanged = (valueW !== oldValueW) ? true : false;
 
-            if (this.valueChanged) {
-                this.canvas.dispatchEvent({
-                    type: 'thresholdValueChangeStartW',
-                    changes: {
-                        valueW: oldValueW,
-                        valueC: oldValueC,
-                        slider: slider
-                    }
-                });
+                if (this.valueChanged) {
+                    this.canvas.dispatchEvent({
+                        type: 'thresholdValueChangeStartW',
+                        changes: {
+                            valueW: oldValueW,
+                            valueC: oldValueC,
+                            slider: slider
+                        }
+                    });
 
-                this.canvas.dispatchEvent({
-                    type: 'thresholdValueChangedW',
-                    changes: {
-                        valueW: valueW,
-                        valueC: oldValueC,
-                        slider: slider
-                    }
-                });
-                this.canvas.setWindowLevel(valueW, oldValueC, slider);
-                this.initW = true;
+                    this.canvas.dispatchEvent({
+                        type: 'thresholdValueChangedW',
+                        changes: {
+                            valueW: valueW,
+                            valueC: oldValueC,
+                            slider: slider
+                        }
+                    });
+                    this.canvas.setWindowLevel(valueW, oldValueC, slider);
+                    this.initW = true;
+                }
             }
         }
-     }
     }
 
 
     @Input() set thresholdValueC(valueC: number) {
-        if(valueC){
-        const slider = 'sliderC'
+        if (valueC) {
+            const slider = 'sliderC'
 
-        if (this.canvas._axialRenderer.stackHelper) {
-            const oldValueC: number = this.initC ? this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter : this._thresholdValueC;
-            const oldValueW: number = this.initW ? this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth : this._thresholdValueW;
-            this.valueChanged = (valueC !== oldValueC) ? true : false;
+            if (this.canvas._axialRenderer.stackHelper) {
+                const oldValueC: number = this.initC ? this.canvas._axialRenderer.stackHelper.slice._stack._windowCenter : this._thresholdValueC;
+                const oldValueW: number = this.initW ? this.canvas._axialRenderer.stackHelper.slice._stack._windowWidth : this._thresholdValueW;
+                this.valueChanged = (valueC !== oldValueC) ? true : false;
 
-            if (this.valueChanged) {
-                this.canvas.dispatchEvent({
-                    type: 'thresholdValueChangeStartC',
-                    changes: {
-                        valueW: oldValueW,
-                        valueC: oldValueC,
-                        slider: slider
-                    }
-                });
+                if (this.valueChanged) {
+                    this.canvas.dispatchEvent({
+                        type: 'thresholdValueChangeStartC',
+                        changes: {
+                            valueW: oldValueW,
+                            valueC: oldValueC,
+                            slider: slider
+                        }
+                    });
 
-                this.canvas.dispatchEvent({
-                    type: 'thresholdValueChangedC',
-                    changes: {
-                        valueW: oldValueW,
-                        valueC: valueC,
-                        slider: slider
-                    }
-                });
-                this.canvas.setWindowLevel(oldValueW, valueC, slider);
-                this.initC = true;
+                    this.canvas.dispatchEvent({
+                        type: 'thresholdValueChangedC',
+                        changes: {
+                            valueW: oldValueW,
+                            valueC: valueC,
+                            slider: slider
+                        }
+                    });
+                    this.canvas.setWindowLevel(oldValueW, valueC, slider);
+                    this.initC = true;
+                }
             }
         }
     }
- }
 
     // @Input() set thresholdValueW(value: number) {
     //     Settings.instance._thresholdValueW = value;
@@ -164,15 +164,15 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
     @Input() set rulerMode(rulerMode: boolean) {
         Settings.instance.rulerOn = rulerMode;
         Settings.instance.rulerModeChange.emit(rulerMode);
-        if(Settings.instance.angleOn){
+        if (Settings.instance.angleOn) {
             Settings.instance.angleOn = false;
             Settings.instance.angleModeChange.emit(false);
         }
-        if(Settings.instance.voxelprobeOn){
+        if (Settings.instance.voxelprobeOn) {
             Settings.instance.voxelprobeOn = false;
             Settings.instance.voxelprobeModeChange.emit(false);
         }
-        if(Settings.instance.annotationOn){
+        if (Settings.instance.annotationOn) {
             Settings.instance.annotationOn = false;
             Settings.instance.annotationModeChange.emit(false);
         }
@@ -182,15 +182,15 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
     @Input() set angleMode(angleMode: boolean) {
         Settings.instance.angleOn = angleMode;
         Settings.instance.angleModeChange.emit(angleMode);
-        if(Settings.instance.rulerOn){
+        if (Settings.instance.rulerOn) {
             Settings.instance.rulerOn = false;
             Settings.instance.rulerModeChange.emit(false);
         }
-        if(Settings.instance.voxelprobeOn){
+        if (Settings.instance.voxelprobeOn) {
             Settings.instance.voxelprobeOn = false;
             Settings.instance.voxelprobeModeChange.emit(false);
         }
-        if(Settings.instance.annotationOn){
+        if (Settings.instance.annotationOn) {
             Settings.instance.annotationOn = false;
             Settings.instance.annotationModeChange.emit(false);
         }
@@ -206,15 +206,15 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
     @Input() set voxelprobeMode(voxelprobeMode: boolean) {
         Settings.instance.voxelprobeOn = voxelprobeMode;
         Settings.instance.voxelprobeModeChange.emit(voxelprobeMode);
-        if(Settings.instance.angleOn){
+        if (Settings.instance.angleOn) {
             Settings.instance.angleOn = false;
             Settings.instance.angleModeChange.emit(false);
         }
-        if(Settings.instance.rulerOn){
+        if (Settings.instance.rulerOn) {
             Settings.instance.rulerOn = false;
             Settings.instance.rulerModeChange.emit(false);
         }
-        if(Settings.instance.annotationOn){
+        if (Settings.instance.annotationOn) {
             Settings.instance.annotationOn = false;
             Settings.instance.annotationModeChange.emit(false);
         }
@@ -224,15 +224,15 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
     @Input() set annotationMode(annotationMode: boolean) {
         Settings.instance.annotationOn = annotationMode;
         Settings.instance.annotationModeChange.emit(annotationMode);
-        if(Settings.instance.angleOn){
+        if (Settings.instance.angleOn) {
             Settings.instance.angleOn = false;
             Settings.instance.angleModeChange.emit(false);
         }
-        if(Settings.instance.voxelprobeOn){
+        if (Settings.instance.voxelprobeOn) {
             Settings.instance.voxelprobeOn = false;
             Settings.instance.voxelprobeModeChange.emit(false);
         }
-        if(Settings.instance.rulerOn){
+        if (Settings.instance.rulerOn) {
             Settings.instance.rulerOn = false;
             Settings.instance.rulerModeChange.emit(false);
         }

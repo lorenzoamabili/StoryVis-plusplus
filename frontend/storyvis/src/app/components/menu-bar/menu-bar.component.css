@@ -11,6 +11,11 @@ button {
   background-color: #586072;
 }
 
+.slicesLocation {
+   min-width: 40px;
+   padding: 0px;
+}
+
 .save {
   background-color: #586072;
 }
