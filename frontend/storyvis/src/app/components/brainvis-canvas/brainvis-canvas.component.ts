@@ -12,10 +12,14 @@ import { addListeners } from './provenanceHelpers/provenanceListeners';
 import { Settings } from './utils/settings';
 import { Renderer2D } from './renderer2d';
 import { Renderer3D } from './renderer3d';
-import { Artifact } from '@visualstorytelling/provenance-core/src/api';
+import { Artifact, ProvenanceNode, StateNode } from '@visualstorytelling/provenance-core/src/api';
 import { ProvenanceService } from '../../shared/_services/provenance.service';
 import { StyledSliderPracticeComponent } from '../styled-slider-practice/styled-slider-practice.component';
 import { StyledSliderExplorationComponent } from '../styled-slider-exploration/styled-slider-exploration.component';
+import Ruler from './ruler';
+import Angle from './angle';
+import Voxelprobe from './voxelprobe';
+import Annotation from './annotation';
 
 
 export enum VIEWS {
@@ -33,6 +37,29 @@ export enum VIEWS {
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
   @Input() studyStarted: boolean;
   @Output() slicesLocationCreated = new EventEmitter<{ slicesPosition: ISlicePosition[], slicesCameraZoom: number[] }>();
+  @Output() resetWLCreated = new EventEmitter<{ valueW: any, valueC: any, slider: string, setting: string }>();
+  @Output() resetConfigCreated = new EventEmitter<{
+    measurements: (Ruler | Angle | Voxelprobe | Annotation)[],
+    locationParam: {
+      doArgs: {
+        slicesPosition: ISlicePosition[];
+        slicesCameraZoom: number[];
+        sliceOrientation: IOrientation;
+      };
+      undoArgs: {
+        slicesPosition: ISlicePosition[];
+        slicesCameraZoom: number[];
+        sliceOrientation: IOrientation;
+      };
+    },
+    WLParam: {
+      valueW: any;
+      valueC: any;
+      slider: string;
+      setting: string;
+    },
+    magnificationParam: string;
+  }>();
 
   public _initialized = false;
   public settings = Settings.getInstance(this);
@@ -223,7 +250,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       // set camera and scene
       this.prepareCamera(this._perspectiveRenderer);
       this.prepareScene(this._axialRenderer);
+      this.resetWindowLevel1();
 
+      this._perspectiveRenderer.originalSliceOrientation = this._perspectiveRenderer.getCameraOrientation();
 
       // // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
@@ -315,11 +344,11 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
 
     if (!this.settings.isOneView) {
-      
+
       this.oldStackDragA = this._axialRenderer.getSlicePosition();
       this.oldStackDragC = this._coronalRenderer.getSlicePosition();
       this.oldStackDragS = this._sagittalRenderer.getSlicePosition();
-  
+
       this.oldStackZoomA = this._axialRenderer.camera.zoom;
       this.oldStackZoomC = this._coronalRenderer.camera.zoom;
       this.oldStackZoomS = this._sagittalRenderer.camera.zoom;
@@ -341,13 +370,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
 
     if (!this.settings.isOneView) {
-    this.setSliceDrag(this.oldStackDragA, VIEWS.AXIAL, 10);
-    this.setSliceDrag(this.oldStackDragC, VIEWS.CORONAL, 10);
-    this.setSliceDrag(this.oldStackDragS, VIEWS.SAGITTAL, 10);
+      this.setSliceDrag(this.oldStackDragA, VIEWS.AXIAL, 10);
+      this.setSliceDrag(this.oldStackDragC, VIEWS.CORONAL, 10);
+      this.setSliceDrag(this.oldStackDragS, VIEWS.SAGITTAL, 10);
 
-    this.setSliceZoom(this.oldStackZoomA, VIEWS.AXIAL, 10);
-    this.setSliceZoom(this.oldStackZoomC, VIEWS.CORONAL, 10);
-    this.setSliceZoom(this.oldStackZoomS, VIEWS.SAGITTAL, 10);
+      this.setSliceZoom(this.oldStackZoomA, VIEWS.AXIAL, 10);
+      this.setSliceZoom(this.oldStackZoomC, VIEWS.CORONAL, 10);
+      this.setSliceZoom(this.oldStackZoomS, VIEWS.SAGITTAL, 10);
     }
 
   }
@@ -361,7 +390,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     document.getElementById(viewID).setAttribute('class', 'rendererOne');
     document.getElementById(viewID).setAttribute('style', 'display: block;');
 
-    this.settings.isOneView = true;
+    this.settings.isOneView = viewID;
   }
 
 
@@ -371,7 +400,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
     this.renderers.forEach(renderer => renderer.domElement.setAttribute('style', 'display: block;'));
 
-    this.settings.isOneView = false;
+    this.settings.isOneView = null;
   }
 
 
@@ -398,45 +427,203 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   //   // this.settings._thresholdUpperBoundC = (this._axialRenderer.stackHelper.stack.minMax[1]);
   // }
 
+
+  resetWindowLevelParam(setting?: string) {
+    const parameters = {
+      valueW: this._axialRenderer.stackHelper.slice._stack._windowWidth,
+      valueC: this._axialRenderer.stackHelper.slice._stack._windowCenter,
+      slider: 'both',
+      setting: setting ? setting : '1'
+    }
+
+    return parameters;
+  }
+
+  resetWindowLevel(setting?: string) {
+    const parameters = this.resetWindowLevelParam(setting ? setting : '1');
+
+    if (parameters.setting === '1') {
+      this.resetWindowLevel1();
+    } else if (setting === '2') {
+      this.resetWindowLevel2();
+    }
+
+    if (setting !== 'resetting') {
+      this.resetWLCreated.emit(parameters);
+    }
+  }
+
   resetWindowLevel1() {
+    this.settings.automaticSettingW = true;
+    this.settings.automaticSettingC = true;
     this.setWindowLevel(1500, 600, 'both');
   }
 
   resetWindowLevel2() {
+    this.settings.automaticSettingW = true;
+    this.settings.automaticSettingC = true;
     this.setWindowLevel(350, 50, 'both');
   }
 
-  resetSlicesLocation() {
+
+
+  resetSlicesLocationParam() {
     let slicesPosition: ISlicePosition[] = [];
-    slicesPosition.push(this._axialRenderer.oldSlicePosition);
-    slicesPosition.push(this._coronalRenderer.oldSlicePosition);
-    slicesPosition.push(this._sagittalRenderer.oldSlicePosition);
+    this.renderers2D.forEach(renderer => slicesPosition.push(renderer.getSlicePosition()));
 
     let slicesCameraZoom: number[] = [];
-    slicesCameraZoom.push(this._axialRenderer.oldCameraZoom);
-    slicesCameraZoom.push(this._coronalRenderer.oldCameraZoom);
-    slicesCameraZoom.push(this._sagittalRenderer.oldCameraZoom);
+    this.renderers2D.forEach(renderer => slicesCameraZoom.push(renderer.camera.zoom));
 
-    const parameters = { slicesPosition, slicesCameraZoom };
+    let sliceOrientation: IOrientation = this._perspectiveRenderer.getCameraOrientation();
 
-    this.resetBackSlicesLocation();
-    this.slicesLocationCreated.emit(parameters);
+    const undoArgs = { slicesPosition, slicesCameraZoom, sliceOrientation };
+
+
+    slicesPosition = [];
+    this.renderers2D.forEach(renderer => slicesPosition.push(renderer.originalSlicePosition));
+
+    slicesCameraZoom = [];
+    this.renderers2D.forEach(renderer => slicesCameraZoom.push(renderer.originalCameraZoom));
+
+    sliceOrientation = this._perspectiveRenderer.originalSliceOrientation;
+
+    const doArgs = { slicesPosition, slicesCameraZoom, sliceOrientation };
+
+
+    const parameters = { doArgs, undoArgs };
+
+    return parameters;
   }
 
-  resetBackSlicesLocation() {
-    this.renderers2D.forEach(renderer => renderer.setSlicePosition(renderer.originalSlicePosition, 1));
-    this.renderers2D.forEach(renderer => renderer.setSliceZoom(renderer.originalCameraZoom, 1));
+
+  resetSlicesLocation() {
+    const parameters = this.resetSlicesLocationParam();
+    this.changeSlicesLocation(parameters.doArgs);
+    this.slicesLocationCreated.emit(parameters.undoArgs);
+    (this.provenance.graph.current as StateNode).metadata.option = 'resetting';
   }
 
-  changeSlicesLocation(parameters: { slicesPosition: ISlicePosition[], slicesCameraZoom: number[] }) {
-    this._axialRenderer.setSlicePosition(parameters.slicesPosition[0], 1);
-    this._coronalRenderer.setSlicePosition(parameters.slicesPosition[1], 1);
-    this._sagittalRenderer.setSlicePosition(parameters.slicesPosition[2], 1);
+  changeSlicesLocation(parameters) {
+    this._axialRenderer.setSlicePosition(parameters.slicesPosition[0], 10);
+    this._coronalRenderer.setSlicePosition(parameters.slicesPosition[1], 10);
+    this._sagittalRenderer.setSlicePosition(parameters.slicesPosition[2], 10);
 
-    this._axialRenderer.setSliceZoom(parameters.slicesCameraZoom[0], 1);
-    this._coronalRenderer.setSliceZoom(parameters.slicesCameraZoom[1], 1);
-    this._sagittalRenderer.setSliceZoom(parameters.slicesCameraZoom[2], 1);
+    this._axialRenderer.setSliceZoom(parameters.slicesCameraZoom[0], 10);
+    this._coronalRenderer.setSliceZoom(parameters.slicesCameraZoom[1], 10);
+    this._sagittalRenderer.setSliceZoom(parameters.slicesCameraZoom[2], 10);
+
+    this._perspectiveRenderer.setCameraOrientation(parameters.sliceOrientation, 10)
   }
+
+  // deleteMeasurementsParam(){
+  //   return this._axialRenderer._measurements;
+  // }
+
+  deleteMeasurements() {
+    this.renderers2D.forEach(renderer => renderer._measurements.forEach(measurement => renderer.deleteArtifact(measurement.artifact)));
+  }
+
+  restoreMeasurements() {
+    this.renderers2D.forEach(renderer => renderer._measurements.forEach(measurement => renderer.restoreArtifact(measurement.artifact, renderer.stackHelper.index)));
+  }
+
+  resetConfigParam() {
+    const measurements = []
+    this.renderers2D.forEach(renderer => measurements.push(renderer._measurements));
+    const locationParam = this.resetSlicesLocationParam();
+    const WLParam = this.resetWindowLevelParam();
+    const magnificationParam = this.settings.isOneView;
+
+    const parameters = { measurements, locationParam, WLParam, magnificationParam };
+    return parameters;
+  }
+
+  resetConfig(newRoot?: boolean) {
+    const parameters = this.resetConfigParam();
+
+    this.deleteMeasurements();
+    this.changeSlicesLocation(parameters.locationParam.doArgs);
+    this.resetWindowLevel('resetting');
+
+    if (parameters.magnificationParam) {
+      this.create4Views(parameters.magnificationParam);
+    }
+
+    if (newRoot) {
+      this.resetConfigCreated.emit(parameters);
+    }
+  }
+
+  setConfig(parameters) {
+    this.restoreMeasurements();
+    this.changeSlicesLocation(parameters.locationParam.undoArgs);
+    this.setWindowLevel(parameters.WLParam.valueW, parameters.WLParam.valueC, parameters.WLParam.slider);
+
+    if (parameters.magnificationParam) {
+      this.createOneView(parameters.magnificationParam);
+    }
+  }
+
+
+  splitting(node: string) {
+    if (this.provenance.graph.current !== this.provenance.graph.root) {
+    let nodeToCopy;
+    if (node === 'root') {
+      nodeToCopy = this.provenance.graph.root;
+      this.newRoot();
+    } else if (node === 'current') {
+        nodeToCopy = this.provenance.graph.current;
+        this.copying(nodeToCopy as StateNode);
+      }
+    }
+  }
+
+  merging(toNode: StateNode) {
+    if ((this.provenance.graph.current as StateNode).metadata.option === 'splitting' &&
+      Math.abs(this.provenance.graph.current.metadata.creationOrder - toNode.metadata.creationOrder) === 1) {
+      // this.provenance.traverser.toMergeNodes(toNode.id, 10);
+      this.provenance.traverser.toStateNode(toNode.id, 10);
+    } else {
+      this.provenance.traverser.toStateNode(toNode.id, 10);
+    }
+  }
+
+  newRoot() {
+    this.resetConfig();
+
+    const action = {
+      metadata: {
+        userIntent: '',
+        label: 'Root - split'
+      },
+      do: 'null',
+      doArguments: { args: [] },
+      undo: 'null',
+      undoArguments: { args: [] }
+    };
+
+    this.provenance.tracker.applyAction(action, true, 'splitting')
+  }
+
+  copying(nodeToCopy: StateNode) {
+    const parameters = this.resetConfigParam();
+    nodeToCopy.action.metadata.userIntent = 'provenance';
+    nodeToCopy.metadata.option = 'splitting';
+
+    const action = {
+      metadata: {
+        userIntent: nodeToCopy.action.metadata.userIntent,
+        label: nodeToCopy.action.metadata.label + '- split'
+      },
+      do: 'setConfig',
+      doArguments: { args: [parameters] },
+      undo: 'resetConfig',
+      undoArguments: { args: [] }
+    };
+
+    this.provenance.tracker.applyAction(action, true, 'splitting')
+  }
+
 
   setWindowLevel(valueW, valueC, slider) {
     if (slider === 'sliderW') {
@@ -458,7 +645,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       }
 
     } else if (slider === 'both') {
-      
+
       if (this.studyStarted) {
         this.sliderExploration.setValueW(valueW);
         this.sliderExploration.setValueC(valueC);
@@ -590,3 +777,4 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     });
   }
 }
+

@@ -147,7 +147,7 @@ function restoreSlide(serialized, graph) {
     });
     var slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.nodeCreationOrder, serialized.transitionTime, annotations);
     if (serialized.node != null) {
-        var node = graph.nodes[serialized.node];
+        var node = graph.getNodes()[serialized.node];
         slide.node = node;
     }
     return slide;

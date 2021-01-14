@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
 import { ProvenanceService, AuthenticationService } from '../../shared/_services';
 import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
+import { Settings } from '../brainvis-canvas/utils/settings';
 
 @Component({
   selector: 'app-provenance-visualization',
@@ -10,6 +11,7 @@ import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree
 })
 export class ProvenanceVisualizationComponent implements OnInit {
   public _viz: ProvenanceTreeVisualization;
+  public settings = Settings.getInstance(this);
 
   constructor(public elementRef: ElementRef, public provenance: ProvenanceService) {
   }
@@ -22,6 +24,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
     document.onkeydown = this.keyPress;
   }
 
+  
 
   createTree(traverser){
     this._viz = new ProvenanceTreeVisualization(
@@ -59,7 +62,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
     }
     // ctrl + IntlBackslash  / create a story with all nodes (by creation order)
     else if (evtobj.keyCode === 192 && evtobj.ctrlKey) {
-      let nodes = graph.nodes;
+      let nodes = graph.getNodes();
       for (const nodeId of Object.keys(nodes)) {
         let node = nodes[nodeId];
         node.metadata.story = true;
@@ -69,7 +72,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
     }
     // ctrl + 1  / all neighbour nodes are added to the slide deck (by creation order)
     else if (evtobj.keyCode === 49 && evtobj.ctrlKey) {
-      let nodes = graph.nodes;
+      let nodes = graph.getNodes();
       var arrayNodes = [];
 
       for (const nodeId of Object.keys(nodes)) {
@@ -89,7 +92,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
 
     // ctrl + W  / derivation and annotation (by creation order)
     else if (evtobj.keyCode === 87 && evtobj.ctrlKey) {
-      let nodes = graph.nodes;
+      let nodes = graph.getNodes();
       var arrayNodes = [];
 
       for (const nodeId of Object.keys(nodes)) {

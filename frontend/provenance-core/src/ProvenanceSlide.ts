@@ -141,7 +141,7 @@ export function restoreSlide(serialized: SerializedProvenanceSlide, graph: Prove
   });
   let slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.nodeCreationOrder, serialized.transitionTime, annotations);
   if(serialized.node != null){
-    const node = graph.nodes[serialized.node];
+    const node = graph.getNodes()[serialized.node];
     slide.node = node;
   }
   return slide;

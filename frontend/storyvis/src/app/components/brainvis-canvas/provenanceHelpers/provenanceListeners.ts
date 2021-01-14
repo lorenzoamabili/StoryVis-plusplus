@@ -4,7 +4,6 @@ import { Renderer2D } from '../renderer2d';
 import { registerActions } from './provenanceActions';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 import { Settings } from '../utils/settings';
-import { ISlicePosition } from '../utils/types';
 
 export const addListeners = (tracker: ProvenanceTracker) => {
   let settings = Settings.getInstance(this);
@@ -29,35 +28,36 @@ export const addListeners = (tracker: ProvenanceTracker) => {
     canvas.removeEventListener('sliceIndexChanged', sliceIndexEndListener);
     sliceIndexEndListener = debounce((event: any) => {
       if (startEvent.changes.sliceOrientation === event.changes.sliceOrientation) {
-      let label = '';
-      switch (startEvent.changes.sliceOrientation) {
-        case 'axial':
-          label = 'A #' + event.changes.newIndex;
-          break;
-        case 'coronal':
-          label = 'C #' + event.changes.newIndex;
-          break;
-        case 'sagittal':
-          label = 'S #' + event.changes.newIndex;
-          break;
-        default:
-          label = 'strange index?';
-      }
-      const action: Action = {
-        metadata: {
-          userIntent: 'exploration',
-          label: label
-        },
-        do: 'setSliceIndex',
-        doArguments: {
-          args: [startEvent.changes.sliceOrientation, event.changes.newIndex, startEvent.changes.oldIndex]
-        },
-        undo: 'setSliceIndex',
-        undoArguments: {
-          args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, event.changes.newIndex]
+        let label = '';
+        switch (startEvent.changes.sliceOrientation) {
+          case 'axial':
+            label = 'A #' + event.changes.newIndex;
+            break;
+          case 'coronal':
+            label = 'C #' + event.changes.newIndex;
+            break;
+          case 'sagittal':
+            label = 'S #' + event.changes.newIndex;
+            break;
+          default:
+            label = 'strange index?';
         }
+        const action: Action = {
+          metadata: {
+            userIntent: 'exploration',
+            label: label
+          },
+          do: 'setSliceIndex',
+          doArguments: {
+            args: [startEvent.changes.sliceOrientation, event.changes.newIndex, startEvent.changes.oldIndex]
+          },
+          undo: 'setSliceIndex',
+          undoArguments: {
+            args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, event.changes.newIndex]
+          }
+        }
+        tracker.applyAction(action);
       }
-      tracker.applyAction(action); }
     }, 500, { trailing: true });
     canvas.addEventListener('sliceIndexChanged', sliceIndexEndListener);
   };
@@ -72,7 +72,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
       // label += ' ' + event.orientation.position[0].toFixed(0);
       // label += '/' + event.orientation.position[1].toFixed(0);
       // label += '/' + event.orientation.position[2].toFixed(0);
-      label += ' #' + event.number;
+      label += ' #' + event.id;
 
       tracker.applyAction({
         metadata: {
@@ -98,7 +98,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
       // label += ' ' + event.orientation.position[0].toFixed(0);
       // label += '/' + event.orientation.position[1].toFixed(0);
       // label += '/' + event.orientation.position[2].toFixed(0);
-      label += ' #' + event.number;
+      label += ' #' + event.id;
 
       tracker.applyAction({
         metadata: {
@@ -312,7 +312,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
           userIntent: 'configuration',
           label: '4Views'
         },
-        do: 'reduceView',
+        do: 'setWindowLevel',
         doArguments: { args: [domID] },
         undo: 'magnifyView',
         undoArguments: { args: [domID] }
@@ -322,17 +322,46 @@ export const addListeners = (tracker: ProvenanceTracker) => {
   });
 
 
+  canvas.resetWLCreated.subscribe((parameters) => {
+    const action = {
+      metadata: {
+        userIntent: 'configuration',
+        label: 'WL setting #' + parameters.setting
+      },
+      do: 'resetWindowLevel',
+      doArguments: { args: [parameters.setting] },
+      undo: 'setWindowLevel',
+      undoArguments: { args: [parameters.valueW, parameters.valueC, parameters.slider] }
+    };
+    tracker.applyAction(action, true);
+  });
+
+
   canvas.slicesLocationCreated.subscribe((parameters) => {
-      const action = {
-        metadata: {
-          userIntent: 'configuration',
-          label: 'slices relocation'
-        },
-        do: 'resetBackSlicesLocation',
-        doArguments: { args: [] },
-        undo: 'changeSlicesLocation',
-        undoArguments: { args: [parameters] }
-      };
-      tracker.applyAction(action, true);
-    });
+    const action = {
+      metadata: {
+        userIntent: 'configuration',
+        label: 'slices relocation'
+      },
+      do: 'changeSlicesLocation',
+      doArguments: { args: [parameters] },
+      undo: 'changeSlicesLocation',
+      undoArguments: { args: [parameters] }
+    };
+    tracker.applyAction(action, true);
+  });
+
+  canvas.resetConfigCreated.subscribe((parameters) => {
+    const action = {
+      metadata: {
+        userIntent: 'configuration',
+        label: 'reset config'
+      },
+      do: 'resetConfig',
+      doArguments: { args: [] },
+      undo: 'setConfig',
+      undoArguments: { args: [parameters] }
+    };
+    tracker.applyAction(action, true, 'resetting');
+  });
 }

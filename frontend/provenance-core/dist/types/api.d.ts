@@ -224,6 +224,14 @@ export interface IProvenanceGraph {
      */
     on(type: string, handler: Handler): void;
     off(type: string, handler: Handler): void;
+    getNodes(): {
+        [key: string]: ProvenanceNode;
+    };
+    setNodes(nodes: {
+        [key: string]: ProvenanceNode;
+    }): {
+        [key: string]: ProvenanceNode;
+    };
     getSelf(): SerializedProvenanceGraph;
     restoreSelf(sgraph: SerializedProvenanceGraph): ProvenanceGraph;
 }
@@ -272,7 +280,7 @@ export interface IProvenanceTracker {
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    applyAction(action: Action, skipFirstDoFunctionCall: boolean, artifact?: Artifact): Promise<StateNode>;
+    applyAction(action: Action, skipFirstDoFunctionCall: boolean, option?: string): Promise<StateNode>;
     getGraph(): SerializedProvenanceGraph;
     restoreGraph(sgraph: any): void;
 }
@@ -292,6 +300,12 @@ export interface IProvenanceGraphTraverser {
      */
     trackingWhenTraversing: boolean;
     graph: IProvenanceGraph;
+    /**
+     * To merge two branches from their split nodes.
+     *
+     * @param id
+     */
+    toMergeNodes(id: NodeIdentifier, transitionTime: number): Promise<ProvenanceNode | undefined>;
     /**
      * Finds shortest path between current node and node with request identifer.
      * Calls the do/undo functions of actions on the path.

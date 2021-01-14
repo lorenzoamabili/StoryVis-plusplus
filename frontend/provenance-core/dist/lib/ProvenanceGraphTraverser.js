@@ -162,6 +162,98 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
         });
     };
     /**
+    * To merge two branches from their split nodes.
+    *
+    * @param id Node identifier
+    */
+    ProvenanceGraphTraverser.prototype.toMergeNodes = function (id, transitionTime) {
+        return __awaiter(this, void 0, void 0, function () {
+            // function gatherNodes(currentNode: ProvenanceNode, targetNode: ProvenanceNode) {
+            //   nodesToMove = [];
+            //   if(currentNode){
+            //     currentNode.children.forEach(x => nodesToMove.push(x));
+            //     for (const nodeToMove of nodesToMove) {
+            //       nodesAppended = [];
+            //       appendNodes(nodeToMove, targetNode);
+            //     }
+            //     for (const nodeAppended of nodesAppended) {
+            //       let currentNode = nodesToMove[nodesAppended.indexOf(nodeAppended)];
+            //       gatherNodes(currentNode, nodeAppended);
+            //     }
+            //   }
+            // }
+            // function appendNodes(nodeToAppend: ProvenanceNode, rootNode: ProvenanceNode) {
+            //   graph.current = rootNode;
+            //   tracker?.applyAction((nodeToAppend as StateNode).action, true);
+            //   rootNode.children.forEach(x => nodesAppended.push(x));
+            // }
+            function gatherNodes(currentNode, targetNode) {
+                nodesToMove = [];
+                if (currentNode) {
+                    currentNode.children.forEach(function (x) { return nodesToMove.push(x); });
+                    for (var _i = 0, nodesToMove_1 = nodesToMove; _i < nodesToMove_1.length; _i++) {
+                        var nodeToMove = nodesToMove_1[_i];
+                        nodesAppended = [];
+                        appendNodes(nodeToMove, targetNode);
+                    }
+                    for (var _a = 0, nodesAppended_1 = nodesAppended; _a < nodesAppended_1.length; _a++) {
+                        var nodeAppended = nodesAppended_1[_a];
+                        var currentNode_1 = nodesToMove[nodesAppended.indexOf(nodeAppended)];
+                        gatherNodes(currentNode_1, nodeAppended);
+                    }
+                }
+            }
+            function appendNodes(nodeToAppend, rootNode) {
+                graph.current = rootNode;
+                tracker === null || tracker === void 0 ? void 0 : tracker.applyAction(nodeToAppend.action, true);
+                rootNode.children.forEach(function (x) { return nodesAppended.push(x); });
+            }
+            function stemNodes(rootNode) {
+                newRootNodes = [];
+                rootNode.children.forEach(function (mergedGraphNode) { return newRootNodes.push(mergedGraphNode); });
+                rootNode.children.forEach(function (mergedGraphNode) { return mergedGraphNodes.push(mergedGraphNode); });
+                for (var _i = 0, newRootNodes_1 = newRootNodes; _i < newRootNodes_1.length; _i++) {
+                    var baseNode = newRootNodes_1[_i];
+                    if (baseNode !== targetNode) {
+                        stemNodes(baseNode);
+                    }
+                }
+            }
+            var currentNode, targetNode, tracker, graph, nodesToMove, nodesAppended, nodesToRemove, mergedGraphNodes, newRootNodes, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        currentNode = this.graph.current;
+                        targetNode = this.graph.getNode(id);
+                        tracker = this.tracker;
+                        graph = this.graph;
+                        nodesToMove = [];
+                        nodesAppended = [];
+                        nodesToRemove = [];
+                        mergedGraphNodes = [];
+                        newRootNodes = [];
+                        // mergedGraphNodes.push(graph.root);
+                        // stemNodes(graph.root);
+                        // gatherNodes(currentNode, targetNode);
+                        // mergedGraphNodes.push(targetNode, ...nodesAppended);
+                        // this.graph = graph.mergedGraph(mergedGraphNodes, graph.root);
+                        // this.registry = new ActionFunctionRegistry();
+                        // this.tracker = new ProvenanceTracker(this.registry, this.graph);
+                        // const traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
+                        // (window as any).tree._viz.setTraverser(traverser);
+                        // (window as any).tree._viz.update();
+                        // let elem = document.getElementById('fake');
+                        // elem?.click();
+                        this.graph.current = targetNode;
+                        return [4 /*yield*/, gatherNodes(currentNode, targetNode)];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, result];
+                }
+            });
+        });
+    };
+    /**
      * Finds shortest path between current node and node with request identifer.
      * Calls the do/undo functions of actions on the path.
      *
@@ -176,6 +268,23 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         currentNode = this.graph.current;
                         targetNode = this.graph.getNode(id);
                         if (currentNode === targetNode) {
+                            return [2 /*return*/, Promise.resolve(currentNode)];
+                        }
+                        if (Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
+                            currentNode.metadata.option === 'splitting' && targetNode.metadata.option === 'splitting') {
+                            console.log('1');
+                            this.graph.current = targetNode;
+                            return [2 /*return*/, Promise.resolve(currentNode)];
+                        }
+                        if (targetNode.label === 'Root' && currentNode.metadata.option === 'resetting' ||
+                            currentNode.label === 'Root' && targetNode.metadata.option === 'resetting') {
+                            console.log('2');
+                            this.graph.current = targetNode;
+                            return [2 /*return*/, Promise.resolve(currentNode)];
+                        }
+                        if (targetNode.label === 'Root' || (currentNode.label === 'Root' && targetNode.metadata.option === 'splitting')) {
+                            console.log('3');
+                            this.graph.current = targetNode;
                             return [2 /*return*/, Promise.resolve(currentNode)];
                         }
                         trackToTarget = [];

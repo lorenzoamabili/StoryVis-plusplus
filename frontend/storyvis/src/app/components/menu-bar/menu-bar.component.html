@@ -85,14 +85,14 @@
     <span>&nbsp;</span>
     
     <button class="slicesLocation" mat-raised-button matTooltip="Set default window level - Lung"
-      (click)="settings.canvas.resetWindowLevel1()">
+      (click)="settings.canvas.resetWindowLevel('1')">
       <mat-icon>settings_brightness</mat-icon>
     </button>
 
     <span>&nbsp;</span>
 
     <button class="slicesLocation" style="background-color: slategray;" mat-raised-button
-      matTooltip="Set default window level - Mediastinum" (click)="settings.canvas.resetWindowLevel2()">
+      matTooltip="Set default window level - Mediastinum" (click)="settings.canvas.resetWindowLevel('2')">
       <mat-icon>settings_brightness</mat-icon>
     </button>
 
@@ -103,6 +103,15 @@
     <button class="slicesLocation" mat-raised-button matTooltip="Restore the original slices position in all the views"
       (click)="settings.canvas.resetSlicesLocation()">
       <mat-icon>settings_overscan</mat-icon>
+    </button>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <button class="slicesLocation" mat-raised-button matTooltip="Reset all the configuration settings"
+      (click)="settings.canvas.resetConfig(true)">
+      <mat-icon>settings_backup_restore</mat-icon>
     </button>
 
     <div *ngIf="!studyStarted" style="position: absolute; right: 0px;">

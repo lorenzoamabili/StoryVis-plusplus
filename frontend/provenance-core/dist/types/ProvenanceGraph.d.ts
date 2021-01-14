@@ -20,9 +20,12 @@ export declare class ProvenanceGraph implements IProvenanceGraph {
     getNode(id: NodeIdentifier): ProvenanceNode;
     get current(): ProvenanceNode;
     set current(node: ProvenanceNode);
-    get nodes(): {
+    getNodes(): {
         [key: string]: ProvenanceNode;
     };
+    setNodes(nodes: {
+        [key: string]: ProvenanceNode;
+    }): any;
     emitNodeChangedEvent(node: ProvenanceNode): void;
     on(type: string, handler: Handler): void;
     off(type: string, handler: Handler): void;

@@ -12,9 +12,10 @@ import { Component } from '@angular/core';
 
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
-  public interactionNumber: number = 0;
-  public zoomNumber: number = 0;
-  
+  public orientationID: number = 0;
+  public zoomID: number = 0;
+  public originalSliceOrientation;
+
   constructor(view: View) {
     super(view);
     this._domElement = document.getElementById(view.domId);
@@ -74,6 +75,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._light.position.copy(this._camera.position);
     this._scene.add(this._light);
 
+
     // resize event
     this._renderer.domElement.addEventListener('resize', this.onWindowResize, false);
 
@@ -96,7 +98,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     );
   }
 
-  updateArtifact() {}
+  updateArtifact() { }
 
   lookAt(vec: THREE.Vector3) {
     this._camera.lookAt(vec);
@@ -124,7 +126,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     const position = this._controls.camera.position.toArray();
     const target = this._controls.target.toArray();
     const up = this._controls.camera.up.toArray();
-    const orientation = { position, target, up };    
+    const orientation = { position, target, up };
     return orientation;
   }
 
@@ -134,18 +136,18 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraZoomChangeStart',
-        orientation,
-        number: this.zoomNumber + 1
+        orientation
       });
     });
 
     this._controls.addEventListener('zoomend', (event) => {
       const orientation = this.getCameraOrientation();
+      this.zoomID = this.zoomID + 1;
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraZoomChanged',
         orientation,
-        number: this.zoomNumber + 1
+        id: this.zoomID
       });
     });
 
@@ -154,18 +156,18 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraOrientationChangeStart',
-        orientation,
-        number: this.interactionNumber + 1
+        orientation
       });
     });
 
     this._controls.addEventListener('end', (event) => {
       const orientation = this.getCameraOrientation();
+      this.orientationID = this.orientationID + 1;
 
       this._canvas.dispatchEvent({
         type: 'perspectiveCameraOrientationChanged',
         orientation,
-        number: this.interactionNumber + 1
+        id: this.orientationID
       });
     });
   }
@@ -182,6 +184,6 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._controls.changeCamera(new THREE.Vector3(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]),
       new THREE.Vector3(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]),
       new THREE.Vector3(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]),
-      within > 0 ? within : 1000);
+      within > 0 ? within : 10);
   }
 }

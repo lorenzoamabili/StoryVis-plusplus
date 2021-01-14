@@ -264,13 +264,58 @@
           enumerable: false,
           configurable: true
       });
-      Object.defineProperty(ProvenanceGraph.prototype, "nodes", {
-          get: function () {
-              return this._nodes;
-          },
-          enumerable: false,
-          configurable: true
-      });
+      ProvenanceGraph.prototype.getNodes = function () {
+          return this._nodes;
+      };
+      ProvenanceGraph.prototype.setNodes = function (nodes) {
+          this._nodes = nodes;
+      };
+      // mergedGraph(mergedGraphNodes: ProvenanceNode[], rootNode: ProvenanceNode): ProvenanceGraph {
+      //   const nodes: { [key: string]: any } = {};
+      //   for (const node of mergedGraphNodes) {
+      //     let nodeId = node.id;
+      //     nodes[node.id] = { ...node };
+      //     if(node !== rootNode){
+      //       nodes[node.id].parent = nodes[(node as any).parent];
+      //     }
+      //     // node.parent = nodes[node.parent];
+      //     nodes[node.id].children = (node as any).children.map((nodeId: string) => nodes[nodeId]);
+      //     console.log(nodes[node.id]);
+      //   }
+      //   console.log(mergedGraphNodes);
+      //   console.log(nodes);
+      //   for (const nodeId of Object.keys(nodes)) {
+      //     const node = nodes[nodeId];
+      //     node.children = node.children.map((id: string) => nodes[id]);
+      //     if ('parent' in node) {
+      //       node.parent = nodes[node.parent];
+      //     }
+      //   }
+      //   console.log(nodes);
+      //   const graph = new ProvenanceGraph(this.application, 'mergedGraph', nodes[rootNode.id]);
+      //   graph._nodes = nodes;
+      //   graph._current = nodes[nodes[rootNode.id]];
+      //   const seriaNodes = Object.keys(graph.getNodes()).map(nodeId => {
+      //     const node = graph.getNode(nodeId);
+      //     node.metadata.loaded = true;
+      //     const serializedNode: SerializedProvenanceNode = { ...node } as any;
+      //     if (isStateNode(node)) {
+      //       (serializedNode as SerializedStateNode).parent = node.parent.id;
+      //     }
+      //     console.log(serializedNode);
+      //     serializedNode.children = node.children.map(child => child.id);
+      //     return serializedNode;
+      //   });
+      //   const seriaGraph: SerializedProvenanceGraph =
+      //   {
+      //     nodes: seriaNodes,
+      //     root: graph.root.id,
+      //     application: graph.application,
+      //     current: graph.current.id
+      //   }
+      //   const mergedGraph = restoreProvenanceGraph(seriaGraph);
+      //   return mergedGraph;
+      // }
       ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {
           /* istanbul ignore if */
           if (!this._nodes[node.id]) {
@@ -316,7 +361,7 @@
       return graph;
   }
   function serializeProvenanceGraph(graph) {
-      var nodes = Object.keys(graph.nodes).map(function (nodeId) {
+      var nodes = Object.keys(graph.getNodes()).map(function (nodeId) {
           var node = graph.getNode(nodeId);
           node.metadata.loaded = true;
           var serializedNode = __assign({}, node);
@@ -364,10 +409,10 @@
        * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
        *        it will only be called when traversing.
        */
-      ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall) {
+      ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, option) {
           if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
           return __awaiter(this, void 0, void 0, function () {
-              var label, createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
+              var label, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
               var _this = this;
               return __generator(this, function (_a) {
                   switch (_a.label) {
@@ -386,6 +431,7 @@
                               id: generateUUID(),
                               label: label,
                               metadata: {
+                                  option: option ? option : false,
                                   loaded: false,
                                   createdBy: _this.username,
                                   createdOn: generateTimestamp(),
@@ -397,8 +443,9 @@
                               children: []
                           }); };
                           currentNode = this.graph.current;
+                          parentNode = (option === 'splitting') ? this.graph.root : this.graph.current;
                           if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
-                          newNode = createNewStateNode(this.graph.current, null);
+                          newNode = createNewStateNode(parentNode, null);
                           nodeCounter = newNode.metadata.creationOrder + 1;
                           newNode.metadata.creationOrder = nodeCounter;
                           return [3 /*break*/, 3];
@@ -408,7 +455,7 @@
                           return [4 /*yield*/, funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args)];
                       case 2:
                           actionResult = _a.sent();
-                          newNode = createNewStateNode(currentNode, actionResult);
+                          newNode = createNewStateNode(parentNode, actionResult);
                           nodeCounter = newNode.metadata.creationOrder + 1;
                           newNode.metadata.creationOrder = nodeCounter;
                           _a.label = 3;
@@ -422,7 +469,12 @@
                               }
                           }
                           // When the node is created, we need to update the graph.
-                          currentNode.children.push(newNode);
+                          if (option === 'splitting') {
+                              this.graph.root.children.push(newNode);
+                          }
+                          else {
+                              currentNode.children.push(newNode);
+                          }
                           this.graph.addNode(newNode);
                           this.graph.current = newNode;
                           return [2 /*return*/, newNode];
@@ -567,6 +619,84 @@
           });
       };
       /**
+      * To merge two branches from their split nodes.
+      *
+      * @param id Node identifier
+      */
+      ProvenanceGraphTraverser.prototype.toMergeNodes = function (id, transitionTime) {
+          return __awaiter(this, void 0, void 0, function () {
+              // function gatherNodes(currentNode: ProvenanceNode, targetNode: ProvenanceNode) {
+              //   nodesToMove = [];
+              //   if(currentNode){
+              //     currentNode.children.forEach(x => nodesToMove.push(x));
+              //     for (const nodeToMove of nodesToMove) {
+              //       nodesAppended = [];
+              //       appendNodes(nodeToMove, targetNode);
+              //     }
+              //     for (const nodeAppended of nodesAppended) {
+              //       let currentNode = nodesToMove[nodesAppended.indexOf(nodeAppended)];
+              //       gatherNodes(currentNode, nodeAppended);
+              //     }
+              //   }
+              // }
+              // function appendNodes(nodeToAppend: ProvenanceNode, rootNode: ProvenanceNode) {
+              //   graph.current = rootNode;
+              //   tracker?.applyAction((nodeToAppend as StateNode).action, true);
+              //   rootNode.children.forEach(x => nodesAppended.push(x));
+              // }
+              function gatherNodes(currentNode, targetNode) {
+                  nodesToMove = [];
+                  if (currentNode) {
+                      currentNode.children.forEach(function (x) { return nodesToMove.push(x); });
+                      for (var _i = 0, nodesToMove_1 = nodesToMove; _i < nodesToMove_1.length; _i++) {
+                          var nodeToMove = nodesToMove_1[_i];
+                          nodesAppended = [];
+                          appendNodes(nodeToMove, targetNode);
+                      }
+                      for (var _a = 0, nodesAppended_1 = nodesAppended; _a < nodesAppended_1.length; _a++) {
+                          var nodeAppended = nodesAppended_1[_a];
+                          var currentNode_1 = nodesToMove[nodesAppended.indexOf(nodeAppended)];
+                          gatherNodes(currentNode_1, nodeAppended);
+                      }
+                  }
+              }
+              function appendNodes(nodeToAppend, rootNode) {
+                  graph.current = rootNode;
+                  tracker === null || tracker === void 0 ? void 0 : tracker.applyAction(nodeToAppend.action, true);
+                  rootNode.children.forEach(function (x) { return nodesAppended.push(x); });
+              }
+              var currentNode, targetNode, tracker, graph, nodesToMove, nodesAppended, result;
+              return __generator(this, function (_a) {
+                  switch (_a.label) {
+                      case 0:
+                          currentNode = this.graph.current;
+                          targetNode = this.graph.getNode(id);
+                          tracker = this.tracker;
+                          graph = this.graph;
+                          nodesToMove = [];
+                          nodesAppended = [];
+                          // mergedGraphNodes.push(graph.root);
+                          // stemNodes(graph.root);
+                          // gatherNodes(currentNode, targetNode);
+                          // mergedGraphNodes.push(targetNode, ...nodesAppended);
+                          // this.graph = graph.mergedGraph(mergedGraphNodes, graph.root);
+                          // this.registry = new ActionFunctionRegistry();
+                          // this.tracker = new ProvenanceTracker(this.registry, this.graph);
+                          // const traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
+                          // (window as any).tree._viz.setTraverser(traverser);
+                          // (window as any).tree._viz.update();
+                          // let elem = document.getElementById('fake');
+                          // elem?.click();
+                          this.graph.current = targetNode;
+                          return [4 /*yield*/, gatherNodes(currentNode, targetNode)];
+                      case 1:
+                          result = _a.sent();
+                          return [2 /*return*/, result];
+                  }
+              });
+          });
+      };
+      /**
        * Finds shortest path between current node and node with request identifer.
        * Calls the do/undo functions of actions on the path.
        *
@@ -581,6 +711,23 @@
                           currentNode = this.graph.current;
                           targetNode = this.graph.getNode(id);
                           if (currentNode === targetNode) {
+                              return [2 /*return*/, Promise.resolve(currentNode)];
+                          }
+                          if (Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
+                              currentNode.metadata.option === 'splitting' && targetNode.metadata.option === 'splitting') {
+                              console.log('1');
+                              this.graph.current = targetNode;
+                              return [2 /*return*/, Promise.resolve(currentNode)];
+                          }
+                          if (targetNode.label === 'Root' && currentNode.metadata.option === 'resetting' ||
+                              currentNode.label === 'Root' && targetNode.metadata.option === 'resetting') {
+                              console.log('2');
+                              this.graph.current = targetNode;
+                              return [2 /*return*/, Promise.resolve(currentNode)];
+                          }
+                          if (targetNode.label === 'Root' || (currentNode.label === 'Root' && targetNode.metadata.option === 'splitting')) {
+                              console.log('3');
+                              this.graph.current = targetNode;
                               return [2 /*return*/, Promise.resolve(currentNode)];
                           }
                           trackToTarget = [];
@@ -866,7 +1013,7 @@
       });
       var slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.nodeCreationOrder, serialized.transitionTime, annotations);
       if (serialized.node != null) {
-          var node = graph.nodes[serialized.node];
+          var node = graph.getNodes()[serialized.node];
           slide.node = node;
       }
       return slide;

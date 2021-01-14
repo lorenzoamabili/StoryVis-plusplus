@@ -26,7 +26,7 @@ export declare class ProvenanceTracker implements IProvenanceTracker {
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    applyAction(action: Action, skipFirstDoFunctionCall?: boolean): Promise<StateNode>;
+    applyAction(action: Action, skipFirstDoFunctionCall?: boolean, option?: string): Promise<StateNode>;
     get screenShotProvider(): IScreenShotProvider | null;
     set screenShotProvider(provider: IScreenShotProvider | null);
     get autoScreenShot(): boolean;

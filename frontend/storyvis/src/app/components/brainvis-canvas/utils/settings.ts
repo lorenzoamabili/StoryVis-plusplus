@@ -10,7 +10,9 @@ export class Settings {
 
     public static instance: Settings;
     public canvas: BrainvisCanvasComponent;
-    public isOneView: boolean = false;
+    public isOneView: string = null;
+    public automaticSettingW: boolean = false;
+    public automaticSettingC: boolean = false;
 
     public _colorMap = 'grayscale';
 
@@ -72,6 +74,7 @@ export class Settings {
                 this.valueChanged = (valueW !== oldValueW) ? true : false;
 
                 if (this.valueChanged) {
+                    if (!this.automaticSettingW) {
                     this.canvas.dispatchEvent({
                         type: 'thresholdValueChangeStartW',
                         changes: {
@@ -89,8 +92,10 @@ export class Settings {
                             slider: slider
                         }
                     });
+                }
                     this.canvas.setWindowLevel(valueW, oldValueC, slider);
                     this.initW = true;
+                    this.automaticSettingW = false;
                 }
             }
         }
@@ -107,6 +112,7 @@ export class Settings {
                 this.valueChanged = (valueC !== oldValueC) ? true : false;
 
                 if (this.valueChanged) {
+                    if (!this.automaticSettingC) {
                     this.canvas.dispatchEvent({
                         type: 'thresholdValueChangeStartC',
                         changes: {
@@ -124,8 +130,10 @@ export class Settings {
                             slider: slider
                         }
                     });
+                }
                     this.canvas.setWindowLevel(oldValueW, valueC, slider);
                     this.initC = true;
+                    this.automaticSettingC = false;
                 }
             }
         }

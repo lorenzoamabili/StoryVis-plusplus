@@ -55,7 +55,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
-  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false): Promise<StateNode> {
+  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, option?: string): Promise<StateNode> {
     if (!this.acceptActions) {
       return Promise.resolve(this.graph.current as StateNode);
     }
@@ -70,6 +70,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       id: generateUUID(),
       label: label,
       metadata: {
+        option: option ? option : false,
         loaded: false,
         createdBy: this.username,
         createdOn: generateTimestamp(),
@@ -85,10 +86,11 @@ export class ProvenanceTracker implements IProvenanceTracker {
 
     // Save the current node because the next block could be asynchronous
     const currentNode = this.graph.current;
+    const parentNode = (option === 'splitting') ? this.graph.root : this.graph.current;
 
 
     if (skipFirstDoFunctionCall) {
-      newNode = createNewStateNode(this.graph.current, null);
+      newNode = createNewStateNode(parentNode, null);
       nodeCounter = newNode.metadata.creationOrder + 1;
       newNode.metadata.creationOrder = nodeCounter;
     } else {
@@ -99,7 +101,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       );
       const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args);
 
-       newNode = createNewStateNode(currentNode, actionResult);
+       newNode = createNewStateNode(parentNode, actionResult);
        nodeCounter = newNode.metadata.creationOrder + 1;
        newNode.metadata.creationOrder = nodeCounter;
     }
@@ -114,7 +116,11 @@ export class ProvenanceTracker implements IProvenanceTracker {
 
 
     // When the node is created, we need to update the graph.
-    currentNode.children.push(newNode);
+    if(option === 'splitting'){
+      this.graph.root.children.push(newNode);
+    } else {
+      currentNode.children.push(newNode);
+    }
 
     this.graph.addNode(newNode);
     this.graph.current = newNode;

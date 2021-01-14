@@ -36,20 +36,20 @@ export class ProvenanceGraph implements IProvenanceGraph {
     this._mitt = mitt();
     this.application = application;
 
-    if (node){
+    if (node) {
       this.root = node;
     } else {
-    this.root = {
-      id: generateUUID(),
-      label: 'Root',
-      metadata: {
-        createdBy: userid,
-        createdOn: generateTimestamp(),
-        creationOrder: 0
-      },
-      children: []
-    } 
-  }
+      this.root = {
+        id: generateUUID(),
+        label: 'Root',
+        metadata: {
+          createdBy: userid,
+          createdOn: generateTimestamp(),
+          creationOrder: 0
+        },
+        children: []
+      }
+    }
     this.addNode(this.root);
     this._current = this.root;
   }
@@ -86,9 +86,75 @@ export class ProvenanceGraph implements IProvenanceGraph {
     this._mitt.emit('currentChanged', node);
   }
 
-  get nodes() {
+  getNodes(): { [key: string]: ProvenanceNode } {
     return this._nodes;
   }
+
+  setNodes(nodes: { [key: string]: ProvenanceNode }): any {
+    this._nodes = nodes;
+  }
+
+  // mergedGraph(mergedGraphNodes: ProvenanceNode[], rootNode: ProvenanceNode): ProvenanceGraph {
+  //   const nodes: { [key: string]: any } = {};
+
+  //   for (const node of mergedGraphNodes) {
+  //     let nodeId = node.id;
+  //     nodes[node.id] = { ...node };
+
+  //     if(node !== rootNode){
+  //       nodes[node.id].parent = nodes[(node as any).parent];
+  //     }
+      
+  //     // node.parent = nodes[node.parent];
+
+
+  //     nodes[node.id].children = (node as any).children.map((nodeId: string) => nodes[nodeId]);
+
+  //     console.log(nodes[node.id]);
+  //   }
+  //   console.log(mergedGraphNodes);
+  //   console.log(nodes);
+
+  //   for (const nodeId of Object.keys(nodes)) {
+  //     const node = nodes[nodeId];
+  //     node.children = node.children.map((id: string) => nodes[id]);
+  //     if ('parent' in node) {
+  //       node.parent = nodes[node.parent];
+  //     }
+  //   }
+
+  //   console.log(nodes);
+
+  //   const graph = new ProvenanceGraph(this.application, 'mergedGraph', nodes[rootNode.id]);
+  //   graph._nodes = nodes;
+  //   graph._current = nodes[nodes[rootNode.id]];
+
+
+  //   const seriaNodes = Object.keys(graph.getNodes()).map(nodeId => {
+  //     const node = graph.getNode(nodeId);
+  //     node.metadata.loaded = true;
+  //     const serializedNode: SerializedProvenanceNode = { ...node } as any;
+  //     if (isStateNode(node)) {
+  //       (serializedNode as SerializedStateNode).parent = node.parent.id;
+  //     }
+  //     console.log(serializedNode);
+
+  //     serializedNode.children = node.children.map(child => child.id);
+  //     return serializedNode;
+  //   });
+
+  //   const seriaGraph: SerializedProvenanceGraph =
+  //   {
+  //     nodes: seriaNodes,
+  //     root: graph.root.id,
+  //     application: graph.application,
+  //     current: graph.current.id
+  //   }
+    
+  //   const mergedGraph = restoreProvenanceGraph(seriaGraph);
+
+  //   return mergedGraph;
+  // }
 
   emitNodeChangedEvent(node: ProvenanceNode) {
     /* istanbul ignore if */
@@ -143,7 +209,7 @@ export function restoreProvenanceGraph(
 }
 
 export function serializeProvenanceGraph(graph: ProvenanceGraph): SerializedProvenanceGraph {
-  const nodes = Object.keys(graph.nodes).map(nodeId => {
+  const nodes = Object.keys(graph.getNodes()).map(nodeId => {
     const node = graph.getNode(nodeId);
     node.metadata.loaded = true;
     const serializedNode: SerializedProvenanceNode = { ...node } as any;

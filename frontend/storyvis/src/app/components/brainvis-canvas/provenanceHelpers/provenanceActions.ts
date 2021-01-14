@@ -37,11 +37,22 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
     canvas.create4Views(domID);
   },
 
+  resetWindowLevel: async (setting) => {
+    canvas.resetWindowLevel(setting);
+  },
+  
   changeSlicesLocation: async (parameters) => {
     canvas.changeSlicesLocation(parameters);
   },
-  resetBackSlicesLocation: async () => {
-    canvas.resetSlicesLocation();
+
+  resetConfig: async () => {
+    canvas.resetConfig();
+  },  
+  setConfig: async (parameters) => {
+    canvas.setConfig(parameters);
+  },
+
+  null: async () => {
   }
 });
 
@@ -52,3 +63,4 @@ export const registerActions = (registry: ActionFunctionRegistry, canvas: Brainv
     registry.register(actionName, actions[actionName]);
   });
 };
+

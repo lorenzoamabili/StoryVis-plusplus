@@ -10,7 +10,6 @@ import Angle from "./angle";
 import Voxelprobe from "./voxelprobe";
 import Annotation from "./annotation";
 import { Artifact } from "@visualstorytelling/provenance-core/src/api";
-import { ProvenanceTracker } from "@visualstorytelling/provenance-core";
 
 @Component({
   template: ''
@@ -19,6 +18,11 @@ import { ProvenanceTracker } from "@visualstorytelling/provenance-core";
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   public _measurement: Ruler | Angle | Voxelprobe | Annotation | null;   // Freehand |
   public _measurements: (Ruler | Angle | Voxelprobe | Annotation | null)[] = [];     // Freehand | 
+
+  public oldSlicePosition: ISlicePosition;
+  public oldCameraZoom: number;
+  public originalSlicePosition: ISlicePosition;
+  public originalCameraZoom: number;
 
   // measurements/artifacts created in the current branch
   // not strictly necessary for each view. However, they can be used for future work.
@@ -36,17 +40,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     measurementType: String
   };
 
-  public oldSliceOrientation: string;
-
-  public originalSlicePosition: ISlicePosition;
-  public oldSlicePosition: ISlicePosition;
-  public originalCameraZoom: number;
-  public oldCameraZoom: number;
-
   private _artifactInit: boolean = false;
   public _artifactID: number = -1;
 
-  public tracker: ProvenanceTracker;
   public _view: View;
 
   public annotationCounter: number = 0;
@@ -79,8 +75,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._sliceColor = view.sliceColor; // 0xff1744
     this._targetID = view.targetID; // 1
     this._view = view;
-
-    this.oldSliceOrientation = this._sliceOrientation;
   }
 
 
@@ -215,10 +209,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     );
     this._scene.add(this._stackHelper);
 
-
     this.originalSlicePosition = this.getSlicePosition();
-    this.originalCameraZoom = this._camera.zoom;
-
+    this.originalCameraZoom = this.camera.zoom;
     this.oldSlicePosition = this.originalSlicePosition;
     this.oldCameraZoom = this.originalCameraZoom;
   }
@@ -305,57 +297,49 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   onScroll(event: any) {
     // super.onScroll(event);
-        const oldIndex = this._stackHelper.index;
-console.log(oldIndex);
-        if(this.sliceOrientation === this.oldSliceOrientation){
-          if (event.delta > 0) {
-            if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
-              return;
-            }
-            this._stackHelper.index += 1;
-            this.removeFromSliceChange(oldIndex, this.sliceOrientation);
-          } else {
-            if (this._stackHelper.index <= 1) {
-              return;
-            }
-            this._stackHelper.index -= 1;
-            this.removeFromSliceChange(oldIndex, this.sliceOrientation);
-          }
-        }
-          
-        const newIndex = this._stackHelper.index;
-        console.log(newIndex);
+    const oldIndex = this._stackHelper.index;
 
-          this._canvas.dispatchEvent({
-          type: "sliceIndexChangeStart",
-          changes: {
-            sliceOrientation: this.sliceOrientation === this.oldSliceOrientation ? this.sliceOrientation : this.oldSliceOrientation,
-            oldIndex: oldIndex,
-            newIndex: newIndex
-          }
-        });
+    if (event.delta > 0) {
+      if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
+        return;
+      }
+      this._stackHelper.index += 1;
+      this.removeFromSliceChange(oldIndex, this.sliceOrientation);
+    } else {
+      if (this._stackHelper.index <= 1) {
+        return;
+      }
+      this._stackHelper.index -= 1;
+      this.removeFromSliceChange(oldIndex, this.sliceOrientation);
+    }
+
+    const newIndex = this._stackHelper.index;
+
+    this._canvas.dispatchEvent({
+      type: "sliceIndexChangeStart",
+      changes: {
+        sliceOrientation: this.sliceOrientation,
+        oldIndex: oldIndex,
+        newIndex: newIndex
+      }
+    });
 
 
-        this._canvas.dispatchEvent({
-          type: "sliceIndexChanged",
-          changes: {
-            sliceOrientation: this.sliceOrientation === this.oldSliceOrientation ? this.sliceOrientation : this.oldSliceOrientation,
-            oldIndex: oldIndex,
-            newIndex: newIndex
-          }
-        });
-
-        this.oldSliceOrientation = this.sliceOrientation;
+    this._canvas.dispatchEvent({
+      type: "sliceIndexChanged",
+      changes: {
+        sliceOrientation: this.sliceOrientation,
+        oldIndex: oldIndex,
+        newIndex: newIndex
+      }
+    });
   }
 
 
 
   onPlane(event: any) {
     if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
-      // if (!this._canvas.settings.rulerMode && !this._canvas.settings.angleMode && !this._canvas.settings.voxelprobeMode && !this._canvas.settings.annotationMode) {
-        const newSlicePosition = this.getSlicePosition();
-        const newCameraZoom = this._camera.zoom;
-
+      if (!this._canvas.settings.rulerMode && !this._canvas.settings.angleMode && !this._canvas.settings.voxelprobeMode && !this._canvas.settings.annotationMode) {
         switch (event.button) {
           case 0:
             this._canvas.dispatchEvent({
@@ -370,7 +354,7 @@ console.log(oldIndex);
               type: "sliceDragChanged",
               changes: {
                 sliceOrientation: this._sliceOrientation,
-                newSlicePosition: newSlicePosition
+                newSlicePosition: this.getSlicePosition()
               }
             });
             break;
@@ -389,22 +373,22 @@ console.log(oldIndex);
               type: "sliceZoomChanged",
               changes: {
                 sliceOrientation: this._sliceOrientation,
-                newZoom: newCameraZoom
+                newZoom: this._camera.zoom
               }
             });
             break;
 
         }
 
-        this.oldSlicePosition = newSlicePosition;
-        this.oldCameraZoom = newCameraZoom;
+        this.oldSlicePosition = this.getSlicePosition();
+        this.oldCameraZoom = this._camera.zoom;
 
-      // } else {
-      //   this._canvas.settings.rulerMode = false;
-      //   this._canvas.settings.angleMode = false;
-      //   this._canvas.settings.voxelprobeMode = false;
-      //   this._canvas.settings.annotationMode = false;
-      // }
+      } else {
+        this._canvas.settings.rulerMode = false;
+        this._canvas.settings.angleMode = false;
+        this._canvas.settings.voxelprobeMode = false;
+        this._canvas.settings.annotationMode = false;
+      }
     }
   }
 
@@ -422,12 +406,12 @@ console.log(oldIndex);
     this.changeCamera2D(
       new THREE.Vector3(newSlicePosition.position[0], newSlicePosition.position[1], newSlicePosition.position[2]),
       new THREE.Vector3(newSlicePosition.direction[0], newSlicePosition.direction[1], newSlicePosition.direction[2]),
-      within > 0 ? within : 1000);
+      within > 0 ? within : 10);
   }
 
 
   setSliceZoom(cameraZoom: number, within: number) {
-    this.changeCamera2DZoom(cameraZoom, within > 0 ? within : 1000);
+    this.changeCamera2DZoom(cameraZoom, within > 0 ? within : 10);
   }
 
 
@@ -562,8 +546,22 @@ console.log(oldIndex);
   }
 
 
+  restoreArtifact(artifact: Artifact, newIndex: number) {
+    this._artifacts.push(artifact);
 
-  addArtifact = (artifact: Artifact) => {
+    if (artifact.sliceOrientation === 'axial') {
+      this._artifactsAxial.push(artifact);
+    } else if (artifact.sliceOrientation === 'coronal') {
+      this._artifactsCoronal.push(artifact);
+    } else if (artifact.sliceOrientation === 'sagittal') {
+      this._artifactsSagittal.push(artifact);
+    }
+
+    this.renderFromSliceChange(artifact.sliceOrientation, newIndex);
+  }
+
+
+  addArtifact(artifact: Artifact) {
     this.renderElms(artifact);
     this._artifacts.push(artifact);
 
@@ -576,7 +574,7 @@ console.log(oldIndex);
     }
   };
 
-  removeArtifact = (artifact: Artifact) => {
+  removeArtifact(artifact: Artifact) {
     this.removeElms(artifact);
     this._artifacts = this._artifacts.filter((x) => x.id !== artifact.id);
 
@@ -610,7 +608,7 @@ console.log(oldIndex);
   deleteArtifact(artifact?: Artifact) {
     const that = this;
     if (artifact) {
-      this.removeElms(artifact);
+      this.removeArtifact(artifact);
     }
     else {
       that._measurements.forEach(x => x.artifact.elements.forEach(x => x.addEventListener('contextmenu', (e) => {
@@ -653,8 +651,6 @@ console.log(oldIndex);
       ]
     };
     this.createArtifact(this._measurement.artifact);
-    this._canvas.settings.rulerMode = false;
-
   }
 
 
@@ -694,7 +690,6 @@ console.log(oldIndex);
       ]
     };
     this.createArtifact(this._measurement.artifact);
-    this._canvas.settings.angleMode = false;
   }
 
   // Freehand
@@ -765,7 +760,6 @@ console.log(oldIndex);
       ]
     };
     this.createArtifact(this._measurement.artifact);
-    this._canvas.settings.voxelprobeMode = false;
   }
 
 
@@ -807,7 +801,6 @@ console.log(oldIndex);
       ]
     };
     this.createArtifact(this._measurement.artifact);
-    this._canvas.settings.annotationMode = false;
   }
 
 
