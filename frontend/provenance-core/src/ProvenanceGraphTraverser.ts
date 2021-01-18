@@ -11,8 +11,6 @@ import {
 } from './api';
 import { isReversibleAction, isStateNode } from './utils';
 import mitt from './mitt';
-import { ActionFunctionRegistry } from './ActionFunctionRegistry';
-import { ProvenanceTracker } from './ProvenanceTracker';
 
 function isNextNodeInTrackUp(currentNode: ProvenanceNode, nextNode: ProvenanceNode): boolean {
   if (isStateNode(currentNode) && currentNode.parent === nextNode) {
@@ -115,154 +113,69 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
 
 
   /**
-  * To merge two branches from their split nodes.
+  * To copy a subtree with a split node as a root into another split node.
   *
   * @param id Node identifier
   */
-  async toMergeNodes(
+
+  async toCopyNodes(
     id: NodeIdentifier,
-    transitionTime: number
+    traverser?: ProvenanceGraphTraverser
   ): Promise<any | undefined> {
-    const currentNode = this.graph.current;
-    const targetNode = this.graph.getNode(id);
-
-
-    // let tracker = this.tracker;
-    // let graph = this.graph;
-
-    // let nodesToMove: ProvenanceNode[] = [];
-    // let nodesAppended: ProvenanceNode[] = [];
-    // let nodesToRemove: ProvenanceNode[] = [];
-    // let mergedGraphNodes: ProvenanceNode[] = [];
-    // let newRootNodes: ProvenanceNode[] = [];
-
-    // function gatherNodes(currentNode: ProvenanceNode, targetNode: ProvenanceNode) {
-    //   currentNode.children.forEach(x => nodesToMove.push(x));
-
-    //   for (const nodeToMove of nodesToMove) {
-    //     nodesAppended = [];
-    //     appendNodes(nodeToMove, targetNode);
-    //   }
-
-    //   nodesToMove = [];
-    //   for (const nodeMoved of nodesAppended) {
-    //     currentNode.children.forEach(nodeToMove => gatherNodes(nodeToMove, nodeMoved));
-    //   }
-    // }
-
-    // function appendNodes(nodeToAppend: ProvenanceNode, rootNode: ProvenanceNode) {
-    //   rootNode.children.forEach(x => nodesAppended.push(x));
-    //   graph.current = rootNode;
-    //   tracker?.applyAction((nodeToAppend as StateNode).action, true);
-    // }
-
-    // function stemNodes(rootNode: ProvenanceNode) {
-    //     newRootNodes = [];
-    //     rootNode.children.forEach(mergedGraphNode => newRootNodes.push(mergedGraphNode));
-    //     rootNode.children.forEach(mergedGraphNode => mergedGraphNodes.push(mergedGraphNode));
-  
-    //     for (const baseNode of newRootNodes) {
-    //       if(baseNode !== targetNode){
-    //       stemNodes(baseNode);
-    //     }
-    //   }
-    // }
-
+    const currentNode = traverser ? traverser.graph.root : this.graph.current;
+    const targetNode = traverser ? this.graph.root : this.graph.getNode(id);
 
     let tracker = this.tracker;
     let graph = this.graph;
 
     let nodesToMove: ProvenanceNode[] = [];
     let nodesAppended: ProvenanceNode[] = [];
-    let nodesToRemove: ProvenanceNode[] = [];
-    let mergedGraphNodes: ProvenanceNode[] = [];
-    let newRootNodes: ProvenanceNode[] = [];
+    let previousChildren: ProvenanceNode[] = [];
 
-    // function gatherNodes(currentNode: ProvenanceNode, targetNode: ProvenanceNode) {
-    //   nodesToMove = [];
-    //   if(currentNode){
-    //     currentNode.children.forEach(x => nodesToMove.push(x));
-
-    //     for (const nodeToMove of nodesToMove) {
-    //       nodesAppended = [];
-    //       appendNodes(nodeToMove, targetNode);
-    //     }
-  
-    //     for (const nodeAppended of nodesAppended) {
-    //       let currentNode = nodesToMove[nodesAppended.indexOf(nodeAppended)];
-    //       gatherNodes(currentNode, nodeAppended);
-    //     }
-    //   }
-
-    // }
-
-    // function appendNodes(nodeToAppend: ProvenanceNode, rootNode: ProvenanceNode) {
-    //   graph.current = rootNode;
-    //   tracker?.applyAction((nodeToAppend as StateNode).action, true);
-    //   rootNode.children.forEach(x => nodesAppended.push(x));
-    // }
-
-
-
-    function gatherNodes(currentNode: ProvenanceNode, targetNode: ProvenanceNode) {
+    function copySubtree(currentNode: ProvenanceNode, targetNode: ProvenanceNode) {
       nodesToMove = [];
-      if(currentNode){
-        currentNode.children.forEach(x => nodesToMove.push(x));
-
-        for (const nodeToMove of nodesToMove) {
-          nodesAppended = [];
-          appendNodes(nodeToMove, targetNode);
+      previousChildren = [];
+      if (currentNode && targetNode) {
+        currentNode.children.forEach(nodeToMove => nodesToMove.push(nodeToMove));
+        if (targetNode.children) {
+          targetNode.children.forEach(previousChild => previousChildren.push(previousChild));
         }
-  
-        for (const nodeAppended of nodesAppended) {
-          let currentNode = nodesToMove[nodesAppended.indexOf(nodeAppended)];
-          gatherNodes(currentNode, nodeAppended);
+        let i = -1;
+        for (let nodeToMove of nodesToMove) {
+          i = i + 1;
+          appendNodes(nodeToMove, targetNode);
+          goOneLevelDown(nodeToMove, nodesAppended, i);
         }
       }
-
     }
 
     function appendNodes(nodeToAppend: ProvenanceNode, rootNode: ProvenanceNode) {
+      nodesAppended = [];
       graph.current = rootNode;
-      tracker?.applyAction((nodeToAppend as StateNode).action, true);
-      rootNode.children.forEach(x => nodesAppended.push(x));
+      if (traverser && nodeToAppend.metadata.option !== 'merged') {
+        tracker?.applyAction((nodeToAppend as StateNode).action, true);
+        nodeToAppend.metadata.option = 'merged';
+      } else {
+        tracker?.applyAction((nodeToAppend as StateNode).action, true);
+      }
+      rootNode.children.forEach(nodeToAppend => nodesAppended.push(nodeToAppend));
+      nodesAppended = nodesAppended.filter(nodeAppended => previousChildren.includes(nodeAppended) === false);
     }
 
-
-
-    function stemNodes(rootNode: ProvenanceNode) {
-        newRootNodes = [];
-        rootNode.children.forEach(mergedGraphNode => newRootNodes.push(mergedGraphNode));
-        rootNode.children.forEach(mergedGraphNode => mergedGraphNodes.push(mergedGraphNode));
-  
-        for (const baseNode of newRootNodes) {
-          if(baseNode !== targetNode){
-          stemNodes(baseNode);
-        }
+    function goOneLevelDown(nodeToMove: ProvenanceNode, nodesAppended: ProvenanceNode[], rootIndex: number) {
+      if (nodeToMove.children) {
+        let lastNodeAppended = nodesAppended[rootIndex];
+        copySubtree(nodeToMove, lastNodeAppended);
       }
     }
-    
-    // mergedGraphNodes.push(graph.root);
-    // stemNodes(graph.root);
-    // gatherNodes(currentNode, targetNode);
-    // mergedGraphNodes.push(targetNode, ...nodesAppended);
-
-    // this.graph = graph.mergedGraph(mergedGraphNodes, graph.root);
-    // this.registry = new ActionFunctionRegistry();
-    // this.tracker = new ProvenanceTracker(this.registry, this.graph);
-    // const traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
-    
-    // (window as any).tree._viz.setTraverser(traverser);
-    // (window as any).tree._viz.update();
-
-    // let elem = document.getElementById('fake');
-    // elem?.click();
 
     this.graph.current = targetNode;
-    const result = await gatherNodes(currentNode, targetNode);
+    const result = await copySubtree(currentNode, targetNode);
 
     return result;
   }
+
+
 
   /**
    * Finds shortest path between current node and node with request identifer.
@@ -270,6 +183,7 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
    *
    * @param id Node identifier
    */
+
   async toStateNode(
     id: NodeIdentifier,
     transitionTime: number
@@ -279,26 +193,19 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
 
     if (currentNode === targetNode) {
       return Promise.resolve(currentNode);
-    }
-    if (Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
-      (currentNode as StateNode).metadata.option === 'splitting' && (targetNode as StateNode).metadata.option === 'splitting') {
-      console.log('1');
-
+    } else if (
+      // Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
+      currentNode.metadata.option === 'split' && targetNode.metadata.option === 'split') {
       this.graph.current = targetNode;
       return Promise.resolve(currentNode);
-    }
-    if (targetNode.label === 'Root' && (currentNode as StateNode).metadata.option === 'resetting' ||
-      currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'resetting') {
-      console.log('2');
-
-      this.graph.current = targetNode;
-      return Promise.resolve(currentNode);
-    }
-    if (targetNode.label === 'Root' || (currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'splitting')) {
-      console.log('3');
-
-      this.graph.current = targetNode;
-      return Promise.resolve(currentNode);
+    // } 
+    // else if (targetNode.label === 'Root' && (currentNode as StateNode).metadata.option === 'reset' ||
+    //   currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'reset') {
+    //   this.graph.current = targetNode;
+    //   return Promise.resolve(currentNode);
+    // } else if (targetNode.label === 'Root' || (currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'split')) {
+    //   this.graph.current = targetNode;
+    //   return Promise.resolve(currentNode);
     }
 
     const trackToTarget: ProvenanceNode[] = [];
@@ -392,6 +299,20 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
 
     return { functionsToDo, argumentsToDo };
   }
+
+  // public getArtifactsFromTrack() {
+  //   const artifacts: Artifact[] = [];
+  //   const track: ProvenanceNode[] = [];
+  //   for (let i = 0; i < track.length - 1; i++) {
+  //     const thisNode = track[i];
+  //       if (thisNode.artifacts !== []) {
+  //         artifacts.push(thisNode.artifacts as any);
+  //     }
+
+  //     return artifacts;
+  //   }
+  // }
+
 
   on(type: string, handler: Handler) {
     this._mitt.on(type, handler);

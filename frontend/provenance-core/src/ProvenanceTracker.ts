@@ -8,12 +8,15 @@ import {
   ProvenanceNode,
   RootNode,
   IScreenShotProvider,
-  SerializedProvenanceGraph
+  SerializedProvenanceGraph,
+  Artifact
 } from './api';
 import { generateUUID, generateTimestamp } from './utils';
-import { ProvenanceGraph, serializeProvenanceGraph } from './ProvenanceGraph';
+import { serializeProvenanceGraph } from './ProvenanceGraph';
 
 var nodeCounter: number = 0;
+var allArtifacts: Artifact[] = [];
+
 /**
  * Provenance Graph Tracker implementation
  *
@@ -55,7 +58,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
-  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, option?: string): Promise<StateNode> {
+  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, artifacts?: Artifact, option?: string, newRoot?: ProvenanceNode): Promise<StateNode> {
     if (!this.acceptActions) {
       return Promise.resolve(this.graph.current as StateNode);
     }
@@ -66,11 +69,19 @@ export class ProvenanceTracker implements IProvenanceTracker {
     } else {
       label = action.do;
     }
+    
+    if(artifacts){
+      allArtifacts.push(artifacts);
+    }
+    
+
+
     const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any): StateNode => ({
       id: generateUUID(),
       label: label,
+      artifacts: artifacts ? allArtifacts : [],
       metadata: {
-        option: option ? option : false,
+        option: option ? option : '',
         loaded: false,
         createdBy: this.username,
         createdOn: generateTimestamp(),
@@ -86,7 +97,8 @@ export class ProvenanceTracker implements IProvenanceTracker {
 
     // Save the current node because the next block could be asynchronous
     const currentNode = this.graph.current;
-    const parentNode = (option === 'splitting') ? this.graph.root : this.graph.current;
+    let parentNode = (option === 'split') ? this.graph.root : this.graph.current;
+    parentNode = newRoot ? newRoot : parentNode;
 
 
     if (skipFirstDoFunctionCall) {
@@ -101,9 +113,9 @@ export class ProvenanceTracker implements IProvenanceTracker {
       );
       const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args);
 
-       newNode = createNewStateNode(parentNode, actionResult);
-       nodeCounter = newNode.metadata.creationOrder + 1;
-       newNode.metadata.creationOrder = nodeCounter;
+      newNode = createNewStateNode(parentNode, actionResult);
+      nodeCounter = newNode.metadata.creationOrder + 1;
+      newNode.metadata.creationOrder = nodeCounter;
     }
 
     if (this.autoScreenShot && this.screenShotProvider) {
@@ -116,10 +128,14 @@ export class ProvenanceTracker implements IProvenanceTracker {
 
 
     // When the node is created, we need to update the graph.
-    if(option === 'splitting'){
-      this.graph.root.children.push(newNode);
+    if (newRoot) {
+      newRoot.children.push(newNode);
     } else {
-      currentNode.children.push(newNode);
+      if (option === 'split') {
+        this.graph.root.children.push(newNode);
+      } else {
+        currentNode.children.push(newNode);
+      }
     }
 
     this.graph.addNode(newNode);
@@ -127,6 +143,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
 
     return newNode;
   }
+
 
   get screenShotProvider() {
     return this._screenShotProvider;

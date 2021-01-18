@@ -64,7 +64,7 @@ export interface Artifact {
   id: number;
   measurementType: string;
   sliceIndex: number;
-  sliceOrientation: string; 
+  sliceOrientation: string;
   elements: HTMLElement[] | null;
   elmHTML: any[] | null;
   metadata: any[] | null;
@@ -267,9 +267,8 @@ export interface IProvenanceGraph {
    */
   on(type: string, handler: Handler): void;
   off(type: string, handler: Handler): void;
-  getNodes(): {[key: string]: ProvenanceNode};
-  setNodes(nodes: {[key: string]: ProvenanceNode}): {[key: string]: ProvenanceNode};
-  // mergedGraph(mergedGraphNodes: ProvenanceNode[], rootNode: ProvenanceNode): ProvenanceGraph;
+  getNodes(): { [key: string]: ProvenanceNode };
+  setNodes(nodes: { [key: string]: ProvenanceNode }): { [key: string]: ProvenanceNode };
   getSelf(): SerializedProvenanceGraph;
   restoreSelf(sgraph: SerializedProvenanceGraph): ProvenanceGraph;
 }
@@ -324,7 +323,7 @@ export interface IProvenanceTracker {
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
-  applyAction(action: Action, skipFirstDoFunctionCall: boolean, option?: string): Promise<StateNode>;
+  applyAction(action: Action, skipFirstDoFunctionCall: boolean, artifacts?: Artifact, option?: string, newRoot?: ProvenanceNode): Promise<StateNode>;
   getGraph(): SerializedProvenanceGraph;
   restoreGraph(sgraph: any): void;
 
@@ -354,11 +353,11 @@ export interface IProvenanceGraphTraverser {
   graph: IProvenanceGraph;
 
   /**
-   * To merge two branches from their split nodes.
+   * To copy a subtree with a split node as a root into another split node.
    *
    * @param id
    */
-  toMergeNodes(id: NodeIdentifier, transitionTime: number): Promise<ProvenanceNode | undefined>;
+  toCopyNodes(id: NodeIdentifier): Promise<ProvenanceNode | undefined>;
 
 
   /**

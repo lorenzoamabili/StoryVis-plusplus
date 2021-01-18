@@ -15,6 +15,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
   public orientationID: number = 0;
   public zoomID: number = 0;
   public originalSliceOrientation;
+  public _artifactID: number = -1;
 
   constructor(view: View) {
     super(view);
@@ -74,7 +75,6 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._light = new THREE.DirectionalLight(0xffffff, 1);
     this._light.position.copy(this._camera.position);
     this._scene.add(this._light);
-
 
     // resize event
     this._renderer.domElement.addEventListener('resize', this.onWindowResize, false);

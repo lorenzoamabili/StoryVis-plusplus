@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core'
 import { ProvenanceService, AuthenticationService } from '../../shared/_services';
 import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
 import { Settings } from '../brainvis-canvas/utils/settings';
+import { setNewAddListeners } from '../../components/brainvis-canvas/provenanceHelpers/provenanceListeners';
 
 @Component({
   selector: 'app-provenance-visualization',
@@ -24,16 +25,18 @@ export class ProvenanceVisualizationComponent implements OnInit {
     document.onkeydown = this.keyPress;
   }
 
-  
 
-  createTree(traverser){
-    this._viz = new ProvenanceTreeVisualization(
-    traverser,
-    this.elementRef.nativeElement,
-    "ProvGraph"
-  );
-}
+  createTree(traverser) {
+    return this._viz = new ProvenanceTreeVisualization(
+      traverser,
+      this.elementRef.nativeElement,
+      "ProvGraph"
+    );
+  }
 
+  addListeners(registry, tracker) {
+    setNewAddListeners(registry, tracker);
+  }
 
   keyPress(e: any) {
     var evtobj = window.event ? event : e;
@@ -57,7 +60,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
     // ctrl + Q  / add the current node to the story
     else if (evtobj.keyCode === 81 && evtobj.ctrlKey) {
       graph.current.metadata.story = true;
-      (window as any).slideDeck.onAdd(graph.current);      
+      (window as any).slideDeck.onAdd(graph.current);
       (window as any).tree._viz.update();
     }
     // ctrl + IntlBackslash  / create a story with all nodes (by creation order)

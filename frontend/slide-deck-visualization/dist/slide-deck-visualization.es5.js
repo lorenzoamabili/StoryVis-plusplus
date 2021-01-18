@@ -221,13 +221,12 @@ var ProvenanceGraph = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(ProvenanceGraph.prototype, "nodes", {
-        get: function () {
-            return this._nodes;
-        },
-        enumerable: false,
-        configurable: true
-    });
+    ProvenanceGraph.prototype.getNodes = function () {
+        return this._nodes;
+    };
+    ProvenanceGraph.prototype.setNodes = function (nodes) {
+        this._nodes = nodes;
+    };
     ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {
         /* istanbul ignore if */
         if (!this._nodes[node.id]) {
@@ -273,7 +272,7 @@ function restoreProvenanceGraph(serializedProvenanceGraph) {
     return graph;
 }
 function serializeProvenanceGraph(graph) {
-    var nodes = Object.keys(graph.nodes).map(function (nodeId) {
+    var nodes = Object.keys(graph.getNodes()).map(function (nodeId) {
         var node = graph.getNode(nodeId);
         node.metadata.loaded = true;
         var serializedNode = __assign({}, node);
@@ -321,7 +320,7 @@ var ProvenanceTracker = /** @class */ (function () {
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, option) {
+    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, option, newRoot) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
             var label, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
@@ -343,7 +342,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             id: generateUUID(),
                             label: label,
                             metadata: {
-                                option: option ? option : false,
+                                option: option ? option : '',
                                 loaded: false,
                                 createdBy: _this.username,
                                 createdOn: generateTimestamp(),
@@ -355,7 +354,8 @@ var ProvenanceTracker = /** @class */ (function () {
                             children: []
                         }); };
                         currentNode = this.graph.current;
-                        parentNode = (option === 'splitting') ? this.graph.root : this.graph.current;
+                        parentNode = (option === 'split') ? this.graph.root : this.graph.current;
+                        parentNode = newRoot ? newRoot : parentNode;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
                         newNode = createNewStateNode(parentNode, null);
                         nodeCounter = newNode.metadata.creationOrder + 1;
@@ -381,11 +381,16 @@ var ProvenanceTracker = /** @class */ (function () {
                             }
                         }
                         // When the node is created, we need to update the graph.
-                        if (option === 'splitting') {
-                            this.graph.root.children.push(newNode);
+                        if (newRoot) {
+                            newRoot.children.push(newNode);
                         }
                         else {
-                            currentNode.children.push(newNode);
+                            if (option === 'split') {
+                                this.graph.root.children.push(newNode);
+                            }
+                            else {
+                                currentNode.children.push(newNode);
+                            }
                         }
                         this.graph.addNode(newNode);
                         this.graph.current = newNode;
@@ -622,7 +627,7 @@ function restoreSlide(serialized, graph) {
     });
     var slide = new ProvenanceSlide(serialized.name, serialized.duration, serialized.nodeCreationOrder, serialized.transitionTime, annotations);
     if (serialized.node != null) {
-        var node = graph.nodes[serialized.node];
+        var node = graph.getNodes()[serialized.node];
         slide.node = node;
     }
     return slide;
@@ -1199,6 +1204,9 @@ class SlideDeckVisualization {
             this.update();
         };
         this.seekDragged = (that) => {
+            select('#pauseBtn').attr('style', 'display: none');
+            select('#playBtn').attr('style', 'display: block');
+            this.stopPlaying();
             this._currentTime = (event.x + this._timelineShift - this._originPosition) / this._barWidthTimeMultiplier;
             this.update();
         };

@@ -15,8 +15,10 @@ import { Artifact } from "@visualstorytelling/provenance-core/src/api";
   template: ''
 })
 
+var artifactID: number = -1;
+
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
-  public _measurement: Ruler | Angle | Voxelprobe | Annotation | null;   // Freehand |
+  public _measurement: Ruler | Angle | Voxelprobe | Annotation | null = null;   // Freehand |
   public _measurements: (Ruler | Angle | Voxelprobe | Annotation | null)[] = [];     // Freehand | 
 
   public oldSlicePosition: ISlicePosition;
@@ -24,13 +26,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   public originalSlicePosition: ISlicePosition;
   public originalCameraZoom: number;
 
-  // measurements/artifacts created in the current branch
-  // not strictly necessary for each view. However, they can be used for future work.
   public _artifacts: Artifact[] = [];
-  public _artifactsAxial: Artifact[] = [];
-  public _artifactsSagittal: Artifact[] = [];
-  public _artifactsCoronal: Artifact[] = [];
   public _deletedArtifacts: Artifact[] = [];
+  private _artifactInit: boolean = false;
+  public annotationCounter: number = 0;
 
   public findingCoord: {
     coordinates: { x: Number, y: Number, z: Number }[],
@@ -39,13 +38,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     viewName: String,
     measurementType: String
   };
-
-  private _artifactInit: boolean = false;
-  public _artifactID: number = -1;
-
   public _view: View;
-
-  public annotationCounter: number = 0;
 
   public mouseDownEvent = new MouseEvent('mousedown', {
     clientX: 0,
@@ -155,7 +148,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     // this.scene.add()
 
-    this._measurement = null;
     this._initialized = true;
   }
 
@@ -304,13 +296,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         return;
       }
       this._stackHelper.index += 1;
-      this.removeFromSliceChange(oldIndex, this.sliceOrientation);
+      this.removeFromSliceChange(oldIndex);
     } else {
       if (this._stackHelper.index <= 1) {
         return;
       }
       this._stackHelper.index -= 1;
-      this.removeFromSliceChange(oldIndex, this.sliceOrientation);
+      this.removeFromSliceChange(oldIndex);
     }
 
     const newIndex = this._stackHelper.index;
@@ -398,7 +390,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     const position = this._camera.position.toArray();
     const direction = this._controls.target.toArray();
     const slicePosition = { position, direction };
-
     return slicePosition;
   }
 
@@ -499,37 +490,15 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
 
-
-
-  removeFromSliceChange(oldIndex, sliceOrientation) {
-    if (sliceOrientation === 'axial') {
-      if (this._artifactsAxial.find((x) => x.sliceIndex === oldIndex)) {
-        this._artifactsAxial.filter((x) => x.sliceIndex === oldIndex).forEach((x) => this.removeElms(x));
-      }
-    } else if (sliceOrientation === 'coronal') {
-      if (this._artifactsCoronal.find((x) => x.sliceIndex === oldIndex)) {
-        this._artifactsCoronal.filter((x) => x.sliceIndex === oldIndex).forEach((x) => this.removeElms(x));
-      }
-    } else if (sliceOrientation === 'sagittal') {
-      if (this._artifactsSagittal.find((x) => x.sliceIndex === oldIndex)) {
-        this._artifactsSagittal.filter((x) => x.sliceIndex === oldIndex).forEach((x) => this.removeElms(x));
-      }
+  removeFromSliceChange(oldIndex) {
+    if(this._artifacts.find((artifact) => artifact.sliceIndex === oldIndex)) {
+      this._artifacts.filter((artifact) => artifact.sliceIndex === oldIndex).forEach((artifact) => this.removeElms(artifact));
     }
   }
 
-  renderFromSliceChange(newIndex, sliceOrientation) {
-    if (sliceOrientation === 'axial') {
-      if (this._artifactsAxial.find((x) => x.sliceIndex === newIndex)) {
-        this._artifactsAxial.filter((x) => x.sliceIndex === newIndex).forEach((x) => this.renderElms(x));
-      }
-    } else if (sliceOrientation === 'coronal') {
-      if (this._artifactsCoronal.find((x) => x.sliceIndex === newIndex)) {
-        this._artifactsCoronal.filter((x) => x.sliceIndex === newIndex).forEach((x) => this.renderElms(x));
-      }
-    } else if (sliceOrientation === 'sagittal') {
-      if (this._artifactsSagittal.find((x) => x.sliceIndex === newIndex)) {
-        this._artifactsSagittal.filter((x) => x.sliceIndex === newIndex).forEach((x) => this.renderElms(x));
-      }
+  renderFromSliceChange(newIndex) {
+    if(this._artifacts.find((artifact) => artifact.sliceIndex === newIndex)) {
+      this._artifacts.filter((artifact) => artifact.sliceIndex === newIndex).forEach((artifact) => this.renderElms(artifact));
     }
   }
 
@@ -540,62 +509,38 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
   }
 
-
-  removeElms(artifact: Artifact) {
-    this._measurements.find((measurement) => measurement.artifact.id === artifact.id).widget.hide();
-  }
-
-
-  restoreArtifact(artifact: Artifact, newIndex: number) {
-    this._artifacts.push(artifact);
-
-    if (artifact.sliceOrientation === 'axial') {
-      this._artifactsAxial.push(artifact);
-    } else if (artifact.sliceOrientation === 'coronal') {
-      this._artifactsCoronal.push(artifact);
-    } else if (artifact.sliceOrientation === 'sagittal') {
-      this._artifactsSagittal.push(artifact);
-    }
-
-    this.renderFromSliceChange(artifact.sliceOrientation, newIndex);
+  removeElms(artifactToRemove: Artifact) {
+    this._measurements.find((measurement) => measurement.artifact.id === artifactToRemove.id).widget.hide();
   }
 
 
   addArtifact(artifact: Artifact) {
     this.renderElms(artifact);
     this._artifacts.push(artifact);
-
-    if (artifact.sliceOrientation === 'axial') {
-      this._artifactsAxial.push(artifact);
-    } else if (artifact.sliceOrientation === 'coronal') {
-      this._artifactsCoronal.push(artifact);
-    } else if (artifact.sliceOrientation === 'sagittal') {
-      this._artifactsSagittal.push(artifact);
-    }
   };
 
-  removeArtifact(artifact: Artifact) {
-    this.removeElms(artifact);
-    this._artifacts = this._artifacts.filter((x) => x.id !== artifact.id);
+  removeArtifact(artifactToRemove: Artifact) {
+    this.removeElms(artifactToRemove);
+    this._artifacts = this._artifacts.filter((artifact) => artifact.id !== artifactToRemove.id);
 
-    if (artifact.sliceOrientation === 'axial') {
-      this._artifactsAxial = this._artifactsAxial.filter((x) => x.id !== artifact.id);
-    } else if (artifact.sliceOrientation === 'coronal') {
-      this._artifactsCoronal = this._artifactsCoronal.filter((x) => x.id !== artifact.id);
-    } else if (artifact.sliceOrientation === 'sagittal') {
-      this._artifactsSagittal = this._artifactsSagittal.filter((x) => x.id !== artifact.id);
-    }
+    // if (artifact.sliceOrientation === 'axial') {
+    //   this._artifactsAxial = this._artifactsAxial.filter((x) => x.id !== artifact.id);
+    // } else if (artifact.sliceOrientation === 'coronal') {
+    //   this._artifactsCoronal = this._artifactsCoronal.filter((x) => x.id !== artifact.id);
+    // } else if (artifact.sliceOrientation === 'sagittal') {
+    //   this._artifactsSagittal = this._artifactsSagittal.filter((x) => x.id !== artifact.id);
+    // }
   };
 
 
   createArtifact(artifact: Artifact) {
     //not necessary, but make the data collection easier
     this.findingCoord = {} as any;
-    this.findingCoord.coordinates = [...this._measurement.artifact.metadata];
-    this.findingCoord.measurementID = this._measurement.artifact.id;
-    this.findingCoord.sliceIndex = this._measurement.artifact.sliceIndex;
-    this.findingCoord.viewName = this._measurement.artifact.sliceOrientation;
-    this.findingCoord.measurementType = this._measurement.artifact.measurementType;
+    this.findingCoord.coordinates = [...artifact.metadata];
+    this.findingCoord.measurementID = artifact.id;
+    this.findingCoord.sliceIndex = artifact.sliceIndex;
+    this.findingCoord.viewName = artifact.sliceOrientation;
+    this.findingCoord.measurementType = artifact.measurementType;
     this._canvas.provenance.findingsCoord.push(this.findingCoord);
 
     this.addArtifact(artifact);
@@ -611,11 +556,11 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this.removeArtifact(artifact);
     }
     else {
-      that._measurements.forEach(x => x.artifact.elements.forEach(x => x.addEventListener('contextmenu', (e) => {
+      that._artifacts.forEach(artifact => artifact.elements.forEach(elem => elem.addEventListener('contextmenu', (e) => {
         if (e.altKey) {
-          const measurementToDelete = that._measurements.find(x => x.artifact.elements.includes(e.target as any));
-          that.removeArtifact(measurementToDelete.artifact);
-          that.artifactDeleted.emit(measurementToDelete.artifact);
+          const artifactToDelete = that._artifacts.find(artifact => artifact.elements.includes(e.target as any));
+          that.removeArtifact(artifactToDelete);
+          that.artifactDeleted.emit(artifactToDelete);
         }
       })));
     }
@@ -627,9 +572,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._measurements.push(this._measurement);
     this._domElement.removeEventListener("mousedown", this.startRuler);
 
-    this._artifactID = this._artifactID + 1;
+    artifactID = artifactID + 1;
     this._measurement.artifact = {
-      id: this._artifactID,
+      id: artifactID,
       measurementType: "Distance",
       sliceIndex: this._stackHelper.index,
       sliceOrientation: this._sliceOrientation,
@@ -661,9 +606,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._measurements.push(this._measurement);
     this._domElement.removeEventListener("mousedown", this.startAngle);
 
-    this._artifactID = this._artifactID + 1;
+    artifactID = artifactID + 1;
     this._measurement.artifact = {
-      id: this._artifactID,
+      id: artifactID,
       measurementType: "Angle",
       sliceIndex: this._stackHelper.index,
       sliceOrientation: this._sliceOrientation,
@@ -741,9 +686,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._measurements.push(this._measurement);
     this._domElement.removeEventListener("mousedown", this.startVoxelprobe);
 
-    this._artifactID = this._artifactID + 1;
+    artifactID = artifactID + 1;
     this._measurement.artifact = {
-      id: this._artifactID,
+      id: artifactID,
       measurementType: "Density",
       sliceIndex: this._stackHelper.index,
       sliceOrientation: this._sliceOrientation,
@@ -782,9 +727,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     this._measurement.widget._label.id = 'textBox ' + this.annotationCounter;
 
-    this._artifactID = this._artifactID + 1;
+    artifactID = artifactID + 1;
     this._measurement.artifact = {
-      id: this._artifactID,
+      id: artifactID,
       measurementType: "Annotation",
       sliceIndex: this._stackHelper.index,
       sliceOrientation: this._sliceOrientation,

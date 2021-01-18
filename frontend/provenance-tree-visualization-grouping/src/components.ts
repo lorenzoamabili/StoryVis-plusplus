@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import { ProvenanceTreeVisualization } from './provenance-tree-visualization';
 import { addLegend, addCommandsList, addInstructionsList } from './legend';
+import { StateNode } from '@visualstorytelling/provenance-core';
 
 /**
  * @description Show the title of the data aggregation algorithm used.
@@ -87,6 +88,10 @@ export function addAggregationButtons(
 
 
 
+
+
+
+
   const upwardButton = provenanceTreeVisualization.container
     .append('button')
     .attr('id', 'upward-trigger')
@@ -95,8 +100,8 @@ export function addAggregationButtons(
     .attr('style', 'position: absolute; z-index: 1; top: 2px;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
-      if ((window as any).prov.graph.current.parent) {
-        provenanceTreeVisualization.traverser.toStateNode((window as any).prov.graph.current.parent.id, 250);
+      if (provenanceTreeVisualization.traverser.graph.current.label !== 'Root') {
+        provenanceTreeVisualization.traverser.toStateNode((provenanceTreeVisualization.traverser.graph.current as StateNode).parent.id, 250);
         provenanceTreeVisualization.update();
       }
     });
@@ -120,6 +125,11 @@ export function addAggregationButtons(
   upwardButton
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+
 
 
 
@@ -161,12 +171,12 @@ export function addAggregationButtons(
 
   const newAnalysisButton = provenanceTreeVisualization.container
     .append('button')
-    .attr('id', 'downward-trigger')
+    .attr('id', 'newAnalysis-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 95px;')
     .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => { (window as any).tree.settings.canvas.splitting('root'); });
+    .on('mousedown', () => { (window as any).tree.settings.canvas.provenance.generation(); });
 
   newAnalysisButton
     .append('span')
@@ -190,15 +200,52 @@ export function addAggregationButtons(
 
 
 
-  const splittingButton = provenanceTreeVisualization.container
+
+
+
+
+
+  const newAnalysisFromCurrentNodeButton = provenanceTreeVisualization.container
     .append('button')
-    .attr('id', 'downward-trigger')
+    .attr('id', 'newAnalysisFromCurrentNode-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 145px;')
     .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => { (window as any).tree.settings.canvas.splitting('current'); });
+    .on('mousedown', () => { (window as any).tree.settings.canvas.provenance.fission(); });
 
+  newAnalysisFromCurrentNodeButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('add_circle');
+
+  newAnalysisFromCurrentNodeButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+  newAnalysisFromCurrentNodeButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+
+  const splittingButton = provenanceTreeVisualization.container
+    .append('button')
+    .attr('id', 'splitting-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; z-index: 1; top: 195px;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => { (window as any).tree.settings.canvas.provenance.splitting(); });
 
   splittingButton
     .append('span')
@@ -221,36 +268,218 @@ export function addAggregationButtons(
     .attr('class', 'mat-button-focus-overlay');
 
 
-  // const mergingButton = provenanceTreeVisualization.container
-  //   .append('button')
-  //   .attr('id', 'downward-trigger')
-  //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
-  //   .attr('color', 'primary')
-  //   .attr('style', 'position: absolute; z-index: 1; top: 195px;')
-  //   .attr('ng-reflect-color', 'primary')
-  //   .on('mousedown', () => { (window as any).tree.settings.canvas.merging('current'); });
 
 
-  // mergingButton
-  //   .append('span')
-  //   .attr('class', 'mat-button-wrapper')
-  //   .append('mat-icon')
-  //   .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-  //   .attr('role', 'img')
-  //   .attr('aria-hidden', 'true')
-  //   .text('merge_type');
 
-  // mergingButton
-  //   .append('div')
-  //   .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-  //   .attr('ng-reflect-centered', 'true')
-  //   .attr('ng-reflect-disabled', 'false')
-  //   .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-  // mergingButton
-  //   .append('div')
-  //   .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+  const transferringButton = provenanceTreeVisualization.container
+    .append('button')
+    .attr('id', 'transferring-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; z-index: 1; top: 245px;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => {
+      if ((window as any).tree._viz.transferringEnabled === false) {
+        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        (window as any).tree._viz.mergingEnabled = false;
+        (window as any).tree._viz.copyingEnabled = false;
+        (window as any).tree._viz.transferringEnabled = true;
+      } else {
+        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        (window as any).tree._viz.transferringEnabled = false;
+      }
+    });
+
+
+    transferringButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('swap_horiz');
+
+    transferringButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+    transferringButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+
+
+
+
+
+
+
+
+  const mergingButton = provenanceTreeVisualization.container
+    .append('button')
+    .attr('id', 'merging-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; z-index: 1; top: 295px;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => {
+      if ((window as any).tree._viz.mergingEnabled === false) {
+        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        (window as any).tree._viz.copyingEnabled = false;
+        (window as any).tree._viz.transferringEnabled = false;
+        (window as any).tree._viz.mergingEnabled = true;
+      } else {
+        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        (window as any).tree._viz.mergingEnabled = false;
+      }
+    });
+
+
+    mergingButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('merge_type');
+    
+    mergingButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+    mergingButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+
+
+
+
+
+
+
+
+  const copyingButton = provenanceTreeVisualization.container
+    .append('button')
+    .attr('id', 'copying-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; z-index: 1; top: 345px;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => {
+      if ((window as any).tree._viz.copyingEnabled === false) {
+        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        (window as any).tree._viz.transferringEnabled = false;
+        (window as any).tree._viz.mergingEnabled = false;
+        (window as any).tree._viz.copyingEnabled = true;
+      } else {
+        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        (window as any).tree._viz.copyingEnabled = false;
+      }
+    });
+
+
+    copyingButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('queue');
+
+    copyingButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+    copyingButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+
+
+
+
+
+
+//   const mergingButton = provenanceTreeVisualization.container
+//     .append('button')
+//     .attr('id', 'merging-trigger')
+//     .attr('class', 'mat-icon-button mat-button-base mat-primary')
+//     .attr('color', 'primary')
+//     .attr('style', 'position: absolute; z-index: 1; top: 345px;')
+//     .attr('ng-reflect-color', 'primary')
+//     .on('mousedown', () => {
+//       if ((window as any).tree._viz.mergingEnabled === false) {
+//         mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+//         transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+//         copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+//         (window as any).tree._viz.mergingEnabled = true;
+//         (window as any).tree._viz.splittingEnabled = false;
+//         (window as any).tree._viz.doublingEnabled = false;
+//         (window as any).tree._viz.transferringEnabled = false;
+//       } else {
+//         mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+//         (window as any).tree._viz.mergingEnabled = false;
+//       }
+//     });
+
+
+//   mergingButton
+//     .append('span')
+//     .attr('class', 'mat-button-wrapper')
+//     .append('mat-icon')
+//     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+//     .attr('role', 'img')
+//     .attr('aria-hidden', 'true')
+//     .text('merge_type');
+
+//   mergingButton
+//     .append('div')
+//     .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+//     .attr('ng-reflect-centered', 'true')
+//     .attr('ng-reflect-disabled', 'false')
+//     .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+//   mergingButton
+//     .append('div')
+//     .attr('class', 'mat-button-focus-overlay');
 }
+
+
+
+
 
 /**
  * @description Slider for Arguments in simple HTML

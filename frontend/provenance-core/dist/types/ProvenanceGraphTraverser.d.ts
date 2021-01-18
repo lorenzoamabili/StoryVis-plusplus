@@ -17,11 +17,11 @@ export declare class ProvenanceGraphTraverser implements IProvenanceGraphTravers
     constructor(registry: IActionFunctionRegistry, graph: IProvenanceGraph, tracker?: IProvenanceTracker | null);
     executeFunctions(functionsToDo: ActionFunctionWithThis[], argumentsToDo: any[], transitionTimes: number[]): Promise<StateNode>;
     /**
-    * To merge two branches from their split nodes.
+    * To copy a subtree with a split node as a root into another split node.
     *
     * @param id Node identifier
     */
-    toMergeNodes(id: NodeIdentifier, transitionTime: number): Promise<any | undefined>;
+    toCopyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser): Promise<any | undefined>;
     /**
      * Finds shortest path between current node and node with request identifer.
      * Calls the do/undo functions of actions on the path.

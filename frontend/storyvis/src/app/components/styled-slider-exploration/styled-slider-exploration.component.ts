@@ -44,6 +44,13 @@ export class StyledSliderExplorationComponent implements DoCheck {
     this.valueW = value;
   }
 
+  getValueC() {
+    return this.valueC;
+  }
+
+  getValueW() {
+    return this.valueW;
+  }
 
   ngDoCheck() {
   }

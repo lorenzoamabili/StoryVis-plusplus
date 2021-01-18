@@ -10,7 +10,7 @@ export class Settings {
 
     public static instance: Settings;
     public canvas: BrainvisCanvasComponent;
-    public isOneView: string = null;
+    public isOneView: string = '';
     public automaticSettingW: boolean = false;
     public automaticSettingC: boolean = false;
 

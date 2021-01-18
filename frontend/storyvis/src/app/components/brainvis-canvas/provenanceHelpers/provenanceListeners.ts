@@ -5,22 +5,30 @@ import { registerActions } from './provenanceActions';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 import { Settings } from '../utils/settings';
 
-export const addListeners = (tracker: ProvenanceTracker) => {
+export function setNewAddListeners(registry, tracker): void {
+  let settings = Settings.getInstance(this);
+  let canvas = settings.canvas;
+
+  registerActions(registry, canvas);
+  addListeners(tracker);
+}
+
+export const addListeners = (tracker: ProvenanceTracker): any => {
   let settings = Settings.getInstance(this);
   let canvas = settings.canvas;
 
   // Naive way to reset the canvas after restoring a provenance graph 
-  let elem = document.createElement('button');
-  elem.setAttribute('id', 'fake');
-  elem.style.display = "none";
-  elem.addEventListener('click', resetCanvas);
-  document.body.appendChild(elem);
+  // let elem = document.createElement('button');
+  // elem.setAttribute('id', 'fake');
+  // elem.style.display = "none";
+  // elem.addEventListener('click', resetCanvas);
+  // document.body.appendChild(elem);
 
-  function resetCanvas(e: Event) {
-    registerActions(canvas.provenance.registry, canvas);
-    addListeners(canvas.provenance.tracker);
-    canvas.addEventListeners();
-  }
+  // function resetCanvas(e: Event) {
+  //   registerActions(canvas.provenance.registry, canvas);
+  //   addListeners(canvas.provenance.tracker);
+  //   canvas.addEventListeners();
+  // }
 
   // Slice Index Listener for all orientations - Debounced
   let sliceIndexEndListener: EventListener = null;
@@ -88,6 +96,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
     canvas.addEventListener('perspectiveCameraZoomChanged', perspectiveZoomEndListener);
   };
   canvas.addEventListener('perspectiveCameraZoomChangeStart', debounce(perspectiveZoomStartListener, 500, { leading: true }));
+
 
   // Perspective canvas orientation Listener - Debounced
   let perspectiveOrientationEndListener: EventListener = null;
@@ -210,7 +219,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
           undo: 'removeArtifact',
           undoArguments: { args: [renderer.sliceOrientation, artifact] }
         };
-        tracker.applyAction(action, true);
+        tracker.applyAction(action, true, artifact);
       });
     }
   });
@@ -229,7 +238,7 @@ export const addListeners = (tracker: ProvenanceTracker) => {
           undo: 'renderArtifact',
           undoArguments: { args: [renderer.sliceOrientation, artifact] }
         };
-        tracker.applyAction(action, true);
+        tracker.applyAction(action, true, artifact);
       });
     }
   });
@@ -290,32 +299,16 @@ export const addListeners = (tracker: ProvenanceTracker) => {
 
 
   canvas.renderers.forEach(renderer => {
-    renderer.magnificationCreated.subscribe((domID: any) => {
+    renderer.magnificationCreated.subscribe((args) => {
       const action = {
         metadata: {
           userIntent: 'configuration',
-          label: 'oneView' + ' - ' + (domID ? domID : '3D view')
+          label: args.oneView ? 'oneView' + ' - ' + (args.domID ? args.domID : '3D view') : '4Views'
         },
-        do: 'magnifyView',
-        doArguments: { args: [domID] },
-        undo: 'reduceView',
-        undoArguments: { args: [domID] }
-      };
-      tracker.applyAction(action, true);
-    })
-  });
-
-  canvas.renderers.forEach(renderer => {
-    renderer.reductionCreated.subscribe((domID: any) => {
-      const action = {
-        metadata: {
-          userIntent: 'configuration',
-          label: '4Views'
-        },
-        do: 'setWindowLevel',
-        doArguments: { args: [domID] },
-        undo: 'magnifyView',
-        undoArguments: { args: [domID] }
+        do: 'changeView',
+        doArguments: { args: [args.domID] },
+        undo: 'changeView',
+        undoArguments: { args: [args.domID] }
       };
       tracker.applyAction(action, true);
     })
@@ -362,6 +355,20 @@ export const addListeners = (tracker: ProvenanceTracker) => {
       undo: 'setConfig',
       undoArguments: { args: [parameters] }
     };
-    tracker.applyAction(action, true, 'resetting');
+    tracker.applyAction(action, true, 'reset');
+  });
+
+  canvas.nullCreated.subscribe(() => {
+    const action = {
+      metadata: {
+        userIntent: 'provenance',
+        label: 'new graph'
+      },
+      do: 'null',
+      doArguments: { args: [] },
+      undo: 'null',
+      undoArguments: { args: [] }
+    };
+    tracker.applyAction(action, true);
   });
 }

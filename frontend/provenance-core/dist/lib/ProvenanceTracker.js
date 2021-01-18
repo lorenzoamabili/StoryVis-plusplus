@@ -40,6 +40,7 @@ exports.ProvenanceTracker = void 0;
 var utils_1 = require("./utils");
 var ProvenanceGraph_1 = require("./ProvenanceGraph");
 var nodeCounter = 0;
+var allArtifacts = [];
 /**
  * Provenance Graph Tracker implementation
  *
@@ -69,7 +70,7 @@ var ProvenanceTracker = /** @class */ (function () {
      * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
      *        it will only be called when traversing.
      */
-    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, option) {
+    ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifacts, option, newRoot) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
             var label, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
@@ -87,11 +88,15 @@ var ProvenanceTracker = /** @class */ (function () {
                         else {
                             label = action.do;
                         }
+                        if (artifacts) {
+                            allArtifacts.push(artifacts);
+                        }
                         createNewStateNode = function (parentNode, actionResult) { return ({
                             id: utils_1.generateUUID(),
                             label: label,
+                            artifacts: artifacts ? allArtifacts : [],
                             metadata: {
-                                option: option ? option : false,
+                                option: option ? option : '',
                                 loaded: false,
                                 createdBy: _this.username,
                                 createdOn: utils_1.generateTimestamp(),
@@ -103,7 +108,8 @@ var ProvenanceTracker = /** @class */ (function () {
                             children: []
                         }); };
                         currentNode = this.graph.current;
-                        parentNode = (option === 'splitting') ? this.graph.root : this.graph.current;
+                        parentNode = (option === 'split') ? this.graph.root : this.graph.current;
+                        parentNode = newRoot ? newRoot : parentNode;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
                         newNode = createNewStateNode(parentNode, null);
                         nodeCounter = newNode.metadata.creationOrder + 1;
@@ -129,11 +135,16 @@ var ProvenanceTracker = /** @class */ (function () {
                             }
                         }
                         // When the node is created, we need to update the graph.
-                        if (option === 'splitting') {
-                            this.graph.root.children.push(newNode);
+                        if (newRoot) {
+                            newRoot.children.push(newNode);
                         }
                         else {
-                            currentNode.children.push(newNode);
+                            if (option === 'split') {
+                                this.graph.root.children.push(newNode);
+                            }
+                            else {
+                                currentNode.children.push(newNode);
+                            }
                         }
                         this.graph.addNode(newNode);
                         this.graph.current = newNode;

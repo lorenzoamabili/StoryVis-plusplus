@@ -12,15 +12,10 @@ import { addListeners } from './provenanceHelpers/provenanceListeners';
 import { Settings } from './utils/settings';
 import { Renderer2D } from './renderer2d';
 import { Renderer3D } from './renderer3d';
-import { Artifact, ProvenanceNode, StateNode } from '@visualstorytelling/provenance-core/src/api';
+import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 import { ProvenanceService } from '../../shared/_services/provenance.service';
 import { StyledSliderPracticeComponent } from '../styled-slider-practice/styled-slider-practice.component';
 import { StyledSliderExplorationComponent } from '../styled-slider-exploration/styled-slider-exploration.component';
-import Ruler from './ruler';
-import Angle from './angle';
-import Voxelprobe from './voxelprobe';
-import Annotation from './annotation';
-
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -36,10 +31,11 @@ export enum VIEWS {
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
   @Input() studyStarted: boolean;
+  @Output() nullCreated = new EventEmitter<any>();
   @Output() slicesLocationCreated = new EventEmitter<{ slicesPosition: ISlicePosition[], slicesCameraZoom: number[] }>();
   @Output() resetWLCreated = new EventEmitter<{ valueW: any, valueC: any, slider: string, setting: string }>();
   @Output() resetConfigCreated = new EventEmitter<{
-    measurements: (Ruler | Angle | Voxelprobe | Annotation)[],
+    artifacts: Artifact[],
     locationParam: {
       doArgs: {
         slicesPosition: ISlicePosition[];
@@ -201,7 +197,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   ngOnInit() {
     // todo: remove object from window
-    // (window as any).canvas = this;
+    (window as any).canvas = this;
 
     this._axialRenderer = new Renderer2D(this.views[0]);
     this._perspectiveRenderer = new Renderer3D(this.views[1]);
@@ -343,7 +339,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     const oldStackIndexS = this._sagittalRenderer.stackHelper.index;
 
 
-    if (!this.settings.isOneView) {
+    if (this.settings.isOneView === '') {
 
       this.oldStackDragA = this._axialRenderer.getSlicePosition();
       this.oldStackDragC = this._coronalRenderer.getSlicePosition();
@@ -369,7 +365,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.setSliceIndex(VIEWS.SAGITTAL, oldStackIndexS);
 
 
-    if (!this.settings.isOneView) {
+    if (this.settings.isOneView === '') {
       this.setSliceDrag(this.oldStackDragA, VIEWS.AXIAL, 10);
       this.setSliceDrag(this.oldStackDragC, VIEWS.CORONAL, 10);
       this.setSliceDrag(this.oldStackDragS, VIEWS.SAGITTAL, 10);
@@ -400,7 +396,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
     this.renderers.forEach(renderer => renderer.domElement.setAttribute('style', 'display: block;'));
 
-    this.settings.isOneView = null;
+    this.settings.isOneView = '';
   }
 
 
@@ -430,17 +426,16 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   resetWindowLevelParam(setting?: string) {
     const parameters = {
-      valueW: this._axialRenderer.stackHelper.slice._stack._windowWidth,
-      valueC: this._axialRenderer.stackHelper.slice._stack._windowCenter,
+      valueW: this.studyStarted ? this.sliderExploration.getValueW() : this.sliderPractice.getValueW(),
+      valueC: this.studyStarted ? this.sliderExploration.getValueC() : this.sliderPractice.getValueC(),
       slider: 'both',
       setting: setting ? setting : '1'
     }
-
     return parameters;
   }
 
   resetWindowLevel(setting?: string) {
-    const parameters = this.resetWindowLevelParam(setting ? setting : '1');
+    const parameters = this.resetWindowLevelParam(setting);
 
     if (parameters.setting === '1') {
       this.resetWindowLevel1();
@@ -448,20 +443,16 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.resetWindowLevel2();
     }
 
-    if (setting !== 'resetting') {
+    if (setting !== 'reset') {
       this.resetWLCreated.emit(parameters);
     }
   }
 
   resetWindowLevel1() {
-    this.settings.automaticSettingW = true;
-    this.settings.automaticSettingC = true;
     this.setWindowLevel(1500, 600, 'both');
   }
 
   resetWindowLevel2() {
-    this.settings.automaticSettingW = true;
-    this.settings.automaticSettingC = true;
     this.setWindowLevel(350, 50, 'both');
   }
 
@@ -500,7 +491,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     const parameters = this.resetSlicesLocationParam();
     this.changeSlicesLocation(parameters.doArgs);
     this.slicesLocationCreated.emit(parameters.undoArgs);
-    (this.provenance.graph.current as StateNode).metadata.option = 'resetting';
+    this.provenance.graph.current.metadata.option = 'reset';
   }
 
   changeSlicesLocation(parameters) {
@@ -515,35 +506,34 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._perspectiveRenderer.setCameraOrientation(parameters.sliceOrientation, 10)
   }
 
-  // deleteMeasurementsParam(){
-  //   return this._axialRenderer._measurements;
-  // }
-
-  deleteMeasurements() {
-    this.renderers2D.forEach(renderer => renderer._measurements.forEach(measurement => renderer.deleteArtifact(measurement.artifact)));
+  deleteArtifacts() {
+    this.renderers2D.forEach(renderer => renderer._artifacts.forEach(artifact => renderer.deleteArtifact(artifact)));
   }
 
-  restoreMeasurements() {
-    this.renderers2D.forEach(renderer => renderer._measurements.forEach(measurement => renderer.restoreArtifact(measurement.artifact, renderer.stackHelper.index)));
+  restoreArtifacts(artifacts) {
+    if(artifacts){
+      artifacts.forEach(artifact => this.renderArtifact(artifact.sliceOrientation, artifact));
+      this.renderers2D.forEach(renderer => artifacts.forEach(artifact => renderer.renderFromSliceChange(artifact.sliceIndex)));
+    }
   }
 
   resetConfigParam() {
-    const measurements = []
-    this.renderers2D.forEach(renderer => measurements.push(renderer._measurements));
+    let artifacts: Artifact[] = []; 
+    this.renderers2D.forEach(renderer => renderer._artifacts.forEach(artifact => artifacts.push(artifact)));
     const locationParam = this.resetSlicesLocationParam();
     const WLParam = this.resetWindowLevelParam();
     const magnificationParam = this.settings.isOneView;
+    const parameters = { artifacts, locationParam, WLParam, magnificationParam };
 
-    const parameters = { measurements, locationParam, WLParam, magnificationParam };
     return parameters;
   }
 
   resetConfig(newRoot?: boolean) {
     const parameters = this.resetConfigParam();
 
-    this.deleteMeasurements();
+    this.deleteArtifacts();
     this.changeSlicesLocation(parameters.locationParam.doArgs);
-    this.resetWindowLevel('resetting');
+    this.resetWindowLevel('reset');
 
     if (parameters.magnificationParam) {
       this.create4Views(parameters.magnificationParam);
@@ -555,73 +545,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   setConfig(parameters) {
-    this.restoreMeasurements();
+    this.restoreArtifacts(parameters.artifacts);
     this.changeSlicesLocation(parameters.locationParam.undoArgs);
     this.setWindowLevel(parameters.WLParam.valueW, parameters.WLParam.valueC, parameters.WLParam.slider);
-
     if (parameters.magnificationParam) {
       this.createOneView(parameters.magnificationParam);
     }
-  }
-
-
-  splitting(node: string) {
-    if (this.provenance.graph.current !== this.provenance.graph.root) {
-    let nodeToCopy;
-    if (node === 'root') {
-      nodeToCopy = this.provenance.graph.root;
-      this.newRoot();
-    } else if (node === 'current') {
-        nodeToCopy = this.provenance.graph.current;
-        this.copying(nodeToCopy as StateNode);
-      }
-    }
-  }
-
-  merging(toNode: StateNode) {
-    if ((this.provenance.graph.current as StateNode).metadata.option === 'splitting' &&
-      Math.abs(this.provenance.graph.current.metadata.creationOrder - toNode.metadata.creationOrder) === 1) {
-      // this.provenance.traverser.toMergeNodes(toNode.id, 10);
-      this.provenance.traverser.toStateNode(toNode.id, 10);
-    } else {
-      this.provenance.traverser.toStateNode(toNode.id, 10);
-    }
-  }
-
-  newRoot() {
-    this.resetConfig();
-
-    const action = {
-      metadata: {
-        userIntent: '',
-        label: 'Root - split'
-      },
-      do: 'null',
-      doArguments: { args: [] },
-      undo: 'null',
-      undoArguments: { args: [] }
-    };
-
-    this.provenance.tracker.applyAction(action, true, 'splitting')
-  }
-
-  copying(nodeToCopy: StateNode) {
-    const parameters = this.resetConfigParam();
-    nodeToCopy.action.metadata.userIntent = 'provenance';
-    nodeToCopy.metadata.option = 'splitting';
-
-    const action = {
-      metadata: {
-        userIntent: nodeToCopy.action.metadata.userIntent,
-        label: nodeToCopy.action.metadata.label + '- split'
-      },
-      do: 'setConfig',
-      doArguments: { args: [parameters] },
-      undo: 'resetConfig',
-      undoArguments: { args: [] }
-    };
-
-    this.provenance.tracker.applyAction(action, true, 'splitting')
   }
 
 
@@ -645,6 +574,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       }
 
     } else if (slider === 'both') {
+      this.settings.automaticSettingW = true;
+      this.settings.automaticSettingC = true;
 
       if (this.studyStarted) {
         this.sliderExploration.setValueW(valueW);
@@ -698,22 +629,31 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   changeSliceRemove(sliceOrientation: VIEWS, oldIndex: number) {
     if (sliceOrientation === 'axial') {
-      this._axialRenderer.removeFromSliceChange(oldIndex, sliceOrientation);
+      this._axialRenderer.removeFromSliceChange(oldIndex);
     } else if (sliceOrientation === 'coronal') {
-      this._coronalRenderer.removeFromSliceChange(oldIndex, sliceOrientation);
+      this._coronalRenderer.removeFromSliceChange(oldIndex);
     } else if (sliceOrientation === 'sagittal') {
-      this._sagittalRenderer.removeFromSliceChange(oldIndex, sliceOrientation);
+      this._sagittalRenderer.removeFromSliceChange(oldIndex);
     }
   }
 
   changeSliceRender(sliceOrientation: VIEWS, newIndex: number) {
     if (sliceOrientation === 'axial') {
-      this._axialRenderer.renderFromSliceChange(newIndex, sliceOrientation);
+      this._axialRenderer.renderFromSliceChange(newIndex);
     } else if (sliceOrientation === 'coronal') {
-      this._coronalRenderer.renderFromSliceChange(newIndex, sliceOrientation);
+      this._coronalRenderer.renderFromSliceChange(newIndex);
     } else if (sliceOrientation === 'sagittal') {
-      this._sagittalRenderer.renderFromSliceChange(newIndex, sliceOrientation);
+      this._sagittalRenderer.renderFromSliceChange(newIndex);
     }
+  }
+
+  renderMeasurements(artifacts){
+    artifacts.forEach(artifact => this.renderArtifact(artifact.sliceOrientation, artifact));
+    this.renderers2D.forEach(renderer => artifacts.forEach(artifact => renderer.renderFromSliceChange(artifact.sliceIndex)));
+  }
+
+  removeMeasurements(artifacts){
+    this.renderers2D.forEach(renderer => artifacts.forEach(artifact => renderer.removeFromSliceChange(artifact.sliceIndex)));
   }
 
   removeArtifact(sliceOrientation: VIEWS, artifact: Artifact) {

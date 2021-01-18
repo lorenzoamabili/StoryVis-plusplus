@@ -30,11 +30,8 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
   setPerspectiveCameraZoomLevel: async (args, transitionTime) => canvas.setPerspectiveCameraZoom(args, transitionTime),
   setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime),
 
-  magnifyView: async (domID) => {
-    canvas.createOneView(domID);
-  },
-  reduceView: async (domID) => {
-    canvas.create4Views(domID);
+  changeView: async (args) => {
+    canvas.displayOneView(args);
   },
 
   resetWindowLevel: async (setting) => {
@@ -52,11 +49,19 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
     canvas.setConfig(parameters);
   },
 
+  renderMeasurements: async (parameters) => {
+    canvas.renderMeasurements(parameters);
+  },  
+  removeMeasurements: async (parameters) => {
+    canvas.removeMeasurements(parameters);
+  },
+
   null: async () => {
   }
 });
 
-export const registerActions = (registry: ActionFunctionRegistry, canvas: BrainvisCanvasComponent) => {
+
+export const registerActions = (registry: ActionFunctionRegistry, canvas: BrainvisCanvasComponent): any => {
   const actions = getActions(canvas);
 
   Object.keys(actions).forEach(actionName => {

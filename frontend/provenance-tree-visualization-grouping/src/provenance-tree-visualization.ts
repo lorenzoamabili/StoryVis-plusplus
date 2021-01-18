@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { HierarchyPointNode, tickStep } from 'd3';
+import { HierarchyPointNode } from 'd3';
 import {
   ProvenanceGraphTraverser,
   ProvenanceNode
@@ -8,7 +8,7 @@ import {
 import gratzl from './gratzl';
 import { IHierarchyPointNodeWithMaxDepth } from './gratzl';
 import { IGroupedTreeNode } from './utils';
-import { NodeAggregator } from './aggregation/aggregation-implementations';
+import { NodeAggregator, transferAll } from './aggregation/aggregation-implementations';
 
 import {
   getNodeIntent,
@@ -70,6 +70,10 @@ export class ProvenanceTreeVisualization {
   private zoomDone = false;
   private brushPos: { x: number, y: number } = { x: 10, y: 10 };
 
+  public mergingEnabled: boolean = false;
+  public transferringEnabled: boolean = false;
+  public copyingEnabled: boolean = false;
+  
   constructor(traverser: ProvenanceGraphTraverser, elm: HTMLDivElement, aggreg: string) {
     this.traverser = traverser;
     this.colorScheme = d3.scaleOrdinal(d3.schemeAccent);
@@ -199,12 +203,16 @@ export class ProvenanceTreeVisualization {
     this.traverser = traverser;
   }
 
+  public hideTree(): void {
+    this.container.attr('class', 'hiddenClass');
+  }
+
   /**
    * @description Update the tree layout.
    */
   public update() {
     const wrappedRoot = wrapNode(this.traverser.graph.root);
-    aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
+    // aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
     const hierarchyRoot = d3.hierarchy(wrappedRoot); // Updated de treeRoot
     const currentHierarchyNode = findHierarchyNodeFromProvenanceNode(
       hierarchyRoot,
@@ -214,7 +222,7 @@ export class ProvenanceTreeVisualization {
     const tree = gratzl(hierarchyRoot, currentHierarchyNode);
     this.hierarchyRoot = tree;
 
-    const treeNodes = tree.descendants();
+    const treeNodes = tree.descendants().filter((d: any) => d.data.wrappedNodes[0].metadata.option !== 'merged');
     const oldNodes = this.g.selectAll('g.node').data(treeNodes, (d: any) => {
       const data = d.data.wrappedNodes.map((n: any) => n.id).join();
       return data;
@@ -245,7 +253,6 @@ export class ProvenanceTreeVisualization {
     updateNodes.selectAll('g.normal').remove();
     updateNodes.selectAll('g.bookmarked').remove();
     updateNodes.selectAll('.circle-text').remove();
-
 
     const getNodeSize = (node: IGroupedTreeNode<ProvenanceNode>) => {
       return Math.min(2.7 + 0.3 * node.wrappedNodes.length, 7);
@@ -283,7 +290,6 @@ export class ProvenanceTreeVisualization {
           classString += ' keynode';
         }
         classString += ' intent_' + getNodeIntent(d.data.wrappedNodes[0]);
-
         return classString;
       })
       .attr('r', (d: any) => getNodeSize(d.data));
@@ -295,12 +301,25 @@ export class ProvenanceTreeVisualization {
 
 
     updateNodes.on('click', d => {
-      if(d.data.wrappedNodes[0].metadata.option === 'splitting'){
-          (window as any).tree.settings.canvas.merging(d.data.wrappedNodes[0]);
+      if (this.transferringEnabled) {
+        (window as any).tree.settings.canvas.provenance.transferring(d.data.wrappedNodes[0]);
+        this.transferringEnabled = false;
+        d3.select("#transferring-trigger").attr('class', 'mat-icon-button mat-button-base mat-primary');
+      } else if (this.mergingEnabled) {
+        let currentNode = this.traverser.graph.current;
+        this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
+        (window as any).tree.settings.canvas.provenance.merging(currentNode, d.data.wrappedNodes[0]);
+        this.update();
+        this.mergingEnabled = false;
+        d3.select("#merging-trigger").attr('class', 'mat-icon-button mat-button-base mat-primary');
+      } else if (this.copyingEnabled) {
+        (window as any).tree.settings.canvas.provenance.copying(d.data.wrappedNodes[0]);
+        this.copyingEnabled = false;
+        d3.select("#copying-trigger").attr('class', 'mat-icon-button mat-button-base mat-primary');
       } else {
         this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
+        this.update();
       }
-      this.update();
     });
 
 
@@ -344,8 +363,9 @@ export class ProvenanceTreeVisualization {
 
     const oldLinks = this.g
       .selectAll('path.link')
-      .data(tree.links(), (d: any) =>
-        d.target.data.wrappedNodes.map((n: any) => n.id).join()
+      .data(tree.links()
+        .filter((d: any) => d.target.data.wrappedNodes[0].metadata.option !== 'merged'),
+        (d: any) => d.target.data.wrappedNodes.map((n: any) => n.id).join()
       );
 
     oldLinks.exit().remove();
@@ -368,6 +388,7 @@ export class ProvenanceTreeVisualization {
       .attr('d', (d: any) => this.linkPath(d));
 
     const updatedLinks = oldLinks.merge(newLinks as any);
+
 
     if (this.caterpillarActivated) {
       caterpillar(updateNodes, treeNodes, updatedLinks, this);

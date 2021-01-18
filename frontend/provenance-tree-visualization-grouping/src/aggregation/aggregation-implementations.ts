@@ -83,13 +83,15 @@ function transferChildren(
  * @description Pointed node wraps ALL children recursively
  * @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
  */
-function transferAll(node: IGroupedTreeNode<ProvenanceNode>) {
+export function transferAll(node: IGroupedTreeNode<ProvenanceNode>) {
   let done: boolean;
   do {
     done = false;
-    for (const child of node.children) {
-      transferToParent(node, child);
-      done = true;
+    if (node.children) {
+      for (const child of node.children) {
+        transferToParent(node, child);
+        done = true;
+      }
     }
   } while (done);
 }
@@ -334,7 +336,7 @@ export const doNothing: NodeAggregationAlgorithm = (
   currentNode: IGroupedTreeNode<ProvenanceNode>,
   node: IGroupedTreeNode<ProvenanceNode>,
   tests: NodeGroupTest<ProvenanceNode>[]
-) => {};
+) => { };
 
 /**
  * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph

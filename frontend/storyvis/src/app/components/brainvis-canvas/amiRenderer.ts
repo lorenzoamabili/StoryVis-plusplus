@@ -31,8 +31,7 @@ export class AMIRenderer {
 
     protected _stackHelper: AMI.HelpersStack;
 
-    @Output() magnificationCreated = new EventEmitter<String>();
-    @Output() reductionCreated = new EventEmitter<String>();
+    @Output() magnificationCreated = new EventEmitter<{domID: String, oneView: boolean }>();
 
     constructor(view: View) {
         this._domID = view.domId;
@@ -88,10 +87,10 @@ export class AMIRenderer {
         if (this._initialized) {
             if (event.shiftKey) {
                 this._canvas.displayOneView(this._domID);
-                if (this._canvas.settings.isOneView) {
-                    this.magnificationCreated.emit(this._domID);
+                if (this._canvas.settings.isOneView !== '') {
+                    this.magnificationCreated.emit({ domID: this._domID, oneView: true });
                 } else {
-                    this.reductionCreated.emit(this._domID);
+                    this.magnificationCreated.emit({ domID: this._domID, oneView: false });
                 }
             }
         }

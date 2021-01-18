@@ -103,6 +103,10 @@ app-provenance-visualization {
   stroke-width: 0.2px;
 }
 
+.link.hiddenClass {
+  display: none;
+}
+
 .link.active {
   /* stroke: white; */
   stroke: #000000;
@@ -200,6 +204,19 @@ app-provenance-visualization {
   width: 10px;
   height: 10px;
   border: 1.5px solid;
-  border-color: #ff0000;
+  border-color: rgb(255, 0, 0);
   border-radius: 6px;
+}
+
+#merging-trigger.checked {
+  color: rgba(255, 0, 0, 0.7);
+}
+#splitting-trigger.checked {
+  color: rgba(255, 0, 0, 0.7);
+}
+#transferring-trigger.checked {
+  color: rgba(255, 0, 0, 0.7);
+}
+#copying-trigger.checked {
+  color: rgba(255, 0, 0, 0.7);
 }

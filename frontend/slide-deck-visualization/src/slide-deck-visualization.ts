@@ -528,6 +528,9 @@ export class SlideDeckVisualization {
     }
 
     private seekDragged = (that: any) => {
+        d3.select('#pauseBtn').attr('style', 'display: none');
+        d3.select('#playBtn').attr('style', 'display: block');
+        this.stopPlaying();
         this._currentTime = ((d3 as any).event.x + this._timelineShift - this._originPosition) / this._barWidthTimeMultiplier;
         this.update();
     }
