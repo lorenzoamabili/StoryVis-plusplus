@@ -11,9 +11,9 @@ import Voxelprobe from "./voxelprobe";
 import Annotation from "./annotation";
 import { Artifact } from "@visualstorytelling/provenance-core/src/api";
 
-@Component({
-  template: ''
-})
+// @Component({
+//   template: ''
+// })
 
 var artifactID: number = -1;
 

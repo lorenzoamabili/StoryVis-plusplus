@@ -89,7 +89,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             label = action.do;
                         }
                         if (artifacts) {
-                            allArtifacts.push(artifacts);
+                            artifacts.length === 1 ? allArtifacts.push(artifacts) : allArtifacts.push.apply(allArtifacts, artifacts);
                         }
                         createNewStateNode = function (parentNode, actionResult) { return ({
                             id: utils_1.generateUUID(),

@@ -355,7 +355,7 @@ export const addListeners = (tracker: ProvenanceTracker): any => {
       undo: 'setConfig',
       undoArguments: { args: [parameters] }
     };
-    tracker.applyAction(action, true, 'reset');
+    tracker.applyAction(action, true);
   });
 
   canvas.nullCreated.subscribe(() => {

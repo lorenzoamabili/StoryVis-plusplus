@@ -2445,7 +2445,7 @@ img {
 				<div class="tsd-signature tsd-kind-icon">graph<span class="tsd-signature-symbol">:</span> <a href="iprovenancegraph.html" class="tsd-signature-type">IProvenanceGraph</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/1e4616f/frontend/provenance-core/src/api.ts#L353">provenance-core/src/api.ts:353</a></li>
+						<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/d211a8a/frontend/provenance-core/src/api.ts#L354">provenance-core/src/api.ts:354</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -2455,7 +2455,7 @@ img {
 				<div class="tsd-signature tsd-kind-icon">tracking<wbr>When<wbr>Traversing<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/1e4616f/frontend/provenance-core/src/api.ts#L351">provenance-core/src/api.ts:351</a></li>
+						<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/d211a8a/frontend/provenance-core/src/api.ts#L352">provenance-core/src/api.ts:352</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -2482,7 +2482,7 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/1e4616f/frontend/provenance-core/src/api.ts#L379">provenance-core/src/api.ts:379</a></li>
+								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/d211a8a/frontend/provenance-core/src/api.ts#L380">provenance-core/src/api.ts:380</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2508,7 +2508,7 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/1e4616f/frontend/provenance-core/src/api.ts#L378">provenance-core/src/api.ts:378</a></li>
+								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/d211a8a/frontend/provenance-core/src/api.ts#L379">provenance-core/src/api.ts:379</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2538,13 +2538,13 @@ img {
 				<a name="tocopynodes" class="tsd-anchor"></a>
 				<h3>to<wbr>Copy<wbr>Nodes</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-					<li class="tsd-signature tsd-kind-icon">to<wbr>Copy<wbr>Nodes<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><a href="../globals.html#nodeidentifier" class="tsd-signature-type">NodeIdentifier</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#provenancenode" class="tsd-signature-type">ProvenanceNode</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<li class="tsd-signature tsd-kind-icon">to<wbr>Copy<wbr>Nodes<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><a href="../globals.html#nodeidentifier" class="tsd-signature-type">NodeIdentifier</a>, traverser<span class="tsd-signature-symbol">?: </span><a href="../classes/provenancegraphtraverser.html" class="tsd-signature-type">ProvenanceGraphTraverser</a>, transferring<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#provenancenode" class="tsd-signature-type">ProvenanceNode</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/1e4616f/frontend/provenance-core/src/api.ts#L360">provenance-core/src/api.ts:360</a></li>
+								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/d211a8a/frontend/provenance-core/src/api.ts#L361">provenance-core/src/api.ts:361</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2558,6 +2558,12 @@ img {
 								<h5>id: <a href="../globals.html#nodeidentifier" class="tsd-signature-type">NodeIdentifier</a></h5>
 								<div class="tsd-comment tsd-typography">
 								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> traverser: <a href="../classes/provenancegraphtraverser.html" class="tsd-signature-type">ProvenanceGraphTraverser</a></h5>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> transferring: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#provenancenode" class="tsd-signature-type">ProvenanceNode</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -2574,7 +2580,7 @@ img {
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/1e4616f/frontend/provenance-core/src/api.ts#L369">provenance-core/src/api.ts:369</a></li>
+								<li>Defined in <a href="https://github.com/lorenzoamabili/userStudy-1/blob/d211a8a/frontend/provenance-core/src/api.ts#L370">provenance-core/src/api.ts:370</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">

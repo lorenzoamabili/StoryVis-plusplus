@@ -378,7 +378,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             label = action.do;
                         }
                         if (artifacts) {
-                            allArtifacts.push(artifacts);
+                            artifacts.length === 1 ? allArtifacts.push(artifacts) : allArtifacts.push.apply(allArtifacts, artifacts);
                         }
                         createNewStateNode = function (parentNode, actionResult) { return ({
                             id: generateUUID(),
@@ -583,7 +583,7 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
     *
     * @param id Node identifier
     */
-    ProvenanceGraphTraverser.prototype.toCopyNodes = function (id, traverser) {
+    ProvenanceGraphTraverser.prototype.toCopyNodes = function (id, traverser, transferring) {
         return __awaiter(this, void 0, void 0, function () {
             function copySubtree(currentNode, targetNode) {
                 nodesToMove = [];
@@ -605,11 +605,11 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
             function appendNodes(nodeToAppend, rootNode) {
                 nodesAppended = [];
                 graph.current = rootNode;
-                if (traverser && nodeToAppend.metadata.option !== 'merged') {
+                if (transferring && nodeToAppend.metadata.option !== 'merged') {
                     tracker === null || tracker === void 0 ? void 0 : tracker.applyAction(nodeToAppend.action, true);
                     nodeToAppend.metadata.option = 'merged';
                 }
-                else {
+                else if (!transferring) {
                     tracker === null || tracker === void 0 ? void 0 : tracker.applyAction(nodeToAppend.action, true);
                 }
                 rootNode.children.forEach(function (nodeToAppend) { return nodesAppended.push(nodeToAppend); });
@@ -657,12 +657,11 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         targetNode = this.graph.getNode(id);
                         if (currentNode === targetNode) {
                             return [2 /*return*/, Promise.resolve(currentNode)];
-                        }
-                        else if (
-                        // Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
-                        currentNode.metadata.option === 'split' && targetNode.metadata.option === 'split') {
-                            this.graph.current = targetNode;
-                            return [2 /*return*/, Promise.resolve(currentNode)];
+                            // } else if (
+                            //   // Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
+                            //   currentNode.metadata.option === 'split' && targetNode.metadata.option === 'split') {
+                            //   this.graph.current = targetNode;
+                            //   return Promise.resolve(currentNode);
                             // } 
                             // else if (targetNode.label === 'Root' && (currentNode as StateNode).metadata.option === 'reset' ||
                             //   currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'reset') {

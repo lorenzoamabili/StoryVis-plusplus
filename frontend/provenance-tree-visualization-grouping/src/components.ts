@@ -176,7 +176,8 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 95px;')
     .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => { (window as any).tree.settings.canvas.provenance.generation(); });
+    .on('click', () => { (window as any).tree.settings.canvas.provenance.generation(true); })
+    .on('contextmenu', () => { (window as any).tree.settings.canvas.provenance.generation(); });
 
   newAnalysisButton
     .append('span')
@@ -212,7 +213,9 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 145px;')
     .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => { (window as any).tree.settings.canvas.provenance.fission(); });
+    .on('click', () => { (window as any).tree.settings.canvas.provenance.fission(true); })
+    .on('contextmenu', () => { (window as any).tree.settings.canvas.provenance.fission(); });
+
 
   newAnalysisFromCurrentNodeButton
     .append('span')
@@ -298,7 +301,7 @@ export function addAggregationButtons(
     });
 
 
-    transferringButton
+  transferringButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
@@ -307,14 +310,14 @@ export function addAggregationButtons(
     .attr('aria-hidden', 'true')
     .text('swap_horiz');
 
-    transferringButton
+  transferringButton
     .append('div')
     .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
     .attr('ng-reflect-centered', 'true')
     .attr('ng-reflect-disabled', 'false')
     .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-    transferringButton
+  transferringButton
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
@@ -336,7 +339,7 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 295px;')
     .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => {
+    .on('click', () => {
       if ((window as any).tree._viz.mergingEnabled === false) {
         mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
         transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
@@ -351,7 +354,7 @@ export function addAggregationButtons(
     });
 
 
-    mergingButton
+  mergingButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
@@ -359,15 +362,15 @@ export function addAggregationButtons(
     .attr('role', 'img')
     .attr('aria-hidden', 'true')
     .text('merge_type');
-    
-    mergingButton
+
+  mergingButton
     .append('div')
     .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
     .attr('ng-reflect-centered', 'true')
     .attr('ng-reflect-disabled', 'false')
     .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-    mergingButton
+  mergingButton
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
@@ -404,7 +407,7 @@ export function addAggregationButtons(
     });
 
 
-    copyingButton
+  copyingButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
@@ -413,14 +416,14 @@ export function addAggregationButtons(
     .attr('aria-hidden', 'true')
     .text('queue');
 
-    copyingButton
+  copyingButton
     .append('div')
     .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
     .attr('ng-reflect-centered', 'true')
     .attr('ng-reflect-disabled', 'false')
     .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-    copyingButton
+  copyingButton
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
@@ -433,48 +436,48 @@ export function addAggregationButtons(
 
 
 
-//   const mergingButton = provenanceTreeVisualization.container
-//     .append('button')
-//     .attr('id', 'merging-trigger')
-//     .attr('class', 'mat-icon-button mat-button-base mat-primary')
-//     .attr('color', 'primary')
-//     .attr('style', 'position: absolute; z-index: 1; top: 345px;')
-//     .attr('ng-reflect-color', 'primary')
-//     .on('mousedown', () => {
-//       if ((window as any).tree._viz.mergingEnabled === false) {
-//         mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-//         transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-//         copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-//         (window as any).tree._viz.mergingEnabled = true;
-//         (window as any).tree._viz.splittingEnabled = false;
-//         (window as any).tree._viz.doublingEnabled = false;
-//         (window as any).tree._viz.transferringEnabled = false;
-//       } else {
-//         mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-//         (window as any).tree._viz.mergingEnabled = false;
-//       }
-//     });
+  //   const mergingButton = provenanceTreeVisualization.container
+  //     .append('button')
+  //     .attr('id', 'merging-trigger')
+  //     .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  //     .attr('color', 'primary')
+  //     .attr('style', 'position: absolute; z-index: 1; top: 345px;')
+  //     .attr('ng-reflect-color', 'primary')
+  //     .on('mousedown', () => {
+  //       if ((window as any).tree._viz.mergingEnabled === false) {
+  //         mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+  //         transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //         copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //         (window as any).tree._viz.mergingEnabled = true;
+  //         (window as any).tree._viz.splittingEnabled = false;
+  //         (window as any).tree._viz.doublingEnabled = false;
+  //         (window as any).tree._viz.transferringEnabled = false;
+  //       } else {
+  //         mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //         (window as any).tree._viz.mergingEnabled = false;
+  //       }
+  //     });
 
 
-//   mergingButton
-//     .append('span')
-//     .attr('class', 'mat-button-wrapper')
-//     .append('mat-icon')
-//     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-//     .attr('role', 'img')
-//     .attr('aria-hidden', 'true')
-//     .text('merge_type');
+  //   mergingButton
+  //     .append('span')
+  //     .attr('class', 'mat-button-wrapper')
+  //     .append('mat-icon')
+  //     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  //     .attr('role', 'img')
+  //     .attr('aria-hidden', 'true')
+  //     .text('merge_type');
 
-//   mergingButton
-//     .append('div')
-//     .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-//     .attr('ng-reflect-centered', 'true')
-//     .attr('ng-reflect-disabled', 'false')
-//     .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+  //   mergingButton
+  //     .append('div')
+  //     .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  //     .attr('ng-reflect-centered', 'true')
+  //     .attr('ng-reflect-disabled', 'false')
+  //     .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-//   mergingButton
-//     .append('div')
-//     .attr('class', 'mat-button-focus-overlay');
+  //   mergingButton
+  //     .append('div')
+  //     .attr('class', 'mat-button-focus-overlay');
 }
 
 

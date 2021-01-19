@@ -58,7 +58,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
    * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
    *        it will only be called when traversing.
    */
-  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, artifacts?: Artifact, option?: string, newRoot?: ProvenanceNode): Promise<StateNode> {
+  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, artifacts?: Artifact | Artifact[], option?: string, newRoot?: ProvenanceNode): Promise<StateNode> {
     if (!this.acceptActions) {
       return Promise.resolve(this.graph.current as StateNode);
     }
@@ -71,8 +71,8 @@ export class ProvenanceTracker implements IProvenanceTracker {
     }
     
     if(artifacts){
-      allArtifacts.push(artifacts);
-    }
+      artifacts.length === 1 ? allArtifacts.push(artifacts as Artifact) : allArtifacts.push(...artifacts as Artifact[]);
+    } 
     
 
 
@@ -99,6 +99,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
     const currentNode = this.graph.current;
     let parentNode = (option === 'split') ? this.graph.root : this.graph.current;
     parentNode = newRoot ? newRoot : parentNode;
+
 
 
     if (skipFirstDoFunctionCall) {

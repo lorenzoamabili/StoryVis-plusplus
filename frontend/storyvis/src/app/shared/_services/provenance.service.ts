@@ -178,7 +178,7 @@ export class ProvenanceService {
         undo: 'null',
         undoArguments: { args: [] }
       };
-      this.tracker.applyAction(action, true, null, 'split');
+      this.tracker.applyAction(action, true, [], 'split', this.graph.root);
     }
   }
 
@@ -206,94 +206,94 @@ export class ProvenanceService {
 
   splitting() {
     let currentNode = (this.graph.current as StateNode);
+    currentNode.action.metadata.userIntent = 'provenance';
     this.tracker.applyAction(currentNode.action, true, currentNode.artifacts, '', currentNode.parent);
   }
 
 
   transferring(toNode: StateNode) {
     this.saveGraphStudy(0);
-    this.traverser.toCopyNodes(toNode.id);
-
+    this.traverser.toCopyNodes(toNode.id, null, true);
     let traverser = this.traverser;
     let currentNodeID = traverser.graph.current.id;
-
     this.newProvenanceGraph();
-    this.traverser.toCopyNodes(currentNodeID, traverser);
+    this.traverser.toCopyNodes(currentNodeID, traverser, true);
+    (this.graph.current as StateNode).action.metadata.userIntent = 'provenance';
   }
 
 
-//   merging(mainNode: StateNode, nodeToMerge: StateNode) {
-//     let currentArtifacts = [];
-//     this.settings.canvas.renderers2D.forEach(renderer => renderer._artifacts.forEach(artifact => currentArtifacts.push(artifact)));
-//     console.log(currentArtifacts);
-//     console.log(mainNode.children);
-//     console.log(mainNode.artifacts);
+  merging(currentNode: StateNode, nodeTo: StateNode) {
+    let newBranchArtifacts = [];
+    this.settings.canvas.renderers2D.forEach(renderer => renderer._artifacts.forEach(artifact => newBranchArtifacts.push(artifact)));
+    if (newBranchArtifacts.length !== 0) {
+      let measurementsCurrent = currentNode.artifacts !== [] ? currentNode.artifacts : [];
+      let measurementsToMerge = newBranchArtifacts !== [] ? newBranchArtifacts : [];
+      measurementsCurrent.push(...measurementsToMerge);
 
-//       let measurementsPrevious = mainNode.artifacts !== [] ? mainNode.artifacts : [];
-//       let measurementsToMerge = currentArtifacts !== []? currentArtifacts : [];
-//       measurementsPrevious.push(...measurementsToMerge);
+      if (measurementsCurrent.length !== 0 && measurementsToMerge.length !== 0) {
+        const action = {
+          metadata: {
+            userIntent: "provenance",
+            label: 'merging - measurements'
+          },
+          do: 'renderMeasurements',
+          doArguments: { args: [measurementsToMerge] },
+          undo: 'removeMeasurements',
+          undoArguments: { args: [measurementsCurrent] }
+        };
 
-//       const action = {
-//         metadata: {
-//           userIntent: "provenance",
-//           label: 'merging - measurements'
-//         },
-//         do: 'renderMeasurements',
-//         doArguments: { args: [measurementsToMerge] },
-//         undo: 'removeMeasurements',
-//         undoArguments: { args: [measurementsPrevious] }
-//       };
-
-//       this.tracker.applyAction(action, true, measurementsPrevious, 'split', nodeToMerge);
-// }
-
-
-copying(toNode: StateNode) {
-  this.traverser.toCopyNodes(toNode.id, null);
-}
+        this.tracker.applyAction(action, true, measurementsCurrent, 'split', nodeTo);
+      }
+    }
+  }
 
 
-
-newProvenanceGraph(newRoot ?: ProvenanceNode) {
-  this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, 'newGraph', newRoot);
-  this.registry = new ActionFunctionRegistry();
-  this.tracker = new ProvenanceTracker(this.registry, this.graph);
-  this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
-
-  (window as any).prov = {
-    graph: this.graph,
-    registry: this.registry,
-    tracker: this.tracker,
-    traverser: this.traverser,
-    deck: this.deck
-  };
-
-  this.tree = (window as any).tree;
-  this.tree._viz.hideTree();
-  this.tree._viz = this.tree.createTree(this.traverser);
-  this.tree._viz.update();
-  setNewAddListeners(this.registry, this.tracker);
-}
+  copying(toNode: StateNode) {
+    this.traverser.toCopyNodes(toNode.id, null);
+  }
 
 
 
-async init() {
-  this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, "originalGraph", undefined);
-  this.registry = new ActionFunctionRegistry();
-  this.tracker = new ProvenanceTracker(this.registry, this.graph);
-  this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
-  this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
+  newProvenanceGraph() {
+    this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, 'newGraph');
+    this.registry = new ActionFunctionRegistry();
+    this.tracker = new ProvenanceTracker(this.registry, this.graph);
+    this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
 
-  (window as any).prov = {
-    graph: this.graph,
-    registry: this.registry,
-    tracker: this.tracker,
-    traverser: this.traverser,
-    deck: this.deck
-  };
-}
+    (window as any).prov = {
+      graph: this.graph,
+      registry: this.registry,
+      tracker: this.tracker,
+      traverser: this.traverser,
+      deck: this.deck
+    };
 
-constructor(private http: HttpClient) {
-  this.init().then(() => this.initialized = true);
-}
+    this.tree = (window as any).tree;
+    this.tree._viz.hideTree();
+    this.tree._viz = this.tree.createTree(this.traverser);
+    this.tree._viz.update();
+    setNewAddListeners(this.registry, this.tracker);
+  }
+
+
+
+  async init() {
+    this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, "originalGraph");
+    this.registry = new ActionFunctionRegistry();
+    this.tracker = new ProvenanceTracker(this.registry, this.graph);
+    this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
+    this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
+
+    (window as any).prov = {
+      graph: this.graph,
+      registry: this.registry,
+      tracker: this.tracker,
+      traverser: this.traverser,
+      deck: this.deck
+    };
+  }
+
+  constructor(private http: HttpClient) {
+    this.init().then(() => this.initialized = true);
+  }
 }

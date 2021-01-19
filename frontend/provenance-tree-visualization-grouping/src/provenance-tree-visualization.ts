@@ -303,6 +303,7 @@ export class ProvenanceTreeVisualization {
     updateNodes.on('click', d => {
       if (this.transferringEnabled) {
         (window as any).tree.settings.canvas.provenance.transferring(d.data.wrappedNodes[0]);
+        this.update();
         this.transferringEnabled = false;
         d3.select("#transferring-trigger").attr('class', 'mat-icon-button mat-button-base mat-primary');
       } else if (this.mergingEnabled) {

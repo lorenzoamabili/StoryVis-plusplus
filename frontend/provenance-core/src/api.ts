@@ -1,4 +1,5 @@
 import { ProvenanceGraph } from "./ProvenanceGraph";
+import { ProvenanceGraphTraverser } from "./ProvenanceGraphTraverser";
 /**
  * String identifier for nodes (e.g., a generated UUID)
  */
@@ -357,7 +358,7 @@ export interface IProvenanceGraphTraverser {
    *
    * @param id
    */
-  toCopyNodes(id: NodeIdentifier): Promise<ProvenanceNode | undefined>;
+  toCopyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser, transferring?: boolean): Promise<ProvenanceNode | undefined>;
 
 
   /**

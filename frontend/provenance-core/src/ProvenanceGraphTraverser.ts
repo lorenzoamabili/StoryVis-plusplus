@@ -120,7 +120,8 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
 
   async toCopyNodes(
     id: NodeIdentifier,
-    traverser?: ProvenanceGraphTraverser
+    traverser?: ProvenanceGraphTraverser,
+    transferring?: boolean
   ): Promise<any | undefined> {
     const currentNode = traverser ? traverser.graph.root : this.graph.current;
     const targetNode = traverser ? this.graph.root : this.graph.getNode(id);
@@ -152,10 +153,10 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
     function appendNodes(nodeToAppend: ProvenanceNode, rootNode: ProvenanceNode) {
       nodesAppended = [];
       graph.current = rootNode;
-      if (traverser && nodeToAppend.metadata.option !== 'merged') {
+      if (transferring && nodeToAppend.metadata.option !== 'merged') {
         tracker?.applyAction((nodeToAppend as StateNode).action, true);
-        nodeToAppend.metadata.option = 'merged';
-      } else {
+        (nodeToAppend as StateNode).metadata.option = 'merged';
+      } else if (!transferring) {
         tracker?.applyAction((nodeToAppend as StateNode).action, true);
       }
       rootNode.children.forEach(nodeToAppend => nodesAppended.push(nodeToAppend));
@@ -193,11 +194,11 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
 
     if (currentNode === targetNode) {
       return Promise.resolve(currentNode);
-    } else if (
-      // Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
-      currentNode.metadata.option === 'split' && targetNode.metadata.option === 'split') {
-      this.graph.current = targetNode;
-      return Promise.resolve(currentNode);
+    // } else if (
+    //   // Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
+    //   currentNode.metadata.option === 'split' && targetNode.metadata.option === 'split') {
+    //   this.graph.current = targetNode;
+    //   return Promise.resolve(currentNode);
     // } 
     // else if (targetNode.label === 'Root' && (currentNode as StateNode).metadata.option === 'reset' ||
     //   currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'reset') {

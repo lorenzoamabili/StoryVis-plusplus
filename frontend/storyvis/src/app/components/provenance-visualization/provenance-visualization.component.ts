@@ -43,28 +43,28 @@ export class ProvenanceVisualizationComponent implements OnInit {
     var graph = (window as any).prov.graph;
 
     // ctrl + Z  / undo
-    if (evtobj.keyCode === 90 && evtobj.ctrlKey && graph.current.parent) {
+    if (evtobj.keyCode === 38 && evtobj.altKey && graph.current.parent) {
       (window as any).tree._viz.traverser.toStateNode(graph.current.parent.id, 250);
       (window as any).tree._viz.update();
     }
     // ctrl + X  / go to the root
-    else if (evtobj.keyCode === 88 && evtobj.ctrlKey) {
+    else if (evtobj.keyCode === 88 && evtobj.altKey) {
       (window as any).tree._viz.traverser.toStateNode(graph.root.id, 250);
       (window as any).tree._viz.update();
     }
     // ctrl + A  / redo
-    else if (evtobj.keyCode === 65 && evtobj.ctrlKey && graph.current.children[0]) {
+    else if (evtobj.keyCode === 40 && evtobj.altKey && graph.current.children[0]) {
       (window as any).tree._viz.traverser.toStateNode(graph.current.children[0].id, 250);
       (window as any).tree._viz.update();
     }
     // ctrl + Q  / add the current node to the story
-    else if (evtobj.keyCode === 81 && evtobj.ctrlKey) {
+    else if (evtobj.keyCode === 81 && evtobj.altKey) {
       graph.current.metadata.story = true;
       (window as any).slideDeck.onAdd(graph.current);
       (window as any).tree._viz.update();
     }
     // ctrl + IntlBackslash  / create a story with all nodes (by creation order)
-    else if (evtobj.keyCode === 192 && evtobj.ctrlKey) {
+    else if (evtobj.keyCode === 192 && evtobj.altKey) {
       let nodes = graph.getNodes();
       for (const nodeId of Object.keys(nodes)) {
         let node = nodes[nodeId];
@@ -74,7 +74,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
       (window as any).tree._viz.update();
     }
     // ctrl + 1  / all neighbour nodes are added to the slide deck (by creation order)
-    else if (evtobj.keyCode === 49 && evtobj.ctrlKey) {
+    else if (evtobj.keyCode === 49 && evtobj.altKey) {
       let nodes = graph.getNodes();
       var arrayNodes = [];
 
@@ -94,7 +94,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
     }
 
     // ctrl + W  / derivation and annotation (by creation order)
-    else if (evtobj.keyCode === 87 && evtobj.ctrlKey) {
+    else if (evtobj.keyCode === 87 && evtobj.altKey) {
       let nodes = graph.getNodes();
       var arrayNodes = [];
 
