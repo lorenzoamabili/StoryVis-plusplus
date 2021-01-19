@@ -118,7 +118,7 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
   * @param id Node identifier
   */
 
-  async toCopyNodes(
+  async copyNodes(
     id: NodeIdentifier,
     traverser?: ProvenanceGraphTraverser,
     transferring?: boolean
@@ -194,19 +194,6 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
 
     if (currentNode === targetNode) {
       return Promise.resolve(currentNode);
-    // } else if (
-    //   // Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
-    //   currentNode.metadata.option === 'split' && targetNode.metadata.option === 'split') {
-    //   this.graph.current = targetNode;
-    //   return Promise.resolve(currentNode);
-    // } 
-    // else if (targetNode.label === 'Root' && (currentNode as StateNode).metadata.option === 'reset' ||
-    //   currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'reset') {
-    //   this.graph.current = targetNode;
-    //   return Promise.resolve(currentNode);
-    // } else if (targetNode.label === 'Root' || (currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'split')) {
-    //   this.graph.current = targetNode;
-    //   return Promise.resolve(currentNode);
     }
 
     const trackToTarget: ProvenanceNode[] = [];
@@ -219,7 +206,7 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
     }
 
     let functionsToDo: ActionFunctionWithThis[], argumentsToDo: any[];
-    const transitionTimes: number[] = [];
+    let transitionTimes: number[] = [];
     try {
       const arg = this.getFunctionsAndArgsFromTrack(trackToTarget, transitionTime);
       functionsToDo = arg.functionsToDo;
@@ -236,6 +223,7 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
         throw error; // should never happen
       }
     }
+
     const result = await this.executeFunctions(functionsToDo, argumentsToDo, transitionTimes);
     this.graph.current = targetNode;
     return result;

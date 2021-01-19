@@ -401,12 +401,12 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this.changeCamera2D(
       new THREE.Vector3(newSlicePosition.position[0], newSlicePosition.position[1], newSlicePosition.position[2]),
       new THREE.Vector3(newSlicePosition.direction[0], newSlicePosition.direction[1], newSlicePosition.direction[2]),
-      within > 0 ? within : 10);
+      within > 0 ? within : 1000);
   }
 
 
   setSliceZoom(cameraZoom: number, within: number) {
-    this.changeCamera2DZoom(cameraZoom, within > 0 ? within : 10);
+    this.changeCamera2DZoom(cameraZoom, within > 0 ? within : 1000);
   }
 
 
@@ -441,7 +441,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         nextTarget.addScaledVector(distanceTarget, interPolateTime);
 
         this.changeCamera2D(nextPosition, nextTarget, 0);
-        changeTime += 10; //  changeTime += delta
+        changeTime += delta;
         if (changeTime > 1.0) {
           this.changeCamera2D(toPosition, toTarget, 0);
           clearInterval(changeTimeout);
@@ -479,7 +479,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         const nextZoom = fromZoom + (distanceZoom * interPolateTime);
 
         this.changeCamera2DZoom(nextZoom, 0);
-        changeTime += 10; //  changeTime += delta
+        changeTime += delta;
         if (changeTime > 1.0) {
           this.changeCamera2DZoom(toZoom, 0);
           clearInterval(changeTimeout);

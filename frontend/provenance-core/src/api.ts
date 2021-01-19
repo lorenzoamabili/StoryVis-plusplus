@@ -358,7 +358,7 @@ export interface IProvenanceGraphTraverser {
    *
    * @param id
    */
-  toCopyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser, transferring?: boolean): Promise<ProvenanceNode | undefined>;
+  copyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser, transferring?: boolean): Promise<ProvenanceNode | undefined>;
 
 
   /**

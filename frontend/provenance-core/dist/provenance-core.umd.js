@@ -589,7 +589,7 @@
       *
       * @param id Node identifier
       */
-      ProvenanceGraphTraverser.prototype.toCopyNodes = function (id, traverser, transferring) {
+      ProvenanceGraphTraverser.prototype.copyNodes = function (id, traverser, transferring) {
           return __awaiter(this, void 0, void 0, function () {
               function copySubtree(currentNode, targetNode) {
                   nodesToMove = [];
@@ -663,19 +663,6 @@
                           targetNode = this.graph.getNode(id);
                           if (currentNode === targetNode) {
                               return [2 /*return*/, Promise.resolve(currentNode)];
-                              // } else if (
-                              //   // Math.abs(currentNode.metadata.creationOrder - targetNode.metadata.creationOrder) === 1 &&
-                              //   currentNode.metadata.option === 'split' && targetNode.metadata.option === 'split') {
-                              //   this.graph.current = targetNode;
-                              //   return Promise.resolve(currentNode);
-                              // } 
-                              // else if (targetNode.label === 'Root' && (currentNode as StateNode).metadata.option === 'reset' ||
-                              //   currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'reset') {
-                              //   this.graph.current = targetNode;
-                              //   return Promise.resolve(currentNode);
-                              // } else if (targetNode.label === 'Root' || (currentNode.label === 'Root' && (targetNode as StateNode).metadata.option === 'split')) {
-                              //   this.graph.current = targetNode;
-                              //   return Promise.resolve(currentNode);
                           }
                           trackToTarget = [];
                           success = findPathToTargetNode(currentNode, targetNode, trackToTarget);

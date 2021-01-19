@@ -54,7 +54,7 @@ export class ProvenanceVisualizationComponent implements OnInit {
     }
     // ctrl + A  / redo
     else if (evtobj.keyCode === 40 && evtobj.altKey && graph.current.children[0]) {
-      (window as any).tree._viz.traverser.toStateNode(graph.current.children[0].id, 250);
+      (window as any).tree._viz.traverser.toStateNode(graph.current.children[graph.current.children.length].id, 250);
       (window as any).tree._viz.update();
     }
     // ctrl + Q  / add the current node to the story

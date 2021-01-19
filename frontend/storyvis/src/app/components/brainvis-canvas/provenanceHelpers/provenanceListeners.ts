@@ -336,8 +336,8 @@ export const addListeners = (tracker: ProvenanceTracker): any => {
         userIntent: 'configuration',
         label: 'slices relocation'
       },
-      do: 'changeSlicesLocation',
-      doArguments: { args: [parameters] },
+      do: 'resetSlicesLocation',
+      doArguments: { args: [] },
       undo: 'changeSlicesLocation',
       undoArguments: { args: [parameters] }
     };

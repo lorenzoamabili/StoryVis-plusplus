@@ -495,15 +495,15 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   changeSlicesLocation(parameters) {
-    this._axialRenderer.setSlicePosition(parameters.slicesPosition[0], 10);
-    this._coronalRenderer.setSlicePosition(parameters.slicesPosition[1], 10);
-    this._sagittalRenderer.setSlicePosition(parameters.slicesPosition[2], 10);
+    this._axialRenderer.setSlicePosition(parameters.slicesPosition[0], 500);
+    this._coronalRenderer.setSlicePosition(parameters.slicesPosition[1], 500);
+    this._sagittalRenderer.setSlicePosition(parameters.slicesPosition[2], 500);
 
-    this._axialRenderer.setSliceZoom(parameters.slicesCameraZoom[0], 10);
-    this._coronalRenderer.setSliceZoom(parameters.slicesCameraZoom[1], 10);
-    this._sagittalRenderer.setSliceZoom(parameters.slicesCameraZoom[2], 10);
+    this._axialRenderer.setSliceZoom(parameters.slicesCameraZoom[0], 500);
+    this._coronalRenderer.setSliceZoom(parameters.slicesCameraZoom[1], 500);
+    this._sagittalRenderer.setSliceZoom(parameters.slicesCameraZoom[2], 500);
 
-    this._perspectiveRenderer.setCameraOrientation(parameters.sliceOrientation, 10)
+    this._perspectiveRenderer.setCameraOrientation(parameters.sliceOrientation, 500)
   }
 
   deleteArtifacts() {

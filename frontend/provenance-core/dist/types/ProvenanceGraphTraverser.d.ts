@@ -21,7 +21,7 @@ export declare class ProvenanceGraphTraverser implements IProvenanceGraphTravers
     *
     * @param id Node identifier
     */
-    toCopyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser, transferring?: boolean): Promise<any | undefined>;
+    copyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser, transferring?: boolean): Promise<any | undefined>;
     /**
      * Finds shortest path between current node and node with request identifer.
      * Calls the do/undo functions of actions on the path.

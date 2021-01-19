@@ -213,11 +213,11 @@ export class ProvenanceService {
 
   transferring(toNode: StateNode) {
     this.saveGraphStudy(0);
-    this.traverser.toCopyNodes(toNode.id, null, true);
+    this.traverser.copyNodes(toNode.id, null, true);
     let traverser = this.traverser;
     let currentNodeID = traverser.graph.current.id;
     this.newProvenanceGraph();
-    this.traverser.toCopyNodes(currentNodeID, traverser, true);
+    this.traverser.copyNodes(currentNodeID, traverser, true);
     (this.graph.current as StateNode).action.metadata.userIntent = 'provenance';
   }
 
@@ -249,7 +249,7 @@ export class ProvenanceService {
 
 
   copying(toNode: StateNode) {
-    this.traverser.toCopyNodes(toNode.id, null);
+    this.traverser.copyNodes(toNode.id, null);
   }
 
 

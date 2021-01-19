@@ -171,7 +171,6 @@
   var ProvenanceGraph = /** @class */ (function () {
       function ProvenanceGraph(application, userid, node) {
           if (userid === void 0) { userid = 'Unknown'; }
-          this.artifacts = [];
           this._nodes = {};
           this.id = generateUUID();
           this._mitt = mitt();
@@ -200,9 +199,9 @@
           }
           this._nodes[node.id] = node;
           this._mitt.emit('nodeAdded', node);
-          if (node.artifacts) {
-              this.artifacts.concat(node.artifacts);
-          }
+          // if (node.artifacts) {
+          //   this.artifacts.concat(node.artifacts);
+          // }
       };
       ProvenanceGraph.prototype.getNode = function (id) {
           var result = this._nodes[id];
@@ -231,6 +230,8 @@
       ProvenanceGraph.prototype.setNodes = function (nodes) {
           this._nodes = nodes;
       };
+      // getArtifacts(){
+      // }
       ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {
           /* istanbul ignore if */
           if (!this._nodes[node.id]) {
@@ -295,6 +296,7 @@
   }
 
   var nodeCounter = 0;
+  var allArtifacts = [];
   /**
    * Provenance Graph Tracker implementation
    *
@@ -324,7 +326,7 @@
        * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
        *        it will only be called when traversing.
        */
-      ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, option, newRoot) {
+      ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifacts, option, newRoot) {
           if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
           return __awaiter(this, void 0, void 0, function () {
               var label, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
@@ -342,9 +344,13 @@
                           else {
                               label = action.do;
                           }
+                          if (artifacts) {
+                              artifacts.length === 1 ? allArtifacts.push(artifacts) : allArtifacts.push.apply(allArtifacts, artifacts);
+                          }
                           createNewStateNode = function (parentNode, actionResult) { return ({
                               id: generateUUID(),
                               label: label,
+                              artifacts: artifacts ? allArtifacts : [],
                               metadata: {
                                   option: option ? option : '',
                                   loaded: false,

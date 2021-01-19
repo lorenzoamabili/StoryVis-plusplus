@@ -42,6 +42,10 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
     canvas.changeSlicesLocation(parameters);
   },
 
+  resetSlicesLocation: async () => {
+    canvas.resetSlicesLocation();
+  },
+
   resetConfig: async () => {
     canvas.resetConfig();
   },  

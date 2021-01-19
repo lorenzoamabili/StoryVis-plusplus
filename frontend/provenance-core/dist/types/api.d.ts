@@ -306,7 +306,7 @@ export interface IProvenanceGraphTraverser {
      *
      * @param id
      */
-    toCopyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser, transferring?: boolean): Promise<ProvenanceNode | undefined>;
+    copyNodes(id: NodeIdentifier, traverser?: ProvenanceGraphTraverser, transferring?: boolean): Promise<ProvenanceNode | undefined>;
     /**
      * Finds shortest path between current node and node with request identifer.
      * Calls the do/undo functions of actions on the path.
