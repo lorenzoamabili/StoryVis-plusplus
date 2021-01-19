@@ -511,14 +511,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   restoreArtifacts(artifacts) {
-    if(artifacts){
+    if (artifacts) {
       artifacts.forEach(artifact => this.renderArtifact(artifact.sliceOrientation, artifact));
       this.renderers2D.forEach(renderer => artifacts.forEach(artifact => renderer.renderFromSliceChange(artifact.sliceIndex)));
     }
   }
 
   resetConfigParam() {
-    let artifacts: Artifact[] = []; 
+    let artifacts: Artifact[] = [];
     this.renderers2D.forEach(renderer => renderer._artifacts.forEach(artifact => artifacts.push(artifact)));
     const locationParam = this.resetSlicesLocationParam();
     const WLParam = this.resetWindowLevelParam();
@@ -647,12 +647,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     }
   }
 
-  renderMeasurements(artifacts){
+  renderMeasurements(artifacts) {
     artifacts.forEach(artifact => this.renderArtifact(artifact.sliceOrientation, artifact));
     this.renderers2D.forEach(renderer => artifacts.forEach(artifact => renderer.renderFromSliceChange(artifact.sliceIndex)));
   }
 
-  removeMeasurements(artifacts){
+  removeMeasurements(artifacts) {
     this.renderers2D.forEach(renderer => artifacts.forEach(artifact => renderer.removeFromSliceChange(artifact.sliceIndex)));
   }
 
@@ -688,33 +688,23 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
 
   toggleRulerMode(isEnabled: boolean) {
-    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
-      renderer.rulerMode = isEnabled;
-    });
-  }
+    this.renderers2D.forEach(renderer => renderer.rulerMode = isEnabled)
+  };
 
   toggleAngleMode(isEnabled: boolean) {
-    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
-      renderer.angleMode = isEnabled;
-    });
-  }
+    this.renderers2D.forEach(renderer => renderer.angleMode = isEnabled)
+  };
 
   // toggleFreehandMode(isEnabled: boolean) {
-  //   [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
-  //     renderer.freehandMode = isEnabled;
-  //   });
-  // }
+  //   this.renderers2D.forEach(renderer => renderer.freehandMode = isEnabled)
+  // };
 
   toggleVoxelprobeMode(isEnabled: boolean) {
-    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
-      renderer.voxelprobeMode = isEnabled;
-    });
-  }
+    this.renderers2D.forEach(renderer => renderer.voxelprobeMode = isEnabled)
+  };
 
   toggleAnnotationMode(isEnabled: boolean) {
-    [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
-      renderer.annotationMode = isEnabled;
-    });
-  }
+    this.renderers2D.forEach(renderer => renderer.annotationMode = isEnabled)
+  };
 }
 

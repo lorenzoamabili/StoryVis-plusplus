@@ -260,6 +260,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       }
     }
 
+    this._camera.updateProjectionMatrix();
+
+
+
     // mesh
     // this._renderer.clearDepth();
     // data.forEach(function(object, key) {

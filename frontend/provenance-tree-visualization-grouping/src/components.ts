@@ -169,263 +169,270 @@ export function addAggregationButtons(
     .attr('class', 'mat-button-focus-overlay');
 
 
-  const newAnalysisButton = provenanceTreeVisualization.container
-    .append('button')
-    .attr('id', 'newAnalysis-trigger')
-    .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 95px;')
-    .attr('ng-reflect-color', 'primary')
-    .on('click', () => { (window as any).tree.settings.canvas.provenance.generation(true); })
-    .on('contextmenu', () => { (window as any).tree.settings.canvas.provenance.generation(); });
 
-  newAnalysisButton
-    .append('span')
-    .attr('class', 'mat-button-wrapper')
-    .append('mat-icon')
-    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    .attr('role', 'img')
-    .attr('aria-hidden', 'true')
-    .text('add_circle_outline');
 
-  newAnalysisButton
-    .append('div')
-    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    .attr('ng-reflect-centered', 'true')
-    .attr('ng-reflect-disabled', 'false')
-    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-  newAnalysisButton
-    .append('div')
-    .attr('class', 'mat-button-focus-overlay');
 
 
 
 
+  // const newAnalysisButton = provenanceTreeVisualization.container
+  //   .append('button')
+  //   .attr('id', 'newAnalysis-trigger')
+  //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  //   .attr('color', 'primary')
+  //   .attr('style', 'position: absolute; z-index: 1; top: 95px;')
+  //   .attr('ng-reflect-color', 'primary')
+  //   .on('click', () => { (window as any).tree.settings.canvas.provenance.generation(true); })
+  //   .on('contextmenu', () => { (window as any).tree.settings.canvas.provenance.generation(); });
 
+  // newAnalysisButton
+  //   .append('span')
+  //   .attr('class', 'mat-button-wrapper')
+  //   .append('mat-icon')
+  //   .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  //   .attr('role', 'img')
+  //   .attr('aria-hidden', 'true')
+  //   .text('add_circle_outline');
 
+  // newAnalysisButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  //   .attr('ng-reflect-centered', 'true')
+  //   .attr('ng-reflect-disabled', 'false')
+  //   .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
+  // newAnalysisButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-focus-overlay');
 
-  const newAnalysisFromCurrentNodeButton = provenanceTreeVisualization.container
-    .append('button')
-    .attr('id', 'newAnalysisFromCurrentNode-trigger')
-    .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 145px;')
-    .attr('ng-reflect-color', 'primary')
-    .on('click', () => { (window as any).tree.settings.canvas.provenance.fission(true); })
-    .on('contextmenu', () => { (window as any).tree.settings.canvas.provenance.fission(); });
-
-
-  newAnalysisFromCurrentNodeButton
-    .append('span')
-    .attr('class', 'mat-button-wrapper')
-    .append('mat-icon')
-    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    .attr('role', 'img')
-    .attr('aria-hidden', 'true')
-    .text('add_circle');
 
-  newAnalysisFromCurrentNodeButton
-    .append('div')
-    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    .attr('ng-reflect-centered', 'true')
-    .attr('ng-reflect-disabled', 'false')
-    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-  newAnalysisFromCurrentNodeButton
-    .append('div')
-    .attr('class', 'mat-button-focus-overlay');
 
 
 
 
 
-  const splittingButton = provenanceTreeVisualization.container
-    .append('button')
-    .attr('id', 'splitting-trigger')
-    .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 195px;')
-    .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => { (window as any).tree.settings.canvas.provenance.splitting(); });
+  // const newAnalysisFromCurrentNodeButton = provenanceTreeVisualization.container
+  //   .append('button')
+  //   .attr('id', 'newAnalysisFromCurrentNode-trigger')
+  //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  //   .attr('color', 'primary')
+  //   .attr('style', 'position: absolute; z-index: 1; top: 145px;')
+  //   .attr('ng-reflect-color', 'primary')
+  //   .on('click', () => { (window as any).tree.settings.canvas.provenance.fission(true); })
+  //   .on('contextmenu', () => { (window as any).tree.settings.canvas.provenance.fission(); });
 
-  splittingButton
-    .append('span')
-    .attr('class', 'mat-button-wrapper')
-    .append('mat-icon')
-    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    .attr('role', 'img')
-    .attr('aria-hidden', 'true')
-    .text('call_split');
 
-  splittingButton
-    .append('div')
-    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    .attr('ng-reflect-centered', 'true')
-    .attr('ng-reflect-disabled', 'false')
-    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+  // newAnalysisFromCurrentNodeButton
+  //   .append('span')
+  //   .attr('class', 'mat-button-wrapper')
+  //   .append('mat-icon')
+  //   .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  //   .attr('role', 'img')
+  //   .attr('aria-hidden', 'true')
+  //   .text('add_circle');
 
-  splittingButton
-    .append('div')
-    .attr('class', 'mat-button-focus-overlay');
+  // newAnalysisFromCurrentNodeButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  //   .attr('ng-reflect-centered', 'true')
+  //   .attr('ng-reflect-disabled', 'false')
+  //   .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
+  // newAnalysisFromCurrentNodeButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-focus-overlay');
 
 
 
 
 
+  // const splittingButton = provenanceTreeVisualization.container
+  //   .append('button')
+  //   .attr('id', 'splitting-trigger')
+  //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  //   .attr('color', 'primary')
+  //   .attr('style', 'position: absolute; z-index: 1; top: 195px;')
+  //   .attr('ng-reflect-color', 'primary')
+  //   .on('mousedown', () => { (window as any).tree.settings.canvas.provenance.splitting(); });
 
+  // splittingButton
+  //   .append('span')
+  //   .attr('class', 'mat-button-wrapper')
+  //   .append('mat-icon')
+  //   .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  //   .attr('role', 'img')
+  //   .attr('aria-hidden', 'true')
+  //   .text('call_split');
 
+  // splittingButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  //   .attr('ng-reflect-centered', 'true')
+  //   .attr('ng-reflect-disabled', 'false')
+  //   .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
+  // splittingButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-focus-overlay');
 
-  const transferringButton = provenanceTreeVisualization.container
-    .append('button')
-    .attr('id', 'transferring-trigger')
-    .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 245px;')
-    .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => {
-      if ((window as any).tree._viz.transferringEnabled === false) {
-        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        (window as any).tree._viz.mergingEnabled = false;
-        (window as any).tree._viz.copyingEnabled = false;
-        (window as any).tree._viz.transferringEnabled = true;
-      } else {
-        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        (window as any).tree._viz.transferringEnabled = false;
-      }
-    });
 
 
-  transferringButton
-    .append('span')
-    .attr('class', 'mat-button-wrapper')
-    .append('mat-icon')
-    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    .attr('role', 'img')
-    .attr('aria-hidden', 'true')
-    .text('swap_horiz');
 
-  transferringButton
-    .append('div')
-    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    .attr('ng-reflect-centered', 'true')
-    .attr('ng-reflect-disabled', 'false')
-    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-  transferringButton
-    .append('div')
-    .attr('class', 'mat-button-focus-overlay');
 
 
 
 
 
+  // const transferringButton = provenanceTreeVisualization.container
+  //   .append('button')
+  //   .attr('id', 'transferring-trigger')
+  //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  //   .attr('color', 'primary')
+  //   .attr('style', 'position: absolute; z-index: 1; top: 245px;')
+  //   .attr('ng-reflect-color', 'primary')
+  //   .on('mousedown', () => {
+  //     if ((window as any).tree._viz.transferringEnabled === false) {
+  //       transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+  //       mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       (window as any).tree._viz.mergingEnabled = false;
+  //       (window as any).tree._viz.copyingEnabled = false;
+  //       (window as any).tree._viz.transferringEnabled = true;
+  //     } else {
+  //       transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       (window as any).tree._viz.transferringEnabled = false;
+  //     }
+  //   });
 
 
+  // transferringButton
+  //   .append('span')
+  //   .attr('class', 'mat-button-wrapper')
+  //   .append('mat-icon')
+  //   .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  //   .attr('role', 'img')
+  //   .attr('aria-hidden', 'true')
+  //   .text('swap_horiz');
 
+  // transferringButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  //   .attr('ng-reflect-centered', 'true')
+  //   .attr('ng-reflect-disabled', 'false')
+  //   .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
+  // transferringButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-focus-overlay');
 
 
 
-  const mergingButton = provenanceTreeVisualization.container
-    .append('button')
-    .attr('id', 'merging-trigger')
-    .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 295px;')
-    .attr('ng-reflect-color', 'primary')
-    .on('click', () => {
-      if ((window as any).tree._viz.mergingEnabled === false) {
-        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        (window as any).tree._viz.copyingEnabled = false;
-        (window as any).tree._viz.transferringEnabled = false;
-        (window as any).tree._viz.mergingEnabled = true;
-      } else {
-        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        (window as any).tree._viz.mergingEnabled = false;
-      }
-    });
 
 
-  mergingButton
-    .append('span')
-    .attr('class', 'mat-button-wrapper')
-    .append('mat-icon')
-    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    .attr('role', 'img')
-    .attr('aria-hidden', 'true')
-    .text('merge_type');
 
-  mergingButton
-    .append('div')
-    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    .attr('ng-reflect-centered', 'true')
-    .attr('ng-reflect-disabled', 'false')
-    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-  mergingButton
-    .append('div')
-    .attr('class', 'mat-button-focus-overlay');
 
 
 
 
 
+  // const mergingButton = provenanceTreeVisualization.container
+  //   .append('button')
+  //   .attr('id', 'merging-trigger')
+  //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  //   .attr('color', 'primary')
+  //   .attr('style', 'position: absolute; z-index: 1; top: 295px;')
+  //   .attr('ng-reflect-color', 'primary')
+  //   .on('click', () => {
+  //     if ((window as any).tree._viz.mergingEnabled === false) {
+  //       mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+  //       transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       (window as any).tree._viz.copyingEnabled = false;
+  //       (window as any).tree._viz.transferringEnabled = false;
+  //       (window as any).tree._viz.mergingEnabled = true;
+  //     } else {
+  //       mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       (window as any).tree._viz.mergingEnabled = false;
+  //     }
+  //   });
 
 
+  // mergingButton
+  //   .append('span')
+  //   .attr('class', 'mat-button-wrapper')
+  //   .append('mat-icon')
+  //   .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  //   .attr('role', 'img')
+  //   .attr('aria-hidden', 'true')
+  //   .text('merge_type');
 
+  // mergingButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  //   .attr('ng-reflect-centered', 'true')
+  //   .attr('ng-reflect-disabled', 'false')
+  //   .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
+  // mergingButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-focus-overlay');
 
 
 
-  const copyingButton = provenanceTreeVisualization.container
-    .append('button')
-    .attr('id', 'copying-trigger')
-    .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 345px;')
-    .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => {
-      if ((window as any).tree._viz.copyingEnabled === false) {
-        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        (window as any).tree._viz.transferringEnabled = false;
-        (window as any).tree._viz.mergingEnabled = false;
-        (window as any).tree._viz.copyingEnabled = true;
-      } else {
-        copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        (window as any).tree._viz.copyingEnabled = false;
-      }
-    });
 
 
-  copyingButton
-    .append('span')
-    .attr('class', 'mat-button-wrapper')
-    .append('mat-icon')
-    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    .attr('role', 'img')
-    .attr('aria-hidden', 'true')
-    .text('queue');
 
-  copyingButton
-    .append('div')
-    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    .attr('ng-reflect-centered', 'true')
-    .attr('ng-reflect-disabled', 'false')
-    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-  copyingButton
-    .append('div')
-    .attr('class', 'mat-button-focus-overlay');
+
+
+
+
+
+  // const copyingButton = provenanceTreeVisualization.container
+  //   .append('button')
+  //   .attr('id', 'copying-trigger')
+  //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  //   .attr('color', 'primary')
+  //   .attr('style', 'position: absolute; z-index: 1; top: 345px;')
+  //   .attr('ng-reflect-color', 'primary')
+  //   .on('mousedown', () => {
+  //     if ((window as any).tree._viz.copyingEnabled === false) {
+  //       copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+  //       mergingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       transferringButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       (window as any).tree._viz.transferringEnabled = false;
+  //       (window as any).tree._viz.mergingEnabled = false;
+  //       (window as any).tree._viz.copyingEnabled = true;
+  //     } else {
+  //       copyingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //       (window as any).tree._viz.copyingEnabled = false;
+  //     }
+  //   });
+
+
+  // copyingButton
+  //   .append('span')
+  //   .attr('class', 'mat-button-wrapper')
+  //   .append('mat-icon')
+  //   .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  //   .attr('role', 'img')
+  //   .attr('aria-hidden', 'true')
+  //   .text('queue');
+
+  // copyingButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  //   .attr('ng-reflect-centered', 'true')
+  //   .attr('ng-reflect-disabled', 'false')
+  //   .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+  // copyingButton
+  //   .append('div')
+  //   .attr('class', 'mat-button-focus-overlay');
 
 
 
