@@ -127,8 +127,9 @@ export interface IrreversibleAction {
     doArguments: Argument;
 }
 export declare type Argument = {
-    artifacts?: Artifact[];
     args: any[];
+    transitionTime?: number;
+    artifacts?: Artifact[];
 };
 /**
  * Reversible action that can be applied and reverted

@@ -115,9 +115,9 @@ export const addListeners = (tracker: ProvenanceTracker): any => {
           label: label
         },
         do: 'setPerspectiveCameraZoomLevel',
-        doArguments: { args: [event.orientation] },
+        doArguments: { args: [event.orientation]},
         undo: 'setPerspectiveCameraZoomLevel',
-        undoArguments: { args: [startEvent.orientation] }
+        undoArguments: { args: [startEvent.orientation]}
       }, true);
     }, 500, { trailing: true });
     canvas.addEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
@@ -159,9 +159,9 @@ export const addListeners = (tracker: ProvenanceTracker): any => {
           label: label
         },
         do: 'setSliceDrag',
-        doArguments: { args: [event.changes.newSlicePosition, startEvent.changes.sliceOrientation] },
+        doArguments: { args: [event.changes.newSlicePosition, startEvent.changes.sliceOrientation]},
         undo: 'setSliceDrag',
-        undoArguments: { args: [startEvent.changes.oldSlicePosition, startEvent.changes.sliceOrientation] }
+        undoArguments: { args: [startEvent.changes.oldSlicePosition, startEvent.changes.sliceOrientation]}
       }, true);
     }, 500, { trailing: true });
     canvas.addEventListener('sliceDragChanged', sliceDragEndListener);
@@ -197,14 +197,17 @@ export const addListeners = (tracker: ProvenanceTracker): any => {
           label: label
         },
         do: 'setSliceZoom',
-        doArguments: { args: [event.changes.newZoom, startEvent.changes.sliceOrientation] },
+        doArguments: { args: [event.changes.newZoom, startEvent.changes.sliceOrientation]},
         undo: 'setSliceZoom',
-        undoArguments: { args: [startEvent.changes.oldZoom, startEvent.changes.sliceOrientation] }
+        undoArguments: { args: [startEvent.changes.oldZoom, startEvent.changes.sliceOrientation]}
       }, true);
     }, 500, { trailing: true });
     canvas.addEventListener('sliceZoomChanged', sliceZoomEndListener);
   };
   canvas.addEventListener('sliceZoomChangeStart', debounce(sliceZoomStartListener, 500, { leading: true }));
+
+
+
 
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {

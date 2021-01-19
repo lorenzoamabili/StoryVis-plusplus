@@ -153,8 +153,9 @@ export interface IrreversibleAction {
 }
 
 export type Argument = {
-  artifacts?: Artifact[],
-  args: any[]
+  args: any[],
+  transitionTime?: number,
+  artifacts?: Artifact[]
 }
 
 /**

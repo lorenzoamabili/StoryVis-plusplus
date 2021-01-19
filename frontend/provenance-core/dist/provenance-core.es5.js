@@ -707,10 +707,17 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                     }
                     var undoFunc = this.registry.getFunctionByName(thisNode.action.undo);
                     functionsToDo.push(undoFunc);
-                    if (thisNode.action.undo === "setControlZoom" ||
-                        thisNode.action.undo === "setControlOrientation" ||
-                        thisNode.action.undo === "setSlicePlaneOrientation" ||
-                        thisNode.action.undo === "setSlicePlaneZoom") {
+                    if (thisNode.action.undo === "setPerspectiveCameraZoomLevel" ||
+                        thisNode.action.undo === "setPerspectiveCameraOrientation" ||
+                        thisNode.action.undo === "setSliceDrag" ||
+                        thisNode.action.undo === "setSliceZoom" ||
+                        thisNode.action.undo === "resetSlicesLocation" ||
+                        thisNode.action.undo === "setSlicesLocation" ||
+                        thisNode.action.undo === "resetConfig" ||
+                        thisNode.action.undo === "setConfig") {
+                        if (Math.abs(thisNode.metadata.creationOrder - nextNode.metadata.creationOrder) !== 1) {
+                            transitionTime = 10;
+                        }
                         argumentsToDo.push(thisNode.action.undoArguments.args.concat([transitionTime]));
                     }
                     else {
@@ -720,7 +727,7 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                 }
                 else {
                     /* istanbul ignore next */
-                    throw new Error('Going up from root? unreachable error ... i hope');
+                    throw new Error('Going up from root? unreachable error ... I hope');
                 }
             }
             else {
@@ -728,10 +735,17 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                 if (isStateNode(nextNode)) {
                     var doFunc = this.registry.getFunctionByName(nextNode.action.do);
                     functionsToDo.push(doFunc);
-                    if (nextNode.action.do === "setControlZoom" ||
-                        nextNode.action.do === "setControlOrientation" ||
-                        nextNode.action.do === "setSlicePlaneOrientation" ||
-                        nextNode.action.do === "setSlicePlaneZoom") {
+                    if (nextNode.action.do === "setPerspectiveCameraZoomLevel" ||
+                        nextNode.action.do === "setPerspectiveCameraOrientation" ||
+                        nextNode.action.do === "setSliceDrag" ||
+                        nextNode.action.do === "setSliceZoom" ||
+                        nextNode.action.do === "resetSlicesLocation" ||
+                        nextNode.action.do === "setSlicesLocation" ||
+                        nextNode.action.do === "resetConfig" ||
+                        nextNode.action.do === "setConfig") {
+                        if (Math.abs(thisNode.metadata.creationOrder - nextNode.metadata.creationOrder) !== 1) {
+                            transitionTime = 10;
+                        }
                         argumentsToDo.push(nextNode.action.doArguments.args.concat([transitionTime]));
                     }
                     else {
