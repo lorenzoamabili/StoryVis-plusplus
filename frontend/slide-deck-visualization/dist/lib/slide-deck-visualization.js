@@ -41,8 +41,15 @@ class SlideDeckVisualization {
         this._playingID = -1;
         // private _annotationContainer = new AnnotationDisplayContainer();
         this._slidesInDeck = 0;
-        this.onDelete = (slide) => {
-            this._slideDeck.removeSlide(slide);
+        this.onDelete = (slide, node) => {
+            this._slideDeck.graph.current.metadata.bookmarked = false;
+            if (slide) {
+                this._slideDeck.removeSlide(slide);
+            }
+            else if (node) {
+                this._slideDeck.slides.filter(slide => slide.node === node);
+                this._slideDeck.removeSlide(this._slideDeck.slides[0]);
+            }
             this._slidesInDeck -= 1;
         };
         this.onSelect = (slide) => {
@@ -84,6 +91,7 @@ class SlideDeckVisualization {
             slideDeck.addSlide(slide, slideDeck.slides.length);
             slideCreationOrder = slideCreationOrder + 1;
             nodeSlide.metadata.slideCreationOrder = slideCreationOrder;
+            slideDeck.graph.current.metadata.bookmarked = true;
             this.selectSlide(slide);
             this._slidesInDeck += 1;
         };
@@ -559,7 +567,7 @@ class SlideDeckVisualization {
             .attr("width", 15)
             .attr("height", 15)
             .append("xhtml:body")
-            .on("click", this.onDelete)
+            .on("click", (d) => this.onDelete(d))
             .html('<i class="fa fa-trash-o"></i>');
         newNodes
             .append("svg:foreignObject")

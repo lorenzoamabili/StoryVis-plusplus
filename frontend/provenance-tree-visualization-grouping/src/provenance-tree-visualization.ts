@@ -268,10 +268,16 @@ export class ProvenanceTreeVisualization {
       .append('g')
       .attr('class', 'normal');
 
+
     updateNodes.on('contextmenu', (d: any) => {
-      d.data.wrappedNodes[0].bookmarked = !d.data.wrappedNodes[0].bookmarked;
+      this.traverser.graph.current = this.traverser.graph.getNode(d.data.wrappedNodes[0].id);
       this.update();
-      // this._deckViz.onAdd(d.data.wrappedNodes[0]);
+      d.data.wrappedNodes[0].metadata.bookmarked = !d.data.wrappedNodes[0].metadata.bookmarked;
+      if(!d.data.wrappedNodes[0].metadata.bookmarked){
+        (window as any).slideDeck.onDelete(null, this.traverser.graph.current);
+      } else {
+        (window as any).slideDeck.onAdd(this.traverser.graph.current);
+      }
     });
 
 
@@ -281,7 +287,7 @@ export class ProvenanceTreeVisualization {
       .attr('class', (d: any) => {
         let classString = '';
         // console.log(d.data.wrappedNodes[0]);
-        if (d.data.wrappedNodes[0].bookmarked === true) {
+        if (d.data.wrappedNodes[0].metadata.bookmarked === true) {
           classString += ' bookmarked';
         } else if (d.data.wrappedNodes[0].metadata.loaded === true) {
           classString += ' loaded';
@@ -403,4 +409,6 @@ export class ProvenanceTreeVisualization {
   public getTraverser(): ProvenanceGraphTraverser {
     return this.traverser;
   }
-}
+
+}  
+

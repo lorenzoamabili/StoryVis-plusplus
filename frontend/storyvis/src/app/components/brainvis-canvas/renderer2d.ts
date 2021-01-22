@@ -251,8 +251,15 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
 
     this._controls.update();
+    this._camera.updateProjectionMatrix();
+
+    // this._camera.update();
+    this._canvas.onAxialChanged();
+    this._canvas.onCoronalChanged();
+    this._canvas.onSagittalChanged();
     this._renderer.clear();
     this._renderer.render(this._scene, this._camera);
+    this._canvas._perspectiveRenderer.render();
 
     if (this._measurements.length > 0 && this._artifacts.length > 0) {
       for (const measurement of this._measurements) {
@@ -260,7 +267,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       }
     }
 
-    this._camera.updateProjectionMatrix();
 
 
 
@@ -336,54 +342,58 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   onPlane(event: any) {
     if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
       if (!this._canvas.settings.rulerMode && !this._canvas.settings.angleMode && !this._canvas.settings.voxelprobeMode && !this._canvas.settings.annotationMode) {
-        switch (event.button) {
-          case 0:
-            this._canvas.dispatchEvent({
-              type: "sliceDragChangeStart",
-              changes: {
-                sliceOrientation: this._sliceOrientation,
-                oldSlicePosition: this.oldSlicePosition
-              }
-            });
+        if (Math.abs(this.oldSlicePosition.position[0] - this.getSlicePosition().position[0]) > 0 ||
+          Math.abs(this.oldSlicePosition.position[1] - this.getSlicePosition().position[1]) > 0 ||
+          Math.abs(this.oldSlicePosition.position[2] - this.getSlicePosition().position[2]) > 0) {
+          switch (event.button) {
+            case 0:
+              this._canvas.dispatchEvent({
+                type: "sliceDragChangeStart",
+                changes: {
+                  sliceOrientation: this._sliceOrientation,
+                  oldSlicePosition: this.oldSlicePosition
+                }
+              });
 
-            this._canvas.dispatchEvent({
-              type: "sliceDragChanged",
-              changes: {
-                sliceOrientation: this._sliceOrientation,
-                newSlicePosition: this.getSlicePosition()
-              }
-            });
-            break;
+              this._canvas.dispatchEvent({
+                type: "sliceDragChanged",
+                changes: {
+                  sliceOrientation: this._sliceOrientation,
+                  newSlicePosition: this.getSlicePosition()
+                }
+              });
+              break;
 
 
-          case 2:
-            this._canvas.dispatchEvent({
-              type: "sliceZoomChangeStart",
-              changes: {
-                sliceOrientation: this._sliceOrientation,
-                oldZoom: this.oldCameraZoom
-              }
-            });
+            case 2:
+              this._canvas.dispatchEvent({
+                type: "sliceZoomChangeStart",
+                changes: {
+                  sliceOrientation: this._sliceOrientation,
+                  oldZoom: this.oldCameraZoom
+                }
+              });
 
-            this._canvas.dispatchEvent({
-              type: "sliceZoomChanged",
-              changes: {
-                sliceOrientation: this._sliceOrientation,
-                newZoom: this._camera.zoom
-              }
-            });
-            break;
+              this._canvas.dispatchEvent({
+                type: "sliceZoomChanged",
+                changes: {
+                  sliceOrientation: this._sliceOrientation,
+                  newZoom: this._camera.zoom
+                }
+              });
+              break;
+
+          }
+
+          this.oldSlicePosition = this.getSlicePosition();
+          this.oldCameraZoom = this._camera.zoom;
 
         }
-
-        this.oldSlicePosition = this.getSlicePosition();
-        this.oldCameraZoom = this._camera.zoom;
-
       } else {
+        this._canvas.settings.voxelprobeMode = false;
         this._canvas.settings.rulerMode = false;
         this._canvas.settings.angleMode = false;
-        this._canvas.settings.voxelprobeMode = false;
-        this._canvas.settings.annotationMode = false;
+        this._canvas.settings.rulerMode = false;
       }
     }
   }
@@ -495,13 +505,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
 
   removeFromSliceChange(oldIndex) {
-    if(this._artifacts.find((artifact) => artifact.sliceIndex === oldIndex)) {
+    if (this._artifacts.find((artifact) => artifact.sliceIndex === oldIndex)) {
       this._artifacts.filter((artifact) => artifact.sliceIndex === oldIndex).forEach((artifact) => this.removeElms(artifact));
     }
   }
 
   renderFromSliceChange(newIndex) {
-    if(this._artifacts.find((artifact) => artifact.sliceIndex === newIndex)) {
+    if (this._artifacts.find((artifact) => artifact.sliceIndex === newIndex)) {
       this._artifacts.filter((artifact) => artifact.sliceIndex === newIndex).forEach((artifact) => this.renderElms(artifact));
     }
   }

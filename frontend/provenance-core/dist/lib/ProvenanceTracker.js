@@ -98,6 +98,7 @@ var ProvenanceTracker = /** @class */ (function () {
                             metadata: {
                                 option: option ? option : '',
                                 loaded: false,
+                                bookmarked: false,
                                 createdBy: _this.username,
                                 createdOn: utils_1.generateTimestamp(),
                                 creationOrder: nodeCounter

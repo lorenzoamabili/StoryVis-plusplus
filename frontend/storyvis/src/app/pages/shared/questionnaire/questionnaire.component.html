@@ -3,16 +3,15 @@
     <div *ngIf="isAdmin || isAuthor">
         <p>Complete the following questionnaire, <u>submit it</u> and press END to end the study.</p>
     </div>
-<br><br>
+    <br><br>
 
     <div *ngIf="(isAuthor || isAdmin) && isNoProvGraph">
         <iframe
-            src="https://docs.google.com/forms/d/e/1FAIpQLSeWhyU1aI6aICEh9AtskJMz-AlJw83v0IB6PUPKengRqUC7Bg/viewform?embedded=true"></iframe>
+        src="https://docs.google.com/forms/d/e/1FAIpQLSeWhyU1aI6aICEh9AtskJMz-AlJw83v0IB6PUPKengRqUC7Bg/viewform?embedded=true"></iframe>
     </div>
 
     <div *ngIf="(isAuthor || isAdmin) && isProvGraph">
-        <iframe
-            src="https://docs.google.com/forms/d/e/1FAIpQLSfoqrWEgOaiuXaCDS7Id6-dMX0FevEtafOdIA8sEdJXYu9EnQ/viewform?embedded=true"></iframe>
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSefyt2VGM8nUpuKSI0PY7BTlwVPmkzoT_KFtdqM9s-snC1uCQ/viewform?embedded=true"></iframe>
     </div>
 
     <div class="buttonLink">
@@ -23,3 +22,5 @@
         </b>
     </div>
 </div>
+
+

@@ -6,7 +6,8 @@ import {
     IProvenanceSlide,
     IProvenanceSlidedeck,
     ProvenanceNode,
-    ProvenanceSlide
+    ProvenanceSlide,
+    StateNode
 } from "@visualstorytelling/provenance-core";
 
 
@@ -209,8 +210,14 @@ export class SlideDeckVisualization {
 
         this.update();
     }
-    public onDelete = (slide: IProvenanceSlide) => {
-        this._slideDeck.removeSlide(slide);
+    public onDelete = (slide?: IProvenanceSlide, node?: ProvenanceNode) => {
+        (this._slideDeck.graph.current as StateNode).metadata.bookmarked = false;
+        if(slide){
+            this._slideDeck.removeSlide(slide);
+        } else if (node) {
+            this._slideDeck.slides.filter(slide => slide.node === node);
+            this._slideDeck.removeSlide(this._slideDeck.slides[0]);      
+        }
         this._slidesInDeck -= 1;
     }
 
@@ -256,6 +263,7 @@ export class SlideDeckVisualization {
         slideDeck.addSlide(slide, slideDeck.slides.length);
         slideCreationOrder = slideCreationOrder + 1;
         nodeSlide.metadata.slideCreationOrder = slideCreationOrder;
+        (slideDeck.graph.current as StateNode).metadata.bookmarked = true;
         this.selectSlide(slide);
         this._slidesInDeck += 1;
     }
@@ -668,7 +676,7 @@ export class SlideDeckVisualization {
             .attr("width", 15)
             .attr("height", 15)
             .append("xhtml:body")
-            .on("click", this.onDelete)
+            .on("click", (d: any) => this.onDelete(d))
             .html('<i class="fa fa-trash-o"></i>');
 
         newNodes

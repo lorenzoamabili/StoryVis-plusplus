@@ -393,6 +393,7 @@
                               metadata: {
                                   option: option ? option : '',
                                   loaded: false,
+                                  bookmarked: false,
                                   createdBy: _this.username,
                                   createdOn: generateTimestamp(),
                                   creationOrder: nodeCounter

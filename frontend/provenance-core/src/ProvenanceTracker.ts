@@ -83,6 +83,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
       metadata: {
         option: option ? option : '',
         loaded: false,
+        bookmarked: false,
         createdBy: this.username,
         createdOn: generateTimestamp(),
         creationOrder: nodeCounter

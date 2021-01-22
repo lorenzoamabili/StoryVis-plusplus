@@ -50,8 +50,8 @@ const legendData = {
     '- ALT+RIGHT CLICK on measurements = To delete a measurement',
     '- RIGHT CLICK on graph nodes = To bookmark a node',
     '- SCROLL on graph = To zoom the graph',
-    '- SCROLL on storyline = To scale the graph',
-    '- SCROLL+SHIFT on storyline = To slide the graph'
+    '- SCROLL on storyline = To slide the graph',
+    '- SHIFT+SCROLL on storyline = To scale the graph'
   ],
   instructions: [
     'TASKS TO BE PERFORMED:',

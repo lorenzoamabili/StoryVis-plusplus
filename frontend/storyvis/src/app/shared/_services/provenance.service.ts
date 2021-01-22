@@ -16,7 +16,6 @@ import {
   ProvenanceStudy, StoryStudy, TextReportStudy
 } from '../_models';
 import { environment } from '../../../environments/environment';
-import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
 import { UserService } from './user.service';
 import { ProvenanceVisualizationComponent } from '../../components/provenance-visualization/provenance-visualization.component';
 import { setNewAddListeners } from '../../components/brainvis-canvas/provenanceHelpers/provenanceListeners';
@@ -33,7 +32,6 @@ export class ProvenanceService {
   public traverser: ProvenanceGraphTraverser;
   public deck: ProvenanceSlidedeck;
   public application: Application;
-  public slideDeck: SlideDeckVisualization;
   public tree: ProvenanceVisualizationComponent;
   public textReport: String;
   public initialized = false;

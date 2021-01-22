@@ -177,7 +177,6 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
   }
 
 
-
   /**
    * Finds shortest path between current node and node with request identifer.
    * Calls the do/undo functions of actions on the path.
@@ -229,6 +228,8 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
     this.graph.current = targetNode;
     return result;
   }
+
+
 
   private getFunctionsAndArgsFromTrack(
     track: ProvenanceNode[],

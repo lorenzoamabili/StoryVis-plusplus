@@ -109,11 +109,13 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
       throw new UninitializedError();
     }
 
+
     this._controls.update();
     this._light.position.copy(this._camera.position);
+    this._camera.updateProjectionMatrix();
+    this._renderer.clear();
     this._renderer.render(this._scene, this._camera);
     
-    this._camera.updateProjectionMatrix();
   }
 
   onWindowResize() {

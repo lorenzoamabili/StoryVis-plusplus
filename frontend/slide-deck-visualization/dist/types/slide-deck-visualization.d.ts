@@ -1,5 +1,5 @@
 import "./style.css";
-import { IProvenanceSlide, IProvenanceSlidedeck } from "@visualstorytelling/provenance-core";
+import { IProvenanceSlide, IProvenanceSlidedeck, StateNode } from "@visualstorytelling/provenance-core";
 export declare class SlideDeckVisualization {
     private _slideDeck;
     private _root;
@@ -29,10 +29,10 @@ export declare class SlideDeckVisualization {
     private _playingID;
     _slidesInDeck: number;
     constructor(slideDeck: IProvenanceSlidedeck, elm: HTMLDivElement);
-    onDelete: (slide: IProvenanceSlide) => void;
+    onDelete: (slide?: IProvenanceSlide | undefined, node?: import("@visualstorytelling/provenance-core").RootNode | StateNode | undefined) => void;
     private onSelect;
     private selectSlide;
-    onAdd: (node?: import("@visualstorytelling/provenance-core").RootNode | import("@visualstorytelling/provenance-core").StateNode | undefined) => void;
+    onAdd: (node?: import("@visualstorytelling/provenance-core").RootNode | StateNode | undefined) => void;
     private onClone;
     private moveDragStarted;
     private moveDragged;
