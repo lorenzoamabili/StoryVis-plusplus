@@ -1,13 +1,22 @@
 app-provenance-visualization {
-  height: 80%;
+  height: 100%;
   width: 400px;
   display: block;
   background-color: #fffafa;
 }
 .visualizationContainer {
+  height: 75%;
   display: flex;
   flex-direction: column;
 }
+
+#minimapContainer {
+  position: relative; 
+  border-top: 1px solid black; 
+  height: 25%; 
+  background-color: snow;
+}
+
 .node {
   fill: #ffffff;
   stroke: #000000;
@@ -26,6 +35,11 @@ app-provenance-visualization {
 .node circle.bookmarked {
   stroke: #ff0000;
   stroke-width: 1.2px;
+}
+
+.node circle.bookmarkedStory {
+  fill: black;
+  stroke-width: 2px;
 }
 
 .node circle.loaded {
@@ -99,8 +113,16 @@ app-provenance-visualization {
 .link {
   fill: none;
   /* stroke: white; */
-  stroke: #000000;
+  stroke: rgb(100, 100, 100);
   stroke-width: 0.2px;
+  opacity: 0.3;
+}
+
+.link.crossing {
+  fill: none;
+  stroke: rgb(100, 100, 100);
+  stroke-width: 0.2px;
+  opacity: 0.7;
 }
 
 .link.hiddenClass {
@@ -111,33 +133,35 @@ app-provenance-visualization {
   /* stroke: white; */
   stroke: #000000;
   stroke-width: 0.8px;
+  opacity: 1;
 }
 
 .titleAggregation {
   font-family: Times;
   font-size: 25px;
 }
+
 #DataAggregationTitle {
-   display: flex;
-    flex: 0.5;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex: 0.5;
+  justify-content: center;
+  align-items: center;
 }
-.dataAggregation-Box {
-  font-family: Times;
+
+.controlsBox {
+  padding: 2%;
 }
 
 .aggButton {
   width: 43%;
-  margin: 0px 10px 0px 5px;
-  font-size: 16px;
+  margin: 5px 10px 0px 5px;
+  font-size: 14px;
   font-family: Times;
 }
 
 .circle-text {
   font-size: 6px;
   display: block;
-  dominant-baseline: central;  /* for firefox */
 }
 
 .circle-label {
@@ -147,32 +171,44 @@ app-provenance-visualization {
 .hiddenClass {
   display: none;
 }
+
 .container {
-  background-color: #fffafa;
-  position: absolute;
-  bottom: 0px;
+  background-color: snow;
 }
 
-#aggregationControls {
-  flex: 1;
+.holder {
+  width: min-content;
   display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  height: 90px;
-  padding: 0 10px;
+  bottom: 30%;
+  left: 1%;
+  position: absolute;
 }
-.caterpillar {
+
+.mat-icon-button{
+  width: 30px;
+  height: 30px;
+}
+
+.checkBox {
   cursor: pointer;
   margin: 0 10px;
+  margin-top: 5px;
+}
+
+.filterCheckbox {
+  cursor: pointer;
+  margin: 0 8px;
 }
 
 /*Legend CSS*/
 
 .legend {
-  display: -webkit-inline-box;
-  box-shadow: 0px 0px 4px #888888;
+  flex: 1;
+  box-shadow: 0px 0px 4px #888;
   margin: 5px;
-  background-color: #ffffff;
+  width: fit-content;
+  height: fit-content;
+  background-color: white;
 }
 .legend ul {
   list-style-type: none;
@@ -200,23 +236,58 @@ app-provenance-visualization {
   font-size: 12px;
 }
 
+.legend li .story  {
+  width: 10px;
+  height: 10px;
+  border: 1px dashed;
+  border-color: red;
+  border-radius: 6px;
+}
+
 .legend li .bookmark  {
   width: 10px;
   height: 10px;
   border: 1.5px solid;
-  border-color: rgb(255, 0, 0);
+  border-color: red;
   border-radius: 6px;
 }
 
-#merging-trigger.checked {
-  color: rgba(255, 0, 0, 0.7);
+.legend li .loaded  {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid;
+  border-color: blue;
+  border-radius: 6px;
 }
-#splitting-trigger.checked {
-  color: rgba(255, 0, 0, 0.7);
+
+.legend li .slideAdded  {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid;
+  border-color: rgb(255, 100, 0);
+  border-radius: 6px;
 }
-#transferring-trigger.checked {
-  color: rgba(255, 0, 0, 0.7);
+
+.checked {
+  opacity: 0.3;
 }
-#copying-trigger.checked {
-  color: rgba(255, 0, 0, 0.7);
+
+
+#annotation-trigger {
+  color: wheat;
+}
+#selection-trigger {
+  color: #80b1d3;
+}
+#configuration-trigger {
+  color: #fdb462;
+}
+#derivation-trigger {
+  color: #fb8072;
+}
+#provenance-trigger {
+  color: #bebada;
+}
+#exploration-trigger {
+  color: #8dd3c7;
 }

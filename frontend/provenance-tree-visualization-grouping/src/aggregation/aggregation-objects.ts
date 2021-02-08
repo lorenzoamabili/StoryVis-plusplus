@@ -8,7 +8,9 @@ import {
   prune,
   areNeighbours,
   plotTrimmerFuncC,
-  plotTrimmerFuncG
+  plotTrimmerFuncG,
+  bookmarkerFunc,
+  filterFunc
 } from "./aggregation-implementations";
 import {
   ProvenanceNode,
@@ -29,6 +31,18 @@ export function getNodeIntent(node: ProvenanceNode): string {
     node.action.metadata.userIntent
   ) {
     return node.action.metadata.userIntent;
+  }
+  return "none";
+}
+
+export function getNodeRenderer(node: ProvenanceNode): string {
+  if (
+    isStateNode(node) &&
+    node.action &&
+    node.action.metadata &&
+    node.action.metadata.renderer
+  ) {
+    return node.action.metadata.renderer;
   }
   return "none";
 }
@@ -102,6 +116,26 @@ export const testUserIntent: NodeGroupTest<ProvenanceNode> = (
 ) => getNodeIntent(a.wrappedNodes[0]) === getNodeIntent(b.wrappedNodes[0]);
 
 /**
+ * @description Test if two nodes share the same userIntent.
+ * @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
+ * @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
+ */
+export const testFilter: NodeGroupTest<ProvenanceNode> = (
+  a: IGroupedTreeNode<ProvenanceNode>,
+  b: IGroupedTreeNode<ProvenanceNode>
+) => b.wrappedNodes[0].metadata.filtered === true;
+
+/**
+ * @description Test if two nodes share the same userIntent.
+ * @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
+ * @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
+ */
+export const testBookmark: NodeGroupTest<ProvenanceNode> = (
+  a: IGroupedTreeNode<ProvenanceNode>,
+  b: IGroupedTreeNode<ProvenanceNode>
+) => b.wrappedNodes[0].metadata.bookmarked === false;
+
+/**
  * @description Test if b is an interval node.
  * @param a {IGroupedTreeNode<ProvenanceNode>} - Not used.
  * @param b {IGroupedTreeNode<ProvenanceNode>} - Node to be tested.
@@ -147,7 +181,7 @@ export const rawData: NodeAggregator<ProvenanceNode> = {
  */
 export const grouping: NodeAggregator<ProvenanceNode> = {
   name: "Grouping",
-  tests: [testUserIntent, testIsIntervalNode],
+  tests: [testUserIntent, testIsIntervalNode, testBookmark],
   algorithm: group,
   arg: false,
   description: `This algorithm groups nodes of the same category (color).
@@ -160,7 +194,8 @@ The grouped nodes must have connectivity equal to two or less (interval nodes or
  */
 export const compression: NodeAggregator<ProvenanceNode> = {
   name: "Compression",
-  tests: [testIsIntervalNode, testIsIntervalNode],
+  // tests: [testIsIntervalNode, testIsIntervalNode],
+  tests: [testIsIntervalNode, testBookmark],
   algorithm: compress,
   arg: false,
   description: `This algorithm groups nodes with connectivity equals to two (interval nodes). However,
@@ -174,7 +209,7 @@ The nodes are grouped regardless their category.`
  */
 export const pruning: NodeAggregator<ProvenanceNode> = {
   name: "Pruning",
-  tests: [testIsIntervalNode],
+  tests: [testIsIntervalNode, testBookmark],
   algorithm: prune,
   arg: true,
   description: `This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.
@@ -189,7 +224,7 @@ The main tree is not considered as a subtree.`
  */
 export const plotTrimmer: NodeAggregator<ProvenanceNode> = {
   name: "PlotTrimmer",
-  tests: [testIsIntervalNode],
+  tests: [testIsIntervalNode, testBookmark],
   algorithm: plotTrimmerFunc,
   arg: true,
   description: "Lorem Ipsum"
@@ -199,8 +234,8 @@ export const plotTrimmer: NodeAggregator<ProvenanceNode> = {
  * @description Object of the interface DataAggregation<ProvenanceNode>.
  */
 export const plotTrimmerC: NodeAggregator<ProvenanceNode> = {
-  name: "PlotTrimmer C",
-  tests: [testIsIntervalNode],
+  name: "PlotTrimmerC",
+  tests: [testIsIntervalNode, testBookmark],
   algorithm: plotTrimmerFuncC,
   arg: true,
   description: "Lorem Ipsum"
@@ -210,27 +245,50 @@ export const plotTrimmerC: NodeAggregator<ProvenanceNode> = {
  * @description Object of the interface DataAggregation<ProvenanceNode>.
  */
 export const plotTrimmerG: NodeAggregator<ProvenanceNode> = {
-  name: "PlotTrimmer G",
-  tests: [testIsIntervalNode],
+  name: "PlotTrimmerG",
+  tests: [testIsIntervalNode, testBookmark],
   algorithm: plotTrimmerFuncG,
   arg: true,
   description: "Lorem Ipsum"
 };
 
 /**
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
+export const bookmarker: NodeAggregator<ProvenanceNode> = {
+  name: "Bookmarker",
+  tests: [testBookmark],
+  algorithm: bookmarkerFunc,
+  arg: true,
+  description: "Lorem Ipsum"
+};
+
+/**
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
+export const filter: NodeAggregator<ProvenanceNode> = {
+  name: "Filter",
+  tests: [testFilter],
+  algorithm: filterFunc,
+  arg: true,
+  description: "Lorem Ipsum"
+};
+/**
  * @description List of the data aggregation objects. Whenever you want to add a
  * new data aggregation algorithm: create object and add it to this list.
  */
 
 export const aggregationObjects = [
-  defaultData,
+  // defaultData,
   rawData,
   grouping,
   compression,
   pruning,
   plotTrimmer,
   plotTrimmerC,
-  plotTrimmerG
+  plotTrimmerG,
+  bookmarker,
+  filter
 ];
 
 export const aggregationObjectsUI1 = [

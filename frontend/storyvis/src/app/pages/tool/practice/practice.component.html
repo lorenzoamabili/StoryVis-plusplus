@@ -1,27 +1,28 @@
-﻿    <app-menu-bar [canvas]="canvas" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar>
-    <mat-sidenav-container hasBackdrop="false">
+﻿<app-menu-bar [canvas]="canvas" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar>
+<mat-sidenav-container hasBackdrop="false">
 
-      <mat-sidenav position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
+  <mat-sidenav position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
 
-        <button id="sidenav-trigger" mat-icon-button (click)="sidenav.toggle()">
-          <mat-icon>menu</mat-icon>
-        </button>
+    <button id="sidenav-trigger" mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
 
-        <app-provenance-visualization *ngIf="!isNoProvGraph"></app-provenance-visualization>
+    <app-provenance-visualization *ngIf="!isNoProvGraph"> </app-provenance-visualization>
+    
 
-      </mat-sidenav>
+  </mat-sidenav>
 
-      <mat-sidenav-content>
-        <app-brainvis-canvas #canvas [studyStarted]="studyStarted"></app-brainvis-canvas>
-        <div id="bottom-container">
-          <app-slides-container *ngIf="!isNoProvGraph">
-            <app-provenance-slides [canvas]="canvas" #slides></app-provenance-slides>
-          </app-slides-container>
-          <app-text-report *ngIf="isNoProvGraph"> </app-text-report>
-        </div>
-        <a id="next-button" (click)="provenance.saveGraphStudy(IDcreator); provenance.saveStoryStudy(IDcreator); 
+  <mat-sidenav-content>
+    <app-brainvis-canvas #canvas [studyStarted]="studyStarted"></app-brainvis-canvas>
+    <div id="bottom-container">
+      <app-slides-container *ngIf="!isNoProvGraph">
+        <app-provenance-slides [canvas]="canvas" #slides></app-provenance-slides>
+      </app-slides-container>
+      <app-text-report *ngIf="isNoProvGraph"> </app-text-report>
+    </div>
+    <a id="next-button" (click)="provenance.saveGraphStudy(IDcreator); provenance.saveStoryStudy(IDcreator); 
         provenance.saveTextReportStudy(IDcreator);" routerLink='/intro-explo'>
-          <mat-icon><b>NEXT</b></mat-icon>
-        </a>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+      <mat-icon><b>NEXT</b></mat-icon>
+    </a>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -2,11 +2,12 @@ import { ActionFunction, ActionFunctionRegistry } from '@visualstorytelling/prov
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 
 const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFunction } => ({
-  setSliceIndex: async (sliceOrientation, newIndex, oldIndex) => {
+  setSliceIndex: async (sliceOrientation, newIndex, oldIndex, transitionTime) => {
     canvas.changeSliceRemove(sliceOrientation, oldIndex);
-    canvas.setSliceIndex(sliceOrientation, newIndex);
+    canvas.setSliceIndex(sliceOrientation, newIndex, transitionTime);
     canvas.changeSliceRender(sliceOrientation, newIndex);
   },
+
   setSliceDrag: async (slicePosition, sliceOrientation, transitionTime) => {
     canvas.setSliceDrag(slicePosition, sliceOrientation, transitionTime);
   },

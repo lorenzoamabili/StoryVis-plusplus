@@ -32,6 +32,7 @@ export default class Ruler {
 
     let startPosition = new THREE.Vector3();
 
+    this.renderer.measurementDone = false;
 
 
 
@@ -72,25 +73,36 @@ export default class Ruler {
     this.renderer.domElement.addEventListener('mouseup', this.onMouseUp);
     this.renderer.domElement.addEventListener('mousemove', this.onMouseMove);
     this.renderer.domElement.addEventListener('mousedown', this.onMouseDown);
+    this.renderer.domElement.addEventListener('contextmenu', this.onContextMenu);
   }
 
   removeListeners() {
     this.renderer.domElement.removeEventListener('mouseup', this.onMouseUp);
     this.renderer.domElement.removeEventListener('mousemove', this.onMouseMove);
     this.renderer.domElement.removeEventListener('mousedown', this.onMouseDown);
+    this.renderer.domElement.removeEventListener('contextmenu', this.onContextMenu);
   }
 
   remove() {
     this.renderer.domElement.removeEventListener('mouseup', this.onMouseUp);
     this.renderer.domElement.removeEventListener('mousemove', this.onMouseMove);
     this.renderer.domElement.removeEventListener('mousedown', this.onMouseDown);
+    this.renderer.domElement.removeEventListener('contextmenu', this.onContextMenu);
     this.widget.free();
+  }
+
+  onContextMenu = () => { 
+      this.renderer._measurement.artifact.sliceIndexEnd = this.renderer.stackHelper.index;
+      this.renderer.saveCoordinates(this.renderer._measurement.artifact);
+      this.renderer.measurementDone = true;
+      this.renderer.artifactCreated.emit(this.renderer._measurement.artifact);
+      this.renderer.domElement.removeEventListener('contextmenu', this.onContextMenu);
   }
 
   onMouseUp = (evt) => {
     this.widget.onEnd(evt);
   }
-  
+
 
   //   if (this.isNew) {
   //     this.created.emit({
@@ -121,7 +133,7 @@ export default class Ruler {
     this.widget.onStart(evt);
   }
 
-  simulateRuler(down, move, up){
+  simulateRuler(down, move, up) {
     this.onMouseDown(down);
     this.onMouseMove(move);
     this.onMouseUp(up);

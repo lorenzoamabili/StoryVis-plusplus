@@ -172,7 +172,7 @@ function serializeSlide(slide) {
         transitionTime: slide.transitionTime,
         duration: slide.duration,
         annotations: annotations,
-        mainAnnotation: ""
+        mainAnnotation: slide.mainAnnotation
     };
 }
 exports.serializeSlide = serializeSlide;

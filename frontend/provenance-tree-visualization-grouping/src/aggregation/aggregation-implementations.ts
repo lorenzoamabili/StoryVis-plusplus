@@ -149,6 +149,23 @@ export function isIntervalNode(
   return result;
 }
 
+
+/**
+ * @description Test whether a node is a bookmarked node.
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - The node to test.
+ */
+export function isBookmarked(
+  node: IGroupedTreeNode<ProvenanceNode>
+): boolean {
+  let result = false;
+
+  if (node.wrappedNodes[0].metadata.bookmarked === true) {
+    result = true;
+  }
+
+  return result;
+}
+
 /**
  * @description Test whether two nodes are neighbours.
  * @param  a  {IGroupedTreeNode<ProvenanceNode>} - The first node to test.
@@ -302,7 +319,6 @@ const testAll = (
       break;
     }
   }
-
   return result;
 };
 
@@ -567,3 +583,54 @@ export const plotTrimmerFuncC: NodeAggregationAlgorithm = (
     }
   }
 };
+
+
+
+/**
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param arg {any} - Optinal parameter
+ */
+export const bookmarkerFunc: NodeAggregationAlgorithm = (
+  currentNode: IGroupedTreeNode<ProvenanceNode>,
+  node: IGroupedTreeNode<ProvenanceNode>,
+  tests: NodeGroupTest<ProvenanceNode>[],
+  ) => {
+    let merged = false;
+    do {
+      merged = false;
+      for (const child of node.children) {
+          if (testAll(tests, node, child)) {
+            transferToParent(node, child);
+            merged = true;
+            break;
+          }
+        }
+    } while (merged);
+    node.children.map(child => bookmarkerFunc(currentNode, child, tests));
+  };
+
+
+  /**
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param arg {any} - Optinal parameter
+ */
+export const filterFunc: NodeAggregationAlgorithm = (
+  currentNode: IGroupedTreeNode<ProvenanceNode>,
+  node: IGroupedTreeNode<ProvenanceNode>,
+  tests: NodeGroupTest<ProvenanceNode>[],
+  ) => {
+    let merged = false;
+    do {
+      merged = false;
+      for (const child of node.children) {
+          if (testAll(tests, node, child)) {
+            transferToParent(node, child);
+            merged = true;
+            break;
+          }
+        }
+    } while (merged);
+    node.children.map(child => filterFunc(currentNode, child, tests));
+  };

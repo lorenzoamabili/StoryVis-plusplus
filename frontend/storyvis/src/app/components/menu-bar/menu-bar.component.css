@@ -11,7 +11,7 @@ button {
   background-color: #586072;
 }
 
-.slicesLocation {
+.smallerButton {
    min-width: 40px;
    padding: 0px;
 }
@@ -20,8 +20,12 @@ button {
   background-color: #586072;
 }
 
-mat-button-toggle.mat-button-toggle-checked {
-  background-color: rgba(255, 255, 255, 0.4);
+mat-raised-button.localizers-checked{
+  background-color: #6b707e;
+}
+
+mat-raised-button.localizers{
+  background-color: #444958;
 }
 
 mat-button-toggle.annotation {
@@ -43,4 +47,8 @@ mat-toolbar-row {
 
 .mat-progress-spinner > svg > circle {
   stroke: white !important;
+}
+
+mat-form-field{
+  width: 15px;
 }

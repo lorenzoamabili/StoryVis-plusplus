@@ -1,7 +1,7 @@
 // We need to use ::ng-deep to overcome view encapsulation
 ::ng-deep {
     .custom-slider {
-      min-width: 300px;
+      min-width: 150px;
     }
     .custom-slider .ngx-slider .ngx-slider-bar {
       height: 2px;
@@ -47,7 +47,7 @@
   }
 
   ngx-slider {
-    width: 200px;
+    width: 150px;
   }
 
 a {

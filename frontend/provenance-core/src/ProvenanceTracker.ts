@@ -82,8 +82,11 @@ export class ProvenanceTracker implements IProvenanceTracker {
       artifacts: artifacts ? allArtifacts : [],
       metadata: {
         option: option ? option : '',
+        mainbranch: false,
+        noLink: false,
         loaded: false,
         bookmarked: false,
+        filtered: false,
         createdBy: this.username,
         createdOn: generateTimestamp(),
         creationOrder: nodeCounter

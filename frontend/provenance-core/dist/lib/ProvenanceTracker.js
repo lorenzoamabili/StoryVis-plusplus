@@ -97,8 +97,11 @@ var ProvenanceTracker = /** @class */ (function () {
                             artifacts: artifacts ? allArtifacts : [],
                             metadata: {
                                 option: option ? option : '',
+                                mainbranch: false,
+                                noLink: false,
                                 loaded: false,
                                 bookmarked: false,
+                                filtered: false,
                                 createdBy: _this.username,
                                 createdOn: utils_1.generateTimestamp(),
                                 creationOrder: nodeCounter

@@ -386,8 +386,11 @@ var ProvenanceTracker = /** @class */ (function () {
                             artifacts: artifacts ? allArtifacts : [],
                             metadata: {
                                 option: option ? option : '',
+                                mainbranch: false,
+                                noLink: false,
                                 loaded: false,
                                 bookmarked: false,
+                                filtered: false,
                                 createdBy: _this.username,
                                 createdOn: generateTimestamp(),
                                 creationOrder: nodeCounter
@@ -612,6 +615,7 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                 }
                 else if (!transferring) {
                     tracker === null || tracker === void 0 ? void 0 : tracker.applyAction(nodeToAppend.action, true);
+                    nodeToAppend.metadata.option = 'copied';
                 }
                 rootNode.children.forEach(function (nodeToAppend) { return nodesAppended.push(nodeToAppend); });
                 nodesAppended = nodesAppended.filter(function (nodeAppended) { return previousChildren.includes(nodeAppended) === false; });
@@ -700,6 +704,7 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
             var thisNode = track[i];
             var nextNode = track[i + 1];
             var up = isNextNodeInTrackUp(thisNode, nextNode);
+            transitionTime = track.length > 2 ? 1 : transitionTime;
             if (up) {
                 /* istanbul ignore else */
                 if (isStateNode(thisNode)) {
@@ -715,10 +720,9 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         thisNode.action.undo === "resetSlicesLocation" ||
                         thisNode.action.undo === "setSlicesLocation" ||
                         thisNode.action.undo === "resetConfig" ||
-                        thisNode.action.undo === "setConfig") {
-                        if (Math.abs(thisNode.metadata.creationOrder - nextNode.metadata.creationOrder) !== 1) {
-                            transitionTime = 10;
-                        }
+                        thisNode.action.undo === "setConfig" ||
+                        thisNode.action.undo === "setSliceIndex" ||
+                        thisNode.action.undo === "navigateVolume") {
                         argumentsToDo.push(thisNode.action.undoArguments.args.concat([transitionTime]));
                     }
                     else {
@@ -743,10 +747,9 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         nextNode.action.do === "resetSlicesLocation" ||
                         nextNode.action.do === "setSlicesLocation" ||
                         nextNode.action.do === "resetConfig" ||
-                        nextNode.action.do === "setConfig") {
-                        if (Math.abs(thisNode.metadata.creationOrder - nextNode.metadata.creationOrder) !== 1) {
-                            transitionTime = 10;
-                        }
+                        nextNode.action.do === "setConfig" ||
+                        nextNode.action.do === "setSliceIndex" ||
+                        nextNode.action.do === "navigateVolume") {
                         argumentsToDo.push(nextNode.action.doArguments.args.concat([transitionTime]));
                     }
                     else {
@@ -991,7 +994,7 @@ function serializeSlide(slide) {
         transitionTime: slide.transitionTime,
         duration: slide.duration,
         annotations: annotations,
-        mainAnnotation: ""
+        mainAnnotation: slide.mainAnnotation
     };
 }
 

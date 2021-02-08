@@ -18,6 +18,7 @@ export declare class SlideDeckVisualization {
     private _toolbarX;
     private _toolbarY;
     private _toolbarPadding;
+    private _shiftedPosition;
     private _draggedSlideReAdjustmentFactor;
     private _originPosition;
     private _currentTime;

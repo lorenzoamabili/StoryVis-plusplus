@@ -158,6 +158,7 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
         (nodeToAppend as StateNode).metadata.option = 'merged';
       } else if (!transferring) {
         tracker?.applyAction((nodeToAppend as StateNode).action, true);
+        (nodeToAppend as StateNode).metadata.option = 'copied';
       }
       rootNode.children.forEach(nodeToAppend => nodesAppended.push(nodeToAppend));
       nodesAppended = nodesAppended.filter(nodeAppended => previousChildren.includes(nodeAppended) === false);
@@ -245,6 +246,7 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
       const thisNode = track[i];
       const nextNode = track[i + 1];
       const up = isNextNodeInTrackUp(thisNode, nextNode);
+      transitionTime = track.length > 2 ? 1 : transitionTime;
 
       if (up) {
         /* istanbul ignore else */
@@ -261,15 +263,14 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
             thisNode.action.undo === "resetSlicesLocation" ||
             thisNode.action.undo === "setSlicesLocation" ||
             thisNode.action.undo === "resetConfig" ||
-            thisNode.action.undo === "setConfig"
+            thisNode.action.undo === "setConfig" ||
+            thisNode.action.undo === "setSliceIndex" ||
+            thisNode.action.undo === "navigateVolume"
           ) {
-            if (Math.abs(thisNode.metadata.creationOrder - nextNode.metadata.creationOrder) !== 1) {
-              transitionTime = 10;
-            }
             argumentsToDo.push(thisNode.action.undoArguments.args.concat([transitionTime]));
           } else {
             argumentsToDo.push(thisNode.action.undoArguments.args
-              .concat(thisNode.action.undoArguments.artifacts ? thisNode.action.undoArguments.artifacts : []))
+              .concat(thisNode.action.undoArguments.artifacts ? thisNode.action.undoArguments.artifacts : []));
           }
         } else {
           /* istanbul ignore next */
@@ -287,15 +288,14 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
             nextNode.action.do === "resetSlicesLocation" ||
             nextNode.action.do === "setSlicesLocation" ||
             nextNode.action.do === "resetConfig" ||
-            nextNode.action.do === "setConfig"
+            nextNode.action.do === "setConfig" ||
+            nextNode.action.do === "setSliceIndex" ||
+            nextNode.action.do === "navigateVolume"
           ) {
-            if (Math.abs(thisNode.metadata.creationOrder - nextNode.metadata.creationOrder) !== 1) {
-              transitionTime = 10;
-            }
             argumentsToDo.push(nextNode.action.doArguments.args.concat([transitionTime]));
           } else {
             argumentsToDo.push(nextNode.action.doArguments.args
-              .concat(nextNode.action.doArguments.artifacts ? nextNode.action.doArguments.artifacts : []))
+              .concat(nextNode.action.doArguments.artifacts ? nextNode.action.doArguments.artifacts : []));
           }
         } else {
           /* istanbul ignore next */

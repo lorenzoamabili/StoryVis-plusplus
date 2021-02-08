@@ -1,7 +1,52 @@
 <mat-toolbar color="primary" style="width: 100%">
   <mat-toolbar-row>
 
-    <div *ngIf="isAdmin">
+
+    <mat-button-toggle class="dashboardBtn" [checked]="canvas.settings.datacomicsMode"
+      (click)="canvas.displayDatacomics()" (change)="canvas.settings.datacomicsMode = $event.source.checked"
+      matTooltip="Data-Comics Mode">
+      <mat-icon>textsms</mat-icon>
+
+    </mat-button-toggle>
+
+    <span>&nbsp;</span>
+
+    <mat-button-toggle class="dashboardBtn" [checked]="canvas.settings.scrollytellingMode"
+      (click)="canvas.displayScrollytelling()" (change)="canvas.settings.scrollytellingMode = $event.source.checked"
+      matTooltip="Scrollytelling Mode">
+      <mat-icon>view_list</mat-icon>
+
+    </mat-button-toggle>
+
+
+    <span>&nbsp;</span>
+
+
+    <button *ngIf="canvas.dashboardOpen" class="btn btn-primary" matTooltip="To rearrange the story elements"
+      style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.rearrangeFrames()">
+      <mat-icon>grid_off</mat-icon>
+
+    </button>
+
+    <span>&nbsp;</span>
+
+    <button *ngIf="canvas.dashboardOpen" class="btn btn-primary" matTooltip="To add a text box"
+      style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.addTextArea()">
+      <mat-icon>speaker_notes</mat-icon>
+
+    </button>
+
+    <span>&nbsp;</span>
+
+    <button *ngIf="canvas.dashboardOpen" class="btn btn-primary" matTooltip="To clear the dashboard"
+      style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.clearDashboard()">
+      <mat-icon>clear</mat-icon>
+
+    </button>
+
+    <span>&nbsp;</span>
+
+    <!-- <div *ngIf="isAdmin">
       <mat-form-field>
         <mat-label>Select Graph</mat-label>
         <mat-select (selectionChange)="provenance.restoreGraph($event)">
@@ -46,7 +91,7 @@
         (click)="provenance.saveTextReport(IDcreator)">
         <mat-icon>library_books</mat-icon>
       </button>
-    </div>
+    </div> -->
 
     <span>&nbsp;</span>
 
@@ -83,15 +128,15 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
-    
-    <button class="slicesLocation" mat-raised-button matTooltip="Set default window level - Lung"
+
+    <button class="smallerButton" mat-raised-button matTooltip="Set default window level - Lung"
       (click)="settings.canvas.resetWindowLevel('1')">
       <mat-icon>settings_brightness</mat-icon>
     </button>
 
     <span>&nbsp;</span>
 
-    <button class="slicesLocation" style="background-color: slategray;" mat-raised-button
+    <button class="smallerButton" style="background-color: slategray;" mat-raised-button
       matTooltip="Set default window level - Mediastinum" (click)="settings.canvas.resetWindowLevel('2')">
       <mat-icon>settings_brightness</mat-icon>
     </button>
@@ -100,7 +145,7 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
-    <button class="slicesLocation" mat-raised-button matTooltip="Restore the original slices position in all the views"
+    <button class="smallerButton" mat-raised-button matTooltip="Restore the original slices position in all the views"
       (click)="settings.canvas.resetSlicesLocation()">
       <mat-icon>settings_overscan</mat-icon>
     </button>
@@ -109,20 +154,80 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
-    <button class="slicesLocation" mat-raised-button matTooltip="Reset all the configuration settings"
+    <button class="smallerButton" mat-raised-button matTooltip="Reset all the configuration settings"
       (click)="settings.canvas.resetConfig(true)">
       <mat-icon>settings_backup_restore</mat-icon>
     </button>
 
-    <div *ngIf="!studyStarted" style="position: absolute; right: 0px;">
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <button *ngIf="!settings.localizersOn" mat-raised-button matTooltip="Activate localizers" class="localizers" (click)="settings.canvas.createLocalizers();">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button *ngIf="settings.localizersOn" style="background-color: lightslategray; color: black;" mat-raised-button matTooltip="Remove localizers" class="localizers-checked" (click)="settings.canvas.removeLocalizers();">
+      <mat-icon>add</mat-icon>
+    </button>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+
+    <div style="position: absolute; right: 10%;">
+      <button class="smallerButton" mat-raised-button matTooltip="To delete all graphs" (click)="reset()">
+        <mat-icon>cancel_presentation</mat-icon>
+      </button>
+
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+
+
+      <mat-form-field matTooltip="Load a previous analysis">
+        <mat-label> </mat-label>
+        <mat-select (selectionChange)="provenance.restoreGraph($event)">
+          <mat-option *ngFor="let graph of graphs" [value]="graph">
+            {{ graph._id}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+
+    <!-- <mat-form-field>
+            <mat-label>Select Story</mat-label>
+            <mat-select (selectionChange)="provenance.restoreStory($event)">
+              <mat-option *ngFor="let story of stories" [value]="story">
+                {{ story._id }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Select Report</mat-label>
+            <mat-select (selectionChange)="provenance.restoreTextReport($event)">
+              <mat-option *ngFor="let textReport of textReports" [value]="textReport">
+                {{ textReport._id }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field> -->
+
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <div *ngIf="!studyStarted" style="position: absolute; right: 0%;">
       <a class="nav-item nav-link">PRACTICE SESSION</a>
     </div>
 
-    <div *ngIf="studyStarted" style="position: absolute; right: 0px;">
+    <div *ngIf="studyStarted" style="position: absolute; right: 0%;">
       <a class="nav-item nav-link">EVALUATION SESSION</a>
     </div>
 
-    <div *ngIf="isAdmin" style="position: absolute; right: 0px;">
+    <div *ngIf="isAdmin" style="position: absolute; right: 0%;">
       <a class="nav-item nav-link" (click)="logout()">LOGOUT</a>
     </div>
 

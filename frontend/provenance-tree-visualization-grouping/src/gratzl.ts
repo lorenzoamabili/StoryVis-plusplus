@@ -1,13 +1,14 @@
 import { HierarchyNode, HierarchyPointNode } from "d3-hierarchy";
+import { StateNode } from "@visualstorytelling/provenance-core";
 
 function depthSort(
   a: IHierarchyPointNodeWithMaxDepth<any>,
   b: IHierarchyPointNodeWithMaxDepth<any>
 ) {
   if (a.maxDescendantDepth > b.maxDescendantDepth) {
-    return -1;
-  } else if (a.maxDescendantDepth < b.maxDescendantDepth) {
     return 1;
+  } else if (a.maxDescendantDepth < b.maxDescendantDepth) {
+    return -1;
   }
   return 0;
 }
@@ -80,6 +81,7 @@ export default function GratzlLayout<T>(
     }
   });
 
+  
   setTreeX(deepestLeaf, 0);
 
   //

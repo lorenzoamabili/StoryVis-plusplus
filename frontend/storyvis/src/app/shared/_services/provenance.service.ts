@@ -20,6 +20,10 @@ import { UserService } from './user.service';
 import { ProvenanceVisualizationComponent } from '../../components/provenance-visualization/provenance-visualization.component';
 import { setNewAddListeners } from '../../components/brainvis-canvas/provenanceHelpers/provenanceListeners';
 import { Settings } from 'src/app/components/brainvis-canvas/utils/settings';
+import { MatSelectChange } from '@angular/material/select';
+import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
+import { restoreProvenanceGraph } from '@visualstorytelling/provenance-core/src/ProvenanceGraph';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -33,10 +37,12 @@ export class ProvenanceService {
   public deck: ProvenanceSlidedeck;
   public application: Application;
   public tree: ProvenanceVisualizationComponent;
+  public slideDeck: SlideDeckVisualization;
   public textReport: String;
   public initialized = false;
   public findingsCoord: any[] = [];
   public timeStart: number = 0;
+  private authentification: AuthenticationService;
 
   public userService: UserService;
   public settings = Settings.getInstance(this);
@@ -160,9 +166,53 @@ export class ProvenanceService {
 
 
 
+
+  public async restoreGraph(input: MatSelectChange) {
+    const graphInput = input.value;
+    this.loadGraph(graphInput);
+    // this.graphLoaded = true;
+  }
+
+  public loadGraph(graphInput: any) {
+    const dataGraph = JSON.parse(graphInput.serializedGraph);
+    this.graph = restoreProvenanceGraph(dataGraph) as any;
+
+    this.newProvenanceGraph(this.graph);
+  }
+
+
+  // public async restoreStory(input: MatSelectChange) {
+  //   const storyInput = input.value;
+  //   this.loadStory(storyInput);
+  // }
+
+  // public loadStory(storyInput: any) {
+  //   const dataStory = JSON.parse(storyInput.story);
+  //   this.slideDeck = (window as any).slideDeck;
+  //   this.slideDeck.setDeck(this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.application));
+  //   this.slideDeck.update();
+  // }
+
+  // public async restoreTextReport(input: MatSelectChange) {
+  //   const textReportInput = input.value;
+  //   this.loadTextReport(textReportInput);
+  // }
+
+  // public loadTextReport(textReportInput: any) {
+  //   (document.getElementById("textArea") as HTMLTextAreaElement).value = textReportInput.textReport;
+  // }
+
+
+
+
+
+
+
+
+
   generation(onThisTree?: boolean) {
     if (onThisTree) {
-      this.saveGraphStudy(0);
+      this.saveGraph(0);
       this.newProvenanceGraph();
       this.graph.root.label = 'New Root';
     } else {
@@ -183,7 +233,7 @@ export class ProvenanceService {
 
   fission(onThisTree?: boolean) {
     if (onThisTree) {
-      this.saveGraphStudy(0);
+      this.saveGraph(0);
       this.newProvenanceGraph();
     } else {
       const parameters = this.settings.canvas.resetConfigParam();
@@ -210,7 +260,7 @@ export class ProvenanceService {
 
 
   transferring(toNode: StateNode) {
-    this.saveGraphStudy(0);
+    this.saveGraph(0);
     this.traverser.copyNodes(toNode.id, null, true);
     let traverser = this.traverser;
     let currentNodeID = traverser.graph.current.id;
@@ -252,11 +302,12 @@ export class ProvenanceService {
 
 
 
-  newProvenanceGraph() {
-    this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, 'newGraph');
+  newProvenanceGraph(graph?: ProvenanceGraph) {
+    this.graph = graph ? graph : new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
+    this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
 
     (window as any).prov = {
       graph: this.graph,
@@ -265,18 +316,18 @@ export class ProvenanceService {
       traverser: this.traverser,
       deck: this.deck
     };
+    
 
-    this.tree = (window as any).tree;
-    this.tree._viz.hideTree();
-    this.tree._viz = this.tree.createTree(this.traverser);
-    this.tree._viz.update();
+    (window as any).tree._viz.free();
+    (window as any).tree._viz = (window as any).tree.createTree(this.traverser);
+    (window as any).tree._viz.update();
     setNewAddListeners(this.registry, this.tracker);
   }
 
 
 
   async init() {
-    this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' }, "originalGraph");
+    this.graph = new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);

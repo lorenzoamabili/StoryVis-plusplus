@@ -48,25 +48,25 @@ void main(void) {
   // draw border if slice is cropped
   // float uBorderDashLength = 10.;
 
-  if( uCanvasWidth > 0. &&
-      ((gl_FragCoord.x > uBorderMargin && (gl_FragCoord.x - uBorderMargin) < uBorderWidth) ||
-       (gl_FragCoord.x < (uCanvasWidth - uBorderMargin) && (gl_FragCoord.x + uBorderMargin) > (uCanvasWidth - uBorderWidth) ))){
-    float valueY = mod(gl_FragCoord.y, 2. * uBorderDashLength);
-    if( valueY < uBorderDashLength && gl_FragCoord.y > uBorderMargin && gl_FragCoord.y < (uCanvasHeight - uBorderMargin) ){
-      gl_FragColor = vec4(uBorderColor, 1.);
-      return;
-    }
-  }
+  // if( uCanvasWidth > 0. &&
+  //     ((gl_FragCoord.x > uBorderMargin && (gl_FragCoord.x - uBorderMargin) < uBorderWidth) ||
+  //      (gl_FragCoord.x < (uCanvasWidth - uBorderMargin) && (gl_FragCoord.x + uBorderMargin) > (uCanvasWidth - uBorderWidth) ))){
+  //   float valueY = mod(gl_FragCoord.y, 2. * uBorderDashLength);
+  //   if( valueY < uBorderDashLength && gl_FragCoord.y > uBorderMargin && gl_FragCoord.y < (uCanvasHeight - uBorderMargin) ){
+  //     gl_FragColor = vec4(uBorderColor, 1.);
+  //     return;
+  //   }
+  // }
 
-  if( uCanvasHeight > 0. &&
-      ((gl_FragCoord.y > uBorderMargin && (gl_FragCoord.y - uBorderMargin) < uBorderWidth) ||
-       (gl_FragCoord.y < (uCanvasHeight - uBorderMargin) && (gl_FragCoord.y + uBorderMargin) > (uCanvasHeight - uBorderWidth) ))){
-    float valueX = mod(gl_FragCoord.x, 2. * uBorderDashLength);
-    if( valueX < uBorderDashLength && gl_FragCoord.x > uBorderMargin && gl_FragCoord.x < (uCanvasWidth - uBorderMargin) ){
-      gl_FragColor = vec4(uBorderColor, 1.);
-      return;
-    }
-  }
+  // if( uCanvasHeight > 0. &&
+  //     ((gl_FragCoord.y > uBorderMargin && (gl_FragCoord.y - uBorderMargin) < uBorderWidth) ||
+  //      (gl_FragCoord.y < (uCanvasHeight - uBorderMargin) && (gl_FragCoord.y + uBorderMargin) > (uCanvasHeight - uBorderWidth) ))){
+  //   float valueX = mod(gl_FragCoord.x, 2. * uBorderDashLength);
+  //   if( valueX < uBorderDashLength && gl_FragCoord.x > uBorderMargin && gl_FragCoord.x < (uCanvasWidth - uBorderMargin) ){
+  //     gl_FragColor = vec4(uBorderColor, 1.);
+  //     return;
+  //   }
+  // }
 
   // get texture coordinates of current pixel
   vec4 dataValue = vec4(0.);

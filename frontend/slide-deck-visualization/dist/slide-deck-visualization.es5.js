@@ -349,8 +349,11 @@ var ProvenanceTracker = /** @class */ (function () {
                             artifacts: artifacts ? allArtifacts : [],
                             metadata: {
                                 option: option ? option : '',
+                                mainbranch: false,
+                                noLink: false,
                                 loaded: false,
                                 bookmarked: false,
+                                filtered: false,
                                 createdBy: _this.username,
                                 createdOn: generateTimestamp(),
                                 creationOrder: nodeCounter
@@ -658,7 +661,7 @@ function serializeSlide(slide) {
         transitionTime: slide.transitionTime,
         duration: slide.duration,
         annotations: annotations,
-        mainAnnotation: ""
+        mainAnnotation: slide.mainAnnotation
     };
 }
 
@@ -965,7 +968,7 @@ class SlideDeckVisualization {
         this._tableHeight = 100;
         this._tableWidth = 1800;
         this._minimumSlideDuration = 100;
-        this._barWidthTimeMultiplier = 0.025;
+        this._barWidthTimeMultiplier = 0.02;
         this._barPadding = 5;
         this._resizebarwidth = 5;
         this._previousSlideX = 0;
@@ -976,6 +979,7 @@ class SlideDeckVisualization {
         this._toolbarX = 10;
         this._toolbarY = 35;
         this._toolbarPadding = 20;
+        this._shiftedPosition = 0;
         // Upon dragging a slide, no matter where you click on it, the beginning of the slide jumps to the mouse position.
         // This next variable is calculated to adjust for that error, it is a workaround but it works
         this._draggedSlideReAdjustmentFactor = 0;
@@ -1090,7 +1094,7 @@ class SlideDeckVisualization {
                     ", 0)");
             });
             this._draggedSlideReAdjustmentFactor = 0;
-            if (draggedObject.className == "vertical-line-seek") {
+            if (draggedObject.className === "vertical-line-seek") {
                 this._currentTime = draggedObject.x1;
             }
         };
@@ -1201,10 +1205,12 @@ class SlideDeckVisualization {
             }
         };
         this.startPlaying = () => {
-            select('#pauseBtn').attr('style', 'display: block');
-            select('#playBtn').attr('style', 'display: none');
-            this._currentlyPlaying = true;
-            this.playTimeline();
+            if (this._shiftedPosition !== this._placeholderX + this._originPosition) {
+                select('#pauseBtn').attr('style', 'display: block');
+                select('#playBtn').attr('style', 'display: none');
+                this._currentlyPlaying = true;
+                this.playTimeline();
+            }
         };
         this.stopPlaying = () => {
             this._currentlyPlaying = false;
@@ -1266,17 +1272,20 @@ class SlideDeckVisualization {
             if (this._currentTime < 0) {
                 this._currentTime = 0;
             }
-            const shiftedPosition = this._originPosition + timeWidth - this._timelineShift;
+            this._shiftedPosition = this._originPosition + timeWidth - this._timelineShift;
+            this._shiftedPosition = this._shiftedPosition < this._originPosition ? this._originPosition : this._shiftedPosition;
+            this._shiftedPosition = this._shiftedPosition > this._placeholderX + this._originPosition ? this._placeholderX + this._originPosition : this._shiftedPosition;
+            this._currentlyPlaying = this._shiftedPosition === this._placeholderX + this._originPosition ? false : this._currentlyPlaying;
             this._slideTable
                 .select("circle.currentTime")
                 .attr("id", "currentTimeCircle")
-                .attr("cx", shiftedPosition + 5)
+                .attr("cx", this._shiftedPosition + 3)
                 .raise();
             this._slideTable
                 .select("line.vertical-line-seek")
-                .attr("x1", shiftedPosition + 5)
+                .attr("x1", this._shiftedPosition + 3)
                 .attr("y1", 65)
-                .attr("x2", shiftedPosition + 5)
+                .attr("x2", this._shiftedPosition + 3)
                 .attr("y2", 0)
                 .raise();
         }; // to do: display time on seek bar
@@ -1286,7 +1295,7 @@ class SlideDeckVisualization {
                 .attr("x", this._placeholderX + 105 - this._timelineShift)
                 .attr("y", 15);
         };
-        this._tableWidth = window.innerWidth - 100;
+        this._tableWidth = this._originPosition + this._placeholderWidth;
         window.addEventListener("resize", this.resizeTable);
         this._slideDeck = slideDeck;
         this._root = select(elm);
@@ -1383,32 +1392,24 @@ class SlideDeckVisualization {
             .append("textarea")
             .attr('id', 'textArea')
             .attr('placeholder', 'Type here to add an annotation')
-            .attr("x", 0)
-            .attr("y", 0)
             .attr("rows", 4);
         select("#slideDeck")
             .append("input")
             .attr('id', 'slideLeft')
             .attr("type", "button")
-            .attr("value", "<")
-            .attr("x", 0)
-            .attr("y", 0)
-            .on("click", this.slideSliceLeft);
+            .attr("value", "  <  ")
+            .on("click", this.slideSliceRight);
         select("#slideDeck")
             .append("input")
             .attr('id', 'slideRight')
             .attr("type", "button")
-            .attr("value", ">")
-            .attr("x", 0)
-            .attr("y", 0)
-            .on("click", this.slideSliceRight);
+            .attr("value", "  >  ")
+            .on("click", this.slideSliceLeft);
         select("#slideDeck")
             .append("input")
             .attr('id', 'addButton')
             .attr("type", "button")
             .attr("value", "Annotate")
-            .attr("x", 0)
-            .attr("y", 0)
             .on("click", this.addAnnotation);
         slideDeck.on("slideAdded", () => this.update());
         slideDeck.on("slideRemoved", () => this.update());
@@ -1467,7 +1468,7 @@ class SlideDeckVisualization {
         }, intervalStepMS);
     }
     resizeTable() {
-        this._tableWidth = window.innerWidth - 400;
+        this._tableWidth = this._tableWidth / 2;
         select(".slide__table").attr("width", this._tableWidth);
     }
     update() {
@@ -1568,6 +1569,7 @@ class SlideDeckVisualization {
             .attr("transform", (slide) => {
             this._previousSlideX = this.previousSlidesWidth(slide);
             slide.xPosition = 50 + this._resizebarwidth + this.previousSlidesWidth(slide);
+            slide.mainAnnotation = slide.mainAnnotation;
             return ("translate(" + (slide.xPosition - this._timelineShift) + ", 0 )");
         });
         allNodes
@@ -1664,13 +1666,21 @@ class SlideDeckVisualization {
             return this.barTotalWidth(slide) + this._barPadding + 10;
         })
             .text((slide) => {
-            return ((this._slideDeck.startTime(slide) + slide.duration + slide.transitionTime) / 1000).toFixed(2);
+            const totalTime = (this._slideDeck.startTime(slide) + slide.duration + slide.transitionTime) / 1000;
+            return (totalTime).toFixed(2);
         });
         placeholder.attr("x", this._placeholderX + 80 - this._timelineShift);
+        this._tableWidth = this._originPosition + this._barPadding + this._placeholderX + 100;
+        select(".slide__table").attr("width", this._tableWidth);
         this.adjustSlideAddObjectPosition();
         this.drawSeekBar();
         this.fixDrawingPriorities();
         allExistingNodes.exit().remove();
+        if (!this._currentlyPlaying) {
+            select('#pauseBtn').attr('style', 'display: none');
+            select('#playBtn').attr('style', 'display: block');
+            this.stopPlaying();
+        }
     }
     setDeck(deck) {
         this._slideDeck = deck;

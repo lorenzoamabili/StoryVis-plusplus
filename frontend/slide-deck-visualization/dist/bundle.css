@@ -99,9 +99,12 @@ rect.add_annotation {
 }
 
 #textArea{
+    position: absolute;
+    top: 5%;
+    right: 1%;
     overflow: hidden;
     width: 30%;
-    height: 70%;
+    height: 60%;
     font-size: 16px;
     border-radius: 5px;
 }
@@ -117,7 +120,7 @@ rect.add_annotation {
 #slideLeft{
     position: absolute;
     bottom: 5%;
-    right: 8%;
+    right: 15%;
     border-radius: 5px;
     border-width: 1px;
 }
@@ -125,7 +128,7 @@ rect.add_annotation {
 #slideRight{
     position: absolute;
     bottom: 5%;
-    right: 6%;
+    right: 10%;
     border-radius: 5px;
     border-width: 1px;
 }

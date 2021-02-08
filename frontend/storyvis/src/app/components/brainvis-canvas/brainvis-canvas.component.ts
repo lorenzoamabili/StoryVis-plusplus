@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
+import * as d3 from 'd3';
 
 import {
   Component, ElementRef, HostListener, OnInit, Input, EventEmitter, Output,
@@ -16,6 +17,7 @@ import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 import { ProvenanceService } from '../../shared/_services/provenance.service';
 import { StyledSliderPracticeComponent } from '../styled-slider-practice/styled-slider-practice.component';
 import { StyledSliderExplorationComponent } from '../styled-slider-exploration/styled-slider-exploration.component';
+import html2canvas from 'html2canvas';
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -31,6 +33,7 @@ export enum VIEWS {
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
   @Input() studyStarted: boolean;
+  @Output() magnificationCreated = new EventEmitter<{ domID: String, oneView: boolean }>();
   @Output() nullCreated = new EventEmitter<any>();
   @Output() slicesLocationCreated = new EventEmitter<{ slicesPosition: ISlicePosition[], slicesCameraZoom: number[] }>();
   @Output() resetWLCreated = new EventEmitter<{ valueW: any, valueC: any, slider: string, setting: string }>();
@@ -59,10 +62,19 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   public _initialized = false;
   public settings = Settings.getInstance(this);
+  public screenWidth = window.innerWidth;
+  public screenHeight = window.innerHeight;
+  public dashboardOpen;
+  public datacomicsOpen;
+  public scrollytellingOpen;
 
   private stack: any;
   public sliderPractice: StyledSliderPracticeComponent;
   public sliderExploration: StyledSliderExplorationComponent;
+
+  private framesCounter: number = 0;
+  private frames: HTMLDivElement[] = [];
+  private textAreas: HTMLTextAreaElement[] = [];
 
   private elem: Element;
   public views: View[] = [
@@ -128,13 +140,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   public _axialRenderer: Renderer2D;
   public _coronalRenderer: Renderer2D;
   public _sagittalRenderer: Renderer2D;
-
-  private oldStackDragA: ISlicePosition;
-  private oldStackDragC: ISlicePosition;
-  private oldStackDragS: ISlicePosition;
-  private oldStackZoomA: number;
-  private oldStackZoomC: number;
-  private oldStackZoomS: number;
 
   // extra variables to show mesh plane intersections in 2D renderers
   private clipPlaneAxial = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
@@ -221,6 +226,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.settings.voxelprobeModeChange.subscribe(this.toggleVoxelprobeMode.bind(this));
     this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
 
+    this.settings.datacomicsModeChange.subscribe(this.toggleDatacomicsMode.bind(this));
+    this.settings.scrollytellingModeChange.subscribe(this.toggleScrollytellingMode.bind(this));
+
     addListeners(this._provenance.tracker);
   }
 
@@ -243,12 +251,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.stack = series.stack[0];
       this.stack.prepare();
 
+
       // set camera and scene
       this.prepareCamera(this._perspectiveRenderer);
       this.prepareScene(this._axialRenderer);
-      this.resetWindowLevel1();
 
+      this.resetWindowLevel1();
       this._perspectiveRenderer.originalSliceOrientation = this._perspectiveRenderer.getCameraOrientation();
+
 
       // // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
@@ -332,49 +342,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   // }
 
   displayOneView(viewID: string) {
-    const oldPerspectiveRenderer = this._perspectiveRenderer;
-
-    const oldStackIndexA = this._axialRenderer.stackHelper.index;
-    const oldStackIndexC = this._coronalRenderer.stackHelper.index;
-    const oldStackIndexS = this._sagittalRenderer.stackHelper.index;
-
-
-    if (this.settings.isOneView === '') {
-
-      this.oldStackDragA = this._axialRenderer.getSlicePosition();
-      this.oldStackDragC = this._coronalRenderer.getSlicePosition();
-      this.oldStackDragS = this._sagittalRenderer.getSlicePosition();
-
-      this.oldStackZoomA = this._axialRenderer.camera.zoom;
-      this.oldStackZoomC = this._coronalRenderer.camera.zoom;
-      this.oldStackZoomS = this._sagittalRenderer.camera.zoom;
-
+    if (!this.settings.isOneView) {
       this.createOneView(viewID);
+      this.magnificationCreated.emit({ domID: viewID, oneView: false });
     } else {
       this.create4Views(viewID);
+      this.magnificationCreated.emit({ domID: viewID, oneView: true });
     }
-
-    this.removeScene();
-
-    this.prepareCamera(this._perspectiveRenderer);
-    this._perspectiveRenderer.setCameraOrientation(oldPerspectiveRenderer.getCameraOrientation(), 10);
-    this.prepareScene(this._axialRenderer);
-
-    this.setSliceIndex(VIEWS.AXIAL, oldStackIndexA);
-    this.setSliceIndex(VIEWS.CORONAL, oldStackIndexC);
-    this.setSliceIndex(VIEWS.SAGITTAL, oldStackIndexS);
-
-
-    if (this.settings.isOneView === '') {
-      this.setSliceDrag(this.oldStackDragA, VIEWS.AXIAL, 10);
-      this.setSliceDrag(this.oldStackDragC, VIEWS.CORONAL, 10);
-      this.setSliceDrag(this.oldStackDragS, VIEWS.SAGITTAL, 10);
-
-      this.setSliceZoom(this.oldStackZoomA, VIEWS.AXIAL, 10);
-      this.setSliceZoom(this.oldStackZoomC, VIEWS.CORONAL, 10);
-      this.setSliceZoom(this.oldStackZoomS, VIEWS.SAGITTAL, 10);
-    }
-
   }
 
 
@@ -396,12 +370,197 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
     this.renderers.forEach(renderer => renderer.domElement.setAttribute('style', 'display: block;'));
 
-    this.settings.isOneView = '';
+    this.settings.isOneView = null;
   }
 
 
+  addFrame(dashboard: any, viewID?: string) {
+    const elmId = viewID ? viewID : this.settings.isOneView;
+    this.framesCounter = this.framesCounter + 1;
+
+    const frame = document.createElement('div');
+    frame.setAttribute('id', 'frame' + this.framesCounter);
+    frame.setAttribute('class', 'storytelling-item');
+    // frame.setAttribute('style', 'display: flex;');
+    dashboard.appendChild(frame);
+    this.frames.push(frame);
+
+
+    html2canvas(document.getElementById(elmId)).then(canvas => {
+      canvas.className = 'canvas';
+      canvas.id = 'canvas' + this.framesCounter;
+      frame.appendChild(canvas);
+    });
+  }
+
+  displayScrollytelling() {
+    if (this.scrollytellingOpen) {
+      document.getElementById('main').setAttribute('style', 'display: none;');
+      document.getElementById('scrollytelling').setAttribute('style', 'display: block;');
+      // this.frames.forEach((frame: any) => frame.setAttribute('style', 'position: static;'));
+      d3.selectAll('.canvas').attr('style', 'width: ' + this.screenWidth / 2 + 'px; height: ' + this.screenWidth / 2 * (this.screenHeight / this.screenWidth) + 'px; padding: 5px 15px; background-color: white;');
+      d3.selectAll('.storytelling-item').attr('style', 'width: fit-content; height: fit-content;');
+      // d3.selectAll('.textArea').attr('style', 'width: ' + this.screenWidth / 2 + 'px; height: 400px; z-index: 13; font-size: 16px; border-radius: 5px; margin: 50px');
+    } else {
+      this.switchToMainView();
+    }
+  }
+
+  displayDatacomics() {
+    if (this.datacomicsOpen) {
+      document.getElementById('main').setAttribute('style', 'display: none;');
+      document.getElementById('datacomics').setAttribute('style', 'display: -webkit-inline-box;')
+      this.frames.forEach((frame: any) => frame.setAttribute('style', 'display: block;'));
+      const gridFactorX =
+        (this.framesCounter < 5) ? 2 :
+          (this.framesCounter < 10) ? 3 :
+            (this.framesCounter < 17) ? 4 : 5;
+      d3.selectAll('.canvas').attr('style', 'width: ' + this.screenWidth / gridFactorX + 'px; height: ' + this.screenWidth / gridFactorX * (this.screenHeight / this.screenWidth) + 'px; padding: 5px 15px; background-color: white;');
+      d3.selectAll('.storytelling-item').attr('style', 'width: fit-content; height: fit-content;');
+      // d3.selectAll('.textArea').attr('style', 'width: ' + this.screenWidth / 2 + 'px; z-index: 13; font-size: 16px; border-radius: 5px; margin: 50px');
+    } else {
+      this.switchToMainView();
+    }
+  }
+
+  rearrangeFrames() {
+    this.frames.forEach((frame: any) => frame.setAttribute('style', 'position: absolute; cursor: move;'));
+    // this.textAreas.forEach((textArea: any) => textArea.setAttribute('style', 'position: absolute; cursor: move; overflow: hidden; z-index: 13; font-size: 16px; border-radius: 5px; height: 100px;'));
+    this.frames.forEach((frame: any) => this.dragFrame(frame));
+    this.scaleFrames(this.frames);
+
+
+    // this.textAreas.forEach((textArea: any) => this.dragFrame(textArea));
+    // d3.selectAll('.canvas').attr('style', 'cursor: w-resize; resize: both; position: absolute;').each((x : HTMLCanvasElement) => this.makeResizableDiv(x));
+  }
+
+  addTextArea() {
+    const textArea = document.createElement('textarea');
+    textArea.setAttribute('class', 'textArea');
+    textArea.setAttribute('placeholder', 'Add some text to the frame here.');
+
+    if (this.datacomicsOpen) {
+      document.getElementById('datacomics').appendChild(textArea);
+    } else if (this.scrollytellingOpen) {
+      document.getElementById('scrollytelling').appendChild(textArea);
+    }
+
+    this.textAreas.push(textArea);
+    textArea.setAttribute('style', 'width: 300px; position: absolute; cursor: move; resize: both; overflow: hidden; z-index: 13; font-size: 16px; border-radius: 5px; height: 100px; top: 0; left: 0;');
+    this.dragFrame(textArea);
+  }
+
+  switchToMainView() {
+    document.getElementById('main').setAttribute('style', 'display: flex;');
+    document.getElementById('datacomics').setAttribute('style', 'display: none;');
+    document.getElementById('scrollytelling').setAttribute('style', 'display: none;');
+  }
+
+  clearDashboard() {
+    if (this.datacomicsOpen) {
+      document.getElementById('datacomics').innerHTML = '';
+    } else if (this.scrollytellingOpen) {
+      document.getElementById('scrollytelling').innerHTML = '';
+    }
+  }
+
+  dragFrame(frame: any) {
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    frame.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+      var evtobj = window.event ? event : e;
+
+      if (evtobj.ctrlKey) {
+        e = e || window.event;
+        e.preventDefault();
+
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+      }
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      frame.style.top = (frame.offsetTop - pos2) + 'px';
+      frame.style.left = (frame.offsetLeft - pos1) + 'px';
+    }
+
+    function closeDragElement() {
+      // stop moving when mouse button is released:
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
+
+  scaleFrames(contents: HTMLDivElement[]) {
+    var zX = 1;
+    window.addEventListener('wheel', (e) => {
+      var dir;
+      dir = (e.deltaY > 0) ? 0.1 : -0.1;
+      zX += dir;
+      // if (e.altKey) {
+      //   var x = e.clientX, y = e.clientY,
+      //     elementMouseIsOver = document.elementFromPoint(x, y) as HTMLDivElement;
+      //   elementMouseIsOver.style.transform = 'scale(' + zX + ')';
+      //   return;
+      // } else 
+      if (e.ctrlKey) {
+        for (var i = 0; i < contents.length; i++) {
+          contents[i].style.transform = 'scale(' + zX + ')';
+        }
+      }
+      // e.preventDefault();
+      return;
+    });
+  }
+
+  removeLocalizers() {
+    this._axialRenderer.removeLocalizers();
+    this._coronalRenderer.removeLocalizers();
+    this._sagittalRenderer.removeLocalizers();
+    this.settings.localizersOn = false;
+  }
+
+  createLocalizers() {
+    // create new mesh with Localizer shaders
+    const plane1 = this._axialRenderer.stackHelper.slice.cartesianEquation();
+    const plane2 = this._coronalRenderer.stackHelper.slice.cartesianEquation();
+    const plane3 = this._sagittalRenderer.stackHelper.slice.cartesianEquation();
+    // localizer axial slice
+    this._axialRenderer.initHelpersLocalizer(this.stack, plane1, [
+      { plane: plane2, color: new THREE.Color(this._coronalRenderer.stackHelper.borderColor) },
+      { plane: plane3, color: new THREE.Color(this._sagittalRenderer.stackHelper.borderColor) },
+    ]);
+
+    // localizer coronal slice
+    this._coronalRenderer.initHelpersLocalizer(this.stack, plane2, [
+      { plane: plane1, color: new THREE.Color(this._axialRenderer.stackHelper.borderColor) },
+      { plane: plane3, color: new THREE.Color(this._sagittalRenderer.stackHelper.borderColor) },
+    ]);
+
+    // localizer sagittal slice
+    this._sagittalRenderer.initHelpersLocalizer(this.stack, plane3, [
+      { plane: plane1, color: new THREE.Color(this._axialRenderer.stackHelper.borderColor) },
+      { plane: plane2, color: new THREE.Color(this._coronalRenderer.stackHelper.borderColor) },
+    ]);
+    this.settings.localizersOn = true;
+  }
+
   onAxialChanged() {
-    // this._axialRenderer.updateLocalizer([this._coronalRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
+    this._axialRenderer.updateLocalizer([this._coronalRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
     this._axialRenderer.updateClipPlane(this.clipPlaneAxial);
     if (this.contourHelper) {
       this.contourHelper.geometry = this._axialRenderer.stackHelper.slice.geometry;
@@ -409,12 +568,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   onCoronalChanged() {
-    // this._coronalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
+    this._coronalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
     this._coronalRenderer.updateClipPlane(this.clipPlaneCoronal);
   }
 
   onSagittalChanged() {
-    // this._sagittalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._coronalRenderer.localizerHelper]);
+    this._sagittalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._coronalRenderer.localizerHelper]);
     this._sagittalRenderer.updateClipPlane(this.clipPlaneSagittal);
   }
 
@@ -455,7 +614,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   resetWindowLevel2() {
     this.setWindowLevel(350, 50, 'both');
   }
-
 
 
   resetSlicesLocationParam() {
@@ -593,6 +751,15 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.onSagittalChanged();
   }
 
+  adjustLocalizersOnDoubleClick(ijk: any) {
+    this._axialRenderer.stackHelper.index = ijk.getComponent((this._axialRenderer.stackHelper.orientation + 2) % 3);
+    this._coronalRenderer.stackHelper.index = ijk.getComponent((this._coronalRenderer.stackHelper.orientation + 2) % 3);
+    this._sagittalRenderer.stackHelper.index = ijk.getComponent((this._sagittalRenderer.stackHelper.orientation + 2) % 3);
+
+    this.onAxialChanged();
+    this.onCoronalChanged();
+    this.onSagittalChanged();
+  }
 
   setPerspectiveCameraZoom(args: IOrientation, transitionTime: number) {
     this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
@@ -622,10 +789,55 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     }
   }
 
-  setSliceIndex(sliceOrientation: VIEWS, newIndex: number) {
-    const renderer = this.getRenderer(sliceOrientation);
-    renderer.stackHelper.index = newIndex;
+  setSliceIndex(sliceOrientation: VIEWS, newIndex: number, transitionTime: number) {
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.changeSliceIndex(newIndex, transitionTime);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.changeSliceIndex(newIndex, transitionTime);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.changeSliceIndex(newIndex, transitionTime);
+    }
   }
+
+
+  navigateVolume(sliceOrientation: VIEWS, newIndex: number, transitionTime: number) {
+    console.log(this._axialRenderer.stackHelper.index);
+    // this.renderAllArtifacts(sliceOrientation);
+    if (sliceOrientation === 'axial') {
+      this._axialRenderer.setSliceIndex(this._axialRenderer.stackHelper.index, newIndex, transitionTime);
+    } else if (sliceOrientation === 'coronal') {
+      this._coronalRenderer.setSliceIndex(this._coronalRenderer.stackHelper.index, newIndex, transitionTime);
+    } else if (sliceOrientation === 'sagittal') {
+      this._sagittalRenderer.setSliceIndex(this._sagittalRenderer.stackHelper.index, newIndex, transitionTime);
+    }
+    // this.removeAllArtifacts(sliceOrientation);
+  }
+
+
+  renderAllArtifacts(sliceOrientation: VIEWS) {
+    let index = 0;
+    if (sliceOrientation === 'axial') {
+      for (let i = 0; i < this._axialRenderer.stackHelper._orientationMaxIndex - 1; i++) {
+        index = index + 1;
+        this._axialRenderer.renderFromSliceChange(index);
+      }
+    } else if (sliceOrientation === 'coronal') {
+      for (let i = 0; i < this._coronalRenderer.stackHelper._orientationMaxIndex - 1; i++) {
+        index = index + 1;
+        this._coronalRenderer.renderFromSliceChange(index);
+      }
+    } else if (sliceOrientation === 'sagittal') {
+      for (let i = 0; i < this._sagittalRenderer.stackHelper._orientationMaxIndex - 1; i++) {
+        index = index + 1;
+        this._sagittalRenderer.renderFromSliceChange(index);
+      }
+    }
+  }
+
+  // setSliceIndex(sliceOrientation: VIEWS, newIndex: number) {
+  //   const renderer = this.getRenderer(sliceOrientation);
+  //   renderer.stackHelper.index = newIndex;
+  // }
 
   changeSliceRemove(sliceOrientation: VIEWS, oldIndex: number) {
     if (sliceOrientation === 'axial') {
@@ -646,6 +858,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this._sagittalRenderer.renderFromSliceChange(newIndex);
     }
   }
+
+
 
   renderMeasurements(artifacts) {
     artifacts.forEach(artifact => this.renderArtifact(artifact.sliceOrientation, artifact));
@@ -706,5 +920,15 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   toggleAnnotationMode(isEnabled: boolean) {
     this.renderers2D.forEach(renderer => renderer.annotationMode = isEnabled)
   };
+
+  toggleDatacomicsMode(isEnabled: boolean) {
+    this.dashboardOpen = isEnabled;
+    this.datacomicsOpen = isEnabled;
+  }
+
+  toggleScrollytellingMode(isEnabled: boolean) {
+    this.dashboardOpen = isEnabled;
+    this.scrollytellingOpen = isEnabled;
+  }
 }
 

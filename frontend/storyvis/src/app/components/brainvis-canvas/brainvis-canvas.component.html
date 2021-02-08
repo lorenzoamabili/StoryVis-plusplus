@@ -1,6 +1,55 @@
 <div id="main" class="visualizer">
-    <div id="r0" class="renderer"></div>
-    <div id="r1" class="renderer"></div>
-    <div id="r2" class="renderer"></div>
-    <div id="r3" class="renderer"></div>
+    <div id="r0" class="renderer">
+        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r0" (click)="displayOneView('r0');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r0');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up" (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down" (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+    </div>
+    <div id="r1" class="renderer">
+        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r1" (click)="displayOneView('r1');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r1');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+    </div>
+    <div id="r2" class="renderer">
+        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r2" (click)="displayOneView('r2');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r2');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up" (click)="navigateVolume('coronal', this._coronalRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down" (click)="navigateVolume('coronal', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+    </div>
+    <div id="r3" class="renderer">
+        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r3" (click)="displayOneView('r3');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r3');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up" (click)="navigateVolume('sagittal', this._sagittalRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down" (click)="navigateVolume('sagittal', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+    </div>
+    
 </div>
+<div id="datacomics" class="storytelling-container" style="display: none;"></div>
+<div id="scrollytelling" class="storytelling-container" style="display: none;"></div>

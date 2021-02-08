@@ -43,6 +43,87 @@
   overflow: hidden;
 }
 
+#magnification-r0 {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 0%;
+}
+#magnification-r1 {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 0%;
+}
+#magnification-r2 {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 0%;
+}
+#magnification-r3 {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 0%;
+}
+.magnification-exit {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 1%;
+}
+
+
+#navigation-r0-up {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 5%;
+}
+#navigation-r2-up {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 5%;
+}
+#navigation-r3-up {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 5%;
+}
+#navigation-r0-down {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 10%;
+}
+#navigation-r2-down {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 10%;
+}
+#navigation-r3-down {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 10%;
+}
+
+.navigation-up {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 5%;
+}
+.navigation-down {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 8%;
+}
 
 /* 
 #r0 {

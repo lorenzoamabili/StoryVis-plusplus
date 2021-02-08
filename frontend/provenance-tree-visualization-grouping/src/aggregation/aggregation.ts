@@ -60,4 +60,38 @@ export function aggregateNodes(
   // } else {
   //   this.dataAggregation.algorithm(currentHierarchyNode.data, rootNode, this.dataAggregation.test);
   // }
-}
+  }
+
+  export function filterNodes(
+    aggregation: IAggregation,
+    rootNode: IGroupedTreeNode<ProvenanceNode>,
+    currentNode: ProvenanceNode
+  ): void {
+    // d3.hierarchy wraps nodes recursively and adds some helpers
+    // See https://github.com/d3/d3-hierarchy#hierarchy
+    const hierarchyRoot: d3.HierarchyNode<
+      IGroupedTreeNode<ProvenanceNode>
+    > = d3.hierarchy(rootNode);
+  
+    // the HierarchyNode containing the active ProvenanceTree node
+    const currentHierarchyNode = findHierarchyNodeFromProvenanceNode(
+      hierarchyRoot,
+      currentNode
+    );
+  
+    const mainBranch: NodeIdentifier[] = hierarchyRoot
+      .path(currentHierarchyNode)
+      .map(d => d.data.wrappedNodes[0].id);
+  
+    // if (this.dataAggregation.arg) {
+    aggregation.aggregator.algorithm(
+      currentHierarchyNode.data,
+      rootNode,
+      aggregation.aggregator.tests,
+      mainBranch,
+      aggregation.arg
+    );
+    // } else {
+    //   this.dataAggregation.algorithm(currentHierarchyNode.data, rootNode, this.dataAggregation.test);
+    // }
+    }

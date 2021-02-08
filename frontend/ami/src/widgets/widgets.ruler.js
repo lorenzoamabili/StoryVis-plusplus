@@ -23,8 +23,17 @@ const widgetsRuler = (three = window.THREE) => {
       this._distance = null;
       this._units = !this._calibrationFactor && !params.pixelSpacing ? 'units' : 'mm';
 
+      this._container.style.cursor = 'pointer';
       this._moving = false;
       this._domHovered = false;
+      this._initialized = false; // set to true when the name of the label is entered
+      this._movinglabel = null; // bool that turns true when the label is moving with the mouse
+      this._labelmoved = false; // bool that turns true once the label is moved by the user (at least once)
+      this._labelhovered = false;
+      this._manuallabeldisplay = false; // Make true to force the label to be displayed
+      this._labeltext = null;
+      this._labelOffset = new three.Vector3(); // difference between label center and second handle
+      this._mouseLabelOffset = new three.Vector3(); // difference between mouse coordinates and label center
 
       // mesh stuff
       this._material = null;
@@ -32,6 +41,7 @@ const widgetsRuler = (three = window.THREE) => {
       this._mesh = null;
 
       // dom stuff
+      this._dashline = null;
       this._line = null;
       this._label = null;
 
@@ -54,9 +64,12 @@ const widgetsRuler = (three = window.THREE) => {
       this._moveHandle.hide();
 
       this.create();
+      this.initOffsets();
 
       this.onMove = this.onMove.bind(this);
       this.onHover = this.onHover.bind(this);
+      this.onHoverlabel = this.onHoverlabel.bind(this);
+      this.notonHoverlabel = this.notonHoverlabel.bind(this);
       this.addEventListeners();
     }
 
@@ -65,8 +78,8 @@ const widgetsRuler = (three = window.THREE) => {
 
       this._line.addEventListener('mouseenter', this.onHover);
       this._line.addEventListener('mouseleave', this.onHover);
-      this._label.addEventListener('mouseenter', this.onHover);
-      this._label.addEventListener('mouseleave', this.onHover);
+      this._label.addEventListener('mouseenter', this.onHoverlabel);
+      this._label.addEventListener('mouseleave', this.notonHoverlabel);
     }
 
     removeEventListeners() {
@@ -74,9 +87,10 @@ const widgetsRuler = (three = window.THREE) => {
 
       this._line.removeEventListener('mouseenter', this.onHover);
       this._line.removeEventListener('mouseleave', this.onHover);
-      this._label.removeEventListener('mouseenter', this.onHover);
-      this._label.removeEventListener('mouseleave', this.onHover);
+      this._label.removeEventListener('mouseenter', this.onHoverlabel);
+      this._label.removeEventListener('mouseleave', this.notonHoverlabel);
     }
+
 
     onHover(evt) {
       if (evt) {
@@ -97,7 +111,34 @@ const widgetsRuler = (three = window.THREE) => {
       this._domHovered = evt.type === 'mouseenter';
     }
 
+    onHoverlabel() {
+      // this function is called when mouse enters the label with "mouseenter" event
+      this._labelhovered = true;
+      this._container.style.cursor = 'pointer';
+    }
+
+    notonHoverlabel() {
+      // this function is called when mouse leaves the label with "mouseleave" event
+      this._labelhovered = false;
+      this._container.style.cursor = 'default';
+    }
+
     onStart(evt) {
+      if (this._labelhovered) {
+        // if label hovered then it should be moved
+        // save mouse coordinates offset from label center
+        const offsets = this.getMouseOffsets(evt, this._container);
+        const paddingPoint = this._handles[1].screenPosition.clone().sub(this._labelOffset);
+
+        this._mouseLabelOffset = new three.Vector3(
+          offsets.screenX - paddingPoint.x,
+          offsets.screenY - paddingPoint.y,
+          0
+        );
+        this._movinglabel = true;
+        this._labelmoved = true;
+      }
+
       this._moveHandle.onMove(evt, true);
 
       this._handles[0].onStart(evt);
@@ -114,11 +155,23 @@ const widgetsRuler = (three = window.THREE) => {
     }
 
     onMove(evt) {
+      if (this._movinglabel) {
+        const offsets = this.getMouseOffsets(evt, this._container);
+
+        this._labelOffset = new three.Vector3(
+          this._handles[1].screenPosition.x - offsets.screenX + this._mouseLabelOffset.x,
+          this._handles[1].screenPosition.y - offsets.screenY + this._mouseLabelOffset.y,
+          0
+        );
+        this._controls.enabled = false;
+      }
+
       if (this._active) {
         const prevPosition = this._moveHandle.worldPosition.clone();
 
         this._dragged = true;
         this._moveHandle.onMove(evt, true);
+        this._hovered = this._handles[0].active || this._handles[1].active || this._labelhovered;
 
         if (this._moving) {
           this._handles.slice(0, -1).forEach(handle => {
@@ -160,7 +213,9 @@ const widgetsRuler = (three = window.THREE) => {
       this._handles[1].selected = this._selected;
 
       this._active = this._handles[0].active || this._handles[1].active;
+      this._initialized = true;
       this._dragged = false;
+      this._movinglabel = false;
       this._moving = false;
 
       this.update();
@@ -190,6 +245,10 @@ const widgetsRuler = (three = window.THREE) => {
     }
 
     createDOM() {
+      this._dashline = document.createElement('div');
+      this._dashline.className = 'widgets-dashline';
+      this._container.appendChild(this._dashline);
+
       this._line = document.createElement('div');
       this._line.className = 'widgets-line';
       this._container.appendChild(this._line);
@@ -251,7 +310,11 @@ const widgetsRuler = (three = window.THREE) => {
     }
 
     updateDOM() {
-      this.updateDOMColor();
+      // this.updateDOMColor();
+
+      const transform = this.adjustLabelTransform(this._label, this._handles[1].screenPosition, true);
+
+      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
 
       // update line
       const lineData = this.getLineData(
@@ -261,11 +324,12 @@ const widgetsRuler = (three = window.THREE) => {
 
       this._line.style.transform = `translate3D(${lineData.transformX}px, ${
         lineData.transformY
-      }px, 0)
+        }px, 0)
       rotate(${lineData.transformAngle}rad)`;
       this._line.style.width = lineData.length + 'px';
 
-      // update label
+
+
       if (this._units === 'units' && !this._label.hasAttribute('title')) {
         this._label.setAttribute('title', 'Calibration is required to display the distance in mm');
         this._label.style.color = this._colors.error;
@@ -280,24 +344,72 @@ const widgetsRuler = (three = window.THREE) => {
         angle = Math.PI - angle;
       }
 
-      const labelPadding =
-        Math.tan(angle) < this._label.offsetHeight / this._label.offsetWidth
-          ? this._label.offsetWidth / 2 / Math.cos(angle) + 15 // 5px for each handle + padding
-          : this._label.offsetHeight / 2 / Math.cos(Math.PI / 2 - angle) + 15;
-      const paddingVector = lineData.line.normalize().multiplyScalar(labelPadding);
-      const paddingPoint =
-        lineData.length > labelPadding * 2
-          ? this._handles[1].screenPosition.clone().sub(paddingVector)
-          : this._handles[1].screenPosition.clone().add(paddingVector);
-      const transform = this.adjustLabelTransform(this._label, paddingPoint);
+      // const labelPadding =
+      //   Math.tan(angle) < this._label.offsetHeight / this._label.offsetWidth
+      //     ? this._label.offsetWidth / 2 / Math.cos(angle) + 15 // 5px for each handle + padding
+      //     : this._label.offsetHeight / 2 / Math.cos(Math.PI / 2 - angle) + 15;
+      // const paddingVector = lineData.line.normalize().multiplyScalar(labelPadding);
+      // const paddingPoint =
+      //   lineData.length > labelPadding * 2
+      //     ? this._handles[1].screenPosition.clone().sub(paddingVector)
+      //     : this._handles[1].screenPosition.clone().add(paddingVector);
 
-      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
+      // update label
+      const paddingVector = lineData.line.multiplyScalar(0.5);
+      const paddingPoint = this._handles[1].screenPosition.clone().sub(
+        this._labelmoved
+          ? this._labelOffset // if the label is moved, then its position is defined by labelOffset
+          : paddingVector
+      ); // otherwise it's placed in the center of the line
+      const labelPosition = this.adjustLabelTransform(this._label, paddingPoint);
+
+      this._label.style.transform = `translate3D(${labelPosition.x}px, ${labelPosition.y}px, 0)`;
+
+      if (this._manuallabeldisplay) {
+        this.displaylabel();
+      }
+
+      // update dash line
+      let minLine = this.getLineData(this._handles[1].screenPosition, paddingPoint);
+      let line0L = this.getLineData(this._handles[0].screenPosition, paddingPoint);
+      let line1L = this.getLineData(this._handles[1].screenPosition, paddingPoint);
+
+      if (minLine.length > line0L.length) {
+        minLine = line0L;
+      }
+      if (minLine.length > line1L.length) {
+        minLine = line1L;
+      }
+
+      this._dashline.style.transform = `translate3D(${minLine.transformX}px, ${
+        minLine.transformY
+        }px, 0)
+        rotate(${minLine.transformAngle}rad)`;
+      this._dashline.style.width = minLine.length + 'px';
     }
 
     updateDOMColor() {
       this._line.style.backgroundColor = this._color;
       this._label.style.borderColor = this._color;
+      this._dashline.style.borderTop = '1.5px dashed ' + this._color;
     }
+
+    displaylabel() {
+      this._label.innerHTML =
+        typeof this._labeltext === 'string' && this._labeltext.length > 0 // avoid error
+          ? this._labeltext
+          : ''; // empty string is passed or Cancel is pressed
+      // show the label (in css an empty string is used to revert display=none)
+      this._label.style.display = '';
+      this._dashline.style.display = '';
+      this._label.style.transform = `translate3D(
+        ${this._handles[1].screenPosition.x - this._labelOffset.x - this._label.offsetWidth / 2}px,
+        ${this._handles[1].screenPosition.y -
+        this._labelOffset.y -
+        this._label.offsetHeight / 2 -
+        this._container.offsetHeight}px, 0)`;
+    }
+
 
     free() {
       this.removeEventListeners();
@@ -310,6 +422,7 @@ const widgetsRuler = (three = window.THREE) => {
 
       this._container.removeChild(this._line);
       this._container.removeChild(this._label);
+      this._container.removeChild(this._dashline);
 
       // mesh, geometry, material
       this.remove(this._mesh);
@@ -327,6 +440,22 @@ const widgetsRuler = (three = window.THREE) => {
       this._material = null;
 
       super.free();
+    }
+
+    hideDOM() {
+      this._dashline.style.display = 'none';
+      this._label.style.display = 'none';
+      this._handles[0].hideDOM();
+      this._handles[1].hideDOM();
+      this._container.removeChild(this._line);
+    }
+
+    showDOM() {
+      this._dashline.style.display = '';
+      this._label.style.display = '';
+      this._handles[0].showDOM();
+      this._handles[1].showDOM();
+      this._container.appendChild(this._line);
     }
 
     getMeasurements() {

@@ -13,6 +13,8 @@ export class Settings {
     public isOneView: string = '';
     public automaticSettingW: boolean = false;
     public automaticSettingC: boolean = false;
+    public slideDeckOpen: boolean = false;
+    public localizersOn: boolean = false;
 
     public _colorMap = 'grayscale';
 
@@ -22,7 +24,9 @@ export class Settings {
     public _thresholdUpperBoundW;
     public _thresholdLowerBoundC;
     public _thresholdUpperBoundC;
-
+    private _datacomicsMode = false;
+    private _scrollytellingMode = false;
+    
     public rulerOn = false;
     public angleOn = false;
     // public freehandOn = false;
@@ -44,6 +48,8 @@ export class Settings {
     // get freehandMode() { return Settings.instance.freehandOn; }
     get voxelprobeMode() { return Settings.instance.voxelprobeOn; }
     get annotationMode() { return Settings.instance.annotationOn; }
+    get datacomicsMode() { return Settings.instance._datacomicsMode; }
+    get scrollytellingMode() { return Settings.instance._scrollytellingMode; }
 
     constructor() {
     }
@@ -246,6 +252,18 @@ export class Settings {
         }
     }
     @Output() annotationModeChange = new EventEmitter<boolean>();
+
+    @Input() set datacomicsMode(datacomicsMode: boolean) {
+        Settings.instance._datacomicsMode = datacomicsMode;
+        Settings.instance.datacomicsModeChange.emit(datacomicsMode);
+    }
+    @Output() datacomicsModeChange = new EventEmitter<boolean>();
+
+    @Input() set scrollytellingMode(scrollytellingMode: boolean) {
+        Settings.instance._scrollytellingMode = scrollytellingMode;
+        Settings.instance.scrollytellingModeChange.emit(scrollytellingMode);
+    }
+    @Output() scrollytellingModeChange = new EventEmitter<boolean>();
 
     static getInstance(canvas) {
         if (!Settings.instance) {

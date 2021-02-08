@@ -45,15 +45,22 @@ const legendData = {
   ],
   commands: [
     'HOW TO PERFORM SOME INTERACTIONS:',
-    '- RIGHT CLICK+MOUSE MOVE on imaging data = To zoom the imaging data',
+    '- ALT+UPWARD ARROW = Go to the previous node',
+    '- ALT+DOWNWARD ARROW = Go to the next node',
+    '- ALT+X = Go to the root',
+    '- ALT+IntlBackslash = Add all nodes to the slide deck',
+    '- ALT+1 = Add neighbour nodes to the slide deck',
+    '- ALT+W = Add annotation/derivation nodes to the slide deck',
+    '- ALT+CLICK = Add slide to the dashboard',
+    '- RIGHT-CLICK DRAGGING on imaging data = To zoom the imaging data',
     '- SHIFT+CLICK on imaging data = To magnify a view', 
     '- ALT+RIGHT CLICK on measurements = To delete a measurement',
-    '- RIGHT CLICK on graph nodes = To bookmark a node',
-    '- SCROLL on graph = To zoom the graph',
-    '- SCROLL on storyline = To slide the graph',
-    '- SHIFT+SCROLL on storyline = To scale the graph'
+    '- RIGHT CLICK on graph nodes = To bookmark a node and to add one slide representing the current state to the storyline',
+    '- SCROLLING on graph = To zoom the graph',
+    '- SCROLLING on storyline = To slide the graph',
+    '- SHIFT+SCROLLING on storyline = To scale the graph'
   ],
-  instructions: [
+  tasks: [
     'TASKS TO BE PERFORMED:',
     '- TASK 1 = Explore the imaging data to find all nodules/anomalies in it.',
     '- TASK 2 = Measure the diameter of all the nodules/anomalies found in the imaging data.', 
@@ -105,18 +112,18 @@ export function addCommandsList(elm: any) {
     return d;
   });
 }
-  export function addInstructionsList(elm: any) {
-    const instructionsContainer = elm.append('div').attr('class', 'legend')
-      .attr('id', 'instructionsContainer').attr('style', 'margin-bottom: 50px; display: none;');
-    const instructionsList = instructionsContainer.append('ul');
-    const instructionsListItem = instructionsList
+  export function addtasksList(elm: any) {
+    const tasksContainer = elm.append('div').attr('class', 'legend')
+      .attr('id', 'tasksContainer').attr('style', 'margin-bottom: 50px; display: none;');
+    const tasksList = tasksContainer.append('ul');
+    const tasksListItem = tasksList
       .selectAll('li')
-      .data(legendData.instructions)
+      .data(legendData.tasks)
       .enter()
       .append('li');
-      instructionsListItem
+      tasksListItem
       .append('div')
-    instructionsListItem.append('span').text((d: any) => {
+    tasksListItem.append('span').text((d: any) => {
       return d;
     });
   }

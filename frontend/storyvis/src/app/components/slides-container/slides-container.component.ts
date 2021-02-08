@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { trigger, style, animate, transition, state } from '@angular/animations';
+import { Settings } from '../brainvis-canvas/utils/settings';
 
 @Component({
   selector: 'app-slides-container',
@@ -20,6 +21,7 @@ import { trigger, style, animate, transition, state } from '@angular/animations'
 
 export class SlidesContainerComponent {
   @Input() opened = false;
+  public settings = Settings.getInstance(this);
 
   constructor() {
   }
@@ -29,10 +31,11 @@ export class SlidesContainerComponent {
     var cont = document.getElementById("textRep");
     if(cont){
       if (this.opened) {
-        cont.style.zIndex = "-1"
+        cont.style.zIndex = "-1";
       } else {
-        cont.style.zIndex = "11"
+        cont.style.zIndex = "11";
       }
+      this.settings.slideDeckOpen = this.opened;
     }
   }
 }

@@ -25,13 +25,13 @@ export class AMIRenderer {
     protected _scene: THREE.Scene;
     protected _light: THREE.Light;
     protected _oldRenderer: any;
+    protected _localizerHelper: AMI.HelpersLocalizer;
+    protected _localizerScene: THREE.Scene;
 
     public _sliceOrientation: string;
     protected _sliceColor: number;
 
     protected _stackHelper: AMI.HelpersStack;
-
-    @Output() magnificationCreated = new EventEmitter<{domID: String, oneView: boolean }>();
 
     constructor(view: View) {
         this._domID = view.domId;
@@ -58,6 +58,10 @@ export class AMIRenderer {
         return this._stackHelper;
     }
 
+    public get localizerHelper(): AMI.HelpersLocalizer {
+        return this._localizerHelper;
+    }
+
     public get renderer() {
         return this._renderer;
     }
@@ -70,28 +74,54 @@ export class AMIRenderer {
         this._controls.addEventListener('mousewheel', this.onScroll.bind(this));
         this._controls.addEventListener('OnScroll', this.onScroll.bind(this));
         this.domElement.addEventListener('click', this.onShiftClick.bind(this));
+        this.domElement.addEventListener('click', this.onAltClick.bind(this));
+        this.domElement.addEventListener('dblclick', this.onDoubleClick.bind(this));
     }
 
 
     protected onScroll(event) {
-        // if (this._initialized) {
+        if (this._initialized) {
 
-        //     this._canvas.onAxialChanged();
-        //     this._canvas.onCoronalChanged();
-        //     this._canvas.onSagittalChanged();
-        // }
+            this._canvas.onAxialChanged();
+            this._canvas.onCoronalChanged();
+            this._canvas.onSagittalChanged();
+        }
     }
 
+    protected onAltClick(event) {
+        if (event.altKey) {
+            if (this._initialized) {
+                this._canvas.addFrame(document.getElementById('datacomics'), this._domID);
+                this._canvas.addFrame(document.getElementById('scrollytelling'), this._domID);
+            }
+        }
+    }
 
     protected onShiftClick(event) {
         if (this._initialized) {
             if (event.shiftKey) {
                 this._canvas.displayOneView(this._domID);
-                if (this._canvas.settings.isOneView !== '') {
-                    this.magnificationCreated.emit({ domID: this._domID, oneView: true });
-                } else {
-                    this.magnificationCreated.emit({ domID: this._domID, oneView: false });
-                }
+            }
+        }
+    }
+
+        protected onDoubleClick(event) {
+        if (this._initialized) {
+            const canvas = event.target.parentElement;
+            const id = event.target.id;
+            const mouse = {
+                x: ((event.clientX - canvas.offsetLeft) / canvas.clientWidth) * 2 - 1,
+                y: -((event.clientY - canvas.offsetTop) / canvas.clientHeight) * 2 + 1,
+            };
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, this._camera);
+
+            const intersects = raycaster.intersectObjects(this._scene.children, true);
+
+            if (intersects.length > 0) {
+                const ijk = AMI.UtilsCore.worldToData(this._stackHelper.stack.lps2IJK, intersects[0].point);
+                this._canvas.adjustLocalizersOnDoubleClick(ijk);
             }
         }
     }

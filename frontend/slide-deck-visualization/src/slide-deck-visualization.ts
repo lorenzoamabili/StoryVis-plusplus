@@ -29,7 +29,7 @@ export class SlideDeckVisualization {
     private _tableHeight = 100;
     private _tableWidth = 1800;
     private _minimumSlideDuration = 100;
-    private _barWidthTimeMultiplier = 0.025;
+    private _barWidthTimeMultiplier = 0.02;
     private _barPadding = 5;
     private _resizebarwidth = 5;
     private _previousSlideX = 0;
@@ -40,6 +40,7 @@ export class SlideDeckVisualization {
     private _toolbarX = 10;
     private _toolbarY = 35;
     private _toolbarPadding = 20;
+    private _shiftedPosition = 0;
     // Upon dragging a slide, no matter where you click on it, the beginning of the slide jumps to the mouse position.
     // This next variable is calculated to adjust for that error, it is a workaround but it works
     private _draggedSlideReAdjustmentFactor = 0;
@@ -57,7 +58,7 @@ export class SlideDeckVisualization {
     public _slidesInDeck: number = 0;
 
     constructor(slideDeck: IProvenanceSlidedeck, elm: HTMLDivElement) {
-        this._tableWidth = window.innerWidth - 100;
+        this._tableWidth = this._originPosition + this._placeholderWidth;
         window.addEventListener("resize", this.resizeTable);
         this._slideDeck = slideDeck;
         this._root = d3.select(elm);
@@ -172,35 +173,27 @@ export class SlideDeckVisualization {
             .append("textarea")
             .attr('id', 'textArea')
             .attr('placeholder', 'Type here to add an annotation')
-            .attr("x", 0)
-            .attr("y", 0)
             .attr("rows", 4);
 
         d3.select("#slideDeck")
             .append("input")
             .attr('id', 'slideLeft')
             .attr("type", "button")
-            .attr("value", "<")
-            .attr("x", 0)
-            .attr("y", 0)
-            .on("click", this.slideSliceLeft);
+            .attr("value", "  <  ")
+            .on("click", this.slideSliceRight);
 
         d3.select("#slideDeck")
             .append("input")
             .attr('id', 'slideRight')
             .attr("type", "button")
-            .attr("value", ">")
-            .attr("x", 0)
-            .attr("y", 0)
-            .on("click", this.slideSliceRight);
+            .attr("value", "  >  ")
+            .on("click", this.slideSliceLeft);
 
         d3.select("#slideDeck")
             .append("input")
             .attr('id', 'addButton')
             .attr("type", "button")
             .attr("value", "Annotate")
-            .attr("x", 0)
-            .attr("y", 0)
             .on("click", this.addAnnotation);
 
         slideDeck.on("slideAdded", () => this.update());
@@ -326,7 +319,7 @@ export class SlideDeckVisualization {
                 );
             });
         this._draggedSlideReAdjustmentFactor = 0;
-        if (draggedObject.className == "vertical-line-seek") {
+        if (draggedObject.className === "vertical-line-seek") {
             this._currentTime = draggedObject.x1;
         }
     }
@@ -514,10 +507,12 @@ export class SlideDeckVisualization {
     }
 
     private startPlaying = () => {
+        if(this._shiftedPosition !== this._placeholderX + this._originPosition){
         d3.select('#pauseBtn').attr('style', 'display: block');
         d3.select('#playBtn').attr('style', 'display: none');
         this._currentlyPlaying = true;
         this.playTimeline();
+    }
     }
 
     private stopPlaying = () => {
@@ -544,7 +539,7 @@ export class SlideDeckVisualization {
     }
 
     private resizeTable() {
-        this._tableWidth = window.innerWidth - 400;
+        this._tableWidth = this._tableWidth / 2;
         d3.select(".slide__table").attr("width", this._tableWidth);
     }
 
@@ -574,7 +569,8 @@ export class SlideDeckVisualization {
         let newAnnotation = textArea.value;
         if (newAnnotation !== null) {
             this._slideDeck.selectedSlide.mainAnnotation = newAnnotation;
-        } else {
+        } 
+        else {
             this._slideDeck.selectedSlide.mainAnnotation = "";
         }
         this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
@@ -598,17 +594,21 @@ export class SlideDeckVisualization {
             this._currentTime = 0;
         }
 
-        const shiftedPosition = this._originPosition + timeWidth - this._timelineShift;
+        this._shiftedPosition = this._originPosition + timeWidth - this._timelineShift;
+        this._shiftedPosition = this._shiftedPosition < this._originPosition ? this._originPosition : this._shiftedPosition; 
+        this._shiftedPosition = this._shiftedPosition > this._placeholderX + this._originPosition ? this._placeholderX + this._originPosition: this._shiftedPosition;
+        this._currentlyPlaying = this._shiftedPosition === this._placeholderX + this._originPosition ? false : this._currentlyPlaying;
+
         this._slideTable
             .select("circle.currentTime")
             .attr("id", "currentTimeCircle")
-            .attr("cx", shiftedPosition + 5)
+            .attr("cx", this._shiftedPosition + 3)
             .raise();
         this._slideTable
             .select("line.vertical-line-seek")
-            .attr("x1", shiftedPosition + 5)
+            .attr("x1", this._shiftedPosition + 3)
             .attr("y1", 65)
-            .attr("x2", shiftedPosition + 5)
+            .attr("x2", this._shiftedPosition + 3)
             .attr("y2", 0)
             .raise();
     }// to do: display time on seek bar
@@ -744,6 +744,7 @@ export class SlideDeckVisualization {
             .attr("transform", (slide: IProvenanceSlide) => {
                 this._previousSlideX = this.previousSlidesWidth(slide);
                 slide.xPosition = 50 + this._resizebarwidth + this.previousSlidesWidth(slide);
+                slide.mainAnnotation = slide.mainAnnotation;
                 return ("translate(" + (slide.xPosition - this._timelineShift) + ", 0 )");
             });
 
@@ -852,10 +853,15 @@ export class SlideDeckVisualization {
                 return this.barTotalWidth(slide) + this._barPadding + 10;
             })
             .text((slide: IProvenanceSlide) => {
-                return ((this._slideDeck.startTime(slide) + slide.duration + slide.transitionTime) / 1000).toFixed(2);
+                const totalTime = (this._slideDeck.startTime(slide) + slide.duration + slide.transitionTime) / 1000;
+                return (totalTime).toFixed(2);
             });
 
         placeholder.attr("x", this._placeholderX + 80 - this._timelineShift);
+
+        this._tableWidth = this._originPosition + this._barPadding + this._placeholderX + 100;
+        d3.select(".slide__table").attr("width", this._tableWidth);
+
 
         this.adjustSlideAddObjectPosition();
 
@@ -864,6 +870,12 @@ export class SlideDeckVisualization {
         this.fixDrawingPriorities();
 
         allExistingNodes.exit().remove();
+
+        if(!this._currentlyPlaying){
+            d3.select('#pauseBtn').attr('style', 'display: none');
+            d3.select('#playBtn').attr('style', 'display: block');
+            this.stopPlaying();
+        }
     }
 
 

@@ -52,7 +52,8 @@ export interface NodeMetadata {
 export interface Artifact {
     id: number;
     measurementType: string;
-    sliceIndex: number;
+    sliceIndexStart: number;
+    sliceIndexEnd: number;
     sliceOrientation: string;
     elements: HTMLElement[] | null;
     elmHTML: any[] | null;
