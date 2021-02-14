@@ -28,7 +28,7 @@ const widgetsAnnotation = (three = window.THREE) => {
       // mesh stuff
       this._material = null;
       this._geometry = null;
-      // this._meshline = null;
+      this._meshline = null;
       this._cone = null;
 
       // dom stuff
@@ -45,11 +45,9 @@ const widgetsAnnotation = (three = window.THREE) => {
       this._handle = new WidgetsHandle(targetMesh, controls, params);
       this.add(this._handle);
 
-      this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
-      this.add(this._moveHandle);
-      this._moveHandle.hide();
-
-      this.create();
+      // this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
+      // this.add(this._moveHandle);
+      // this._moveHandle.hide();
 
       this._handle.active = true;
 
@@ -118,7 +116,7 @@ const widgetsAnnotation = (three = window.THREE) => {
       }
 
       // this._handle.onStart(evt);
-      this._moveHandle.onMove(evt, true);
+      // this._moveHandle.onMove(evt, true);
       this._handle.onStart(evt);
 
       this._active = this._handle.active || this._domHovered;
@@ -144,9 +142,9 @@ const widgetsAnnotation = (three = window.THREE) => {
       // this._handle.onMove(evt);
       this._handle.onMove(evt);
 
-      this._hovered = 
-      // this._handle.hovered || 
-      this._handle.hovered || this._labelhovered;
+      this._hovered =
+        // this._handle.hovered || 
+        this._handle.hovered || this._labelhovered;
 
       this.update();
     }
@@ -168,15 +166,15 @@ const widgetsAnnotation = (three = window.THREE) => {
       }
 
       if (!this._initialized) {
-        this._labelOffset = this._handle.screenPosition
-          .clone()
-          .multiplyScalar(0.5);
+        // this._labelOffset = this._handle.screenPosition
+        //   .clone()
+        //   .multiplyScalar(0.5);
         this.setlabeltext();
         this._initialized = true;
       }
 
-      this._active = 
-      this._handle.active;
+      this._active =
+        this._handle.active;
       this._dragged = false;
       this._movinglabel = false;
       this.update();
@@ -207,12 +205,42 @@ const widgetsAnnotation = (three = window.THREE) => {
       this._label.style.transform = `translate3D(
         ${this._handle.screenPosition.x - this._labelOffset.x - this._label.offsetWidth / 2}px,
         ${this._handle.screenPosition.y -
-          this._labelOffset.y -
-          this._label.offsetHeight / 2 -
-          this._container.offsetHeight}px, 0)`;
+        this._labelOffset.y -
+        this._label.offsetHeight / 2 -
+        this._container.offsetHeight}px, 0)`;
+    }
+
+    createMesh() {
+      // material
+      this._material = new three.LineBasicMaterial();
+
+      this.updateMeshColor();
+
+      // line geometry
+      this._geometry = new three.Geometry();
+      this._geometry.vertices.push(this._handle.worldPosition);
+      this._geometry.vertices.push(this._handle.worldPosition);
+
+      // line mesh
+      this._meshline = new three.Line(this._geometry, this._material);
+      this._meshline.visible = true;
+
+      this.add(this._meshline);
+
+      // cone geometry
+      this._conegeometry = new three.CylinderGeometry(0, 2, 10);
+      this._conegeometry.translate(0, -5, 0);
+      this._conegeometry.rotateX(-Math.PI / 2);
+
+      // cone mesh
+      this._cone = new three.Mesh(this._conegeometry, this._material);
+      this._cone.visible = true;
+
+      this.add(this._cone);
     }
 
     create() {
+      this.createMesh();
       this.createDOM();
     }
 
@@ -234,24 +262,42 @@ const widgetsAnnotation = (three = window.THREE) => {
       this.updateColor();
 
       this._handle.update();
-      this._worldPosition.copy(this._handle.worldPosition);
+      // this._worldPosition.copy(this._handle.worldPosition);
+      this.updateMeshColor();
+      this.updateMeshPosition();
 
       this.updateDOM();
     }
 
+    updateMeshColor() {
+      if (this._material) {
+        this._material.color.set(this._color);
+      }
+    }
+
+    updateMeshPosition() {
+      if (this._geometry) {
+        this._geometry.verticesNeedUpdate = true;
+      }
+
+      if (this._cone) {
+        this._cone.position.copy(this._handle.worldPosition);
+        this._cone.lookAt(this._handle.worldPosition);
+      }
+    }
+
 
     updateDOM() {
-      this.updateDOMColor();
-
-      const transform = this.adjustLabelTransform(this._label, this._handle.screenPosition, true);
-
-      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
-
+      // this.updateDOMColor();
       // update line
       const lineData = this.getLineData(
         this._handle.screenPosition,
         this._handle.screenPosition
       );
+
+      const transform = this.adjustLabelTransform(this._label, this._handle.screenPosition, true);
+
+      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
 
       // update label
       const paddingVector = lineData.line.multiplyScalar(0.5);
@@ -283,7 +329,7 @@ const widgetsAnnotation = (three = window.THREE) => {
 
       this._dashline.style.transform = `translate3D(${minLine.transformX}px, ${
         minLine.transformY
-      }px, 0)
+        }px, 0)
         rotate(${minLine.transformAngle}rad)`;
       this._dashline.style.width = minLine.length + 'px';
     }
@@ -318,7 +364,39 @@ const widgetsAnnotation = (three = window.THREE) => {
       this._container.removeChild(this._dashline);
       this._container.removeChild(this._label);
 
+      // mesh, geometry, material
+      this.remove(this._meshline);
+      this._meshline.geometry.dispose();
+      this._meshline.geometry = null;
+      this._meshline.material.dispose();
+      this._meshline.material = null;
+      this._meshline = null;
+      this._geometry.dispose();
+      this._geometry = null;
+      this._material.vertexShader = null;
+      this._material.fragmentShader = null;
+      this._material.uniforms = null;
+      this._material.dispose();
+      this._material = null;
+      this.remove(this._cone);
+      this._cone.geometry.dispose();
+      this._cone.geometry = null;
+      this._cone.material.dispose();
+      this._cone.material = null;
+      this._cone = null;
+      this._conegeometry.dispose();
+      this._conegeometry = null;
       super.free();
+    }
+
+    get targetMesh() {
+      return this._targetMesh;
+    }
+
+    set targetMesh(targetMesh) {
+      this._targetMesh = targetMesh;
+      this._handles.forEach(elem => (elem.targetMesh = targetMesh));
+      this.update();
     }
 
     get worldPosition() {

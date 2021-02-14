@@ -23,7 +23,7 @@ export default class Ruler {
 
   constructor(renderer: Renderer2D, evt: MouseEvent | null = null) {
     this.renderer = renderer;
-    this.isNew = false;
+    this.isNew = true;
 
     const { stackHelper, controls } = renderer;
     const stack = stackHelper._stack;
@@ -65,6 +65,8 @@ export default class Ruler {
       // ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
       worldPosition: startPosition
     });
+
+    this.widget._labeltext = 'DOUBLE CLICK HERE to create an annotation';
 
     this.widget.update();
 

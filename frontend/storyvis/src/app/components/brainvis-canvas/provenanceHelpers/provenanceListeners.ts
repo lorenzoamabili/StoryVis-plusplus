@@ -4,15 +4,18 @@ import { Renderer2D } from '../renderer2d';
 import { registerActions } from './provenanceActions';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 import { Settings } from '../utils/settings';
+import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
+import { ComparisonComponent } from '../comparison.component';
 
-export function setNewAddListeners(registry, tracker): void {
+export function setNewAddListeners(registry, tracker, thisCanvasComparison?: ComparisonComponent): void {
   let settings = Settings.getInstance(this);
-  let canvas = settings.canvas;
+  let canvas = thisCanvasComparison ? thisCanvasComparison : settings.canvas;
 
   // removeListeners(canvas);
   registerActions(registry, canvas);
   addListeners(tracker);
 }
+
 
 //  function removeListeners(canvas): void {
 
@@ -52,9 +55,9 @@ export function setNewAddListeners(registry, tracker): void {
 //   canvas.removeEventListener('thresholdValueChangedC', wLChangeEndListenerC);
 // }
 
-export const addListeners = (tracker: ProvenanceTracker): any => {
+export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: ComparisonComponent): any => {
   let settings = Settings.getInstance(this);
-  let canvas = settings.canvas;
+  let canvas = thisCanvasComparison ? thisCanvasComparison : settings.canvas;
 
   // Naive way to reset the canvas after restoring a provenance graph 
   // let elem = document.createElement('button');
@@ -422,10 +425,10 @@ export const addListeners = (tracker: ProvenanceTracker): any => {
     const action = {
       metadata: {
         userIntent: 'configuration',
-        label: 'WL setting #' + parameters.setting
+        label: 'WL: ' + parameters.setting
       },
-      do: 'resetWindowLevel',
-      doArguments: { args: [parameters.setting] },
+      do: 'setWindowLevel',
+      doArguments:{ args: [parameters.valueW, parameters.valueC, parameters.slider] },
       undo: 'setWindowLevel',
       undoArguments: { args: [parameters.valueW, parameters.valueC, parameters.slider] }
     };
@@ -460,36 +463,6 @@ export const addListeners = (tracker: ProvenanceTracker): any => {
     };
     tracker.applyAction(action, true);
   });
-
-  //   canvas.navigateVolumeUpCreated.subscribe((sliceOrientation) => {
-  //   const action = {
-  //     metadata: {
-  //       userIntent: 'exploration',
-  //       label: 'volume navigation up'
-  //     },
-  //     do: 'navigateVolumeUp',
-  //     doArguments: { args: [sliceOrientation] },
-  //     undo: 'navigateVolumeDown',
-  //     undoArguments: { args: [sliceOrientation] }
-  //   };
-  //   tracker.applyAction(action, true);
-  // });
-
-  // canvas.navigateVolumeDownCreated.subscribe((sliceOrientation) => {
-  //   const action = {
-  //     metadata: {
-  //       userIntent: 'exploration',
-  //       label: 'volume navigation down'
-  //     },
-  //     do: 'navigateVolumeDown',
-  //     doArguments: { args: [sliceOrientation] },
-  //     undo: 'navigateVolumeUp',
-  //     undoArguments: { args: [sliceOrientation] }
-  //   };
-  //   tracker.applyAction(action, true);
-  // });
-
-
 
   canvas.nullCreated.subscribe(() => {
     const action = {

@@ -91,7 +91,7 @@ export class ProvenanceTreeVisualization {
   public topoFilter: boolean = true;
   public filter: NodeFilter<ProvenanceNode>[] = [derivation, exploration, selection, configuration, annotation, provenance];
   private wasManuallyZoomed: boolean;
-
+  public minimapActive: boolean = false;
   private hierarchyRoot:
     | IHierarchyPointNodeWithMaxDepth<IGroupedTreeNode<ProvenanceNode>>
     | undefined;
@@ -185,6 +185,7 @@ export class ProvenanceTreeVisualization {
     // }
 
     this.minimap = this.createMinimap();
+
     provGraphControls(this);
 
     this.update();
@@ -222,7 +223,9 @@ export class ProvenanceTreeVisualization {
       const scale = transform.k;
       const translate = [-transform.x, -transform.y] as [number, number];
 
-      this.minimap.setView(translate, 1 / scale);
+      if(this.minimapActive){
+        this.minimap.setView(translate, 1 / scale);
+      }
     }
     this.wasManuallyZoomed = false;
   }
@@ -368,7 +371,7 @@ export class ProvenanceTreeVisualization {
 
       treeNodes = treeNodes.filter((d: any) => d.data.wrappedNodes[0].metadata.option !== 'merged');
 
-      if(this.topoFilter){
+      if (this.topoFilter) {
         treeNodes = filterTreeNodes(treeNodes, this.filter);
       } else {
         filterNodes(this.filterAggr, wrappedRoot, this.traverser.graph.current);
@@ -399,7 +402,12 @@ export class ProvenanceTreeVisualization {
         .text(d => groupNodeLabel(d.data)) // .text(d => d.data.neighbour.toString())
         .attr('x', 7)
         .attr('alignment-baseline', 'central');
+      // .text(function(d: any) { return d.subtitle; })
+      // .call(this.make_editable, "subtitle");
       // .call(this.wrap, 70);
+
+
+
 
       const updateNodes = newNodes.merge(oldNodes as any);
 
@@ -484,11 +492,8 @@ export class ProvenanceTreeVisualization {
           let classString = '';
           // console.log(d.data.wrappedNodes[0]);
           if (d.data.wrappedNodes[0].metadata.bookmarked === true) {
-            if((window as any).canvas.settings.slideDeckOpen){
-              classString += ' bookmarkedStory';
-            } else { 
             classString += ' bookmarked';
-          }} else if (d.data.wrappedNodes[0].metadata.loaded === true) {
+          } else if (d.data.wrappedNodes[0].metadata.loaded === true) {
             classString += ' loaded';
           }
           if (isKeyNode(d.data.wrappedNodes[0])) {
@@ -561,7 +566,8 @@ export class ProvenanceTreeVisualization {
       // updateNodes
       // .attr('class', 'node branch-active story')
       // .filter((d: any) => d.data.neighbour === true)
-      // .attr('class', 'node branch-active neighbour');
+      // .attr('class', 'node branch-active neighbour')
+
 
       updateNodes.on('click', d => {
         if (this.transferringEnabled) {
@@ -651,7 +657,7 @@ export class ProvenanceTreeVisualization {
       const updatedLinks = oldLinks.merge(newLinks as any);
 
 
-      if(this.topoFilter){
+      if (this.topoFilter) {
         let nodeTargets: any[] = [];
 
         updatedLinks.filter((d: any) => {
@@ -677,11 +683,11 @@ export class ProvenanceTreeVisualization {
           }
           return d;
         });
-  
+
         let filterComplete = ['derivation', 'exploration', 'selection', 'configuration', 'annotation', 'provenance'];
         if (this.filter.length !== filterComplete.length) {
           updatedLinks.filter((d: any) => d.target.data.wrappedNodes[0].metadata.noLink === true).attr('class', 'link hiddenClass');
-        } 
+        }
       }
 
       if (this.storyOrderLayoutActivated) {
@@ -692,16 +698,21 @@ export class ProvenanceTreeVisualization {
         caterpillar(updateNodes, treeNodes, updatedLinks, this);
       }
 
-      if(this.minimapFixed){
-        this.minimap.updateNodes(originalTree, minimapNodes);
-      } else {
-        this.minimap.updateNodes(tree, treeNodes);
+      this.minimapActive = d3.select('#minimap-trigger').attr('class') === 'mat-icon-button mat-button-base mat-primary checked';
+      if (this.minimapActive) {
+        if (this.minimapFixed) {
+          this.minimap.updateNodes(originalTree, minimapNodes);
+        } else {
+          this.minimap.updateNodes(tree, treeNodes);
+        }
       }
+
+
 
       // if (!this.zoomDone) {
       //   this.setView([this.brushPos.x, this.brushPos.y], 2 / this.zoom);
       // }
-      
+
     } // end update
   }
 
@@ -721,5 +732,89 @@ export class ProvenanceTreeVisualization {
     this.container.remove();
     this.minimap.container.remove();
   }
-}
 
+  //   public make_editable(d: any, field: any) {
+  //     console.log("make_editable", arguments);
+  //     let that =  d3.select('.circle-label');
+  //     that.on("mouseover", function () {
+  //       that.style("fill", "red");
+  //     })
+  //       .on("mouseout", function () {
+  //         that.style("fill", null);
+  //       })
+  //       .on("click", function (d: any) {
+  //         var p = that.parentNode;
+  //         console.log(elm, arguments);
+
+  //         // inject a HTML form to edit the content here...
+
+  //         // bug in the getBBox logic here, but don't know what I've done wrong here;
+  //         // anyhow, the coordinates are completely off & wrong. :-((
+  //         var xy = elm.getBBox();
+  //         var p_xy = p.getBBox();
+
+  //         xy.x -= p_xy.x;
+  //         xy.y -= p_xy.y;
+
+  //         var el = d3.select(elm);
+  //         var p_el = d3.select(p);
+
+  //         var frm = p_el.append("foreignObject");
+
+  //         var inp = frm
+  //           .attr("x", xy.x)
+  //           .attr("y", xy.y)
+  //           .attr("width", 300)
+  //           .attr("height", 25)
+  //           .append("xhtml:form")
+  //           .append("input")
+  //           .attr("value", function () {
+  //             // nasty spot to place this call, but here we are sure that the <input> tag is available
+  //             // and is handily pointed at by 'this':
+  //             this.focus();
+
+  //             return d[field];
+  //           })
+  //           .attr("style", "width: 294px;")
+  //           // make the form go away when you jump out (form looses focus) or hit ENTER:
+  //           .on("blur", function () {
+  //             console.log("blur", this, arguments);
+
+  //             var txt = (inp as any).node().value;
+
+  //             d[field] = txt;
+  //             el
+  //               .text(function (d: any) { return d[field]; });
+
+  //             // Note to self: frm.remove() will remove the entire <g> group! Remember the D3 selection logic!
+  //             p_el.select("foreignObject").remove();
+  //           })
+  //           .on("keypress", function () {
+  //             console.log("keypress", this, arguments);
+
+  //             // IE fix
+  //             if (!(d3 as any).event)
+  //               (d3 as any).event = window.event;
+
+  //             var e = (d3 as any).event;
+  //             if (e.keyCode == 13) {
+  //               if (typeof (e.cancelBubble) !== 'undefined') // IE
+  //                 e.cancelBubble = true;
+  //               if (e.stopPropagation)
+  //                 e.stopPropagation();
+  //               e.preventDefault();
+
+  //               var txt = (inp as any).node().value;
+
+  //               d[field] = txt;
+  //               el
+  //                 .text(function (d: any) { return d[field]; });
+
+  //               // odd. Should work in Safari, but the debugger crashes on this instead.
+  //               // Anyway, it SHOULD be here and it doesn't hurt otherwise.
+  //               p_el.select("foreignObject").remove();
+  //             }
+  //           });
+  //       });
+  //   } 
+}

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Application, ProvenanceNode, StateNode } from '../../../../../provenance-core/src/api';
+import { Application, StateNode } from '../../../../../provenance-core/src/api';
 import {
   ProvenanceGraph,
   ProvenanceTracker,
@@ -23,7 +23,7 @@ import { Settings } from 'src/app/components/brainvis-canvas/utils/settings';
 import { MatSelectChange } from '@angular/material/select';
 import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
 import { restoreProvenanceGraph } from '@visualstorytelling/provenance-core/src/ProvenanceGraph';
-import { AuthenticationService } from './authentication.service';
+import { ProvenanceVisualizationComparisonComponent } from 'src/app/components/brainvis-canvas/provenance-visualization-comparison/provenance-visualization-comparison.component';
 
 @Injectable({
   providedIn: 'root'
@@ -35,14 +35,27 @@ export class ProvenanceService {
   public tracker: ProvenanceTracker;
   public traverser: ProvenanceGraphTraverser;
   public deck: ProvenanceSlidedeck;
-  public application: Application;
   public tree: ProvenanceVisualizationComponent;
   public slideDeck: SlideDeckVisualization;
+
+  public graphComparison: ProvenanceGraph;
+  public registryComparison: ActionFunctionRegistry;
+  public trackerComparison: ProvenanceTracker;
+  public traverserComparison: ProvenanceGraphTraverser;
+  public deckComparison: ProvenanceSlidedeck;
+  public treeComparison: ProvenanceVisualizationComparisonComponent;
+
+  public graphEducation: ProvenanceGraph;
+  public trackerEducation: ProvenanceTracker;
+  public traverserEducation: ProvenanceGraphTraverser;
+  
+  public application: Application;
+
   public textReport: String;
   public initialized = false;
   public findingsCoord: any[] = [];
   public timeStart: number = 0;
-  private authentification: AuthenticationService;
+  public comparison: number = null;
 
   public userService: UserService;
   public settings = Settings.getInstance(this);
@@ -163,22 +176,45 @@ export class ProvenanceService {
 
 
 
+  public async compareGraphs(input: MatSelectChange) {
+    const graphInput = input.value;
+    this.compareGraph(graphInput);
+  }
 
+  public compareGraph(graphInput: any) {
+    const dataGraph = JSON.parse(graphInput.serializedGraph);
+    this.graphComparison = restoreProvenanceGraph(dataGraph) as any;
+    this.newGraphComparison(this.graphComparison);
+  }
 
 
 
   public async restoreGraph(input: MatSelectChange) {
     const graphInput = input.value;
     this.loadGraph(graphInput);
-    // this.graphLoaded = true;
   }
 
   public loadGraph(graphInput: any) {
     const dataGraph = JSON.parse(graphInput.serializedGraph);
     this.graph = restoreProvenanceGraph(dataGraph) as any;
+    // this.graphLoaded = true;
 
     this.newProvenanceGraph(this.graph);
   }
+
+
+
+  public async restoreGraphEducation(input: MatSelectChange) {
+    const graphInput = input.value;
+    this.loadGraphEducation(graphInput);
+  }
+
+  public loadGraphEducation(graphInput: any) {
+    const dataGraph = JSON.parse(graphInput.serializedGraph);
+    this.graphEducation = restoreProvenanceGraph(dataGraph) as any;
+    this.newGraphEducation(this.graphEducation);
+  }
+
 
 
   // public async restoreStory(input: MatSelectChange) {
@@ -301,6 +337,50 @@ export class ProvenanceService {
   }
 
 
+  // newGraphComparison(graph?: ProvenanceGraph) {
+  //   this.graphComparison = graph ? graph : new ProvenanceGraph({ name: 'storyvisComparison', version: '1.0.0' });
+  //   this.registryComparison = new ActionFunctionRegistry();
+  //   this.trackerComparison = new ProvenanceTracker(this.registryComparison, this.graphComparison);
+  //   this.traverserEducation = new ProvenanceGraphTraverser(this.registryComparison, this.graphComparison, this.trackerComparison);
+  //   // this.deck = new ProvenanceSlidedeck(this.application, this.traverserComparison);
+
+  //   this.settings.isComparisonMode = true;
+
+  //   // setNewAddListeners(this.registryComparison, this.trackerComparison);  
+  // }
+
+
+  newGraphComparison(graph?: ProvenanceGraph) {
+    this.graphComparison = graph ? graph : new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
+    this.registryComparison = new ActionFunctionRegistry();
+    this.trackerComparison = new ProvenanceTracker(this.registryComparison, this.graphComparison);
+    this.traverserComparison = new ProvenanceGraphTraverser(this.registryComparison, this.graphComparison, this.trackerComparison);
+    this.deckComparison = new ProvenanceSlidedeck(this.application, this.traverserComparison);
+
+    (window as any).prov = {
+      graphComparison: this.graphComparison,
+      registryComparison: this.registryComparison,
+      trackerComparison: this.trackerComparison,
+      traverserComparison: this.traverserComparison,
+      deckComparison: this.deckComparison
+    };
+
+
+    (window as any).treeComparison._viz.free();
+    (window as any).treeComparison._viz = this.treeComparison.createTree(this.traverserComparison);
+    (window as any).treeComparison._viz.update();
+    setNewAddListeners(this.registryComparison, this.trackerComparison);
+  }
+
+  newGraphEducation(graph?: ProvenanceGraph) {
+    this.graphEducation = graph ? graph : new ProvenanceGraph({ name: 'storyvisEducation', version: '1.0.0' });
+    this.trackerEducation = new ProvenanceTracker(this.registry, this.graphEducation);
+    this.traverserEducation = new ProvenanceGraphTraverser(this.registry, this.graphEducation, this.tracker);
+
+    this.settings.isEducationMode = true;
+  }
+
+  
 
   newProvenanceGraph(graph?: ProvenanceGraph) {
     this.graph = graph ? graph : new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
@@ -316,7 +396,7 @@ export class ProvenanceService {
       traverser: this.traverser,
       deck: this.deck
     };
-    
+
 
     (window as any).tree._viz.free();
     (window as any).tree._viz = (window as any).tree.createTree(this.traverser);
@@ -332,6 +412,12 @@ export class ProvenanceService {
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
     this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
+
+    this.graphComparison = new ProvenanceGraph({ name: 'storyvisComparison', version: '1.0.0' });
+    this.registryComparison = new ActionFunctionRegistry();
+    this.trackerComparison = new ProvenanceTracker(this.registryComparison, this.graphComparison);
+    this.traverserComparison = new ProvenanceGraphTraverser(this.registryComparison, this.graphComparison, this.trackerComparison);
+    this.deckComparison = new ProvenanceSlidedeck(this.application, this.traverserComparison);
 
     (window as any).prov = {
       graph: this.graph,

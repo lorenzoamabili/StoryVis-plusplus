@@ -46,10 +46,14 @@ export interface NodeMetadata {
   createdOn: number;
 
   /**
-   * UNIX timestamp
+   * Creation order in the graph
    */
   creationOrder: number;
-
+  
+  /**
+   * Graph ID
+   */
+  graphID: number;
   /**
    * Enable custom properties
    */

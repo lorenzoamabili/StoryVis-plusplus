@@ -14,6 +14,8 @@ export declare class ProvenanceGraph implements IProvenanceGraph {
         [key: string]: ProvenanceNode;
     };
     id: string;
+    graphID: number;
+    creationOrder: number;
     constructor(application: Application, userid?: string, node?: RootNode);
     addNode(node: ProvenanceNode): void;
     getNode(id: NodeIdentifier): ProvenanceNode;

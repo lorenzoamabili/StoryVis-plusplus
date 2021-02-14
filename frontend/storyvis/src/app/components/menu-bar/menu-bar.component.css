@@ -1,3 +1,7 @@
+:host.comparison{
+  scale: 0.5;
+}
+
 .mat-toolbar.mat-primary {
   background: #434957;
   color: #fff;
@@ -8,12 +12,17 @@ mat-button-toggle,
 
 button {
   color: ivory;
-  background-color: #586072;
 }
 
 .smallerButton {
    min-width: 40px;
    padding: 0px;
+}
+
+.transparent {
+  background-color: transparent;
+  box-shadow: none;
+  border-color: transparent !important;
 }
 
 .save {
@@ -34,6 +43,10 @@ mat-button-toggle.annotation {
   border-color: lightgray;
 }
 
+.mat-button-toggle-checked{
+  color: red;
+}
+
 div.right {
   position: absolute;
   right: 1em;
@@ -50,5 +63,5 @@ mat-toolbar-row {
 }
 
 mat-form-field{
-  width: 15px;
+  width: min-content;
 }

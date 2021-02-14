@@ -1,19 +1,25 @@
-﻿<app-menu-bar [canvas]="canvas" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar>
+﻿<app-menu-bar [canvas]="canvas" [canvasComparison]="canvasComparison" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar>
+<!-- <app-menu-bar-comparison [canvasComparison]="canvasComparison" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar-comparison> -->
+
 <mat-sidenav-container hasBackdrop="false">
 
-  <mat-sidenav position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
+  <mat-sidenav [class.comparison] = "provenance.settings.isComparisonMode" position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
 
     <button id="sidenav-trigger" mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
 
-    <app-provenance-visualization *ngIf="!isNoProvGraph"> </app-provenance-visualization>
-    
+      <app-provenance-visualization [ngClass]="!provenance.settings.treeButtons ? 'noButtons': 'withButtons'" *ngIf="!isNoProvGraph"></app-provenance-visualization>
+      <app-provenance-visualization-comparison [ngClass]="!provenance.settings.treeButtons ? 'noButtons': 'withButtons'" *ngIf="!isNoProvGraph && (provenance.settings.isEducationMode || provenance.settings.isComparisonMode)"></app-provenance-visualization-comparison>
 
+    
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <app-brainvis-canvas #canvas [studyStarted]="studyStarted"></app-brainvis-canvas>
+    
+    <app-brainvis-canvas [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvas [studyStarted]="studyStarted"></app-brainvis-canvas>
+    <app-brainvis-canvas-comparison *ngIf="provenance.settings.isComparisonMode" [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvasComparison [studyStarted]="studyStarted"></app-brainvis-canvas-comparison>
+
     <div id="bottom-container">
       <app-slides-container *ngIf="!isNoProvGraph">
         <app-provenance-slides [canvas]="canvas" #slides></app-provenance-slides>

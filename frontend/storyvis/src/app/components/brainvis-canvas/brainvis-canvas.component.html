@@ -1,55 +1,304 @@
 <div id="main" class="visualizer">
     <div id="r0" class="renderer">
-        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r0" (click)="displayOneView('r0');">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r0');">
             <mat-icon>fullscreen</mat-icon>
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r0');">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up" (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r0');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r0');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
             <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down" (click)="navigateVolume('axial', 1, 10000);">
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
             <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" (click) = "settings.canvas.multiplePlane('r0');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
     </div>
     <div id="r1" class="renderer">
-        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r1" (click)="displayOneView('r1');">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r1');">
             <mat-icon>fullscreen</mat-icon>
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r1');">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r1');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r1');">
+            <mat-icon>ballot</mat-icon>
+        </button>
     </div>
     <div id="r2" class="renderer">
-        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r2" (click)="displayOneView('r2');">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r2');">
             <mat-icon>fullscreen</mat-icon>
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r2');">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up" (click)="navigateVolume('coronal', this._coronalRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r2');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r2');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('coronal', this._coronalRenderer.stackHelper._orientationMaxIndex -1, 10000);">
             <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down" (click)="navigateVolume('coronal', 1, 10000);">
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('coronal', 1, 10000);">
             <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+        settings.canvas.compareAnalyses('r2');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
     </div>
     <div id="r3" class="renderer">
-        <button *ngIf="!settings.isOneView" mat-icon-button id="magnification-r3" (click)="displayOneView('r3');">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r3');">
             <mat-icon>fullscreen</mat-icon>
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r3');">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up" (click)="navigateVolume('sagittal', this._sagittalRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r3');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r3');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('sagittal', this._sagittalRenderer.stackHelper._orientationMaxIndex -1, 10000);">
             <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down" (click)="navigateVolume('sagittal', 1, 10000);">
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('sagittal', 1, 10000);">
             <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+         settings.canvas.compareAnalyses('r3');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
     </div>
-    
+
+    <div id="r00" class="rendererNone">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r00');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r00');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r00');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r00');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison"  (change)="settings.multiplePlanesModeOn = !settings.multiplePlanesModeOn;"   
+        (click)="settings.canvas.multiplePlane('r0');" matTooltip="Regular view mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
+    </div>
+    <div id="r000" class="rendererNone">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r000');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r000');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r000');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r000');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" (change)="settings.multiplePlanesModeOn = !settings.multiplePlanesModeOn;"   
+        (click)="settings.canvas.multiplePlane('r0');" matTooltip="Regular view mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
+    </div>
+    <div id="r22" class="rendererNone">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r22');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r22');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r22');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r22');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+        settings.canvas.multiplePlane('r2');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
+    </div>
+    <div id="r222" class="rendererNone">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r222');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r222');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r222');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r222');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+        settings.canvas.multiplePlane('r2');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
+    </div>
+    <div id="r33" class="rendererNone">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r33');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r33');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r33');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r33');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+        settings.canvas.multiplePlane('r3');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
+    </div>
+    <div id="r333" class="rendererNone">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r333');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r333');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r333');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'r333');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+        settings.canvas.multiplePlane('r3');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
+    </div>
 </div>
+
 <div id="datacomics" class="storytelling-container" style="display: none;"></div>
 <div id="scrollytelling" class="storytelling-container" style="display: none;"></div>
+
+
+<div id="comparisonMain1" style="display: none;" class="visualizerComparison">
+    <div id="c0" class="rendererComparison">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('c0');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('c0');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'c0');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'c0');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._comparisonRenderer2D1.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+        settings.canvasComparison.compareAnalyses('c0');" matTooltip="Multiple plane mode">
+            <mat-icon>filter_none</mat-icon>
+        </mat-button-toggle>
+    </div>
+    <div id="c2" class="rendererComparison">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r1');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r1');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'c2');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'c2');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+    </div>
+</div>

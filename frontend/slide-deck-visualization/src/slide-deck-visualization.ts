@@ -41,6 +41,7 @@ export class SlideDeckVisualization {
     private _toolbarY = 35;
     private _toolbarPadding = 20;
     private _shiftedPosition = 0;
+    private calculatedWidth = 0;
     // Upon dragging a slide, no matter where you click on it, the beginning of the slide jumps to the mouse position.
     // This next variable is calculated to adjust for that error, it is a workaround but it works
     private _draggedSlideReAdjustmentFactor = 0;
@@ -177,6 +178,40 @@ export class SlideDeckVisualization {
 
         d3.select("#slideDeck")
             .append("input")
+            .attr('id', 'createStoryFromDerivationNodes')
+            .attr("type", "button")
+            .attr("value", "  o  ")
+            .on("click", this.createStoryFromDerivationNodes);
+
+
+        d3.select("#slideDeck")
+            .append("input")
+            .attr("id", "transitionTimeButton")
+            .attr("type", "button")
+            .attr("value", " =|= ")
+            .on("click", () => {
+                this.calculatedWidth = this.calculatedWidth + 100;
+                d3.selectAll('.slide').each((d: any) => d.transitionTime = this.calculatedWidth);
+                this.update();
+            });
+
+        d3.select("#slideDeck")
+            .append("input")
+            .attr('id', 'shrink')
+            .attr("type", "button")
+            .attr("value", "  -  ")
+            .on("click", this.stretch);
+
+
+        d3.select("#slideDeck")
+            .append("input")
+            .attr('id', 'stretch')
+            .attr("type", "button")
+            .attr("value", "  +  ")
+            .on("click", this.shrink);
+
+        d3.select("#slideDeck")
+            .append("input")
             .attr('id', 'slideLeft')
             .attr("type", "button")
             .attr("value", "  <  ")
@@ -205,11 +240,11 @@ export class SlideDeckVisualization {
     }
     public onDelete = (slide?: IProvenanceSlide, node?: ProvenanceNode) => {
         (this._slideDeck.graph.current as StateNode).metadata.bookmarked = false;
-        if(slide){
+        if (slide) {
             this._slideDeck.removeSlide(slide);
         } else if (node) {
             this._slideDeck.slides.filter(slide => slide.node === node);
-            this._slideDeck.removeSlide(this._slideDeck.slides[0]);      
+            this._slideDeck.removeSlide(this._slideDeck.slides[0]);
         }
         this._slidesInDeck -= 1;
     }
@@ -324,14 +359,14 @@ export class SlideDeckVisualization {
         }
     }
 
-    private transitionTimeDragged = (that: any, slide: IProvenanceSlide) => {
+    private transitionTimeDragged = (slide: IProvenanceSlide) => {
         let transitionTime =
             Math.max((d3 as any).event.x, 0) / this._barWidthTimeMultiplier;
         slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
         this.update();
     }
 
-    private transitionTimeSubject = (that: any, slide: IProvenanceSlide) => {
+    private transitionTimeSubject = (slide: IProvenanceSlide) => {
         return { x: this.barTransitionTimeWidth(slide) };
     }
 
@@ -369,9 +404,9 @@ export class SlideDeckVisualization {
     }
 
     private barTransitionTimeWidth(slide: IProvenanceSlide) {
-        let calculatedWidth =
+        this.calculatedWidth =
             this._barWidthTimeMultiplier * slide.transitionTime;
-        return Math.max(calculatedWidth, 0);
+        return Math.max(this.calculatedWidth, 0);
     }
 
     private barDurationWidth(slide: IProvenanceSlide) {
@@ -415,18 +450,10 @@ export class SlideDeckVisualization {
         let wheelDirectionY = (d3 as any).event.deltaY < 0 ? "up" : "down";
         let wheelDirectionX = (d3 as any).event.deltaX < 0 ? "up" : "down";
         if ((d3 as any).event.shiftKey) {
-            let correctedShiftAmount = (d3 as any).event.x - (this._originPosition - this._timelineShift);
-            let scalingFactor = 0.2;
             if (wheelDirectionX === "down") {
-                if (this._placeholderX > this._tableWidth / 5) {
-                    this._barWidthTimeMultiplier *= 1 - scalingFactor;
-                    this._timelineShift -= correctedShiftAmount * scalingFactor;
-                }
+                this.shrink();
             } else {
-                this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
-                if (!(this._placeholderX - this._timelineShift < (d3 as any).event.x)) {
-                    this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
-                }
+                this.stretch();
             }
             this.update();
         } else {
@@ -436,6 +463,26 @@ export class SlideDeckVisualization {
                 this.slideSliceRight();
             }
         }
+    }
+
+    private shrink = () => {
+        let correctedShiftAmount = (d3 as any).event.x - (this._originPosition - this._timelineShift);
+        let scalingFactor = 0.2;
+        if (this._placeholderX > this._tableWidth / 5) {
+            this._barWidthTimeMultiplier *= 1 - scalingFactor;
+            this._timelineShift -= correctedShiftAmount * scalingFactor;
+        }
+        this.update();
+    }
+
+    private stretch = () => {
+        let correctedShiftAmount = (d3 as any).event.x - (this._originPosition - this._timelineShift);
+        let scalingFactor = 0.2;
+        this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
+        if (!(this._placeholderX - this._timelineShift < (d3 as any).event.x)) {
+            this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
+        }
+        this.update();
     }
 
     private slideSliceRight = () => {
@@ -507,12 +554,12 @@ export class SlideDeckVisualization {
     }
 
     private startPlaying = () => {
-        if(this._shiftedPosition !== this._placeholderX + this._originPosition){
-        d3.select('#pauseBtn').attr('style', 'display: block');
-        d3.select('#playBtn').attr('style', 'display: none');
-        this._currentlyPlaying = true;
-        this.playTimeline();
-    }
+        if (this._shiftedPosition !== this._placeholderX + this._originPosition) {
+            d3.select('#pauseBtn').attr('style', 'display: block');
+            d3.select('#playBtn').attr('style', 'display: none');
+            this._currentlyPlaying = true;
+            this.playTimeline();
+        }
     }
 
     private stopPlaying = () => {
@@ -569,7 +616,7 @@ export class SlideDeckVisualization {
         let newAnnotation = textArea.value;
         if (newAnnotation !== null) {
             this._slideDeck.selectedSlide.mainAnnotation = newAnnotation;
-        } 
+        }
         else {
             this._slideDeck.selectedSlide.mainAnnotation = "";
         }
@@ -595,8 +642,8 @@ export class SlideDeckVisualization {
         }
 
         this._shiftedPosition = this._originPosition + timeWidth - this._timelineShift;
-        this._shiftedPosition = this._shiftedPosition < this._originPosition ? this._originPosition : this._shiftedPosition; 
-        this._shiftedPosition = this._shiftedPosition > this._placeholderX + this._originPosition ? this._placeholderX + this._originPosition: this._shiftedPosition;
+        this._shiftedPosition = this._shiftedPosition < this._originPosition ? this._originPosition : this._shiftedPosition;
+        this._shiftedPosition = this._shiftedPosition > this._placeholderX + this._originPosition ? this._placeholderX + this._originPosition : this._shiftedPosition;
         this._currentlyPlaying = this._shiftedPosition === this._placeholderX + this._originPosition ? false : this._currentlyPlaying;
 
         this._slideTable
@@ -871,13 +918,29 @@ export class SlideDeckVisualization {
 
         allExistingNodes.exit().remove();
 
-        if(!this._currentlyPlaying){
+        if (!this._currentlyPlaying) {
             d3.select('#pauseBtn').attr('style', 'display: none');
             d3.select('#playBtn').attr('style', 'display: block');
             this.stopPlaying();
         }
     }
 
+    public createStoryFromDerivationNodes() {
+        let nodes = (window as any).prov.graph.getNodes();
+        var arrayNodes: any[] = [];
+
+        for (const nodeId of Object.keys(nodes)) {
+            let node = nodes[nodeId];
+            arrayNodes.push(node);
+        }
+        arrayNodes.shift();
+
+        for (const node of (arrayNodes as any).filter((node: any) => node.action.metadata.userIntent === ('derivation' || 'annotation'))) {
+            node.metadata.story = true;
+            (window as any).slideDeck.onAdd(node);
+        }
+        (window as any).tree._viz.update();
+    }
 
     public setDeck(deck: IProvenanceSlidedeck) {
         this._slideDeck = deck;

@@ -12,7 +12,8 @@ import { Settings } from './utils/settings';
 export class AMIRenderer {
     protected _initialized = false;
     public settings = Settings.getInstance(this);
-    public _canvas = this.settings.canvas; // to avoid circular dependency
+    public _canvas = this.settings._canvas; // to avoid circular dependency
+    public _canvasComparison = this.settings.canvasComparison2;
 
     protected _color = 0x121212;
     protected _targetID = 1;
@@ -91,8 +92,8 @@ export class AMIRenderer {
     protected onAltClick(event) {
         if (event.altKey) {
             if (this._initialized) {
-                this._canvas.addFrame(document.getElementById('datacomics'), this._domID);
-                this._canvas.addFrame(document.getElementById('scrollytelling'), this._domID);
+                this._canvas.addFrame('datacomics', this._domID);
+                this._canvas.addFrame('scrollytelling', this._domID);
             }
         }
     }

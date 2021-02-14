@@ -24,9 +24,12 @@ var ProvenanceGraph = /** @class */ (function () {
     function ProvenanceGraph(application, userid, node) {
         if (userid === void 0) { userid = 'Unknown'; }
         this._nodes = {};
+        this.graphID = 0;
+        this.creationOrder = 0;
         this.id = utils_1.generateUUID();
         this._mitt = mitt_1.default();
         this.application = application;
+        this.graphID = this.graphID + 1;
         if (node) {
             this.root = node;
         }
@@ -37,7 +40,8 @@ var ProvenanceGraph = /** @class */ (function () {
                 metadata: {
                     createdBy: userid,
                     createdOn: utils_1.generateTimestamp(),
-                    creationOrder: 0
+                    creationOrder: this.creationOrder,
+                    graphID: this.graphID
                 },
                 children: []
             };

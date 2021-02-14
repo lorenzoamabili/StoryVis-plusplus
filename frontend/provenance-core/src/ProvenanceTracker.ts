@@ -35,6 +35,7 @@ export class ProvenanceTracker implements IProvenanceTracker {
 
   private graph: IProvenanceGraph;
   private username: string;
+  private previousNode: any = null;
 
   private _screenShotProvider: IScreenShotProvider | null = null;
   private _autoScreenShot = false;
@@ -73,7 +74,6 @@ export class ProvenanceTracker implements IProvenanceTracker {
     if(artifacts){
       artifacts.length === 1 ? allArtifacts.push(artifacts as Artifact) : allArtifacts.push(...artifacts as Artifact[]);
     } 
-    
 
 
     const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any): StateNode => ({
@@ -89,7 +89,8 @@ export class ProvenanceTracker implements IProvenanceTracker {
         filtered: false,
         createdBy: this.username,
         createdOn: generateTimestamp(),
-        creationOrder: nodeCounter
+        creationOrder: 0,
+        graphID: parentNode.metadata.graphID
       },
       action,
       actionResult,
@@ -103,25 +104,23 @@ export class ProvenanceTracker implements IProvenanceTracker {
     const currentNode = this.graph.current;
     let parentNode = (option === 'split') ? this.graph.root : this.graph.current;
     parentNode = newRoot ? newRoot : parentNode;
-
-
+    this.previousNode = this.previousNode !== null ? this.previousNode : currentNode;
 
     if (skipFirstDoFunctionCall) {
       newNode = createNewStateNode(parentNode, null);
-      nodeCounter = newNode.metadata.creationOrder + 1;
-      newNode.metadata.creationOrder = nodeCounter;
+      nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+      newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
     } else {
       // Get the registered function from the action out of the registry
       const functionNameToExecute: string = action.do;
-      const funcWithThis: ActionFunctionWithThis = this.registry.getFunctionByName(
-        functionNameToExecute
-      );
+      const funcWithThis: ActionFunctionWithThis = this.registry.getFunctionByName(functionNameToExecute);
       const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args);
 
       newNode = createNewStateNode(parentNode, actionResult);
-      nodeCounter = newNode.metadata.creationOrder + 1;
-      newNode.metadata.creationOrder = nodeCounter;
+      nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+      newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
     }
+    this.previousNode = newNode;
 
     if (this.autoScreenShot && this.screenShotProvider) {
       try {

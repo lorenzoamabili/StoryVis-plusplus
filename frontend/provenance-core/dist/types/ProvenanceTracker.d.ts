@@ -14,6 +14,7 @@ export declare class ProvenanceTracker implements IProvenanceTracker {
     acceptActions: boolean;
     private graph;
     private username;
+    private previousNode;
     private _screenShotProvider;
     private _autoScreenShot;
     constructor(registry: IActionFunctionRegistry, graph: IProvenanceGraph, username?: string);

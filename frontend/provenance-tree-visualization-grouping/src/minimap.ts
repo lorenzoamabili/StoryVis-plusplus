@@ -55,18 +55,19 @@ export class ProvenanceMinimap {
         this.container = d3
             .select(elm)
             .append('div')
-            .attr('id', 'minimapContainer')
+            .attr('class', 'minimapContainer')
 
         // Append svg element
         this.svg = this.container
             .append('div')
-            .attr('style', 'height: 85%; width: 95%; margin-left: 5px; margin-top: 10px;')
+            .attr('style', 'height: 85%; width: 95%; margin-left: 5px;')
             .append('svg')
             .attr(
                 'style', 'overflow: hidden; width: 100%; height: 100%;');
 
         const span = this.container
             .append('span');
+            
         // Check box setup (label + checkbox)
         // const followLabel = span
         //     .append('label')

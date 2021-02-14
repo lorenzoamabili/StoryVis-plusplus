@@ -1,0 +1,31 @@
+<div id="comparisonMain2" class="visualizerComparison">
+    <div id="c1" class="rendererComparison">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('c1');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('c1');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', this._comparisonRenderer1.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('axial', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
+            (change)="settings.isComparisonMode = $event.source.checked;
+        settings.canvasComparison.compareAnalyses('c1');" matTooltip="Compare two analyses">
+            <mat-icon>compare_arrows</mat-icon>
+        </mat-button-toggle>
+    </div>
+    <div id="c3" class="rendererComparison">
+        <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('c3');">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('c3');">
+            <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+    </div>
+</div>

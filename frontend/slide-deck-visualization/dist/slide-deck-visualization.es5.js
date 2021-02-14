@@ -168,9 +168,12 @@ var ProvenanceGraph = /** @class */ (function () {
     function ProvenanceGraph(application, userid, node) {
         if (userid === void 0) { userid = 'Unknown'; }
         this._nodes = {};
+        this.graphID = 0;
+        this.creationOrder = 0;
         this.id = generateUUID();
         this._mitt = mitt();
         this.application = application;
+        this.graphID = this.graphID + 1;
         if (node) {
             this.root = node;
         }
@@ -181,7 +184,8 @@ var ProvenanceGraph = /** @class */ (function () {
                 metadata: {
                     createdBy: userid,
                     createdOn: generateTimestamp(),
-                    creationOrder: 0
+                    creationOrder: this.creationOrder,
+                    graphID: this.graphID
                 },
                 children: []
             };
@@ -307,6 +311,7 @@ var ProvenanceTracker = /** @class */ (function () {
          * When acceptActions is false, the Tracker will ignore calls to applyAction
          */
         this.acceptActions = true;
+        this.previousNode = null;
         this._screenShotProvider = null;
         this._autoScreenShot = false;
         this.registry = registry;
@@ -356,7 +361,8 @@ var ProvenanceTracker = /** @class */ (function () {
                                 filtered: false,
                                 createdBy: _this.username,
                                 createdOn: generateTimestamp(),
-                                creationOrder: nodeCounter
+                                creationOrder: 0,
+                                graphID: parentNode.metadata.graphID
                             },
                             action: action,
                             actionResult: actionResult,
@@ -366,10 +372,11 @@ var ProvenanceTracker = /** @class */ (function () {
                         currentNode = this.graph.current;
                         parentNode = (option === 'split') ? this.graph.root : this.graph.current;
                         parentNode = newRoot ? newRoot : parentNode;
+                        this.previousNode = this.previousNode !== null ? this.previousNode : currentNode;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
                         newNode = createNewStateNode(parentNode, null);
-                        nodeCounter = newNode.metadata.creationOrder + 1;
-                        newNode.metadata.creationOrder = nodeCounter;
+                        nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+                        newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
                         return [3 /*break*/, 3];
                     case 1:
                         functionNameToExecute = action.do;
@@ -378,10 +385,11 @@ var ProvenanceTracker = /** @class */ (function () {
                     case 2:
                         actionResult = _a.sent();
                         newNode = createNewStateNode(parentNode, actionResult);
-                        nodeCounter = newNode.metadata.creationOrder + 1;
-                        newNode.metadata.creationOrder = nodeCounter;
+                        nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+                        newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
                         _a.label = 3;
                     case 3:
+                        this.previousNode = newNode;
                         if (this.autoScreenShot && this.screenShotProvider) {
                             try {
                                 newNode.metadata.screenShot = this.screenShotProvider();
@@ -956,6 +964,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
     };
     return ProvenanceSlidedeckPlayer;
 }());
+//# sourceMappingURL=provenance-core.es5.js.map
 
 function firstArgThis(f) {
     return function (...args) {
@@ -980,6 +989,7 @@ class SlideDeckVisualization {
         this._toolbarY = 35;
         this._toolbarPadding = 20;
         this._shiftedPosition = 0;
+        this.calculatedWidth = 0;
         // Upon dragging a slide, no matter where you click on it, the beginning of the slide jumps to the mouse position.
         // This next variable is calculated to adjust for that error, it is a workaround but it works
         this._draggedSlideReAdjustmentFactor = 0;
@@ -1098,12 +1108,12 @@ class SlideDeckVisualization {
                 this._currentTime = draggedObject.x1;
             }
         };
-        this.transitionTimeDragged = (that, slide) => {
+        this.transitionTimeDragged = (slide) => {
             let transitionTime = Math.max(event.x, 0) / this._barWidthTimeMultiplier;
             slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
             this.update();
         };
-        this.transitionTimeSubject = (that, slide) => {
+        this.transitionTimeSubject = (slide) => {
             return { x: this.barTransitionTimeWidth(slide) };
         };
         this.durationDragged = (that, slide) => {
@@ -1133,19 +1143,11 @@ class SlideDeckVisualization {
             let wheelDirectionY = event.deltaY < 0 ? "up" : "down";
             let wheelDirectionX = event.deltaX < 0 ? "up" : "down";
             if (event.shiftKey) {
-                let correctedShiftAmount = event.x - (this._originPosition - this._timelineShift);
-                let scalingFactor = 0.2;
                 if (wheelDirectionX === "down") {
-                    if (this._placeholderX > this._tableWidth / 5) {
-                        this._barWidthTimeMultiplier *= 1 - scalingFactor;
-                        this._timelineShift -= correctedShiftAmount * scalingFactor;
-                    }
+                    this.shrink();
                 }
                 else {
-                    this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
-                    if (!(this._placeholderX - this._timelineShift < event.x)) {
-                        this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
-                    }
+                    this.stretch();
                 }
                 this.update();
             }
@@ -1157,6 +1159,24 @@ class SlideDeckVisualization {
                     this.slideSliceRight();
                 }
             }
+        };
+        this.shrink = () => {
+            let correctedShiftAmount = event.x - (this._originPosition - this._timelineShift);
+            let scalingFactor = 0.2;
+            if (this._placeholderX > this._tableWidth / 5) {
+                this._barWidthTimeMultiplier *= 1 - scalingFactor;
+                this._timelineShift -= correctedShiftAmount * scalingFactor;
+            }
+            this.update();
+        };
+        this.stretch = () => {
+            let correctedShiftAmount = event.x - (this._originPosition - this._timelineShift);
+            let scalingFactor = 0.2;
+            this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
+            if (!(this._placeholderX - this._timelineShift < event.x)) {
+                this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
+            }
+            this.update();
         };
         this.slideSliceRight = () => {
             let shiftAmount = 75;
@@ -1395,6 +1415,34 @@ class SlideDeckVisualization {
             .attr("rows", 4);
         select("#slideDeck")
             .append("input")
+            .attr('id', 'createStoryFromDerivationNodes')
+            .attr("type", "button")
+            .attr("value", "  o  ")
+            .on("click", this.createStoryFromDerivationNodes);
+        select("#slideDeck")
+            .append("input")
+            .attr("id", "transitionTimeButton")
+            .attr("type", "button")
+            .attr("value", " =|= ")
+            .on("click", () => {
+            this.calculatedWidth = this.calculatedWidth + 100;
+            selectAll('.slide').each((d) => d.transitionTime = this.calculatedWidth);
+            this.update();
+        });
+        select("#slideDeck")
+            .append("input")
+            .attr('id', 'shrink')
+            .attr("type", "button")
+            .attr("value", "  -  ")
+            .on("click", this.stretch);
+        select("#slideDeck")
+            .append("input")
+            .attr('id', 'stretch')
+            .attr("type", "button")
+            .attr("value", "  +  ")
+            .on("click", this.shrink);
+        select("#slideDeck")
+            .append("input")
             .attr('id', 'slideLeft')
             .attr("type", "button")
             .attr("value", "  <  ")
@@ -1421,8 +1469,9 @@ class SlideDeckVisualization {
         select(this).raise().classed("active", true);
     }
     barTransitionTimeWidth(slide) {
-        let calculatedWidth = this._barWidthTimeMultiplier * slide.transitionTime;
-        return Math.max(calculatedWidth, 0);
+        this.calculatedWidth =
+            this._barWidthTimeMultiplier * slide.transitionTime;
+        return Math.max(this.calculatedWidth, 0);
     }
     barDurationWidth(slide) {
         let calculatedWidth = this._barWidthTimeMultiplier * slide.duration;
@@ -1682,6 +1731,20 @@ class SlideDeckVisualization {
             this.stopPlaying();
         }
     }
+    createStoryFromDerivationNodes() {
+        let nodes = window.prov.graph.getNodes();
+        var arrayNodes = [];
+        for (const nodeId of Object.keys(nodes)) {
+            let node = nodes[nodeId];
+            arrayNodes.push(node);
+        }
+        arrayNodes.shift();
+        for (const node of arrayNodes.filter((node) => node.action.metadata.userIntent === ('derivation' ))) {
+            node.metadata.story = true;
+            window.slideDeck.onAdd(node);
+        }
+        window.tree._viz.update();
+    }
     setDeck(deck) {
         this._slideDeck = deck;
     }
@@ -1689,6 +1752,7 @@ class SlideDeckVisualization {
         return this._slideDeck;
     }
 }
+//# sourceMappingURL=slide-deck-visualization.js.map
 
 export { SlideDeckVisualization };
 //# sourceMappingURL=slide-deck-visualization.es5.js.map

@@ -1,7 +1,8 @@
 import { ActionFunction, ActionFunctionRegistry } from '@visualstorytelling/provenance-core';
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
+import { ComparisonComponent } from '../comparison.component';
 
-const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFunction } => ({
+const getActions = (canvas: BrainvisCanvasComponent | ComparisonComponent): { [key: string]: ActionFunction } => ({
   setSliceIndex: async (sliceOrientation, newIndex, oldIndex, transitionTime) => {
     canvas.changeSliceRemove(sliceOrientation, oldIndex);
     canvas.setSliceIndex(sliceOrientation, newIndex, transitionTime);
@@ -24,19 +25,15 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
     canvas.deleteArtifact(view, artifact);
   },
 
-  setWindowLevel: async (valueW, valueC, slider) => {
-    canvas.setWindowLevel(valueW, valueC, slider);
-  },
+  // setWindowLevel: async (valueW, valueC, slider) => {
+  //   canvas.setWindowLevel(valueW, valueC, slider);
+  // },
 
   setPerspectiveCameraZoomLevel: async (args, transitionTime) => canvas.setPerspectiveCameraZoom(args, transitionTime),
   setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime),
 
   changeView: async (args) => {
     canvas.displayOneView(args);
-  },
-
-  resetWindowLevel: async (setting) => {
-    canvas.resetWindowLevel(setting);
   },
   
   changeSlicesLocation: async (parameters) => {
@@ -66,11 +63,10 @@ const getActions = (canvas: BrainvisCanvasComponent): { [key: string]: ActionFun
 });
 
 
-export const registerActions = (registry: ActionFunctionRegistry, canvas: BrainvisCanvasComponent): any => {
+export const registerActions = (registry: ActionFunctionRegistry, canvas: BrainvisCanvasComponent | ComparisonComponent): any => {
   const actions = getActions(canvas);
 
   Object.keys(actions).forEach(actionName => {
     registry.register(actionName, actions[actionName]);
   });
 };
-

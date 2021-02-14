@@ -448,9 +448,7 @@ export class Trackball extends THREE.EventDispatcher {
 
   private mousedown = (event) => {
     if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
-      if (!this.settings.rulerOn && !this.settings.angleOn && 
-        // !this.settings.freehandOn && 
-        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && !this.settings.voxelprobeOn && !this.settings.annotationOn) {
         if (this.enabled === false) { return; }
 
         // if (!this.inScope(event.pageX, event.pageY)) { return; }
@@ -486,9 +484,7 @@ export class Trackball extends THREE.EventDispatcher {
 
   private mousemove = (event) => {
     if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
-      if (!this.settings.rulerOn && !this.settings.angleOn && 
-        // !this.settings.freehandOn && 
-        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && !this.settings.voxelprobeOn && !this.settings.annotationOn) {
         if (this.enabled === false || !this.isDragging) { return; }
 
         event.preventDefault();
@@ -511,9 +507,7 @@ export class Trackball extends THREE.EventDispatcher {
 
   private mouseup = (event) => {
     if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
-      if (!this.settings.rulerOn && !this.settings.angleOn && 
-        // !this.settings.freehandOn && 
-        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && !this.settings.voxelprobeOn && !this.settings.annotationOn) {
         if (this.enabled === false || !this.isDragging) { return; }
 
         this.isDragging = false;
@@ -538,9 +532,7 @@ export class Trackball extends THREE.EventDispatcher {
 
   private mousewheel = (event) => {
     if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
-      if (!this.settings.rulerOn && !this.settings.angleOn && 
-        // !this.settings.freehandOn && 
-        !this.settings.voxelprobeOn && !this.settings.annotationOn) {
+      if (!this.settings.rulerOn && !this.settings.angleOn && !this.settings.voxelprobeOn && !this.settings.annotationOn) {
         if (this.enabled === false) { return; }
 
         event.preventDefault();

@@ -116,21 +116,22 @@ const widgetsHandle = (three = window.THREE) => {
         this._active = true;
         this._controls.enabled = false;
 
-        if (this._targetMesh) {
-          if (this._geometry) {
-            let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
-            if (intersectsTarget.length > 0) {
-              this._offset.copy(intersectsTarget[0].point).sub(this._worldPosition);
-            }
-          }
-        } else {
-          this._plane.position.copy(this._worldPosition);
-          this._plane.direction.copy(this._camera.getWorldDirection());
+        // if (this._targetMesh) {
+        //   if (this._geometry) {
+        //     let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
+        //     if (intersectsTarget.length > 0) {
+        //       this._offset.copy(intersectsTarget[0].point).sub(this._worldPosition);
+        //     }
+        //   }
+        // } else {
+          this._plane.position.copy(this._worldPosition)
+          var vec = new three.Vector3();
+          this._plane.direction.copy(this._camera.getWorldDirection(vec));
           let intersection = CoreIntersections.rayPlane(this._raycaster.ray, this._plane);
           if (intersection !== null) {
             this._offset.copy(intersection).sub(this._plane.position);
           }
-        }
+        // }
 
         this.update();
       }
@@ -152,16 +153,16 @@ const widgetsHandle = (three = window.THREE) => {
       if (this._active || forced) {
         this._dragged = true;
 
-        if (this._targetMesh) {
-          try {
-            let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
-            if (intersectsTarget.length > 0) {
-              this._worldPosition.copy(intersectsTarget[0].point.sub(this._offset));
-            }
-          }
-          catch (e) {
-          }
-        } else {
+        // if (this._targetMesh) {
+        //   try {
+        //     let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
+        //     if (intersectsTarget.length > 0) {
+        //       this._worldPosition.copy(intersectsTarget[0].point.sub(this._offset));
+        //     }
+        //   }
+        //   catch (e) {
+        //   }
+        // } else {
           if (this._plane.direction.length() === 0) {
             var vector = new THREE.Vector3();
             // free mode!this._targetMesh
@@ -173,7 +174,7 @@ const widgetsHandle = (three = window.THREE) => {
           if (intersection !== null) {
             this._worldPosition.copy(intersection.sub(this._offset));
           }
-        }
+        // }
       } else {
         this.onHover(null);
       }

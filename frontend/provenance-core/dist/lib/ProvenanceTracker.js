@@ -55,6 +55,7 @@ var ProvenanceTracker = /** @class */ (function () {
          * When acceptActions is false, the Tracker will ignore calls to applyAction
          */
         this.acceptActions = true;
+        this.previousNode = null;
         this._screenShotProvider = null;
         this._autoScreenShot = false;
         this.registry = registry;
@@ -104,7 +105,8 @@ var ProvenanceTracker = /** @class */ (function () {
                                 filtered: false,
                                 createdBy: _this.username,
                                 createdOn: utils_1.generateTimestamp(),
-                                creationOrder: nodeCounter
+                                creationOrder: 0,
+                                graphID: parentNode.metadata.graphID
                             },
                             action: action,
                             actionResult: actionResult,
@@ -114,10 +116,11 @@ var ProvenanceTracker = /** @class */ (function () {
                         currentNode = this.graph.current;
                         parentNode = (option === 'split') ? this.graph.root : this.graph.current;
                         parentNode = newRoot ? newRoot : parentNode;
+                        this.previousNode = this.previousNode !== null ? this.previousNode : currentNode;
                         if (!skipFirstDoFunctionCall) return [3 /*break*/, 1];
                         newNode = createNewStateNode(parentNode, null);
-                        nodeCounter = newNode.metadata.creationOrder + 1;
-                        newNode.metadata.creationOrder = nodeCounter;
+                        nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+                        newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
                         return [3 /*break*/, 3];
                     case 1:
                         functionNameToExecute = action.do;
@@ -126,10 +129,11 @@ var ProvenanceTracker = /** @class */ (function () {
                     case 2:
                         actionResult = _a.sent();
                         newNode = createNewStateNode(parentNode, actionResult);
-                        nodeCounter = newNode.metadata.creationOrder + 1;
-                        newNode.metadata.creationOrder = nodeCounter;
+                        nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+                        newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
                         _a.label = 3;
                     case 3:
+                        this.previousNode = newNode;
                         if (this.autoScreenShot && this.screenShotProvider) {
                             try {
                                 newNode.metadata.screenShot = this.screenShotProvider();

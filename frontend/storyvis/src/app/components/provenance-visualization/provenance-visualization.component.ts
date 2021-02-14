@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
 import { ProvenanceService, AuthenticationService } from '../../shared/_services';
 import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
-import { setNewAddListeners } from '../../components/brainvis-canvas/provenanceHelpers/provenanceListeners';
 import { User } from 'src/app/shared/_models';
 
 @Component({
@@ -36,8 +35,4 @@ export class ProvenanceVisualizationComponent implements OnInit {
   public getElement(): any {
     return this.elementRef;
   }
-
-  // addListeners(registry, tracker) {
-  //   setNewAddListeners(registry, tracker);
-  // }
 }

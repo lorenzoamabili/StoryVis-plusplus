@@ -1,9 +1,16 @@
 :host {
     display: contents;
   }
-  app-brainvis-canvas {
+  app-brainvis-canvas.normal {
     flex: 1;
   }
+  app-brainvis-canvas.comparison {
+    width: 50%;
+  }
+  app-brainvis-canvas-comparison.comparison {
+    width: 50%;
+  }
+
   #bottom-container {
     position: absolute;
     bottom: 0;
@@ -29,6 +36,10 @@
     flex: 1;
   }
   
+  mat-sidenav.comparison {
+    width: fit-content;
+  }
+
   #sidenav-trigger {
     color: orange;
     position: absolute;

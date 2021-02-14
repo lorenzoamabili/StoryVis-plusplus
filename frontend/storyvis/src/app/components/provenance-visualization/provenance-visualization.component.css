@@ -1,20 +1,41 @@
-app-provenance-visualization {
+app-provenance-visualization.withButtons{
   height: 100%;
   width: 400px;
   display: block;
   background-color: #fffafa;
 }
+
+app-provenance-visualization.noButtons{
+  height: 100%;
+  width: 350px;
+  display: block;
+  background-color: #fffafa;
+}
+
+.mat-drawer-inner-container {
+  display: flex;
+  overflow: inherit;
+  }
+
 .visualizationContainer {
-  height: 75%;
+  height: 80%;
   display: flex;
   flex-direction: column;
 }
 
-#minimapContainer {
+.minimapContainer {
+  display: none;
   position: relative; 
   border-top: 1px solid black; 
-  height: 25%; 
+  height: 20%; 
   background-color: snow;
+}
+
+.withButtons{
+  display: block;
+}
+.noButtons{
+  display: none;
 }
 
 .node {
@@ -37,14 +58,9 @@ app-provenance-visualization {
   stroke-width: 1.2px;
 }
 
-.node circle.bookmarkedStory {
-  fill: black;
-  stroke-width: 2px;
-}
-
 .node circle.loaded {
   stroke: #0000ff;
-  stroke-width: 1.2px;
+  stroke-width: 0.5px;
 }
 
 .node circle.intent_none {
@@ -149,7 +165,7 @@ app-provenance-visualization {
 }
 
 .controlsBox {
-  padding: 2%;
+  padding: 1%;
 }
 
 .aggButton {

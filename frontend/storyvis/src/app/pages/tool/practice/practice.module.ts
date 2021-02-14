@@ -50,6 +50,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { NgxSliderModule } from '@m0t0r/ngx-slider';
 import { RouterModule, Routes } from '@angular/router';
 import { BrainvisCanvasComponent } from '../../../components/brainvis-canvas/brainvis-canvas.component';
+import { ComparisonComponent } from 'src/app/components/brainvis-canvas/comparison.component';
 
 const routes: Routes = [
     { path: '', component: PracticeComponent }
@@ -72,7 +73,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [PracticeComponent],
-    providers: [ProvenanceService, BrainvisCanvasComponent],
+    providers: [ProvenanceService, BrainvisCanvasComponent, ComparisonComponent],
     exports: [PracticeComponent]
 })
 

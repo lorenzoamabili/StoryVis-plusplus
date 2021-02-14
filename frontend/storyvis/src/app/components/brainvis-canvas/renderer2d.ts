@@ -91,8 +91,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     });
     this._renderer.autoClear = false;
     this._renderer.localClippingEnabled = true;
+    const clientWidth = this._domElement.clientWidth === 0 ? window.innerWidth / 2 : this._domElement.clientWidth;
     this._renderer.setSize(
-      this._domElement.clientWidth,
+      clientWidth,
       this._domElement.clientHeight,
       false
     );
@@ -334,8 +335,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     if (this.settings.localizersOn) {
       this._canvas.onAxialChanged();
-      this._canvas.onSagittalChanged();
-      this._canvas.onCoronalChanged();
+      // this._canvas.onSagittalChanged();
+      // this._canvas.onCoronalChanged();
     }
 
     this._renderer.clear();
@@ -346,11 +347,11 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this._renderer.render(this._localizerScene, this._camera);
     }
 
-    if (this._measurements.length > 0 && this._artifacts.length > 0) {
-      for (const measurement of this._measurements) {
-        measurement.widget.update();
-      }
-    }
+    // if (this._measurements.length > 0 && this._artifacts.length > 0) {
+    //   for (const measurement of this._measurements) { 
+    //     measurement.widget.update();
+    //   }
+    // }
 
     // mesh
     // this._renderer.clearDepth();
@@ -392,33 +393,39 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         return;
       }
       this._stackHelper.index += 1;
+      if (this.settings.multiplePlanesModeOn) {
+        this.settings.canvas.updateSliceIndexMultiplePlanesPlus(this._domID);
+      }
     } else {
       if (this._stackHelper.index <= 1) {
         return;
       }
       this._stackHelper.index -= 1;
+      if (this.settings.multiplePlanesModeOn) {
+        this.settings.canvas.updateSliceIndexMultiplePlanesMinus(this._domID);
+      }
     }
     const newIndex = Math.round(this._stackHelper.index);
     this.renderFromSliceChange(newIndex);
 
-    this._canvas.dispatchEvent({
-      type: "sliceIndexChangeStart",
-      changes: {
-        sliceOrientation: this.sliceOrientation,
-        oldIndex: oldIndex,
-        newIndex: newIndex
-      }
-    });
+      this._canvas.dispatchEvent({
+        type: "sliceIndexChangeStart",
+        changes: {
+          sliceOrientation: this.sliceOrientation,
+          oldIndex: oldIndex,
+          newIndex: newIndex
+        }
+      });
 
 
-    this._canvas.dispatchEvent({
-      type: "sliceIndexChanged",
-      changes: {
-        sliceOrientation: this.sliceOrientation,
-        oldIndex: oldIndex,
-        newIndex: newIndex
-      }
-    });
+      this._canvas.dispatchEvent({
+        type: "sliceIndexChanged",
+        changes: {
+          sliceOrientation: this.sliceOrientation,
+          oldIndex: oldIndex,
+          newIndex: newIndex
+        }
+      });
   }
 
 

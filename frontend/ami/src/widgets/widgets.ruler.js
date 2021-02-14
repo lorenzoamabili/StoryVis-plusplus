@@ -44,6 +44,8 @@ const widgetsRuler = (three = window.THREE) => {
       this._dashline = null;
       this._line = null;
       this._label = null;
+      this._labelMeasurement = null;
+      this._labelTextBox = null;
 
       // add handles
       this._handles = [];
@@ -58,39 +60,48 @@ const widgetsRuler = (three = window.THREE) => {
       this._handles[1].active = true;
       this._handles[1].tracking = true;
 
-      this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
-      this.add(this._moveHandle);
-      this._handles.push(this._moveHandle);
-      this._moveHandle.hide();
+      // this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
+      // this.add(this._moveHandle);
+      // this._handles.push(this._moveHandle);
+      // this._moveHandle.hide();
 
       this.create();
       this.initOffsets();
 
+      this.changelabeltext = this.changelabeltext.bind(this);
       this.onMove = this.onMove.bind(this);
-      this.onHover = this.onHover.bind(this);
+      // this.onHover = this.onHover.bind(this);
       this.onHoverlabel = this.onHoverlabel.bind(this);
       this.notonHoverlabel = this.notonHoverlabel.bind(this);
       this.addEventListeners();
     }
 
     addEventListeners() {
+      window.addEventListener('resize', this.onResize);
       this._container.addEventListener('wheel', this.onMove);
 
-      this._line.addEventListener('mouseenter', this.onHover);
-      this._line.addEventListener('mouseleave', this.onHover);
+      // this._line.addEventListener('mouseenter', this.onHover);
+      // this._line.addEventListener('mouseleave', this.onHover);
       this._label.addEventListener('mouseenter', this.onHoverlabel);
       this._label.addEventListener('mouseleave', this.notonHoverlabel);
+      this._label.addEventListener('dblclick', this.changelabeltext);
+
     }
 
     removeEventListeners() {
+      window.removeEventListener('resize', this.onResize);
       this._container.removeEventListener('wheel', this.onMove);
 
-      this._line.removeEventListener('mouseenter', this.onHover);
-      this._line.removeEventListener('mouseleave', this.onHover);
+      // this._line.removeEventListener('mouseenter', this.onHover);
+      // this._line.removeEventListener('mouseleave', this.onHover);
       this._label.removeEventListener('mouseenter', this.onHoverlabel);
       this._label.removeEventListener('mouseleave', this.notonHoverlabel);
+      this._label.removeEventListener('dblclick', this.changelabeltext);
     }
 
+    onResize() {
+      this.initOffsets();
+    }
 
     onHover(evt) {
       if (evt) {
@@ -139,17 +150,18 @@ const widgetsRuler = (three = window.THREE) => {
         this._labelmoved = true;
       }
 
-      this._moveHandle.onMove(evt, true);
+      // this._moveHandle.onMove(evt, true);
 
       this._handles[0].onStart(evt);
       this._handles[1].onStart(evt);
 
       this._active = this._handles[0].active || this._handles[1].active || this._domHovered;
 
-      if (this._domHovered && !this._handles[1].tracking) {
-        this._moving = true;
-        this._controls.enabled = false;
-      }
+      // if (this._domHovered && !this._handles[1].tracking) {
+      //   this._moving = true;
+      //   this._controls.enabled = false;
+      // }
+      console.log('1');
 
       this.update();
     }
@@ -167,23 +179,25 @@ const widgetsRuler = (three = window.THREE) => {
       }
 
       if (this._active) {
-        const prevPosition = this._moveHandle.worldPosition.clone();
+        // const prevPosition = this._moveHandle.worldPosition.clone();
 
         this._dragged = true;
-        this._moveHandle.onMove(evt, true);
-        this._hovered = this._handles[0].active || this._handles[1].active || this._labelhovered;
+        // this._moveHandle.onMove(evt, true);
 
-        if (this._moving) {
-          this._handles.slice(0, -1).forEach(handle => {
-            handle.worldPosition.add(this._moveHandle.worldPosition.clone().sub(prevPosition));
-          });
-        }
-      } else {
-        this.onHover(null);
+      //   if (this._moving) {
+      //     this._handles.slice(0, -1).forEach(handle => {
+      //       handle.worldPosition.add(this._moveHandle.worldPosition.clone().sub(prevPosition));
+      //     });
+      //   }
+      // } else {
+      //   this.onHover(null);
       }
 
       this._handles[0].onMove(evt);
       this._handles[1].onMove(evt);
+
+      this._hovered = this._handles[0].active || this._handles[1].active || this._labelhovered;
+      console.log('2');
 
       this.update();
     }
@@ -212,6 +226,16 @@ const widgetsRuler = (three = window.THREE) => {
       }
       this._handles[1].selected = this._selected;
 
+
+      if (!this._initialized) {
+        // this._labelOffset = this._handle.screenPosition
+        //   .clone()
+        //   .multiplyScalar(0.5);
+        this.setlabeltext();
+        this._initialized = true;
+      }
+
+console.log('3');
       this._active = this._handles[0].active || this._handles[1].active;
       this._initialized = true;
       this._dragged = false;
@@ -247,6 +271,7 @@ const widgetsRuler = (three = window.THREE) => {
     createDOM() {
       this._dashline = document.createElement('div');
       this._dashline.className = 'widgets-dashline';
+      this._dashline.style.display = 'none';
       this._container.appendChild(this._dashline);
 
       this._line = document.createElement('div');
@@ -255,22 +280,19 @@ const widgetsRuler = (three = window.THREE) => {
 
       this._label = document.createElement('div');
       this._label.className = 'widgets-label';
+      this._label.style.display = 'none';
+
+      this._labelTextBox = document.createElement('div');
+      this._labelTextBox.className = 'valueText';
+      this._label.appendChild(this._labelTextBox);
+
+      this._labelMeasurement = document.createElement('div');
+      this._labelMeasurement.className = 'value'
+      this._label.appendChild(this._labelMeasurement);
+
       this._container.appendChild(this._label);
 
       this.updateDOMColor();
-    }
-
-    hideDOM() {
-      this._line.style.display = 'none';
-      this._label.style.display = 'none';
-      this._handles.forEach(elem => elem.hideDOM());
-    }
-
-    showDOM() {
-      this._line.style.display = '';
-      this._label.style.display = '';
-      this._handles[0].showDOM();
-      this._handles[1].showDOM();
     }
 
     update() {
@@ -312,15 +334,15 @@ const widgetsRuler = (three = window.THREE) => {
     updateDOM() {
       // this.updateDOMColor();
 
-      const transform = this.adjustLabelTransform(this._label, this._handles[1].screenPosition, true);
-
-      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
-
       // update line
       const lineData = this.getLineData(
         this._handles[0].screenPosition,
         this._handles[1].screenPosition
       );
+
+
+      const transform = this.adjustLabelTransform(this._label, this._handles[1].screenPosition, true);
+      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
 
       this._line.style.transform = `translate3D(${lineData.transformX}px, ${
         lineData.transformY
@@ -330,14 +352,14 @@ const widgetsRuler = (three = window.THREE) => {
 
 
 
-      if (this._units === 'units' && !this._label.hasAttribute('title')) {
-        this._label.setAttribute('title', 'Calibration is required to display the distance in mm');
-        this._label.style.color = this._colors.error;
-      } else if (this._units !== 'units' && this._label.hasAttribute('title')) {
-        this._label.removeAttribute('title');
-        this._label.style.color = this._colors.text;
-      }
-      this._label.innerHTML = `${this._distance.toFixed(2)} ${this._units}`;
+      // if (this._units === 'units' && !this._labelMeasurement.hasAttribute('title')) {
+      //   this._labelMeasurement.setAttribute('title', 'Calibration is required to display the distance in mm');
+      //   this._label.style.color = this._colors.error;
+      // } else if (this._units !== 'units' && this._label.hasAttribute('title')) {
+      //   this._labelMeasurement.removeAttribute('title');
+      //   this._label.style.color = this._colors.text;
+      // }
+      this._labelMeasurement.innerHTML = `${this._distance.toFixed(2)} ${this._units}`;
 
       let angle = Math.abs(lineData.transformAngle);
       if (angle > Math.PI / 2) {
@@ -361,13 +383,13 @@ const widgetsRuler = (three = window.THREE) => {
           ? this._labelOffset // if the label is moved, then its position is defined by labelOffset
           : paddingVector
       ); // otherwise it's placed in the center of the line
-      const labelPosition = this.adjustLabelTransform(this._label, paddingPoint);
+      const labelPosition = this.adjustLabelTransform(this._labelMeasurement, paddingPoint);
 
       this._label.style.transform = `translate3D(${labelPosition.x}px, ${labelPosition.y}px, 0)`;
 
-      if (this._manuallabeldisplay) {
-        this.displaylabel();
-      }
+      // if (this._manuallabeldisplay) {
+      //   this.displaylabel();
+      // }
 
       // update dash line
       let minLine = this.getLineData(this._handles[1].screenPosition, paddingPoint);
@@ -386,6 +408,10 @@ const widgetsRuler = (three = window.THREE) => {
         }px, 0)
         rotate(${minLine.transformAngle}rad)`;
       this._dashline.style.width = minLine.length + 'px';
+
+
+      const labelValue = this._label.querySelector('.valueText');
+      labelValue.innerHTML = `${this._labeltext}`;
     }
 
     updateDOMColor() {
@@ -394,20 +420,35 @@ const widgetsRuler = (three = window.THREE) => {
       this._dashline.style.borderTop = '1.5px dashed ' + this._color;
     }
 
+
+    setlabeltext() {
+      // called when the user creates a new arrow
+      while (!this._labeltext) {
+        this._labeltext = prompt('Please enter the annotation text', '');
+      }
+      this.displaylabel();
+    }
+
+    changelabeltext() {
+      // called when the user does double click in the label
+      this._labeltext = prompt('Please enter a new annotation text', this._labelTextBox.innerHTML);
+      this.displaylabel();
+    }
+
     displaylabel() {
-      this._label.innerHTML =
+      this._labelTextBox.innerHTML =
         typeof this._labeltext === 'string' && this._labeltext.length > 0 // avoid error
           ? this._labeltext
           : ''; // empty string is passed or Cancel is pressed
       // show the label (in css an empty string is used to revert display=none)
       this._label.style.display = '';
       this._dashline.style.display = '';
-      this._label.style.transform = `translate3D(
-        ${this._handles[1].screenPosition.x - this._labelOffset.x - this._label.offsetWidth / 2}px,
-        ${this._handles[1].screenPosition.y -
-        this._labelOffset.y -
-        this._label.offsetHeight / 2 -
-        this._container.offsetHeight}px, 0)`;
+      // this._labelTextBox.style.transform = `translate3D(
+      //   ${this._handles[1].screenPosition.x - this._labelOffset.x - this._labelTextBox.offsetWidth / 2}px,
+      //   ${this._handles[1].screenPosition.y -
+      //   this._labelOffset.y -
+      //   this._labelTextBox.offsetHeight / 2 -
+      //   this._container.offsetHeight}px, 0)`;
     }
 
 

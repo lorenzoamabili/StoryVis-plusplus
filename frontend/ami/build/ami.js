@@ -45450,7 +45450,7 @@ const widgetsAnnotation = (three = window.THREE) => {
       // mesh stuff
       this._material = null;
       this._geometry = null;
-      // this._meshline = null;
+      this._meshline = null;
       this._cone = null;
 
       // dom stuff
@@ -45467,11 +45467,9 @@ const widgetsAnnotation = (three = window.THREE) => {
       this._handle = new WidgetsHandle(targetMesh, controls, params);
       this.add(this._handle);
 
-      this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
-      this.add(this._moveHandle);
-      this._moveHandle.hide();
-
-      this.create();
+      // this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
+      // this.add(this._moveHandle);
+      // this._moveHandle.hide();
 
       this._handle.active = true;
 
@@ -45536,7 +45534,7 @@ const widgetsAnnotation = (three = window.THREE) => {
       }
 
       // this._handle.onStart(evt);
-      this._moveHandle.onMove(evt, true);
+      // this._moveHandle.onMove(evt, true);
       this._handle.onStart(evt);
 
       this._active = this._handle.active || this._domHovered;
@@ -45582,7 +45580,9 @@ const widgetsAnnotation = (three = window.THREE) => {
       }
 
       if (!this._initialized) {
-        this._labelOffset = this._handle.screenPosition.clone().multiplyScalar(0.5);
+        // this._labelOffset = this._handle.screenPosition
+        //   .clone()
+        //   .multiplyScalar(0.5);
         this.setlabeltext();
         this._initialized = true;
       }
@@ -45618,7 +45618,37 @@ const widgetsAnnotation = (three = window.THREE) => {
         ${this._handle.screenPosition.y - this._labelOffset.y - this._label.offsetHeight / 2 - this._container.offsetHeight}px, 0)`;
     }
 
+    createMesh() {
+      // material
+      this._material = new three.LineBasicMaterial();
+
+      this.updateMeshColor();
+
+      // line geometry
+      this._geometry = new three.Geometry();
+      this._geometry.vertices.push(this._handle.worldPosition);
+      this._geometry.vertices.push(this._handle.worldPosition);
+
+      // line mesh
+      this._meshline = new three.Line(this._geometry, this._material);
+      this._meshline.visible = true;
+
+      this.add(this._meshline);
+
+      // cone geometry
+      this._conegeometry = new three.CylinderGeometry(0, 2, 10);
+      this._conegeometry.translate(0, -5, 0);
+      this._conegeometry.rotateX(-Math.PI / 2);
+
+      // cone mesh
+      this._cone = new three.Mesh(this._conegeometry, this._material);
+      this._cone.visible = true;
+
+      this.add(this._cone);
+    }
+
     create() {
+      this.createMesh();
       this.createDOM();
     }
 
@@ -45640,20 +45670,38 @@ const widgetsAnnotation = (three = window.THREE) => {
       this.updateColor();
 
       this._handle.update();
-      this._worldPosition.copy(this._handle.worldPosition);
+      // this._worldPosition.copy(this._handle.worldPosition);
+      this.updateMeshColor();
+      this.updateMeshPosition();
 
       this.updateDOM();
     }
 
+    updateMeshColor() {
+      if (this._material) {
+        this._material.color.set(this._color);
+      }
+    }
+
+    updateMeshPosition() {
+      if (this._geometry) {
+        this._geometry.verticesNeedUpdate = true;
+      }
+
+      if (this._cone) {
+        this._cone.position.copy(this._handle.worldPosition);
+        this._cone.lookAt(this._handle.worldPosition);
+      }
+    }
+
     updateDOM() {
-      this.updateDOMColor();
+      // this.updateDOMColor();
+      // update line
+      const lineData = this.getLineData(this._handle.screenPosition, this._handle.screenPosition);
 
       const transform = this.adjustLabelTransform(this._label, this._handle.screenPosition, true);
 
       this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
-
-      // update line
-      const lineData = this.getLineData(this._handle.screenPosition, this._handle.screenPosition);
 
       // update label
       const paddingVector = lineData.line.multiplyScalar(0.5);
@@ -45715,7 +45763,39 @@ const widgetsAnnotation = (three = window.THREE) => {
       this._container.removeChild(this._dashline);
       this._container.removeChild(this._label);
 
+      // mesh, geometry, material
+      this.remove(this._meshline);
+      this._meshline.geometry.dispose();
+      this._meshline.geometry = null;
+      this._meshline.material.dispose();
+      this._meshline.material = null;
+      this._meshline = null;
+      this._geometry.dispose();
+      this._geometry = null;
+      this._material.vertexShader = null;
+      this._material.fragmentShader = null;
+      this._material.uniforms = null;
+      this._material.dispose();
+      this._material = null;
+      this.remove(this._cone);
+      this._cone.geometry.dispose();
+      this._cone.geometry = null;
+      this._cone.material.dispose();
+      this._cone.material = null;
+      this._cone = null;
+      this._conegeometry.dispose();
+      this._conegeometry = null;
       super.free();
+    }
+
+    get targetMesh() {
+      return this._targetMesh;
+    }
+
+    set targetMesh(targetMesh) {
+      this._targetMesh = targetMesh;
+      this._handles.forEach(elem => elem.targetMesh = targetMesh);
+      this.update();
     }
 
     get worldPosition() {
@@ -48449,21 +48529,22 @@ const widgetsHandle = (three = window.THREE) => {
         this._active = true;
         this._controls.enabled = false;
 
-        if (this._targetMesh) {
-          if (this._geometry) {
-            let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
-            if (intersectsTarget.length > 0) {
-              this._offset.copy(intersectsTarget[0].point).sub(this._worldPosition);
-            }
-          }
-        } else {
-          this._plane.position.copy(this._worldPosition);
-          this._plane.direction.copy(this._camera.getWorldDirection());
-          let intersection = _core_core_intersections__WEBPACK_IMPORTED_MODULE_1__["default"].rayPlane(this._raycaster.ray, this._plane);
-          if (intersection !== null) {
-            this._offset.copy(intersection).sub(this._plane.position);
-          }
+        // if (this._targetMesh) {
+        //   if (this._geometry) {
+        //     let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
+        //     if (intersectsTarget.length > 0) {
+        //       this._offset.copy(intersectsTarget[0].point).sub(this._worldPosition);
+        //     }
+        //   }
+        // } else {
+        this._plane.position.copy(this._worldPosition);
+        var vec = new three.Vector3();
+        this._plane.direction.copy(this._camera.getWorldDirection(vec));
+        let intersection = _core_core_intersections__WEBPACK_IMPORTED_MODULE_1__["default"].rayPlane(this._raycaster.ray, this._plane);
+        if (intersection !== null) {
+          this._offset.copy(intersection).sub(this._plane.position);
         }
+        // }
 
         this.update();
       }
@@ -48485,26 +48566,28 @@ const widgetsHandle = (three = window.THREE) => {
       if (this._active || forced) {
         this._dragged = true;
 
-        if (this._targetMesh) {
-          try {
-            let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
-            if (intersectsTarget.length > 0) {
-              this._worldPosition.copy(intersectsTarget[0].point.sub(this._offset));
-            }
-          } catch (e) {}
-        } else {
-          if (this._plane.direction.length() === 0) {
-            var vector = new THREE.Vector3();
-            // free mode!this._targetMesh
-            this._plane.position.copy(this._worldPosition);
-            this._plane.direction.copy(this._camera.getWorldDirection(vector));
-          }
-
-          let intersection = _core_core_intersections__WEBPACK_IMPORTED_MODULE_1__["default"].rayPlane(this._raycaster.ray, this._plane);
-          if (intersection !== null) {
-            this._worldPosition.copy(intersection.sub(this._offset));
-          }
+        // if (this._targetMesh) {
+        //   try {
+        //     let intersectsTarget = this._raycaster.intersectObject(this._targetMesh);
+        //     if (intersectsTarget.length > 0) {
+        //       this._worldPosition.copy(intersectsTarget[0].point.sub(this._offset));
+        //     }
+        //   }
+        //   catch (e) {
+        //   }
+        // } else {
+        if (this._plane.direction.length() === 0) {
+          var vector = new THREE.Vector3();
+          // free mode!this._targetMesh
+          this._plane.position.copy(this._worldPosition);
+          this._plane.direction.copy(this._camera.getWorldDirection(vector));
         }
+
+        let intersection = _core_core_intersections__WEBPACK_IMPORTED_MODULE_1__["default"].rayPlane(this._raycaster.ray, this._plane);
+        if (intersection !== null) {
+          this._worldPosition.copy(intersection.sub(this._offset));
+        }
+        // }
       } else {
         this.onHover(null);
       }
@@ -50605,6 +50688,8 @@ const widgetsRuler = (three = window.THREE) => {
       this._dashline = null;
       this._line = null;
       this._label = null;
+      this._labelMeasurement = null;
+      this._labelTextBox = null;
 
       // add handles
       this._handles = [];
@@ -50619,37 +50704,46 @@ const widgetsRuler = (three = window.THREE) => {
       this._handles[1].active = true;
       this._handles[1].tracking = true;
 
-      this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
-      this.add(this._moveHandle);
-      this._handles.push(this._moveHandle);
-      this._moveHandle.hide();
+      // this._moveHandle = new WidgetsHandle(targetMesh, controls, params);
+      // this.add(this._moveHandle);
+      // this._handles.push(this._moveHandle);
+      // this._moveHandle.hide();
 
       this.create();
       this.initOffsets();
 
+      this.changelabeltext = this.changelabeltext.bind(this);
       this.onMove = this.onMove.bind(this);
-      this.onHover = this.onHover.bind(this);
+      // this.onHover = this.onHover.bind(this);
       this.onHoverlabel = this.onHoverlabel.bind(this);
       this.notonHoverlabel = this.notonHoverlabel.bind(this);
       this.addEventListeners();
     }
 
     addEventListeners() {
+      window.addEventListener('resize', this.onResize);
       this._container.addEventListener('wheel', this.onMove);
 
-      this._line.addEventListener('mouseenter', this.onHover);
-      this._line.addEventListener('mouseleave', this.onHover);
+      // this._line.addEventListener('mouseenter', this.onHover);
+      // this._line.addEventListener('mouseleave', this.onHover);
       this._label.addEventListener('mouseenter', this.onHoverlabel);
       this._label.addEventListener('mouseleave', this.notonHoverlabel);
+      this._label.addEventListener('dblclick', this.changelabeltext);
     }
 
     removeEventListeners() {
+      window.removeEventListener('resize', this.onResize);
       this._container.removeEventListener('wheel', this.onMove);
 
-      this._line.removeEventListener('mouseenter', this.onHover);
-      this._line.removeEventListener('mouseleave', this.onHover);
+      // this._line.removeEventListener('mouseenter', this.onHover);
+      // this._line.removeEventListener('mouseleave', this.onHover);
       this._label.removeEventListener('mouseenter', this.onHoverlabel);
       this._label.removeEventListener('mouseleave', this.notonHoverlabel);
+      this._label.removeEventListener('dblclick', this.changelabeltext);
+    }
+
+    onResize() {
+      this.initOffsets();
     }
 
     onHover(evt) {
@@ -50695,17 +50789,18 @@ const widgetsRuler = (three = window.THREE) => {
         this._labelmoved = true;
       }
 
-      this._moveHandle.onMove(evt, true);
+      // this._moveHandle.onMove(evt, true);
 
       this._handles[0].onStart(evt);
       this._handles[1].onStart(evt);
 
       this._active = this._handles[0].active || this._handles[1].active || this._domHovered;
 
-      if (this._domHovered && !this._handles[1].tracking) {
-        this._moving = true;
-        this._controls.enabled = false;
-      }
+      // if (this._domHovered && !this._handles[1].tracking) {
+      //   this._moving = true;
+      //   this._controls.enabled = false;
+      // }
+      console.log('1');
 
       this.update();
     }
@@ -50719,23 +50814,25 @@ const widgetsRuler = (three = window.THREE) => {
       }
 
       if (this._active) {
-        const prevPosition = this._moveHandle.worldPosition.clone();
+        // const prevPosition = this._moveHandle.worldPosition.clone();
 
         this._dragged = true;
-        this._moveHandle.onMove(evt, true);
-        this._hovered = this._handles[0].active || this._handles[1].active || this._labelhovered;
+        // this._moveHandle.onMove(evt, true);
 
-        if (this._moving) {
-          this._handles.slice(0, -1).forEach(handle => {
-            handle.worldPosition.add(this._moveHandle.worldPosition.clone().sub(prevPosition));
-          });
-        }
-      } else {
-        this.onHover(null);
+        //   if (this._moving) {
+        //     this._handles.slice(0, -1).forEach(handle => {
+        //       handle.worldPosition.add(this._moveHandle.worldPosition.clone().sub(prevPosition));
+        //     });
+        //   }
+        // } else {
+        //   this.onHover(null);
       }
 
       this._handles[0].onMove(evt);
       this._handles[1].onMove(evt);
+
+      this._hovered = this._handles[0].active || this._handles[1].active || this._labelhovered;
+      console.log('2');
 
       this.update();
     }
@@ -50761,6 +50858,15 @@ const widgetsRuler = (three = window.THREE) => {
       }
       this._handles[1].selected = this._selected;
 
+      if (!this._initialized) {
+        // this._labelOffset = this._handle.screenPosition
+        //   .clone()
+        //   .multiplyScalar(0.5);
+        this.setlabeltext();
+        this._initialized = true;
+      }
+
+      console.log('3');
       this._active = this._handles[0].active || this._handles[1].active;
       this._initialized = true;
       this._dragged = false;
@@ -50796,6 +50902,7 @@ const widgetsRuler = (three = window.THREE) => {
     createDOM() {
       this._dashline = document.createElement('div');
       this._dashline.className = 'widgets-dashline';
+      this._dashline.style.display = 'none';
       this._container.appendChild(this._dashline);
 
       this._line = document.createElement('div');
@@ -50804,22 +50911,19 @@ const widgetsRuler = (three = window.THREE) => {
 
       this._label = document.createElement('div');
       this._label.className = 'widgets-label';
+      this._label.style.display = 'none';
+
+      this._labelTextBox = document.createElement('div');
+      this._labelTextBox.className = 'valueText';
+      this._label.appendChild(this._labelTextBox);
+
+      this._labelMeasurement = document.createElement('div');
+      this._labelMeasurement.className = 'value';
+      this._label.appendChild(this._labelMeasurement);
+
       this._container.appendChild(this._label);
 
       this.updateDOMColor();
-    }
-
-    hideDOM() {
-      this._line.style.display = 'none';
-      this._label.style.display = 'none';
-      this._handles.forEach(elem => elem.hideDOM());
-    }
-
-    showDOM() {
-      this._line.style.display = '';
-      this._label.style.display = '';
-      this._handles[0].showDOM();
-      this._handles[1].showDOM();
     }
 
     update() {
@@ -50857,25 +50961,24 @@ const widgetsRuler = (three = window.THREE) => {
     updateDOM() {
       // this.updateDOMColor();
 
-      const transform = this.adjustLabelTransform(this._label, this._handles[1].screenPosition, true);
-
-      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
-
       // update line
       const lineData = this.getLineData(this._handles[0].screenPosition, this._handles[1].screenPosition);
+
+      const transform = this.adjustLabelTransform(this._label, this._handles[1].screenPosition, true);
+      this._label.style.transform = `translate3D(${transform.x}px, ${transform.y}px, 0)`;
 
       this._line.style.transform = `translate3D(${lineData.transformX}px, ${lineData.transformY}px, 0)
       rotate(${lineData.transformAngle}rad)`;
       this._line.style.width = lineData.length + 'px';
 
-      if (this._units === 'units' && !this._label.hasAttribute('title')) {
-        this._label.setAttribute('title', 'Calibration is required to display the distance in mm');
-        this._label.style.color = this._colors.error;
-      } else if (this._units !== 'units' && this._label.hasAttribute('title')) {
-        this._label.removeAttribute('title');
-        this._label.style.color = this._colors.text;
-      }
-      this._label.innerHTML = `${this._distance.toFixed(2)} ${this._units}`;
+      // if (this._units === 'units' && !this._labelMeasurement.hasAttribute('title')) {
+      //   this._labelMeasurement.setAttribute('title', 'Calibration is required to display the distance in mm');
+      //   this._label.style.color = this._colors.error;
+      // } else if (this._units !== 'units' && this._label.hasAttribute('title')) {
+      //   this._labelMeasurement.removeAttribute('title');
+      //   this._label.style.color = this._colors.text;
+      // }
+      this._labelMeasurement.innerHTML = `${this._distance.toFixed(2)} ${this._units}`;
 
       let angle = Math.abs(lineData.transformAngle);
       if (angle > Math.PI / 2) {
@@ -50896,13 +50999,13 @@ const widgetsRuler = (three = window.THREE) => {
       const paddingVector = lineData.line.multiplyScalar(0.5);
       const paddingPoint = this._handles[1].screenPosition.clone().sub(this._labelmoved ? this._labelOffset // if the label is moved, then its position is defined by labelOffset
       : paddingVector); // otherwise it's placed in the center of the line
-      const labelPosition = this.adjustLabelTransform(this._label, paddingPoint);
+      const labelPosition = this.adjustLabelTransform(this._labelMeasurement, paddingPoint);
 
       this._label.style.transform = `translate3D(${labelPosition.x}px, ${labelPosition.y}px, 0)`;
 
-      if (this._manuallabeldisplay) {
-        this.displaylabel();
-      }
+      // if (this._manuallabeldisplay) {
+      //   this.displaylabel();
+      // }
 
       // update dash line
       let minLine = this.getLineData(this._handles[1].screenPosition, paddingPoint);
@@ -50919,6 +51022,9 @@ const widgetsRuler = (three = window.THREE) => {
       this._dashline.style.transform = `translate3D(${minLine.transformX}px, ${minLine.transformY}px, 0)
         rotate(${minLine.transformAngle}rad)`;
       this._dashline.style.width = minLine.length + 'px';
+
+      const labelValue = this._label.querySelector('.valueText');
+      labelValue.innerHTML = `${this._labeltext}`;
     }
 
     updateDOMColor() {
@@ -50927,15 +51033,32 @@ const widgetsRuler = (three = window.THREE) => {
       this._dashline.style.borderTop = '1.5px dashed ' + this._color;
     }
 
+    setlabeltext() {
+      // called when the user creates a new arrow
+      while (!this._labeltext) {
+        this._labeltext = prompt('Please enter the annotation text', '');
+      }
+      this.displaylabel();
+    }
+
+    changelabeltext() {
+      // called when the user does double click in the label
+      this._labeltext = prompt('Please enter a new annotation text', this._labelTextBox.innerHTML);
+      this.displaylabel();
+    }
+
     displaylabel() {
-      this._label.innerHTML = typeof this._labeltext === 'string' && this._labeltext.length > 0 // avoid error
+      this._labelTextBox.innerHTML = typeof this._labeltext === 'string' && this._labeltext.length > 0 // avoid error
       ? this._labeltext : ''; // empty string is passed or Cancel is pressed
       // show the label (in css an empty string is used to revert display=none)
       this._label.style.display = '';
       this._dashline.style.display = '';
-      this._label.style.transform = `translate3D(
-        ${this._handles[1].screenPosition.x - this._labelOffset.x - this._label.offsetWidth / 2}px,
-        ${this._handles[1].screenPosition.y - this._labelOffset.y - this._label.offsetHeight / 2 - this._container.offsetHeight}px, 0)`;
+      // this._labelTextBox.style.transform = `translate3D(
+      //   ${this._handles[1].screenPosition.x - this._labelOffset.x - this._labelTextBox.offsetWidth / 2}px,
+      //   ${this._handles[1].screenPosition.y -
+      //   this._labelOffset.y -
+      //   this._labelTextBox.offsetHeight / 2 -
+      //   this._container.offsetHeight}px, 0)`;
     }
 
     free() {

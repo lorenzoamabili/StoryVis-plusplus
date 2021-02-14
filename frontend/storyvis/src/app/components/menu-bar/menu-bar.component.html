@@ -2,48 +2,57 @@
   <mat-toolbar-row>
 
 
-    <mat-button-toggle class="dashboardBtn" [checked]="canvas.settings.datacomicsMode"
-      (click)="canvas.displayDatacomics()" (change)="canvas.settings.datacomicsMode = $event.source.checked"
-      matTooltip="Data-Comics Mode">
-      <mat-icon>textsms</mat-icon>
+    <div *ngIf="settings.isAdvancedMode">
+      <mat-button-toggle class="transparent dashboardBtn" [checked]="canvas.settings.datacomicsMode"
+        (click)="canvas.displayDatacomics()" (change)="canvas.settings.datacomicsMode = $event.source.checked"
+        matTooltip="Data-Comics Mode">
+        <mat-icon>grid_on</mat-icon>
 
-    </mat-button-toggle>
+      </mat-button-toggle>
+
+      <span>&nbsp;</span>
+
+      <mat-button-toggle class="transparent dashboardBtn" [checked]="canvas.settings.scrollytellingMode"
+        (click)="canvas.displayScrollytelling()" (change)="canvas.settings.scrollytellingMode = $event.source.checked"
+        matTooltip="Scrollytelling Mode">
+        <mat-icon>ballot</mat-icon>
+
+      </mat-button-toggle>
+
+
+      <span>&nbsp;</span>
+
+
+      <button *ngIf="canvas.dashboardOpen" class="transparent btn btn-primary"
+        matTooltip="To rearrange the story elements"
+        style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.rearrangeFrames();">
+        <mat-icon>grid_off</mat-icon>
+
+      </button>
+
+      <span>&nbsp;</span>
+
+      <button *ngIf="canvas.dashboardOpen" class="transparent btn btn-primary" matTooltip="To add a text box"
+        style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.addTextArea();">
+        <mat-icon>speaker_notes</mat-icon>
+
+      </button>
+
+      <span>&nbsp;</span>
+
+      <button *ngIf="canvas.dashboardOpen" class="transparent btn btn-primary" matTooltip="To clear the dashboard"
+        style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.clearDashboard();">
+        <mat-icon>clear</mat-icon>
+
+      </button>
+    </div>
 
     <span>&nbsp;</span>
-
-    <mat-button-toggle class="dashboardBtn" [checked]="canvas.settings.scrollytellingMode"
-      (click)="canvas.displayScrollytelling()" (change)="canvas.settings.scrollytellingMode = $event.source.checked"
-      matTooltip="Scrollytelling Mode">
-      <mat-icon>view_list</mat-icon>
-
-    </mat-button-toggle>
-
-
+    <span>&nbsp;</span>
     <span>&nbsp;</span>
 
-
-    <button *ngIf="canvas.dashboardOpen" class="btn btn-primary" matTooltip="To rearrange the story elements"
-      style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.rearrangeFrames()">
-      <mat-icon>grid_off</mat-icon>
-
-    </button>
-
     <span>&nbsp;</span>
-
-    <button *ngIf="canvas.dashboardOpen" class="btn btn-primary" matTooltip="To add a text box"
-      style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.addTextArea()">
-      <mat-icon>speaker_notes</mat-icon>
-
-    </button>
-
     <span>&nbsp;</span>
-
-    <button *ngIf="canvas.dashboardOpen" class="btn btn-primary" matTooltip="To clear the dashboard"
-      style="font-size: 12px; background-color: lightslategrey; border: none;" (click)="canvas.clearDashboard()">
-      <mat-icon>clear</mat-icon>
-
-    </button>
-
     <span>&nbsp;</span>
 
     <!-- <div *ngIf="isAdmin">
@@ -78,49 +87,61 @@
 
 
 
-      <button class="save" mat-raised-button matTooltip="Save provenance graph in cloud"
+      <button class="transparent save" mat-raised-button matTooltip="Save provenance graph in cloud"
         (click)="provenance.saveGraph(IDcreator)">
         <mat-icon>backup</mat-icon>
       </button>
 
-      <button class="save" mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
+      <button class="transparent save" mat-raised-button matTooltip="Save story in cloud" (click)="provenance.saveStory(IDcreator)">
         <mat-icon>mms icon</mat-icon>
       </button>
 
-      <button class="save" mat-raised-button matTooltip="Save text report in cloud"
+      <button class="transparent save" mat-raised-button matTooltip="Save text report in cloud"
         (click)="provenance.saveTextReport(IDcreator)">
         <mat-icon>library_books</mat-icon>
       </button>
     </div> -->
 
-    <span>&nbsp;</span>
 
-    <mat-button-toggle [checked]="settings.rulerMode" (change)="settings.rulerMode = $event.source.checked"
-      matTooltip="Distance Measurement">
-      <mat-icon class="example-icon">space_bar</mat-icon>
+    <mat-button-toggle class="transparent" [checked]="settings.rulerMode"
+      (change)="settings.rulerMode = $event.source.checked" matTooltip="Distance Measurement">
+      <mat-icon>space_bar</mat-icon>
     </mat-button-toggle>
 
-    <mat-button-toggle [checked]="settings.angleMode" (change)="settings.angleMode = $event.source.checked"
-      matTooltip="Angle Measurement">
-      <mat-icon class="example-icon">launch</mat-icon>
+    <mat-button-toggle class="transparent" [checked]="settings.angleMode"
+      (change)="settings.angleMode = $event.source.checked" matTooltip="Angle Measurement">
+      <mat-icon>launch</mat-icon>
     </mat-button-toggle>
 
     <!-- <mat-button-toggle [checked]="settings.freehandMode"
       (change)="settings.freehandMode = $event.source.checked" matTooltip="Freehand Measurement">
-      <mat-icon class="example-icon">pan_tool</mat-icon>
+      <mat-icon>pan_tool</mat-icon>
     </mat-button-toggle> -->
 
-    <mat-button-toggle [checked]="settings.voxelprobeMode" (change)="settings.voxelprobeMode = $event.source.checked"
-      matTooltip="Density Measurement">
-      <mat-icon class="example-icon">fingerprint</mat-icon>
+    <mat-button-toggle class="transparent" [checked]="settings.voxelprobeMode"
+      (change)="settings.voxelprobeMode = $event.source.checked" matTooltip="Density Measurement">
+      <mat-icon>fingerprint</mat-icon>
     </mat-button-toggle>
 
     <span>&nbsp;</span>
 
-    <mat-button-toggle class="annotation" [checked]="settings.annotationMode"
+    <mat-button-toggle class="transparent annotation" [checked]="settings.annotationMode"
       (change)="settings.annotationMode = $event.source.checked" matTooltip="Text Annotation">
-      <mat-icon class="example-icon">speaker_notes</mat-icon>
+      <mat-icon>speaker_notes</mat-icon>
     </mat-button-toggle>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
 
     <app-styled-slider-practice *ngIf="!studyStarted"></app-styled-slider-practice>
     <app-styled-slider-exploration *ngIf="studyStarted"></app-styled-slider-exploration>
@@ -129,24 +150,43 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
-    <button class="smallerButton" mat-raised-button matTooltip="Set default window level - Lung"
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <mat-form-field style='width: fit-content;' matTooltip="Set default window level">
+      <mat-label> Default WL settings </mat-label>
+      <mat-select (selectionChange)="settings.canvas.presetWindowLevel($event);">
+        <mat-option *ngFor="let wlSetting of wlSettings" [value]="wlSetting">
+          {{ wlSetting.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+
+    <!-- <button class="transparent smallerButton" mat-raised-button matTooltip="Set default window level - Lung"
       (click)="settings.canvas.resetWindowLevel('1')">
       <mat-icon>settings_brightness</mat-icon>
     </button>
 
     <span>&nbsp;</span>
 
-    <button class="smallerButton" style="background-color: slategray;" mat-raised-button
+    <button class="transparent smallerButton" style="background-color: slategray;" mat-raised-button
       matTooltip="Set default window level - Mediastinum" (click)="settings.canvas.resetWindowLevel('2')">
       <mat-icon>settings_brightness</mat-icon>
-    </button>
+    </button> -->
 
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
-    <button class="smallerButton" mat-raised-button matTooltip="Restore the original slices position in all the views"
-      (click)="settings.canvas.resetSlicesLocation()">
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <button class="transparent smallerButton" mat-raised-button
+      matTooltip="Restore the original slices position in all the views"
+      (click)="settings.canvas.resetSlicesLocation();">
       <mat-icon>settings_overscan</mat-icon>
     </button>
 
@@ -154,8 +194,8 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
-    <button class="smallerButton" mat-raised-button matTooltip="Reset all the configuration settings"
-      (click)="settings.canvas.resetConfig(true)">
+    <button class="transparent smallerButton" mat-raised-button matTooltip="Reset all the configuration settings"
+      (click)="settings.canvas.resetConfig(true);">
       <mat-icon>settings_backup_restore</mat-icon>
     </button>
 
@@ -163,22 +203,76 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
-    <button *ngIf="!settings.localizersOn" mat-raised-button matTooltip="Activate localizers" class="localizers" (click)="settings.canvas.createLocalizers();">
+    <button *ngIf="!settings.localizersOn" mat-raised-button matTooltip="Activate localizers"
+      class="transparent localizers" (click)="settings.canvas.createLocalizers();">
       <mat-icon>add</mat-icon>
     </button>
-    <button *ngIf="settings.localizersOn" style="background-color: lightslategray; color: black;" mat-raised-button matTooltip="Remove localizers" class="localizers-checked" (click)="settings.canvas.removeLocalizers();">
+    <button *ngIf="settings.localizersOn" style="background-color: lightslategray; color: black;" mat-raised-button
+      matTooltip="Remove localizers" class="transparent localizers-checked"
+      (click)="settings.canvas.removeLocalizers();">
       <mat-icon>add</mat-icon>
     </button>
 
+
+
+    <div *ngIf="settings.isAdvancedMode">
+      <mat-button-toggle class="transparent dashboardBtn" [checked]="settings.syncScroll"
+        (change)="settings.syncScroll = !settings.syncScroll;" matTooltip="Synchronize slice scrolling">
+        <mat-icon>sync</mat-icon>
+      </mat-button-toggle>
+    </div>
+
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
 
-    <div style="position: absolute; right: 10%;">
-      <button class="smallerButton" mat-raised-button matTooltip="To delete all graphs" (click)="reset()">
-        <mat-icon>cancel_presentation</mat-icon>
+    <div *ngIf="settings.isAdvancedMode" style="position: absolute; right: 400px;">
+      <button class="transparent smallerButton" mat-raised-button matTooltip="Compare your analysis"
+        (click)="canvas.compareAnalyses();">
+        <mat-icon>compare_arrows</mat-icon>
       </button>
+
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+
+      <mat-form-field *ngIf="settings.isComparisonMode" matTooltip="Compare your analysis with another one">
+        <mat-label> Compare Analysis </mat-label>
+        <mat-select (selectionChange)="settings.canvasComparison2.loadDataExternal($event);">
+          <mat-option *ngFor="let data of dataSources" [value]="data">
+            {{ data.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+
+      <mat-form-field matTooltip="Support your analysis with a previous one">
+        <mat-label> Analysis Support </mat-label>
+        <mat-select (selectionChange)="provenance.restoreGraphEducation($event);">
+          <mat-option *ngFor="let graph of graphs" [value]="graph">
+            {{ graph._id}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+
+      <!-- <button class="transparent smallerButton" mat-raised-button matTooltip="Delete all graphs" (click)="reset()">
+        <mat-icon>cancel_presentation</mat-icon>
+      </button> -->
 
       <span>&nbsp;</span>
       <span>&nbsp;</span>
@@ -186,13 +280,42 @@
 
 
       <mat-form-field matTooltip="Load a previous analysis">
-        <mat-label> </mat-label>
-        <mat-select (selectionChange)="provenance.restoreGraph($event)">
+        <mat-label> Load Analysis </mat-label>
+        <mat-select (selectionChange)="provenance.restoreGraph($event);">
           <mat-option *ngFor="let graph of graphs" [value]="graph">
             {{ graph._id}}
           </mat-option>
         </mat-select>
       </mat-form-field>
+
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+
+      <button class="transparent smallerButton" mat-raised-button matTooltip="Load all graphs" (click)="load();">
+        <mat-icon>forward</mat-icon>
+      </button>
+
+    </div>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+    <div style="position: absolute; right: 200px;">
+    <mat-button-toggle *ngIf="settings.isAdvancedMode" class="transparent dashboardBtn" [checked]="settings.treeButtons" (click)="canvas.treeButtons();"
+      (change)="settings.treeButtons = !settings.treeButtons;" matTooltip="Show/hide tree buttons">
+      <mat-icon>radio_button_checked</mat-icon>
+    </mat-button-toggle>
+
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+
+      <mat-button-toggle class="transparent dashboardBtn" [checked]="settings.isAdvancedMode"
+        (change)="settings.isAdvancedMode = !settings.isAdvancedMode;" matTooltip="StoryVis - Adult version">
+        <mat-icon>supervisor_account</mat-icon>
+      </mat-button-toggle>
     </div>
 
 
@@ -220,15 +343,15 @@
     <span>&nbsp;</span>
 
     <div *ngIf="!studyStarted" style="position: absolute; right: 0%;">
-      <a class="nav-item nav-link">PRACTICE SESSION</a>
+      <a class="transparent nav-item nav-link">PRACTICE SESSION</a>
     </div>
 
     <div *ngIf="studyStarted" style="position: absolute; right: 0%;">
-      <a class="nav-item nav-link">EVALUATION SESSION</a>
+      <a class="transparent nav-item nav-link">EVALUATION SESSION</a>
     </div>
 
     <div *ngIf="isAdmin" style="position: absolute; right: 0%;">
-      <a class="nav-item nav-link" (click)="logout()">LOGOUT</a>
+      <a class="transparent nav-item nav-link" (click)="logout();">LOGOUT</a>
     </div>
 
   </mat-toolbar-row>

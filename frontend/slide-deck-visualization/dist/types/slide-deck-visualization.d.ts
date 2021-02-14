@@ -19,6 +19,7 @@ export declare class SlideDeckVisualization {
     private _toolbarY;
     private _toolbarPadding;
     private _shiftedPosition;
+    private calculatedWidth;
     private _draggedSlideReAdjustmentFactor;
     private _originPosition;
     private _currentTime;
@@ -49,6 +50,8 @@ export declare class SlideDeckVisualization {
     private previousSlidesWidth;
     private updateTimeIndices;
     private rescaleTimeline;
+    private shrink;
+    private stretch;
     private slideSliceRight;
     private slideSliceLeft;
     private onBackward;
@@ -74,6 +77,7 @@ export declare class SlideDeckVisualization {
     private drawSeekBar;
     private adjustSlideAddObjectPosition;
     update(): void;
+    createStoryFromDerivationNodes(): void;
     setDeck(deck: IProvenanceSlidedeck): void;
     getDeck(): IProvenanceSlidedeck;
 }

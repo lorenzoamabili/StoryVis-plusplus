@@ -7,6 +7,9 @@ import { StyledSliderExplorationComponent } from './styled-slider-exploration/st
 import { SlidesContainerComponent } from './slides-container/slides-container.component';
 import { TextReportComponent } from './text-report/text-report.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
+import { MenuBarComparisonComponent } from './menu-bar-comparison/menu-bar-comparison.component';
+import { ProvenanceVisualizationComparisonComponent } from './brainvis-canvas/provenance-visualization-comparison/provenance-visualization-comparison.component';
+import { ComparisonComponent } from './brainvis-canvas/comparison.component';
 
 import { MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -66,22 +69,28 @@ import { HttpClientModule } from '@angular/common/http';
     declarations: [
         BrainvisCanvasComponent,
         ProvenanceVisualizationComponent,
+        ProvenanceVisualizationComparisonComponent,
         ProvenanceSlidesComponent,
         StyledSliderPracticeComponent,
         StyledSliderExplorationComponent,
         SlidesContainerComponent,
         TextReportComponent,
-        MenuBarComponent
+        MenuBarComponent,
+        MenuBarComparisonComponent,
+        ComparisonComponent
     ],
     exports: [
         BrainvisCanvasComponent,
         ProvenanceVisualizationComponent,
+        ProvenanceVisualizationComparisonComponent,
         ProvenanceSlidesComponent,
         StyledSliderPracticeComponent,
         StyledSliderExplorationComponent,
         SlidesContainerComponent,
         MenuBarComponent,
-        TextReportComponent
+        MenuBarComparisonComponent,
+        TextReportComponent,
+        ComparisonComponent
     ]
 })
 

@@ -28,13 +28,15 @@ export class ProvenanceGraph implements IProvenanceGraph {
   private _mitt: any;
   public _nodes: { [key: string]: ProvenanceNode } = {};
   public id: string;
+  public graphID: number = 0;
+  public creationOrder: number = 0;
 
 
   constructor(application: Application, userid: string = 'Unknown', node?: RootNode) {
     this.id = generateUUID();
     this._mitt = mitt();
     this.application = application;
-
+    this.graphID = this.graphID + 1;
   
     if (node) {
       this.root = node;
@@ -45,7 +47,8 @@ export class ProvenanceGraph implements IProvenanceGraph {
         metadata: {
           createdBy: userid,
           createdOn: generateTimestamp(),
-          creationOrder: 0
+          creationOrder: this.creationOrder,
+          graphID: this.graphID
         },
         children: []
       }

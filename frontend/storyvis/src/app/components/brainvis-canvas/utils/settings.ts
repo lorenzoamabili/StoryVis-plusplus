@@ -1,5 +1,6 @@
 import { Input, Output, EventEmitter, Component } from '@angular/core';
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
+import { ComparisonComponent } from '../comparison.component';
 
 @Component({
     template: ''
@@ -10,11 +11,20 @@ export class Settings {
 
     public static instance: Settings;
     public canvas: BrainvisCanvasComponent;
+    public canvasComparison1: BrainvisCanvasComponent;
+    public canvasComparison2: ComparisonComponent;
+    public _canvas: BrainvisCanvasComponent | ComparisonComponent;
+
+    public syncScroll: boolean = false;
     public isOneView: string = '';
     public automaticSettingW: boolean = false;
     public automaticSettingC: boolean = false;
     public slideDeckOpen: boolean = false;
     public localizersOn: boolean = false;
+    public isComparisonMode: boolean = false;
+    public isEducationMode: boolean = false;
+    public treeButtons: boolean = false;
+    public multiplePlanesModeOn: boolean = false;
 
     public _colorMap = 'grayscale';
 
@@ -27,6 +37,8 @@ export class Settings {
     private _datacomicsMode = false;
     private _scrollytellingMode = false;
     
+    public registryOn = false;
+
     public rulerOn = false;
     public angleOn = false;
     // public freehandOn = false;
@@ -269,7 +281,7 @@ export class Settings {
         if (!Settings.instance) {
             Settings.instance = new Settings();
 
-            Settings.instance.canvas = canvas;
+            Settings.instance._canvas = canvas;
         }
 
         return Settings.instance;
