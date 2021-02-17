@@ -246,8 +246,8 @@ export class ProvenanceService {
 
 
 
-  generation(onThisTree?: boolean) {
-    if (onThisTree) {
+  generation(newGraph?: boolean) {
+    if (newGraph) {
       this.saveGraph(0);
       this.newProvenanceGraph();
       this.graph.root.label = 'New Root';
@@ -267,11 +267,7 @@ export class ProvenanceService {
   }
 
 
-  fission(onThisTree?: boolean) {
-    if (onThisTree) {
-      this.saveGraph(0);
-      this.newProvenanceGraph();
-    } else {
+  fission() {
       const parameters = this.settings.canvas.resetConfigParam();
       const action = {
         metadata: {
@@ -284,7 +280,6 @@ export class ProvenanceService {
         undoArguments: { args: [] }
       };
       this.tracker.applyAction(action, true, parameters.artifacts, 'split');
-    }
   }
 
 

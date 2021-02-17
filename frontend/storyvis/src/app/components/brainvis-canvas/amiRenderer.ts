@@ -109,7 +109,6 @@ export class AMIRenderer {
         protected onDoubleClick(event) {
         if (this._initialized) {
             const canvas = event.target.parentElement;
-            const id = event.target.id;
             const mouse = {
                 x: ((event.clientX - canvas.offsetLeft) / canvas.clientWidth) * 2 - 1,
                 y: -((event.clientY - canvas.offsetTop) / canvas.clientHeight) * 2 + 1,

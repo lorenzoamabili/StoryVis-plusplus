@@ -6,19 +6,20 @@
         <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('c1');">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'c1');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'c1');">
+            <mat-icon>ballot</mat-icon>
+        </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
-            (click)="navigateVolume('axial', this._comparisonRenderer1.stackHelper._orientationMaxIndex -1, 10000);">
+            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);">
             <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
             (click)="navigateVolume('axial', 1, 10000);">
             <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
-        <mat-button-toggle *ngIf="!settings.isOneView" class="comparison" [checked]="settings.isComparisonMode"
-            (change)="settings.isComparisonMode = $event.source.checked;
-        settings.canvasComparison.compareAnalyses('c1');" matTooltip="Compare two analyses">
-            <mat-icon>compare_arrows</mat-icon>
-        </mat-button-toggle>
     </div>
     <div id="c3" class="rendererComparison">
         <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('c3');">
@@ -26,6 +27,20 @@
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('c3');">
             <mat-icon>fullscreen_exit</mat-icon>
+        </button>
+        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'c3');">
+            <mat-icon>grid_on</mat-icon>
+        </button>
+        <button mat-icon-button class="scrollytelling" (click)="addFrame('scrollytelling', 'c3');">
+            <mat-icon>ballot</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('freeform', this._perspectiveRenderer.stackHelper._orientationMaxIndex -1, 10000);">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+            (click)="navigateVolume('freeform', 1, 10000);">
+            <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
     </div>
 </div>

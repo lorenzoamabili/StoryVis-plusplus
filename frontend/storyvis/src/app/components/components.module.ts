@@ -4,7 +4,6 @@ import { ProvenanceVisualizationComponent } from './provenance-visualization/pro
 import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
 import { StyledSliderPracticeComponent } from './styled-slider-practice/styled-slider-practice.component';
 import { StyledSliderExplorationComponent } from './styled-slider-exploration/styled-slider-exploration.component';
-import { SlidesContainerComponent } from './slides-container/slides-container.component';
 import { TextReportComponent } from './text-report/text-report.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
 import { MenuBarComparisonComponent } from './menu-bar-comparison/menu-bar-comparison.component';
@@ -73,7 +72,6 @@ import { HttpClientModule } from '@angular/common/http';
         ProvenanceSlidesComponent,
         StyledSliderPracticeComponent,
         StyledSliderExplorationComponent,
-        SlidesContainerComponent,
         TextReportComponent,
         MenuBarComponent,
         MenuBarComparisonComponent,
@@ -86,7 +84,6 @@ import { HttpClientModule } from '@angular/common/http';
         ProvenanceSlidesComponent,
         StyledSliderPracticeComponent,
         StyledSliderExplorationComponent,
-        SlidesContainerComponent,
         MenuBarComponent,
         MenuBarComparisonComponent,
         TextReportComponent,

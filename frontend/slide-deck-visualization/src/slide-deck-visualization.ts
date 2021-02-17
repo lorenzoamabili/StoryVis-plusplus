@@ -180,6 +180,7 @@ export class SlideDeckVisualization {
             .append("input")
             .attr('id', 'createStoryFromDerivationNodes')
             .attr("type", "button")
+            .attr("class", "button")
             .attr("value", "  o  ")
             .on("click", this.createStoryFromDerivationNodes);
 
@@ -188,6 +189,7 @@ export class SlideDeckVisualization {
             .append("input")
             .attr("id", "transitionTimeButton")
             .attr("type", "button")
+            .attr("class", "button")
             .attr("value", " =|= ")
             .on("click", () => {
                 this.calculatedWidth = this.calculatedWidth + 100;
@@ -198,35 +200,40 @@ export class SlideDeckVisualization {
         d3.select("#slideDeck")
             .append("input")
             .attr('id', 'shrink')
+            .attr("class", "button")
             .attr("type", "button")
             .attr("value", "  -  ")
-            .on("click", this.stretch);
+            .on("click", this.shrink);
 
 
         d3.select("#slideDeck")
             .append("input")
             .attr('id', 'stretch')
+            .attr("class", "button")
             .attr("type", "button")
             .attr("value", "  +  ")
-            .on("click", this.shrink);
+            .on("click", this.stretch);
 
         d3.select("#slideDeck")
             .append("input")
             .attr('id', 'slideLeft')
+            .attr("class", "button")
             .attr("type", "button")
             .attr("value", "  <  ")
-            .on("click", this.slideSliceRight);
-
-        d3.select("#slideDeck")
-            .append("input")
-            .attr('id', 'slideRight')
-            .attr("type", "button")
-            .attr("value", "  >  ")
             .on("click", this.slideSliceLeft);
 
         d3.select("#slideDeck")
             .append("input")
+            .attr('id', 'slideRight')
+            .attr("class", "button")
+            .attr("type", "button")
+            .attr("value", "  >  ")
+            .on("click", this.slideSliceRight);
+
+        d3.select("#slideDeck")
+            .append("input")
             .attr('id', 'addButton')
+            .attr("class", "button")
             .attr("type", "button")
             .attr("value", "Annotate")
             .on("click", this.addAnnotation);
@@ -240,6 +247,7 @@ export class SlideDeckVisualization {
     }
     public onDelete = (slide?: IProvenanceSlide, node?: ProvenanceNode) => {
         (this._slideDeck.graph.current as StateNode).metadata.bookmarked = false;
+        (window as any).tree._viz.update();
         if (slide) {
             this._slideDeck.removeSlide(slide);
         } else if (node) {
@@ -268,10 +276,11 @@ export class SlideDeckVisualization {
             artificialTransitionTime = 250;
         }
 
-        slide.transitionTime =
-            artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
+        slide.transitionTime = artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
         this._slideDeck.selectedSlide = slide;
         slide.transitionTime = originalSlideTransitionTime;
+        (window as any).prov.graph.current = slide.node;
+        (window as any).tree._viz.update();
 
         this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
         this.update();
@@ -279,19 +288,14 @@ export class SlideDeckVisualization {
 
     public onAdd = (node?: ProvenanceNode) => {
         let slideDeck = this._slideDeck;
-        let nodeSlide = node;
-        if (node == undefined) {
-            nodeSlide = slideDeck.graph.current;
-            nodeSlide.metadata.story = true;
-        } else {
-            nodeSlide = node;
-        }
+        let nodeSlide = node ? node : slideDeck.graph.current;
         const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, [], nodeSlide);
         slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
         slideDeck.addSlide(slide, slideDeck.slides.length);
         slideCreationOrder = slideCreationOrder + 1;
         nodeSlide.metadata.slideCreationOrder = slideCreationOrder;
         (slideDeck.graph.current as StateNode).metadata.bookmarked = true;
+        (window as any).tree._viz.update();
         this.selectSlide(slide);
         this._slidesInDeck += 1;
     }

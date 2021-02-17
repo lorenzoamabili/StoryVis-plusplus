@@ -382,7 +382,7 @@ export class ProvenanceMinimap {
      */
     public setView(t: [number, number], s: number): void {
         this.manuallyUpdated = true;
-        const brushRect = [this.targetRect.width * this.scale, this.targetRect.height * this.scale];
+        const brushRect = this.targetRect ? [this.targetRect.width * this.scale, this.targetRect.height * this.scale] : [0,0];
         const [t0, t1] = [t[0] * this.scale, t[1] * this.scale];
         const [x0, y0] = [t0, t1];
         const [x1, y1] = [t0 + brushRect[0], t1 + brushRect[1]];

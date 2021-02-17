@@ -57,7 +57,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._camera.position.z = 250;
 
     // controls
-    this._controls = new Trackball( //new AMI.TrackballControl(
+    this._controls =
+     new Trackball( //new AMI.TrackballControl(
       this._camera,
       this._renderer.domElement as HTMLCanvasElement
     );
@@ -110,6 +111,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     }
 
     this._controls.update();
+    this._light.position.copy(this._camera.position);
     this._camera.updateProjectionMatrix();
     this._renderer.clear();
     this._renderer.clearDepth();

@@ -197,7 +197,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
       color: 0x121212,
       sliceOrientation: VIEWS.MULTIPLEA2,
-      sliceColor: 0xffffff,
+      sliceColor: 0x67a9cf,
       targetID: 11
     },
     {
@@ -223,7 +223,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
       color: 0x121212,
       sliceOrientation: VIEWS.MULTIPLEC2,
-      sliceColor: 0xffffff,
+      sliceColor: 0x67a9cf,
       targetID: 13
     },
     {
@@ -249,7 +249,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
       color: 0x121212,
       sliceOrientation: VIEWS.MULTIPLES2,
-      sliceColor: 0xffffff,
+      sliceColor: 0x67a9cf,
       targetID: 15
     }
   ];
@@ -526,8 +526,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     } else {
       this.restoreInitialSetting();
     }
-    // this.provenance.newProvenanceGraph();
-    this.resize();
     this.settings.isComparisonMode = !this.settings.isComparisonMode;
   }
 
@@ -537,6 +535,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     document.getElementById('r3').setAttribute('style', 'display: none;');
     document.getElementById('r0').setAttribute('class', 'rendererComparison');
     document.getElementById('r1').setAttribute('class', 'rendererComparison');
+    addListeners(this.provenance.trackerComparison, this.settings.canvasComparison2);
   }
 
   restoreInitialSetting() {
@@ -560,6 +559,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         this._axialRenderer2.init();
 
         this.renderersMultiplePlane2D = [this._axialRenderer, this._axialRenderer1, this._axialRenderer2];
+
       } else if (viewID === 'r2') {
         document.getElementById('r0').setAttribute('class', 'rendererNone');
         document.getElementById('r3').setAttribute('class', 'rendererNone');
@@ -584,7 +584,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
         this.renderersMultiplePlane2D = [this._sagittalRenderer, this._sagittalRenderer1, this._sagittalRenderer2];
       }
+
+      this.activeRenderers = [this.renderersMultiplePlane2D[0], this.renderersMultiplePlane2D[1], this.renderersMultiplePlane2D[2], this._perspectiveRenderer];
       this.settings.multiplePlanesModeOn = true;
+
     } else {
       // document.getElementById('r2').setAttribute('class', 'renderer');
 
@@ -606,23 +609,22 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         document.getElementById('r33').setAttribute('class', 'rendererNone');
         document.getElementById('r333').setAttribute('class', 'rendererNone');
       }
-      this.renderersMultiplePlane2D = [this._axialRenderer, this._sagittalRenderer, this._coronalRenderer];
+      this.renderersMultiplePlane2D = [this._axialRenderer, this._coronalRenderer, this._sagittalRenderer];
       this.settings.multiplePlanesModeOn = false;
     }
-
     this.activeRenderers = [this.renderersMultiplePlane2D[0], this.renderersMultiplePlane2D[1], this.renderersMultiplePlane2D[2], this._perspectiveRenderer];
 
     this.removeScene(this.renderersMultiplePlane2D);
     this.prepareScene(this.renderersMultiplePlane2D);
-    this.presetWindowLevel();
 
     if (this.settings.multiplePlanesModeOn) {
+      this.presetWindowLevel();
       this.setSliceIndexMultiplePlanes(this.renderersMultiplePlane2D[0].stackHelper.index, 10);
-    }
 
-    this.activeRenderers.forEach(renderer => renderer.addEventListeners());
-    this.animate();
-    this.resize();
+      this.activeRenderers.forEach(renderer => renderer.addEventListeners());
+      this.animate();
+      this.resize();
+    }
   }
 
   addFrame(dashboard: any, viewID?: string) {
@@ -1057,21 +1059,26 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   updateSliceIndexMultiplePlanesMinus(domID: string) {
     if (this.renderersMultiplePlane2D[0].domElement.id === domID) {
+      this.renderersMultiplePlane2D[0].stackHelper.index -= this.renderersMultiplePlane2D[1].stackHelper.index - 1 > 1 ? 1 : 0;
       this.renderersMultiplePlane2D[1].stackHelper.index -= this.renderersMultiplePlane2D[1].stackHelper.index - 1 > 1 ? 1 : 0;
-      this.renderersMultiplePlane2D[2].stackHelper.index -= this.renderersMultiplePlane2D[2].stackHelper.index - 1 > 1 ? 1 : 0;
-    } else if (this.renderersMultiplePlane2D[2].domElement.id === domID) {
-      this.renderersMultiplePlane2D[2].stackHelper.index = this.renderersMultiplePlane2D[2].stackHelper.index < this.renderersMultiplePlane2D[0].stackHelper.index ? 
-      this.renderersMultiplePlane2D[0].stackHelper.index + 1 : this.renderersMultiplePlane2D[2].stackHelper.index;
+      this.renderersMultiplePlane2D[2].stackHelper.index -= this.renderersMultiplePlane2D[1].stackHelper.index - 1 > 1 ? 1 : 0;
+    } else if (this.renderersMultiplePlane2D[1].domElement.id === domID) {
+      this.renderersMultiplePlane2D[1].stackHelper.index -= this.renderersMultiplePlane2D[1].stackHelper.index - 1 > 1 ? 1 : 0;
+    }  else if (this.renderersMultiplePlane2D[2].domElement.id === domID) {
+      this.renderersMultiplePlane2D[2].stackHelper.index -= this.renderersMultiplePlane2D[2].stackHelper.index - 1 > this.renderersMultiplePlane2D[0].stackHelper.index ? 1 : 0;
     }
   };
 
   updateSliceIndexMultiplePlanesPlus(domID: string) {
     if (this.renderersMultiplePlane2D[0].domElement.id === domID) {
-      this.renderersMultiplePlane2D[1].stackHelper.index += this.renderersMultiplePlane2D[1].stackHelper.index + 1 < this.renderersMultiplePlane2D[1].stackHelper._orientationMaxIndex ? 1 : 0;
+      this.renderersMultiplePlane2D[0].stackHelper.index += this.renderersMultiplePlane2D[2].stackHelper.index + 1 < this.renderersMultiplePlane2D[2].stackHelper._orientationMaxIndex ? 1 : 0;
+      this.renderersMultiplePlane2D[1].stackHelper.index += this.renderersMultiplePlane2D[2].stackHelper.index + 1 < this.renderersMultiplePlane2D[2].stackHelper._orientationMaxIndex ? 1 : 0;
       this.renderersMultiplePlane2D[2].stackHelper.index += this.renderersMultiplePlane2D[2].stackHelper.index + 1 < this.renderersMultiplePlane2D[2].stackHelper._orientationMaxIndex ? 1 : 0;
     } else if (this.renderersMultiplePlane2D[1].domElement.id === domID) {
-      this.renderersMultiplePlane2D[1].stackHelper.index = this.renderersMultiplePlane2D[1].stackHelper.index > this.renderersMultiplePlane2D[0].stackHelper.index ?
-       this.renderersMultiplePlane2D[0].stackHelper.index - 1 : this.renderersMultiplePlane2D[1].stackHelper.index;    } 
+      this.renderersMultiplePlane2D[1].stackHelper.index += this.renderersMultiplePlane2D[1].stackHelper.index + 1 < this.renderersMultiplePlane2D[0].stackHelper.index ? 1 : 0;
+    } else if (this.renderersMultiplePlane2D[2].domElement.id === domID) {
+      this.renderersMultiplePlane2D[2].stackHelper.index += this.renderersMultiplePlane2D[2].stackHelper.index + 1 < this.renderersMultiplePlane2D[2].stackHelper._orientationMaxIndex ? 1 : 0;
+    }
   };
 
 

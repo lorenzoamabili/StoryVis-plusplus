@@ -91,9 +91,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     });
     this._renderer.autoClear = false;
     this._renderer.localClippingEnabled = true;
-    const clientWidth = this._domElement.clientWidth === 0 ? window.innerWidth / 2 : this._domElement.clientWidth;
     this._renderer.setSize(
-      clientWidth,
+      this._domElement.clientWidth,
       this._domElement.clientHeight,
       false
     );
@@ -333,17 +332,17 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._controls.update();
     this._camera.updateProjectionMatrix();
 
-    if (this.settings.localizersOn) {
+    if (this.settings.localizersOn && !this.settings.multiplePlanesModeOn) {
       this._canvas.onAxialChanged();
-      // this._canvas.onSagittalChanged();
-      // this._canvas.onCoronalChanged();
+      this._canvas.onSagittalChanged();
+      this._canvas.onCoronalChanged();
     }
 
     this._renderer.clear();
     this._renderer.clearDepth();
     this._renderer.render(this._scene, this._camera);
 
-    if (this.settings.localizersOn) {
+    if (this.settings.localizersOn && !this.settings.multiplePlanesModeOn) {
       this._renderer.render(this._localizerScene, this._camera);
     }
 
@@ -392,40 +391,42 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
         return;
       }
-      this._stackHelper.index += 1;
       if (this.settings.multiplePlanesModeOn) {
         this.settings.canvas.updateSliceIndexMultiplePlanesPlus(this._domID);
+      } else {
+        this._stackHelper.index += 1;
       }
     } else {
       if (this._stackHelper.index <= 1) {
         return;
       }
-      this._stackHelper.index -= 1;
       if (this.settings.multiplePlanesModeOn) {
         this.settings.canvas.updateSliceIndexMultiplePlanesMinus(this._domID);
+      } else {
+        this._stackHelper.index -= 1;
       }
     }
     const newIndex = Math.round(this._stackHelper.index);
     this.renderFromSliceChange(newIndex);
 
-      this._canvas.dispatchEvent({
-        type: "sliceIndexChangeStart",
-        changes: {
-          sliceOrientation: this.sliceOrientation,
-          oldIndex: oldIndex,
-          newIndex: newIndex
-        }
-      });
+    this._canvas.dispatchEvent({
+      type: "sliceIndexChangeStart",
+      changes: {
+        sliceOrientation: this.sliceOrientation,
+        oldIndex: oldIndex,
+        newIndex: newIndex
+      }
+    });
 
 
-      this._canvas.dispatchEvent({
-        type: "sliceIndexChanged",
-        changes: {
-          sliceOrientation: this.sliceOrientation,
-          oldIndex: oldIndex,
-          newIndex: newIndex
-        }
-      });
+    this._canvas.dispatchEvent({
+      type: "sliceIndexChanged",
+      changes: {
+        sliceOrientation: this.sliceOrientation,
+        oldIndex: oldIndex,
+        newIndex: newIndex
+      }
+    });
   }
 
 

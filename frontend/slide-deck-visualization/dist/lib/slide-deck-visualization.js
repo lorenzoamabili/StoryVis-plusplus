@@ -28,6 +28,7 @@ class SlideDeckVisualization {
         this._toolbarY = 35;
         this._toolbarPadding = 20;
         this._shiftedPosition = 0;
+        this.calculatedWidth = 0;
         // Upon dragging a slide, no matter where you click on it, the beginning of the slide jumps to the mouse position.
         // This next variable is calculated to adjust for that error, it is a workaround but it works
         this._draggedSlideReAdjustmentFactor = 0;
@@ -44,6 +45,7 @@ class SlideDeckVisualization {
         this._slidesInDeck = 0;
         this.onDelete = (slide, node) => {
             this._slideDeck.graph.current.metadata.bookmarked = false;
+            window.tree._viz.update();
             if (slide) {
                 this._slideDeck.removeSlide(slide);
             }
@@ -70,29 +72,24 @@ class SlideDeckVisualization {
             else {
                 artificialTransitionTime = 250;
             }
-            slide.transitionTime =
-                artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
+            slide.transitionTime = artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
             this._slideDeck.selectedSlide = slide;
             slide.transitionTime = originalSlideTransitionTime;
+            window.prov.graph.current = slide.node;
+            window.tree._viz.update();
             this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
             this.update();
         };
         this.onAdd = (node) => {
             let slideDeck = this._slideDeck;
-            let nodeSlide = node;
-            if (node == undefined) {
-                nodeSlide = slideDeck.graph.current;
-                nodeSlide.metadata.story = true;
-            }
-            else {
-                nodeSlide = node;
-            }
+            let nodeSlide = node ? node : slideDeck.graph.current;
             const slide = new provenance_core_1.ProvenanceSlide(nodeSlide.label, 5000, 0, 0, [], nodeSlide);
             slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
             slideDeck.addSlide(slide, slideDeck.slides.length);
             slideCreationOrder = slideCreationOrder + 1;
             nodeSlide.metadata.slideCreationOrder = slideCreationOrder;
             slideDeck.graph.current.metadata.bookmarked = true;
+            window.tree._viz.update();
             this.selectSlide(slide);
             this._slidesInDeck += 1;
         };
@@ -146,12 +143,12 @@ class SlideDeckVisualization {
                 this._currentTime = draggedObject.x1;
             }
         };
-        this.transitionTimeDragged = (that, slide) => {
+        this.transitionTimeDragged = (slide) => {
             let transitionTime = Math.max(d3.event.x, 0) / this._barWidthTimeMultiplier;
             slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
             this.update();
         };
-        this.transitionTimeSubject = (that, slide) => {
+        this.transitionTimeSubject = (slide) => {
             return { x: this.barTransitionTimeWidth(slide) };
         };
         this.durationDragged = (that, slide) => {
@@ -181,19 +178,11 @@ class SlideDeckVisualization {
             let wheelDirectionY = d3.event.deltaY < 0 ? "up" : "down";
             let wheelDirectionX = d3.event.deltaX < 0 ? "up" : "down";
             if (d3.event.shiftKey) {
-                let correctedShiftAmount = d3.event.x - (this._originPosition - this._timelineShift);
-                let scalingFactor = 0.2;
                 if (wheelDirectionX === "down") {
-                    if (this._placeholderX > this._tableWidth / 5) {
-                        this._barWidthTimeMultiplier *= 1 - scalingFactor;
-                        this._timelineShift -= correctedShiftAmount * scalingFactor;
-                    }
+                    this.shrink();
                 }
                 else {
-                    this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
-                    if (!(this._placeholderX - this._timelineShift < d3.event.x)) {
-                        this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
-                    }
+                    this.stretch();
                 }
                 this.update();
             }
@@ -205,6 +194,24 @@ class SlideDeckVisualization {
                     this.slideSliceRight();
                 }
             }
+        };
+        this.shrink = () => {
+            let correctedShiftAmount = d3.event.x - (this._originPosition - this._timelineShift);
+            let scalingFactor = 0.2;
+            if (this._placeholderX > this._tableWidth / 5) {
+                this._barWidthTimeMultiplier *= 1 - scalingFactor;
+                this._timelineShift -= correctedShiftAmount * scalingFactor;
+            }
+            this.update();
+        };
+        this.stretch = () => {
+            let correctedShiftAmount = d3.event.x - (this._originPosition - this._timelineShift);
+            let scalingFactor = 0.2;
+            this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
+            if (!(this._placeholderX - this._timelineShift < d3.event.x)) {
+                this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
+            }
+            this.update();
         };
         this.slideSliceRight = () => {
             let shiftAmount = 75;
@@ -443,19 +450,54 @@ class SlideDeckVisualization {
             .attr("rows", 4);
         d3.select("#slideDeck")
             .append("input")
-            .attr('id', 'slideLeft')
+            .attr('id', 'createStoryFromDerivationNodes')
             .attr("type", "button")
-            .attr("value", "  <  ")
-            .on("click", this.slideSliceRight);
+            .attr("class", "button")
+            .attr("value", "  o  ")
+            .on("click", this.createStoryFromDerivationNodes);
         d3.select("#slideDeck")
             .append("input")
-            .attr('id', 'slideRight')
+            .attr("id", "transitionTimeButton")
             .attr("type", "button")
-            .attr("value", "  >  ")
+            .attr("class", "button")
+            .attr("value", " =|= ")
+            .on("click", () => {
+            this.calculatedWidth = this.calculatedWidth + 100;
+            d3.selectAll('.slide').each((d) => d.transitionTime = this.calculatedWidth);
+            this.update();
+        });
+        d3.select("#slideDeck")
+            .append("input")
+            .attr('id', 'shrink')
+            .attr("class", "button")
+            .attr("type", "button")
+            .attr("value", "  -  ")
+            .on("click", this.shrink);
+        d3.select("#slideDeck")
+            .append("input")
+            .attr('id', 'stretch')
+            .attr("class", "button")
+            .attr("type", "button")
+            .attr("value", "  +  ")
+            .on("click", this.stretch);
+        d3.select("#slideDeck")
+            .append("input")
+            .attr('id', 'slideLeft')
+            .attr("class", "button")
+            .attr("type", "button")
+            .attr("value", "  <  ")
             .on("click", this.slideSliceLeft);
         d3.select("#slideDeck")
             .append("input")
+            .attr('id', 'slideRight')
+            .attr("class", "button")
+            .attr("type", "button")
+            .attr("value", "  >  ")
+            .on("click", this.slideSliceRight);
+        d3.select("#slideDeck")
+            .append("input")
             .attr('id', 'addButton')
+            .attr("class", "button")
             .attr("type", "button")
             .attr("value", "Annotate")
             .on("click", this.addAnnotation);
@@ -469,8 +511,9 @@ class SlideDeckVisualization {
         d3.select(this).raise().classed("active", true);
     }
     barTransitionTimeWidth(slide) {
-        let calculatedWidth = this._barWidthTimeMultiplier * slide.transitionTime;
-        return Math.max(calculatedWidth, 0);
+        this.calculatedWidth =
+            this._barWidthTimeMultiplier * slide.transitionTime;
+        return Math.max(this.calculatedWidth, 0);
     }
     barDurationWidth(slide) {
         let calculatedWidth = this._barWidthTimeMultiplier * slide.duration;
@@ -729,6 +772,20 @@ class SlideDeckVisualization {
             d3.select('#playBtn').attr('style', 'display: block');
             this.stopPlaying();
         }
+    }
+    createStoryFromDerivationNodes() {
+        let nodes = window.prov.graph.getNodes();
+        var arrayNodes = [];
+        for (const nodeId of Object.keys(nodes)) {
+            let node = nodes[nodeId];
+            arrayNodes.push(node);
+        }
+        arrayNodes.shift();
+        for (const node of arrayNodes.filter((node) => node.action.metadata.userIntent === ('derivation' || 'annotation'))) {
+            node.metadata.story = true;
+            window.slideDeck.onAdd(node);
+        }
+        window.tree._viz.update();
     }
     setDeck(deck) {
         this._slideDeck = deck;

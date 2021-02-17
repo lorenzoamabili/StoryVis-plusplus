@@ -317,7 +317,9 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
         const action = {
           metadata: {
             userIntent: artifact.measurementType === 'annotation' ? 'annotation' : 'derivation',
-            label: artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndexStart + '-' + artifact.sliceIndexEnd,
+            label: artifact.sliceIndexStart !== artifact.sliceIndexEnd ? 
+            artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndexStart + '-' + artifact.sliceIndexEnd :
+            artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndexStartl,
             renderer: renderer.domElement.id
           },
           do: 'renderArtifact',

@@ -964,7 +964,6 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
     };
     return ProvenanceSlidedeckPlayer;
 }());
-//# sourceMappingURL=provenance-core.es5.js.map
 
 function firstArgThis(f) {
     return function (...args) {
@@ -1006,6 +1005,7 @@ class SlideDeckVisualization {
         this._slidesInDeck = 0;
         this.onDelete = (slide, node) => {
             this._slideDeck.graph.current.metadata.bookmarked = false;
+            window.tree._viz.update();
             if (slide) {
                 this._slideDeck.removeSlide(slide);
             }
@@ -1032,29 +1032,24 @@ class SlideDeckVisualization {
             else {
                 artificialTransitionTime = 250;
             }
-            slide.transitionTime =
-                artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
+            slide.transitionTime = artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
             this._slideDeck.selectedSlide = slide;
             slide.transitionTime = originalSlideTransitionTime;
+            window.prov.graph.current = slide.node;
+            window.tree._viz.update();
             this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
             this.update();
         };
         this.onAdd = (node) => {
             let slideDeck = this._slideDeck;
-            let nodeSlide = node;
-            if (node == undefined) {
-                nodeSlide = slideDeck.graph.current;
-                nodeSlide.metadata.story = true;
-            }
-            else {
-                nodeSlide = node;
-            }
+            let nodeSlide = node ? node : slideDeck.graph.current;
             const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, [], nodeSlide);
             slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
             slideDeck.addSlide(slide, slideDeck.slides.length);
             slideCreationOrder = slideCreationOrder + 1;
             nodeSlide.metadata.slideCreationOrder = slideCreationOrder;
             slideDeck.graph.current.metadata.bookmarked = true;
+            window.tree._viz.update();
             this.selectSlide(slide);
             this._slidesInDeck += 1;
         };
@@ -1417,12 +1412,14 @@ class SlideDeckVisualization {
             .append("input")
             .attr('id', 'createStoryFromDerivationNodes')
             .attr("type", "button")
+            .attr("class", "button")
             .attr("value", "  o  ")
             .on("click", this.createStoryFromDerivationNodes);
         select("#slideDeck")
             .append("input")
             .attr("id", "transitionTimeButton")
             .attr("type", "button")
+            .attr("class", "button")
             .attr("value", " =|= ")
             .on("click", () => {
             this.calculatedWidth = this.calculatedWidth + 100;
@@ -1432,30 +1429,35 @@ class SlideDeckVisualization {
         select("#slideDeck")
             .append("input")
             .attr('id', 'shrink')
+            .attr("class", "button")
             .attr("type", "button")
             .attr("value", "  -  ")
-            .on("click", this.stretch);
-        select("#slideDeck")
-            .append("input")
-            .attr('id', 'stretch')
-            .attr("type", "button")
-            .attr("value", "  +  ")
             .on("click", this.shrink);
         select("#slideDeck")
             .append("input")
-            .attr('id', 'slideLeft')
+            .attr('id', 'stretch')
+            .attr("class", "button")
             .attr("type", "button")
-            .attr("value", "  <  ")
-            .on("click", this.slideSliceRight);
+            .attr("value", "  +  ")
+            .on("click", this.stretch);
         select("#slideDeck")
             .append("input")
-            .attr('id', 'slideRight')
+            .attr('id', 'slideLeft')
+            .attr("class", "button")
             .attr("type", "button")
-            .attr("value", "  >  ")
+            .attr("value", "  <  ")
             .on("click", this.slideSliceLeft);
         select("#slideDeck")
             .append("input")
+            .attr('id', 'slideRight')
+            .attr("class", "button")
+            .attr("type", "button")
+            .attr("value", "  >  ")
+            .on("click", this.slideSliceRight);
+        select("#slideDeck")
+            .append("input")
             .attr('id', 'addButton')
+            .attr("class", "button")
             .attr("type", "button")
             .attr("value", "Annotate")
             .on("click", this.addAnnotation);
@@ -1752,7 +1754,6 @@ class SlideDeckVisualization {
         return this._slideDeck;
     }
 }
-//# sourceMappingURL=slide-deck-visualization.js.map
 
 export { SlideDeckVisualization };
 //# sourceMappingURL=slide-deck-visualization.es5.js.map

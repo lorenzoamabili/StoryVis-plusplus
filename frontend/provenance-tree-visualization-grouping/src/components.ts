@@ -46,8 +46,8 @@ export function addAggregationButtons(
   let ann = true;
   let prov = true;
 
-  const container = provenanceTreeVisualization.container.append('div').attr('class', 'noButtons').attr('id', 'buttonsContainer'); 
-  const holder = container.append('div').attr('class', 'holder').attr('id', 'holderDiv').attr('style', 'display: contents;'); 
+  const container = provenanceTreeVisualization.container.append('div').attr('class', 'noButtons').attr('id', 'buttonsContainer');
+  const holder = container.append('div').attr('class', 'holder').attr('id', 'holderDiv').attr('style', 'display: contents;');
 
   // Data aggregation Div
   const dataDiv = holder.append('div').attr('class', 'controlsBox').attr('style', 'z-index: 1; position: absolute; top: 61%;');
@@ -228,8 +228,8 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 8%;')
     .attr('ng-reflect-color', 'primary')
-    .on('click', () => { (window as any).canvas.provenance.generation(true); })
-    .on('contextmenu', () => { (window as any).canvas.provenance.generation(); });
+    .on('contextmenu', () => { (window as any).canvas.provenance.generation(true); })
+    .on('click', () => { (window as any).canvas.provenance.generation(); });
 
   newAnalysisButton
     .append('span')
@@ -265,8 +265,7 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 11%;')
     .attr('ng-reflect-color', 'primary')
-    .on('click', () => { (window as any).canvas.provenance.fission(true); })
-    .on('contextmenu', () => { (window as any).canvas.provenance.fission(); });
+    .on('click', () => { (window as any).canvas.provenance.fission(); })
 
 
   newAnalysisFromCurrentNodeButton
@@ -674,7 +673,47 @@ export function addAggregationButtons(
 
 
 
+  const activeNodeButton = container
+    .append('button')
+    .attr('id', 'activeNode-trigger')
+    .attr('class', 'mat-icon-button mat-button-base mat-primary')
+    .attr('color', 'primary')
+    .attr('style', 'position: absolute; color: darkcyan; z-index: 1; top: 40%;')
+    .attr('ng-reflect-color', 'primary')
+    .on('mousedown', () => {
+      const visible = provenanceTreeVisualization.minimap.followActiveNode === false;
+      if (visible) {
+        activeNodeButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        provenanceTreeVisualization.minimap.followActiveNode = !provenanceTreeVisualization.minimap.followActiveNode;
+        provenanceTreeVisualization.update();
+        provenanceTreeVisualization.scaleToFit();
+      } else {
+        activeNodeButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+        provenanceTreeVisualization.minimap.followActiveNode = !provenanceTreeVisualization.minimap.followActiveNode;
+        provenanceTreeVisualization.update();
+        provenanceTreeVisualization.scaleToFit();
+      }
+    });
 
+  activeNodeButton
+    .append('span')
+    .attr('class', 'mat-button-wrapper')
+    .append('mat-icon')
+    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+    .attr('role', 'img')
+    .attr('aria-hidden', 'true')
+    .text('filter_center_focus');
+
+  activeNodeButton
+    .append('div')
+    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+    .attr('ng-reflect-centered', 'true')
+    .attr('ng-reflect-disabled', 'false')
+    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+
+  activeNodeButton
+    .append('div')
+    .attr('class', 'mat-button-focus-overlay');
 
 
 
@@ -685,7 +724,7 @@ export function addAggregationButtons(
     .append('button')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 42%;')
+    .attr('style', 'position: absolute; z-index: 1; top: 44%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
@@ -752,7 +791,7 @@ export function addAggregationButtons(
     .append('button')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 45%;')
+    .attr('style', 'position: absolute; z-index: 1; top: 46%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
@@ -883,7 +922,7 @@ export function addAggregationButtons(
     .append('button')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 51%;')
+    .attr('style', 'position: absolute; z-index: 1; top: 50%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
@@ -954,7 +993,7 @@ export function addAggregationButtons(
     .append('button')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 54%;')
+    .attr('style', 'position: absolute; z-index: 1; top: 52%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
@@ -1024,7 +1063,7 @@ export function addAggregationButtons(
     .append('button')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
-    .attr('style', 'position: absolute; z-index: 1; top: 57%;')
+    .attr('style', 'position: absolute; z-index: 1; top: 54%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
@@ -1086,7 +1125,7 @@ export function addAggregationButtons(
 
 
 
-    const saveGraphButton = container
+  const saveGraphButton = container
     .append('button')
     .attr('id', 'saveGraph-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
@@ -1150,65 +1189,65 @@ export function addAggregationButtons(
 
 
 
-    // const bookmarkButton = container
-    // .append('button')
-    // .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    // .attr('color', 'primary')
-    // .attr('style', 'position: absolute; z-index: 1; top: 57%;')
-    // .attr('ng-reflect-color', 'primary')
-    // .on('mousedown', () => {
-    //   var filters: any[] = [];
-    //   if (prov === true) {
-    //     bookmarkButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-    //     prov = false;
-    //   } else {
-    //     bookmarkButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-    //     prov = true;
-    //   }
-    //   if (der) {
-    //     filters.push(filterObjects.find(x => x.name === 'derivation'))
-    //   }
-    //   if (ann) {
-    //     filters.push(filterObjects.find(x => x.name === 'annotation'))
-    //   }
-    //   if (expl) {
-    //     filters.push(filterObjects.find(x => x.name === 'exploration'))
-    //   }
-    //   if (sel) {
-    //     filters.push(filterObjects.find(x => x.name === 'selection'))
-    //   }
-    //   if (prov) {
-    //     filters.push(filterObjects.find(x => x.name === 'provenance'))
-    //   }
-    //   if (conf) {
-    //     filters.push(filterObjects.find(x => x.name === 'configuration'))
-    //   }
+  // const bookmarkButton = container
+  // .append('button')
+  // .attr('class', 'mat-icon-button mat-button-base mat-primary')
+  // .attr('color', 'primary')
+  // .attr('style', 'position: absolute; z-index: 1; top: 57%;')
+  // .attr('ng-reflect-color', 'primary')
+  // .on('mousedown', () => {
+  //   var filters: any[] = [];
+  //   if (prov === true) {
+  //     bookmarkButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+  //     prov = false;
+  //   } else {
+  //     bookmarkButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
+  //     prov = true;
+  //   }
+  //   if (der) {
+  //     filters.push(filterObjects.find(x => x.name === 'derivation'))
+  //   }
+  //   if (ann) {
+  //     filters.push(filterObjects.find(x => x.name === 'annotation'))
+  //   }
+  //   if (expl) {
+  //     filters.push(filterObjects.find(x => x.name === 'exploration'))
+  //   }
+  //   if (sel) {
+  //     filters.push(filterObjects.find(x => x.name === 'selection'))
+  //   }
+  //   if (prov) {
+  //     filters.push(filterObjects.find(x => x.name === 'provenance'))
+  //   }
+  //   if (conf) {
+  //     filters.push(filterObjects.find(x => x.name === 'configuration'))
+  //   }
 
-    //   provenanceTreeVisualization.filter = filters;
-    //   provenanceTreeVisualization.update();
-    //   provenanceTreeVisualization.scaleToFit();
-    // });
+  //   provenanceTreeVisualization.filter = filters;
+  //   provenanceTreeVisualization.update();
+  //   provenanceTreeVisualization.scaleToFit();
+  // });
 
-    // bookmarkButton
-    // .append('span')
-    // .attr('class', 'mat-button-wrapper')
-    // .append('mat-icon')
-    // .attr('id', 'provenance-trigger')
-    // .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    // .attr('role', 'img')
-    // .attr('aria-hidden', 'true')
-    // .text('fiber_manual_record');
+  // bookmarkButton
+  // .append('span')
+  // .attr('class', 'mat-button-wrapper')
+  // .append('mat-icon')
+  // .attr('id', 'provenance-trigger')
+  // .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
+  // .attr('role', 'img')
+  // .attr('aria-hidden', 'true')
+  // .text('fiber_manual_record');
 
-    // bookmarkButton
-    // .append('div')
-    // .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    // .attr('ng-reflect-centered', 'true')
-    // .attr('ng-reflect-disabled', 'false')
-    // .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
+  // bookmarkButton
+  // .append('div')
+  // .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
+  // .attr('ng-reflect-centered', 'true')
+  // .attr('ng-reflect-disabled', 'false')
+  // .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
-    // bookmarkButton
-    // .append('div')
-    // .attr('class', 'mat-button-focus-overlay');
+  // bookmarkButton
+  // .append('div')
+  // .attr('class', 'mat-button-focus-overlay');
 
 
 
@@ -1224,15 +1263,16 @@ export function addAggregationButtons(
     .attr('id', 'legend-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
-    .attr('style', 'position: absolute; color: orange; z-index: 1; background-color: snow; top: 74%;')
+    .attr('style', 'position: absolute; color: orange; z-index: 1; top: 74%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       const visible = d3.select("#legendContainer").style('display') === 'none';
-      const buttonsVisible = container.attr('class') === 'noButtons';
+      const buttonsVisible = container.attr('class') === 'withButtons';
       if (visible) {
-        if(!buttonsVisible){
+        if (buttonsVisible) {
           activeNodeButton.style('display', 'none');
         }
+        minimapButton.style('display', 'none');
         legendButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked').attr('style', 'bottom: 1%; color: orange;');
         d3.select("#legendContainer").attr('style', 'display: block; z-index: 11;');
         d3.select("#commandsContainer").attr('style', 'display: block; z-index: 11;');
@@ -1241,10 +1281,11 @@ export function addAggregationButtons(
         provenanceTreeVisualization.update();
         provenanceTreeVisualization.scaleToFit();
       } else {
-        if(!buttonsVisible){
+        if (buttonsVisible) {
           activeNodeButton.style('display', 'block');
         }
-        legendButton.attr('class', 'mat-icon-button mat-button-base mat-primary').attr('style', 'position: absolute; color: orange; z-index: 1; background-color: snow; top: 74%;');
+        minimapButton.style('display', 'block');
+        legendButton.attr('class', 'mat-icon-button mat-button-base mat-primary').attr('style', 'position: absolute; color: orange; z-index: 1; top: 74%;');
         d3.select("#legendContainer").attr('style', 'display: none;');
         d3.select("#commandsContainer").attr('style', 'display: none;');
         d3.select("#tasksContainer").attr('style', 'display: none;');
@@ -1283,7 +1324,7 @@ export function addAggregationButtons(
   //   .attr('id', 'setting-trigger')
   //   .attr('class', 'mat-icon-button mat-button-base mat-primary')
   //   .attr('color', 'primary')
-  //   .attr('style', 'position: absolute; color: orange; z-index: 1; background-color: snow; top: 63%;')
+  //   .attr('style', 'position: absolute; color: orange; z-index: 1; top: 63%;')
   //   .attr('ng-reflect-color', 'primary')
   //   .on('mousedown', () => {
   //     const visible = holder.style('display') === 'flex';
@@ -1331,20 +1372,18 @@ export function addAggregationButtons(
     .attr('id', 'minimap-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
-    .attr('style', 'position: absolute; color: orange; z-index: 1; background-color: snow; top: 77%;')
+    .attr('style', 'position: absolute; color: orange; z-index: 1; top: 77%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       const visible = provenanceTreeVisualization.minimap.container.style('display') === 'none';
       if (visible) {
         minimapButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        activeNodeButton.style('display', 'none');
         provenanceTreeVisualization.minimap.container.style('display', 'block');
         container.style('height', '100%');
         provenanceTreeVisualization.update();
         provenanceTreeVisualization.scaleToFit();
       } else {
         minimapButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        activeNodeButton.style('display', 'block');
         provenanceTreeVisualization.minimap.container.style('display', 'none');
         container.style('height', '80%');
         provenanceTreeVisualization.update();
@@ -1369,69 +1408,6 @@ export function addAggregationButtons(
     .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
 
   minimapButton
-    .append('div')
-    .attr('class', 'mat-button-focus-overlay');
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  const activeNodeButton = provenanceTreeVisualization.minimap ? provenanceTreeVisualization.minimap.container : container
-    .append('button')
-    .attr('id', 'activeNode-trigger')
-    .attr('class', 'mat-icon-button mat-button-base mat-primary')
-    .attr('color', 'primary')
-    .attr('style', 'position: absolute; color: dodgerblue; z-index: 1; background-color: snow; bottom: 1%')
-    .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => {
-      const visible = provenanceTreeVisualization.minimap.followActiveNode === false;
-      if (visible) {
-        activeNodeButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        provenanceTreeVisualization.minimap.followActiveNode = !provenanceTreeVisualization.minimap.followActiveNode;
-        provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
-      } else {
-        activeNodeButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
-        provenanceTreeVisualization.minimap.followActiveNode = !provenanceTreeVisualization.minimap.followActiveNode;
-        provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
-      }
-    });
-
-  activeNodeButton
-    .append('span')
-    .attr('class', 'mat-button-wrapper')
-    .append('mat-icon')
-    .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
-    .attr('role', 'img')
-    .attr('aria-hidden', 'true')
-    .text('filter_center_focus');
-
-  activeNodeButton
-    .append('div')
-    .attr('class', 'mat-button-ripple mat-ripple mat-button-ripple-round')
-    .attr('ng-reflect-centered', 'true')
-    .attr('ng-reflect-disabled', 'false')
-    .attr('ng-reflect-trigger', '[object HTMLButtonElement]');
-
-  activeNodeButton
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 

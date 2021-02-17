@@ -70,6 +70,7 @@
   overflow: hidden;
 }
 
+
 .magnification {    
   position: absolute;
   color: rgb(255, 200, 100);
@@ -83,18 +84,30 @@
   top: 1%;
 }
 
+.datacomics {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 6%;
+}
+.scrollytelling {    
+  position: absolute;
+  color: rgb(255, 200, 100);
+  left: 1%;
+  top: 11%;
+}
 
 .navigation-up {    
   position: absolute;
   color: rgb(255, 200, 100);
   left: 1%;
-  top: 5%;
+  top: 15%;
 }
 .navigation-down {    
   position: absolute;
   color: rgb(255, 200, 100);
   left: 1%;
-  top: 8%;
+  top: 18%;
 }
 
 

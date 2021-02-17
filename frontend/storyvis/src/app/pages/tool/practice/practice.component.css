@@ -16,21 +16,23 @@
     bottom: 0;
     width: 100%;
     height: 0%;
-    background-color: #fafafa;
   }
   /*New Container for elements on the top of the screen to make way for timeline at the bottom*/
   #top-container {
     position: absolute;
     top: 0;
     width: 25%;
-    background-color: #fafafa;
   }
   mat-sidenav {
     overflow: visible;
     visibility: visible !important;
-    background-color: #fafafa;
   }
-  mat-sidenav-container,
+  mat-sidenav-container.normal{
+    height: 100%;
+  }
+  mat-sidenav-container.isSlideDeckOpen{
+    height: 80%;
+  }
   mat-sidenav-content {
     display: flex;
     flex: 1;
@@ -40,12 +42,25 @@
     width: fit-content;
   }
 
+  mat-sidenav.bottom {
+    height: 12%;
+    width: 95%;
+    position: absolute;
+    top: 87%;
+    border-color: white;
+}
+
   #sidenav-trigger {
     color: orange;
     position: absolute;
     left: -50px;
   }
-
+  #sidenavBottom-trigger {
+    color: orange;
+    position: absolute;
+    right: -50px;
+    bottom: 20px;
+  }
   #next-button {
     color: orange;
     position: absolute;

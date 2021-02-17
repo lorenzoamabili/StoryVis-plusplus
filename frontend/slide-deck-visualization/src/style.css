@@ -107,61 +107,34 @@ rect.add_annotation {
     height: 60%;
     font-size: 16px;
     border-radius: 5px;
+    background-color: snow;
 }
 
 #addButton{
-      position: absolute;
-      bottom: 5%;
-      right: 1%;
-      border-radius: 5px;
-      border-width: 1px;
+    right: 1%;
 }
 
 #slideRight{
-    position: absolute;
-    bottom: 5%;
     right: 10%;
-    border-radius: 5px;
-    border-width: 1px;
 }
 
 #slideLeft{
-    position: absolute;
-    bottom: 5%;
     right: 13%;
-    border-radius: 5px;
-    border-width: 1px;
 }
 
 #stretch{
-    position: absolute;
-    bottom: 5%;
     right: 18%;
-    border-radius: 5px;
-    border-width: 1px;
 }
 
 #shrink{
-    position: absolute;
-    bottom: 5%;
     right: 21%;
-    border-radius: 5px;
-    border-width: 1px;
 }
 
 #transitionTimeButton{
-    position: absolute;
-    bottom: 5%;
     right: 25%;
-    border-radius: 5px;
-    border-width: 1px;
 }
 #createStoryFromDerivationNodes{
-    position: absolute;
-    bottom: 5%;
     right: 28%;
-    border-radius: 5px;
-    border-width: 1px;
 }
 
 .slides_background_rect {
@@ -195,4 +168,13 @@ rect.add_annotation {
 .slides_clone_icon{
     color: #000000;
     background-color: transparent;
+}
+
+.button{
+    border-color: white;
+    background-color: white;
+    position: absolute;
+    bottom: 5%;
+    border-radius: 5px;
+    border-width: 0px;
 }

@@ -24,6 +24,7 @@ export class Settings {
     public isComparisonMode: boolean = false;
     public isEducationMode: boolean = false;
     public treeButtons: boolean = false;
+    public isSlideDeckOpen: boolean = false;
     public multiplePlanesModeOn: boolean = false;
 
     public _colorMap = 'grayscale';

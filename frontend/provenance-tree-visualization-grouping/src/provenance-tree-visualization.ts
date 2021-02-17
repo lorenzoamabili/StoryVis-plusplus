@@ -28,7 +28,8 @@ import {
   filter,
   testUserIntent,
   testNeighbours,
-  getNodeRenderer
+  getNodeRenderer,
+  bookmarker
 } from './aggregation/aggregation-objects';
 import {
   addAggregationButtons
@@ -47,10 +48,8 @@ import { ProvenanceMinimap } from './minimap';
 
 var xScale = -20;
 var yScale = 20;
-// var treeWidth = 0;
 var treeWidth = 1;
-var treePaddingX = 12;
-var maxtreeWidth = 10;
+var treePaddingX = 15;
 var p = 3;
 const fontSize = 8;
 
@@ -223,9 +222,7 @@ export class ProvenanceTreeVisualization {
       const scale = transform.k;
       const translate = [-transform.x, -transform.y] as [number, number];
 
-      if(this.minimapActive){
-        this.minimap.setView(translate, 1 / scale);
-      }
+      this.minimap.setView(translate, 1 / scale);
     }
     this.wasManuallyZoomed = false;
   }
@@ -233,9 +230,9 @@ export class ProvenanceTreeVisualization {
   public scaleToFit(n?: number) {
     const sizeX = this.svg.node()!.clientWidth;
     const sizeY = this.svg.node()!.clientHeight;
-    const maxScale = 2;
+    const maxScale = 2.5;
     const magicNumY = 0.9; // todo: get relevant number based on dimensions
-    const magicNumX = 0.5; // todo: get relevant number based on dimensions
+    const magicNumX = 0.4; // todo: get relevant number based on dimensions
 
     var width = (n !== undefined) ? n : 0;
     var height = this.elasticTreeLayoutActivated ? this.traverser.graph.current.metadata.creationOrder : this.hierarchyRoot ? this.hierarchyRoot.height : 0;
@@ -328,6 +325,12 @@ export class ProvenanceTreeVisualization {
       const originalTree = gratzl(originalHierarchyRoot, originalCurrentHierarchyNode);
       const minimapNodes = originalTree.descendants();
 
+      if (this.storyOrderLayoutActivated) {
+        this.aggregation.aggregator = bookmarker;
+      } else {
+        this.aggregation.aggregator = rawData;
+      }
+
       aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
       const hierarchyRoot = d3.hierarchy(wrappedRoot); // Updated de treeRoot
       const currentHierarchyNode = findHierarchyNodeFromProvenanceNode(
@@ -362,9 +365,11 @@ export class ProvenanceTreeVisualization {
 
       if (this.storyOrderLayoutActivated) {
         for (const node of treeNodes) {
+          // if (node.data.wrappedNodes[0].metadata.story) {
           node.y = node.data.wrappedNodes[0].metadata.creationOrder;
           node.x = node.data.wrappedNodes[0].metadata.slideCreationOrder ? -node.data.wrappedNodes[0].metadata.slideCreationOrder : 0;
           storyOrderNodes.push(node);
+          // }
           treeNodes = storyOrderNodes;
         }
       }

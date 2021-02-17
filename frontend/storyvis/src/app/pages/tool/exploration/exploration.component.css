@@ -9,19 +9,16 @@ app-brainvis-canvas {
   bottom: 0;
   width: 100%;
   height: 0%;
-  background-color: #fafafa;
 }
 /*New Container for elements on the top of the screen to make way for timeline at the bottom*/
 #top-container {
   position: absolute;
   top: 0;
   width: 25%;
-  background-color: #fafafa;
 }
 mat-sidenav {
   overflow: visible;
   visibility: visible !important;
-  background-color: #fafafa;
 }
 mat-sidenav-container,
 mat-sidenav-content {

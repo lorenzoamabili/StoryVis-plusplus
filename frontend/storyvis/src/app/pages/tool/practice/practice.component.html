@@ -1,34 +1,50 @@
-﻿<app-menu-bar [canvas]="canvas" [canvasComparison]="canvasComparison" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar>
+﻿<app-menu-bar [canvas]="canvas" [canvasComparison]="canvasComparison" [studyStarted]="studyStarted"
+  [IDcreator]="IDcreator"></app-menu-bar>
 <!-- <app-menu-bar-comparison [canvasComparison]="canvasComparison" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar-comparison> -->
 
-<mat-sidenav-container hasBackdrop="false">
+<mat-sidenav-container [ngClass]="!provenance.settings.isSlideDeckOpen ? 'normal' : 'isSlideDeckOpen'" hasBackdrop="false">
 
-  <mat-sidenav [class.comparison] = "provenance.settings.isComparisonMode" position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
+  <mat-sidenav [class.comparison]="provenance.settings.isComparisonMode" position="end" #sidenav mode="side"
+    [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
 
-    <button id="sidenav-trigger" mat-icon-button (click)="sidenav.toggle()">
+    <button id="sidenav-trigger" mat-icon-button (click)="sidenav.toggle();">
       <mat-icon>menu</mat-icon>
     </button>
 
-      <app-provenance-visualization [ngClass]="!provenance.settings.treeButtons ? 'noButtons': 'withButtons'" *ngIf="!isNoProvGraph"></app-provenance-visualization>
-      <app-provenance-visualization-comparison [ngClass]="!provenance.settings.treeButtons ? 'noButtons': 'withButtons'" *ngIf="!isNoProvGraph && (provenance.settings.isEducationMode || provenance.settings.isComparisonMode)"></app-provenance-visualization-comparison>
+    <app-provenance-visualization [ngClass]="!provenance.settings.treeButtons ? 'noButtons': 'withButtons'"
+      *ngIf="!isNoProvGraph"></app-provenance-visualization>
+    <app-provenance-visualization-comparison [ngClass]="!provenance.settings.treeButtons ? 'noButtons': 'withButtons'"
+      *ngIf="!isNoProvGraph && (provenance.settings.isEducationMode || provenance.settings.isComparisonMode)">
+    </app-provenance-visualization-comparison>
 
-    
+
   </mat-sidenav>
 
-  <mat-sidenav-content>
-    
-    <app-brainvis-canvas [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvas [studyStarted]="studyStarted"></app-brainvis-canvas>
-    <app-brainvis-canvas-comparison *ngIf="provenance.settings.isComparisonMode" [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvasComparison [studyStarted]="studyStarted"></app-brainvis-canvas-comparison>
+  <!-- <div id="bottom-container"> -->
 
-    <div id="bottom-container">
-      <app-slides-container *ngIf="!isNoProvGraph">
-        <app-provenance-slides [canvas]="canvas" #slides></app-provenance-slides>
-      </app-slides-container>
-      <app-text-report *ngIf="isNoProvGraph"> </app-text-report>
-    </div>
+  <mat-sidenav-content>
+    <app-brainvis-canvas [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvas
+      [studyStarted]="studyStarted"></app-brainvis-canvas>
+    <app-brainvis-canvas-comparison *ngIf="provenance.settings.isComparisonMode"
+      [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvasComparison
+      [studyStarted]="studyStarted"></app-brainvis-canvas-comparison>
+
+
+
+    <!-- </div> -->
     <a id="next-button" (click)="provenance.saveGraphStudy(IDcreator); provenance.saveStoryStudy(IDcreator); 
         provenance.saveTextReportStudy(IDcreator);" routerLink='/intro-explo'>
       <mat-icon><b>NEXT</b></mat-icon>
     </a>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<mat-sidenav class="bottom" position='start' #sidenavBottom mode="side" [opened]="false" hasBackdrop="false">
+  <button id="sidenavBottom-trigger" mat-icon-button (click)="sidenavBottom.toggle(); provenance.settings.isSlideDeckOpen = !provenance.settings.isSlideDeckOpen;">
+    <mat-icon>message</mat-icon>
+  </button>
+  <!-- <app-slides-container *ngIf="!isNoProvGraph"> -->
+  <app-provenance-slides [canvas]="canvas" #slides *ngIf="!isNoProvGraph"></app-provenance-slides>
+  <!-- </app-slides-container> -->
+  <app-text-report *ngIf="isNoProvGraph"> </app-text-report>
+</mat-sidenav>

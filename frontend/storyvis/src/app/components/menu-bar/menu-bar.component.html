@@ -203,6 +203,7 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
 
+    <div *ngIf="!settings.multiplePlanesModeOn">
     <button *ngIf="!settings.localizersOn" mat-raised-button matTooltip="Activate localizers"
       class="transparent localizers" (click)="settings.canvas.createLocalizers();">
       <mat-icon>add</mat-icon>
@@ -212,7 +213,7 @@
       (click)="settings.canvas.removeLocalizers();">
       <mat-icon>add</mat-icon>
     </button>
-
+  </div>
 
 
     <div *ngIf="settings.isAdvancedMode">

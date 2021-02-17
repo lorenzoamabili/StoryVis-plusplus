@@ -2,16 +2,16 @@ app-provenance-visualization-comparison.withButtons {
   height: 100%;
   width: 400px;
   display: block;
-  background-color: #fffafa;
   border-left: 1px solid black;
+  border-bottom: 1px solid black;
 }
 
 app-provenance-visualization-comparison.noButtons {
   height: 100%;
   width: 350px;
   display: block;
-  background-color: #fffafa;
   border-left: 1px solid black;
+  border-bottom: 1px solid black;
 }
 
 .mat-drawer-inner-container {
@@ -30,7 +30,7 @@ app-provenance-visualization-comparison.noButtons {
   position: relative; 
   border-top: 1px solid black; 
   height: 20%; 
-  background-color: snow;
+  background-color: white;
 }
 
 .withButtons{
@@ -113,12 +113,21 @@ app-provenance-visualization-comparison.noButtons {
   display: block;
 }
 
+.node.node-active text {
+  fill: #000;
+}
+
 .node.branch-active.node circle {
   opacity: 1;
 }
 
+.node.neighbour .circle-label {
+  font-size: 8px;
+}
+
 .node.node-active .circle-label {
-  font-weight: bold;
+  font-weight: bolder;
+  font-size: 9px;
 }
 
 .node.node-active circle {
@@ -196,7 +205,7 @@ app-provenance-visualization-comparison.noButtons {
 }
 
 .container {
-  background-color: snow;
+  background-color: white;
 }
 
 .holder {

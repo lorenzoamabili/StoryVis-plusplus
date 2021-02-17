@@ -2,19 +2,19 @@ app-provenance-visualization.withButtons{
   height: 100%;
   width: 400px;
   display: block;
-  background-color: #fffafa;
+  border-bottom: 1px solid black;
 }
 
 app-provenance-visualization.noButtons{
   height: 100%;
   width: 350px;
   display: block;
-  background-color: #fffafa;
+  border-bottom: 1px solid black;
 }
 
 .mat-drawer-inner-container {
   display: flex;
-  overflow: inherit;
+  /* overflow: inherit; */
   }
 
 .visualizationContainer {
@@ -28,7 +28,6 @@ app-provenance-visualization.noButtons{
   position: relative; 
   border-top: 1px solid black; 
   height: 20%; 
-  background-color: snow;
 }
 
 .withButtons{
@@ -106,12 +105,21 @@ app-provenance-visualization.noButtons{
   display: block;
 }
 
+.node.node-active text {
+  fill: #000;
+}
+
 .node.branch-active.node circle {
   opacity: 1;
 }
 
+.node.neighbour .circle-label {
+  font-size: 8px;
+}
+
 .node.node-active .circle-label {
-  font-weight: bold;
+  font-weight: bolder;
+  font-size: 9px;
 }
 
 .node.node-active circle {
@@ -188,10 +196,6 @@ app-provenance-visualization.noButtons{
   display: none;
 }
 
-.container {
-  background-color: snow;
-}
-
 .holder {
   width: min-content;
   display: flex;
@@ -224,7 +228,6 @@ app-provenance-visualization.noButtons{
   margin: 5px;
   width: fit-content;
   height: fit-content;
-  background-color: white;
 }
 .legend ul {
   list-style-type: none;

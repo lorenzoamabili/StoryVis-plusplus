@@ -1,16 +1,16 @@
 .animationContainer {
     position: absolute;
-    bottom: 40px;
+    left: 20px;
     width: 90%;
-    z-index: 11;
+    /* z-index: 11; */
 }
 
-#reportnav-trigger {    
+/* #reportnav-trigger {    
     position: absolute;
     color: orange;
     right: -3%;
     bottom: 2%;
-}
+} */
 
 #textArea{
     overflow: hidden;
