@@ -20,4 +20,4 @@
 
 
 For further information, please check https://github.com/VisualStorytelling
-or send us an email (l.amabili@rug.nl)
+or send us an email (l.amabili@rug.nl)# StoryVisDemo
