@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as AMI from "ami.js";
 import { IAMIRenderer, View, ISlicePosition } from "./utils/types";
 import { AMIRenderer } from "./amiRenderer";
-import { EventEmitter, Output, ViewChild, Component } from "@angular/core";
+import { EventEmitter, Output, ViewChild, Component, ɵbypassSanitizationTrustResourceUrl } from "@angular/core";
 import { UninitializedError } from "./utils/exceptions";
 import Ruler from "./ruler";
 import Angle from "./angle";
@@ -25,6 +25,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   public oldCameraZoom: number;
   public originalSlicePosition: ISlicePosition;
   public originalCameraZoom: number;
+  public originalSliceIndex: number;
 
   public _artifacts: Artifact[] = [];
   public _deletedArtifacts: Artifact[] = [];
@@ -32,7 +33,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   public annotationCounter: number = 0;
   public click: boolean = false;
   public sliceIndexTransition = false;
-  public navigationNode: boolean = false;
   public measurementDone: boolean = true;
 
   public findingCoord: {
@@ -141,13 +141,43 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     const height = this._domElement.clientHeight;
     const aspect = width / height;
     const viewSize = 0.5 * width;
-    this._camera = new AMI.OrthographicCamera(
-      (aspect * viewSize) / -2,
-      (aspect * viewSize) / 2,
-      viewSize / 2,
-      viewSize / -2
-    );
+    // this._camera = new AMI.OrthographicCamera(
+    //   (aspect * viewSize) / -2,
+    //   (aspect * viewSize) / 2,
+    //   viewSize / 2,
+    //   viewSize / -2,
+    //   1,
+    //   this._targetID === 0 ? 5000 : 500
+    // );
     // 1,1000);
+
+    // rough attempt to solve the flickering problem
+    if (this._canvas.studyStarted) {
+      this._camera = new AMI.OrthographicCamera(
+        (aspect * viewSize) / -2,
+        (aspect * viewSize) / 2,
+        viewSize / 2,
+        viewSize / -2,
+        1,
+        this._targetID === 0 ? 5000 : 500
+      );
+    } else {
+      this._camera = this._targetID === 3 ?
+        new AMI.OrthographicCamera(
+          (aspect * viewSize) / -2,
+          (aspect * viewSize) / 2,
+          viewSize / 2,
+          viewSize / -2,
+          10,
+          1000
+        ) :
+        new AMI.OrthographicCamera(
+          (aspect * viewSize) / -2,
+          (aspect * viewSize) / 2,
+          viewSize / 2,
+          viewSize / -2
+        )
+    }
 
     // controls
     this._controls = new AMI.TrackballOrthoControl(
@@ -166,7 +196,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._renderer.domElement.addEventListener("mouseup", this.onPlane.bind(this));
 
     // this.scene.add()
-
     this._initialized = true;
   }
 
@@ -226,6 +255,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     this.originalSlicePosition = this.getSlicePosition();
     this.originalCameraZoom = this.camera.zoom;
+    this.originalSliceIndex = this.stackHelper.index;
     this.oldSlicePosition = this.originalSlicePosition;
     this.oldCameraZoom = this.originalCameraZoom;
   }
@@ -281,8 +311,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
   }
 
-  removeLocalizers() {
+  disactivateLocalizers() {
     this._localizerScene.remove();
+    this.domElement.removeEventListener('dblclick', this.onDoubleClick.bind(this));
+  }
+
+  activateLocalizers() {
+    this.domElement.addEventListener('dblclick', this.onDoubleClick.bind(this));
   }
 
   updateClipPlane(clipPlane) {
@@ -336,6 +371,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this._canvas.onAxialChanged();
       this._canvas.onSagittalChanged();
       this._canvas.onCoronalChanged();
+    } else if (this.settings.localizersOn && this.settings.multiplePlanesModeOn) {
+      this._canvas.onMulti1Changed();
+      this._canvas.onMulti2Changed();
     }
 
     this._renderer.clear();
@@ -345,6 +383,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (this.settings.localizersOn && !this.settings.multiplePlanesModeOn) {
       this._renderer.render(this._localizerScene, this._camera);
     }
+
+
 
     // if (this._measurements.length > 0 && this._artifacts.length > 0) {
     //   for (const measurement of this._measurements) { 
@@ -394,7 +434,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       if (this.settings.multiplePlanesModeOn) {
         this.settings.canvas.updateSliceIndexMultiplePlanesPlus(this._domID);
       } else {
-        this._stackHelper.index += 1;
+        this._stackHelper.index += this._stackHelper.index - Math.round(this._stackHelper.index) !== 0 ? (Math.round(this._stackHelper.index) - this._stackHelper.index) > 0
+          ? Math.abs(Math.round(this._stackHelper.index) - this._stackHelper.index) : 1 - Math.abs(Math.round(this._stackHelper.index) - this._stackHelper.index) : 1
       }
     } else {
       if (this._stackHelper.index <= 1) {
@@ -403,30 +444,52 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       if (this.settings.multiplePlanesModeOn) {
         this.settings.canvas.updateSliceIndexMultiplePlanesMinus(this._domID);
       } else {
-        this._stackHelper.index -= 1;
+        this._stackHelper.index -= this._stackHelper.index - Math.round(this._stackHelper.index) !== 0 ? (Math.round(this._stackHelper.index) - this._stackHelper.index) > 0
+          ? 1 - Math.abs(Math.round(this._stackHelper.index) - this._stackHelper.index) : Math.abs(Math.round(this._stackHelper.index) - this._stackHelper.index) : 1;
       }
     }
     const newIndex = Math.round(this._stackHelper.index);
     this.renderFromSliceChange(newIndex);
 
-    this._canvas.dispatchEvent({
-      type: "sliceIndexChangeStart",
-      changes: {
-        sliceOrientation: this.sliceOrientation,
-        oldIndex: oldIndex,
-        newIndex: newIndex
-      }
-    });
+    if (this.settings.multiplePlanesModeOn) {
+      this._canvas.dispatchEvent({
+        type: "multipleSliceIndexChangeStart",
+        changes: {
+          sliceOrientation: this.sliceOrientation,
+          oldIndex: oldIndex,
+          newIndex: newIndex
+        }
+      });
 
+      this._canvas.dispatchEvent({
+        type: "multipleSliceIndexChanged",
+        changes: {
+          sliceOrientation: this.sliceOrientation,
+          oldIndex: oldIndex,
+          newIndex: newIndex,
+          domID: this._domID
+        }
+      });
+    } else {
+      this._canvas.dispatchEvent({
+        type: "sliceIndexChangeStart",
+        changes: {
+          sliceOrientation: this.sliceOrientation,
+          oldIndex: oldIndex,
+          newIndex: newIndex
+        }
+      });
 
-    this._canvas.dispatchEvent({
-      type: "sliceIndexChanged",
-      changes: {
-        sliceOrientation: this.sliceOrientation,
-        oldIndex: oldIndex,
-        newIndex: newIndex
-      }
-    });
+      this._canvas.dispatchEvent({
+        type: "sliceIndexChanged",
+        changes: {
+          sliceOrientation: this.sliceOrientation,
+          oldIndex: oldIndex,
+          newIndex: newIndex
+        }
+      });
+    }
+
   }
 
 
@@ -537,37 +600,33 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         this.removeFromSliceChange(Math.round(this._stackHelper.index));
         this.renderFromSliceChange(Math.round(nextSlice));
 
-        this.navigationNode = false;
         if (this.click) {
           this.click = false;
           clearInterval(changeTimeout);
           this.sliceIndexTransition = false;
-          this.navigationNode = true;
-        } else if (!this.navigationNode) {
-          this.navigationNode = true;
-        }
 
-        let stopIndex;
-        if (this.navigationNode && oldIndex) {
-          stopIndex = this._stackHelper.index;
+          let stopIndex;
+          if (oldIndex) {
+            stopIndex = this._stackHelper.index;
 
-          this._canvas.dispatchEvent({
-            type: "navigateChangeStart",
-            changes: {
-              sliceOrientation: this._sliceOrientation,
-              oldIndex: Math.round(this._stackHelper.index),
-              newIndex: Math.round(stopIndex)
-            }
-          });
+            this._canvas.dispatchEvent({
+              type: "navigateChangeStart",
+              changes: {
+                sliceOrientation: this._sliceOrientation,
+                oldIndex: Math.round(this._canvas.navigationStartIndex),
+                newIndex: Math.round(stopIndex)
+              }
+            });
 
-          this._canvas.dispatchEvent({
-            type: "navigateChanged",
-            changes: {
-              sliceOrientation: this._sliceOrientation,
-              oldIndex: Math.round(this._stackHelper.index),
-              newIndex: Math.round(stopIndex)
-            }
-          });
+            this._canvas.dispatchEvent({
+              type: "navigateChanged",
+              changes: {
+                sliceOrientation: this._sliceOrientation,
+                oldIndex: Math.round(this._canvas.navigationStartIndex),
+                newIndex: Math.round(stopIndex)
+              }
+            });
+          }
         }
 
         this.changeSliceIndex(nextSlice, 0);
@@ -675,7 +734,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     if (this._artifacts.find((artifact) => ((artifact.sliceIndexStart - oldIndex) * (artifact.sliceIndexEnd - oldIndex)) <= 0)) {
       this._artifacts.filter((artifact) => ((artifact.sliceIndexStart - oldIndex) * (artifact.sliceIndexEnd - oldIndex)) <= 0).forEach(
         (artifact) => {
-          this.removeElms(artifact);
+          if (this._measurements.find((measurement) => measurement.artifact.id === artifact.id).artifact.displayed === true) {
+            this.removeElms(artifact);
+          }
         }
       )
     }
@@ -700,13 +761,15 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   renderElms(artifact: Artifact) {
     if (this._artifactInit) {
-      this._measurements.find((measurement) => measurement.artifact.id === artifact.id).widget.showDOM(); //show
+      this._measurements.find((measurement) => measurement.artifact.id === artifact.id).widget.show(); //show
+      this._measurements.find((measurement) => measurement.artifact.id === artifact.id).artifact.displayed = true;
     }
   }
 
   removeElms(artifactToRemove: Artifact) {
     if (this.measurementDone) {
-      this._measurements.find((measurement) => measurement.artifact.id === artifactToRemove.id).widget.hideDOM(); //hide
+      this._measurements.find((measurement) => measurement.artifact.id === artifactToRemove.id).widget.hide(); //hide
+      this._measurements.find((measurement) => measurement.artifact.id === artifactToRemove.id).artifact.displayed = false;
     }
   }
 
@@ -772,6 +835,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     artifactID = artifactID + 1;
     this._measurement.artifact = {
+      displayed: true,
       id: artifactID,
       measurementType: "Distance",
       sliceIndexStart: this._stackHelper.index,
@@ -809,6 +873,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     artifactID = artifactID + 1;
     this._measurement.artifact = {
+      displayed: true,
       id: artifactID,
       measurementType: "Angle",
       sliceIndexStart: this._stackHelper.index,
@@ -891,6 +956,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     artifactID = artifactID + 1;
     this._measurement.artifact = {
+      displayed: true,
       id: artifactID,
       measurementType: "Density",
       sliceIndexStart: this._stackHelper.index,
@@ -934,6 +1000,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     artifactID = artifactID + 1;
     this._measurement.artifact = {
+      displayed: true,
       id: artifactID,
       measurementType: "Annotation",
       sliceIndexStart: this._stackHelper.index,

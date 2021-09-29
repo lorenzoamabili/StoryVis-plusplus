@@ -6,7 +6,6 @@ import { Role, Provenance, Story, TextReport, User } from '../../shared/_models'
 import { MatSelectChange } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { Settings } from '../brainvis-canvas/utils/settings';
-import { ComparisonComponent } from '../brainvis-canvas/comparison.component';
 
 @Component({
   selector: 'app-menu-bar',
@@ -15,7 +14,6 @@ import { ComparisonComponent } from '../brainvis-canvas/comparison.component';
 })
 export class MenuBarComponent implements OnInit {
   @Input() canvas: BrainvisCanvasComponent;
-  @Input() canvasComparison: ComparisonComponent;
   @Input() IDcreator: number;
   @Input() studyStarted: boolean;
   public now: string;
@@ -27,10 +25,10 @@ export class MenuBarComponent implements OnInit {
   textReports: TextReport[] = [];
 
   constructor(
-    private userService: UserService,
+    public userService: UserService,
     public provenance: ProvenanceService,
-    private router: Router,
-    private authenticationService: AuthenticationService
+    public router: Router,
+    public authenticationService: AuthenticationService
   ) {
 
     this.userService.getAllGraphs().pipe(first()).subscribe(graphs => {
@@ -72,12 +70,9 @@ export class MenuBarComponent implements OnInit {
   // { name: 'Practice Data', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' }];
 
   public dataSources = [
-    { name: 'tcia_1', url: 'https://rawcdn.githack.com/VisualStorytelling/data/a9dd031a51006b8d36aba5c510f0e140616e6bbc/tcia/20000101000000__3000566.nii.gz' },
-    { name: 'adi_brain', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
-    { name: 'adi_slice', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_slice.nii.gz' },
-    { name: 'carp', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/mricrogl/carp.nii.gz' },
-    { name: 'chris t1', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/mricrogl/chris_t1.nii.gz' },
-    { name: 'visiblehuman', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/mricrogl/visiblehuman.nii.gz' }
+    { name: 'brain', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
+    { name: 'chest1', url: 'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' },
+    { name: 'chest2', url: 'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' }
   ];
 
   // public setDataSource(change: MatSelectChange) {

@@ -62,6 +62,8 @@ export default class Voxelprobe {
       worldPosition: startPosition
     });
 
+    this.widget._labeltext = 'DOUBLE CLICK HERE to create an annotation';
+
     this.widget.update();
  
     

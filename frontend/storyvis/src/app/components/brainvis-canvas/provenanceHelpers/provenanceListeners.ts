@@ -118,6 +118,60 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
   };
   canvas.addEventListener('sliceIndexChangeStart', debounce(sliceIndexStartListener, 500, { leading: true }));
 
+
+  // // Slice Index Listener for all orientations - Debounced
+  // let multipleSliceIndexEndListener: EventListener = null;
+  // const multipleSliceIndexStartListener = (startEvent) => {
+  //   canvas.removeEventListener('multipleSliceIndexChanged', multipleSliceIndexEndListener);
+  //   multipleSliceIndexEndListener = debounce((event: any) => {
+  //     if (startEvent.changes.sliceOrientation === event.changes.sliceOrientation) {
+  //       let label = '';
+  //       let plane = '';
+  //       let domID = '';
+  //       if(event.changes.domID === ('r00' || 'r22' || 'r33')){
+  //         plane = 'lower';
+  //       } else if (event.changes.domID === ('r000' || 'r222' || 'r333')) {
+  //         plane = 'upper';
+  //       }
+  //       switch (startEvent.changes.sliceOrientation) {
+  //         case 'axial':
+  //           label = 'A* ' + plane + ' #' + event.changes.newIndex;
+  //           domID = 'r0';
+  //           break;
+  //         case 'coronal':
+  //           label = 'C* ' + plane + ' #' + event.changes.newIndex;
+  //           domID = 'r2';
+  //           break;
+  //         case 'sagittal':
+  //           label = 'S* ' + plane + ' #' + event.changes.newIndex;
+  //           domID = 'r3';
+  //           break;
+  //         default:
+  //           label = 'strange index?';
+  //       }
+  //       const action: Action = {
+  //         metadata: {
+  //           userIntent: 'exploration',
+  //           label: label,
+  //           renderer: domID
+  //         },
+  //         do: 'setMultipleSliceIndex',
+  //         doArguments: {
+  //           args: [startEvent.changes.sliceOrientation, event.changes.newIndex, startEvent.changes.oldIndex, event.changes.domID]
+  //         },
+  //         undo: 'setMultipleSliceIndex',
+  //         undoArguments: {
+  //           args: [startEvent.changes.sliceOrientation, startEvent.changes.oldIndex, event.changes.newIndex, event.changes.domID]
+  //         }
+  //       }
+  //       tracker.applyAction(action, true);
+  //     }
+  //   }, 500, { trailing: true });
+  //   canvas.addEventListener('multipleSliceIndexChanged', multipleSliceIndexEndListener);
+  // };
+  // canvas.addEventListener('multipleSliceIndexChangeStart', debounce(multipleSliceIndexStartListener, 500, { leading: true }));
+
+
   // Perspective canvas zoom Listener - Debounced
   let perspectiveZoomEndListener: EventListener = null;
   const perspectiveZoomStartListener = (startEvent) => {
@@ -317,9 +371,9 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
         const action = {
           metadata: {
             userIntent: artifact.measurementType === 'annotation' ? 'annotation' : 'derivation',
-            label: artifact.sliceIndexStart !== artifact.sliceIndexEnd ? 
-            artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndexStart + '-' + artifact.sliceIndexEnd :
-            artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndexStartl,
+            label: artifact.sliceIndexStart !== artifact.sliceIndexEnd ?
+              artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndexStart + '-' + artifact.sliceIndexEnd :
+              artifact.measurementType + ' - ' + renderer.sliceOrientation + ' #' + artifact.sliceIndexStart,
             renderer: renderer.domElement.id
           },
           do: 'renderArtifact',
@@ -332,6 +386,20 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }
   });
 
+  canvas.navigationVolumeCreated.subscribe((sliceOrientation, index) => {
+    const action = {
+      metadata: {
+        userIntent: 'selection',
+        label: 'Volume navigation - ' + sliceOrientation + '',
+        renderer: sliceOrientation
+      },
+      do: 'navigateVolume',
+      doArguments: { args: [sliceOrientation, index] },
+      undo: 'navigateVolume',
+      undoArguments: { args: [sliceOrientation, index] }
+    };
+    tracker.applyAction(action, true);
+  });
 
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
@@ -380,7 +448,7 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
 
 
 
-  // Window Level Changes Listener - Debounced
+  // Preset Window Level Changes Listener - Debounced
   let wLChangeEndListenerW: EventListener = null;
   const wLChangeListenerW = (startEvent) => {
     canvas.removeEventListener('thresholdValueChangedW', wLChangeEndListenerW);
@@ -411,7 +479,7 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     const action = {
       metadata: {
         userIntent: 'configuration',
-        label: args.oneView ? 'multiple views' + ' - ' + (args.domID ? args.domID : '3D view') : 'one view',
+        label: args.oneView ? 'oneView' + ' - ' + (args.domID ? args.domID : '3D view') : '4Views',
         renderer: args.sliceOrientation
       },
       do: 'changeView',
@@ -423,60 +491,52 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
   });
 
 
-  canvas.resetWLCreated.subscribe((parameters) => {
-    const action = {
-      metadata: {
-        userIntent: 'configuration',
-        label: 'WL: ' + parameters.setting
-      },
-      do: 'setWindowLevel',
-      doArguments:{ args: [parameters.valueW, parameters.valueC, parameters.slider] },
-      undo: 'setWindowLevel',
-      undoArguments: { args: [parameters.valueW, parameters.valueC, parameters.slider] }
-    };
-    tracker.applyAction(action, true);
-  });
+  let resetWLEndListener: EventListener = null;
+  const resetWLListener = (startEvent) => {
+    canvas.removeEventListener('WLChanged', resetWLEndListener);
+    resetWLEndListener = debounce((event: any) => {
+      const action: Action = {
+        metadata: {
+          userIntent: 'configuration',
+          label: 'WL - ' + event.changes.setting
+        },
+        do: 'setWindowLevel',
+        doArguments: {
+          args: [event.changes.valueW, event.changes.valueC, event.changes.slider]
+        },
+        undo: 'setWindowLevel',
+        undoArguments: {
+          args: [startEvent.changes.valueW, startEvent.changes.valueC, startEvent.changes.slider]
+        }
+      }
+      tracker.applyAction(action, true);
+    }, 500, { trailing: true });
+    canvas.addEventListener('WLChanged', resetWLEndListener);
+  };
+  canvas.addEventListener('WLChangeStarted', debounce(resetWLListener, 500, { leading: true }));
 
 
-  canvas.slicesLocationCreated.subscribe((parameters) => {
-    const action = {
-      metadata: {
-        userIntent: 'configuration',
-        label: 'slices relocation'
-      },
-      do: 'resetSlicesLocation',
-      doArguments: { args: [] },
-      undo: 'changeSlicesLocation',
-      undoArguments: { args: [parameters] }
-    };
-    tracker.applyAction(action, true);
-  });
-
-  canvas.resetConfigCreated.subscribe((parameters) => {
-    const action = {
-      metadata: {
-        userIntent: 'configuration',
-        label: 'reset config'
-      },
-      do: 'resetConfig',
-      doArguments: { args: [] },
-      undo: 'setConfig',
-      undoArguments: { args: [parameters] }
-    };
-    tracker.applyAction(action, true);
-  });
-
-  canvas.nullCreated.subscribe(() => {
-    const action = {
-      metadata: {
-        userIntent: 'provenance',
-        label: 'new graph'
-      },
-      do: 'null',
-      doArguments: { args: [] },
-      undo: 'null',
-      undoArguments: { args: [] }
-    };
-    tracker.applyAction(action, true);
-  });
+  let resetConfigEndListener: EventListener = null;
+  const resetConfigListener = (startEvent) => {
+    canvas.removeEventListener('configChanged', resetConfigEndListener);
+    resetConfigEndListener = debounce((event: any) => {
+      const action: Action = {
+        metadata: {
+          userIntent: 'configuration',
+          label: 'reset config'
+        },
+        do: 'setConfig',
+        doArguments: {
+          args: [event.changes]
+        },
+        undo: 'setConfig',
+        undoArguments: {
+          args: [startEvent.changes]
+        }
+      }
+      tracker.applyAction(action, true);
+    }, 500, { trailing: true });
+    canvas.addEventListener('configChanged', resetConfigEndListener);
+  };
+  canvas.addEventListener('configChangeStarted', debounce(resetConfigListener, 500, { leading: true }));
 }

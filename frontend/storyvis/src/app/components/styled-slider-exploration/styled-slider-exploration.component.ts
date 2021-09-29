@@ -16,7 +16,6 @@ export class StyledSliderExplorationComponent implements DoCheck {
 
   constructor() {
     this.settings.canvas.sliderExploration = this;
-
     this.settings._thresholdValueC = this.valueC;
     this.settings._thresholdValueW = this.valueW;
   }
@@ -53,5 +52,8 @@ export class StyledSliderExplorationComponent implements DoCheck {
   }
 
   ngDoCheck() {
+    if(this.settings.isComparisonMode){
+      this.settings.canvasComparison.sliderExploration = this;
+    }
   }
 }

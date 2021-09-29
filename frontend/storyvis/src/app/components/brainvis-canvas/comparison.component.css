@@ -1,5 +1,5 @@
-:host {
-  display: block;
+:host.normal {
+  display: none;
 }
 :host.comparison {
   display: flex;
@@ -90,12 +90,6 @@
   left: 1%;
   top: 6%;
 }
-.scrollytelling {    
-  position: absolute;
-  color: rgb(255, 200, 100);
-  left: 1%;
-  top: 11%;
-}
 
 .navigation-up {    
   position: absolute;
@@ -108,15 +102,4 @@
   color: rgb(255, 200, 100);
   left: 1%;
   top: 18%;
-}
-
-
-.comparison {    
-  position: absolute;
-  color: rgb(255, 200, 100);
-  left: 0%;
-  top: 10%;
-  background-color: transparent;
-  max-width: fit-content;
-  max-height: fit-content;
 }

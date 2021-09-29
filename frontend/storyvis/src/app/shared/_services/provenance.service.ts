@@ -62,116 +62,132 @@ export class ProvenanceService {
 
 
   public async saveGraph(IDcreator: number) {
-    const sJson = JSON.stringify(this.tracker.getGraph());
-    this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
-      {
-        serializedGraph: sJson,
-        IDcreator: IDcreator,
-        findingsCoord: this.findingsCoord,
-        timeStart: this.timeStart,
-        timeEnd: new Date().getTime()
-      })
-      .subscribe(
-        data => {
-          console.log("POST Request is successful", data);
-        },
-        error => {
-          console.log("Error", error);
-        }
-      );
+    if (this.tracker) {
+      const sJson = JSON.stringify(this.tracker.getGraph());
+      this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
+        {
+          serializedGraph: sJson,
+          IDcreator: IDcreator,
+          findingsCoord: this.findingsCoord,
+          timeStart: this.timeStart,
+          timeEnd: new Date().getTime()
+        })
+        .subscribe(
+          data => {
+            console.log("POST Request is successful", data);
+          },
+          error => {
+            console.log("Error", error);
+          }
+        );
+    }
   }
 
   public async saveStory(IDcreator: number) {
     this.deck = (window as any).deck;
-    const sJson = JSON.stringify(this.deck.serializeSelf());
-    this.http.post<Story>(`${environment.apiUrl}/stories/story`,
-      {
-        story: sJson,
-        IDcreator: IDcreator
-      })
-      .subscribe(
-        data => {
-          console.log("POST Request is successful", data);
-        },
-        error => {
-          console.log("Error", error);
-        }
-      );
+    if (this.deck && this.tracker) {
+      const sJson = JSON.stringify(this.deck.serializeSelf());
+      const sJsonGraph = JSON.stringify(this.tracker.getGraph());
+      this.http.post<Story>(`${environment.apiUrl}/stories/story`,
+        {
+          story: sJson,
+          graph: sJsonGraph,
+          IDcreator: IDcreator
+        })
+        .subscribe(
+          data => {
+            console.log("POST Request is successful", data);
+          },
+          error => {
+            console.log("Error", error);
+          }
+        );
+    }
   }
 
   public async saveTextReport(IDcreator: number) {
-    const textArea = document.getElementById("textArea") as HTMLTextAreaElement;
-    this.textReport = textArea.value;
-    this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
-      {
-        textReport: this.textReport,
-        IDcreator: IDcreator
-      })
-      .subscribe(
-        data => {
-          console.log("POST Request is successful", data);
-        },
-        error => {
-          console.log("Error", error);
-        }
-      );
+    const textReportArea = document.getElementById("textReportArea") as HTMLTextAreaElement;
+    if (textReportArea) {
+      this.textReport = textReportArea.value;
+      this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
+        {
+          textReport: this.textReport,
+          IDcreator: IDcreator
+        })
+        .subscribe(
+          data => {
+            console.log("POST Request is successful", data);
+          },
+          error => {
+            console.log("Error", error);
+          }
+        );
+    }
   }
 
 
   public async saveGraphStudy(IDcreator: number) {
-    const sJson = JSON.stringify(this.tracker.getGraph());
-    this.http.post<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/provenance`,
-      {
-        serializedGraph: sJson,
-        IDcreator: IDcreator,
-        findingsCoord: this.findingsCoord,
-        timeStart: this.timeStart,
-        timeEnd: new Date().getTime()
-      })
-      .subscribe(
-        data => {
-          console.log("POST Request is successful", data);
-        },
-        error => {
-          console.log("Error", error);
-        }
-      );
+    if (this.tracker) {
+      const sJson = JSON.stringify(this.tracker.getGraph());
+      this.http.post<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/provenance`,
+        {
+          serializedGraph: sJson,
+          IDcreator: IDcreator,
+          findingsCoord: this.findingsCoord,
+          timeStart: this.timeStart,
+          timeEnd: new Date().getTime()
+        })
+        .subscribe(
+          data => {
+            console.log("POST Request is successful", data);
+          },
+          error => {
+            console.log("Error", error);
+          }
+        );
+    }
   }
 
   public async saveStoryStudy(IDcreator: number) {
     this.deck = (window as any).deck;
-    const sJson = JSON.stringify(this.deck.serializeSelf());
-    this.http.post<StoryStudy>(`${environment.apiUrl}/storiesStudy/story`,
-      {
-        story: sJson,
-        IDcreator: IDcreator
-      })
-      .subscribe(
-        data => {
-          console.log("POST Request is successful", data);
-        },
-        error => {
-          console.log("Error", error);
-        }
-      );
+    if (this.deck && this.tracker) {
+      const sJson = JSON.stringify(this.deck.serializeSelf());
+      const sJsonGraph = JSON.stringify(this.tracker.getGraph());
+      this.http.post<StoryStudy>(`${environment.apiUrl}/storiesStudy/story`,
+        {
+          story: sJson,
+          graph: sJsonGraph,
+          IDcreator: IDcreator
+        })
+        .subscribe(
+          data => {
+            console.log("POST Request is successful", data);
+          },
+          error => {
+            console.log("Error", error);
+          }
+        );
+    }
   }
 
   public async saveTextReportStudy(IDcreator: number) {
-    const textArea = document.getElementById("textArea") as HTMLTextAreaElement;
-    this.textReport = textArea.value;
-    this.http.post<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/textReport`,
-      {
-        textReport: this.textReport,
-        IDcreator: IDcreator
-      })
-      .subscribe(
-        data => {
-          console.log("POST Request is successful", data);
-        },
-        error => {
-          console.log("Error", error);
-        }
-      );
+    const textReportArea = document.getElementById("textReportArea") as HTMLTextAreaElement;
+    if (textReportArea) {
+      this.textReport = textReportArea.value;
+      this.http.post<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/textReport`,
+        {
+          textReport: this.textReport,
+          IDcreator: IDcreator
+        })
+        .subscribe(
+          data => {
+            console.log("POST Request is successful", data);
+          },
+          error => {
+            console.log("Error", error);
+          }
+        );
+    }
   }
 
 
@@ -268,7 +284,7 @@ export class ProvenanceService {
 
 
   fission() {
-      const parameters = this.settings.canvas.resetConfigParam();
+      const parameters = this.settings.canvas.configParam();
       const action = {
         metadata: {
           userIntent: 'provenance',
@@ -313,7 +329,7 @@ export class ProvenanceService {
         const action = {
           metadata: {
             userIntent: "provenance",
-            label: 'merging - measurements'
+            label: 'merging'
           },
           do: 'renderMeasurements',
           doArguments: { args: [measurementsToMerge] },
@@ -328,7 +344,12 @@ export class ProvenanceService {
 
 
   copying(toNode: StateNode) {
+    this.saveGraph(0);
     this.traverser.copyNodes(toNode.id, null);
+    let traverser = this.traverser;
+    let currentNodeID = traverser.graph.current.id;
+    this.newProvenanceGraph();
+    this.traverser.copyNodes(currentNodeID, traverser);
   }
 
 
@@ -360,17 +381,25 @@ export class ProvenanceService {
       deckComparison: this.deckComparison
     };
 
-
     (window as any).treeComparison._viz.free();
-    (window as any).treeComparison._viz = this.treeComparison.createTree(this.traverserComparison);
+    (window as any).treeComparison._viz = (window as any).treeComparison.createTree(this.traverserComparison);
     (window as any).treeComparison._viz.update();
-    setNewAddListeners(this.registryComparison, this.trackerComparison);
+    
+    // if(!this.settings.isEducationMode){
+    //   setNewAddListeners(this.registryComparison, this.trackerComparison);
+    // }
   }
 
   newGraphEducation(graph?: ProvenanceGraph) {
     this.graphEducation = graph ? graph : new ProvenanceGraph({ name: 'storyvisEducation', version: '1.0.0' });
     this.trackerEducation = new ProvenanceTracker(this.registry, this.graphEducation);
     this.traverserEducation = new ProvenanceGraphTraverser(this.registry, this.graphEducation, this.tracker);
+
+    if((window as any).treeComparison){
+      (window as any).treeComparison._viz.free();
+      (window as any).treeComparison._viz = (window as any).treeComparison.createTree(this.traverserEducation);
+      (window as any).treeComparison._viz.update();
+    }
 
     this.settings.isEducationMode = true;
   }

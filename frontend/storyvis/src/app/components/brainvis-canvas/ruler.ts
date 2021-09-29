@@ -99,6 +99,7 @@ export default class Ruler {
       this.renderer.measurementDone = true;
       this.renderer.artifactCreated.emit(this.renderer._measurement.artifact);
       this.renderer.domElement.removeEventListener('contextmenu', this.onContextMenu);
+      this.widget.displaylabel();
   }
 
   onMouseUp = (evt) => {

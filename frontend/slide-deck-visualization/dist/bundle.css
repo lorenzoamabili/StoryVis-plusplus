@@ -103,12 +103,17 @@ rect.add_annotation {
     top: 5%;
     right: 1%;
     overflow: hidden;
-    width: 30%;
+    width: 32%;
     height: 60%;
     font-size: 16px;
     border-radius: 5px;
     background-color: snow;
 }
+
+#addSlide{
+    right: 31%;
+}
+
 
 #addButton{
     right: 1%;

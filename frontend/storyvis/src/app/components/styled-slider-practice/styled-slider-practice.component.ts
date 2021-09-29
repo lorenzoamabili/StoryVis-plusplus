@@ -16,7 +16,6 @@ export class StyledSliderPracticeComponent implements DoCheck {
 
   constructor() {
     this.settings.canvas.sliderPractice = this;
-
     this.settings._thresholdValueC = this.valueC;
     this.settings._thresholdValueW = this.valueW;
   }
@@ -54,5 +53,8 @@ export class StyledSliderPracticeComponent implements DoCheck {
   }
   
   ngDoCheck() {
+    if(this.settings.isComparisonMode){
+      this.settings.canvasComparison.sliderPractice = this;
+    }
   }
 }

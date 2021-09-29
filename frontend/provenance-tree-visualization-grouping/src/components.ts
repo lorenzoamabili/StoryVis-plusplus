@@ -3,7 +3,9 @@ import {
   aggregationObjects,
   aggregationObjectsUI1,
   aggregationObjectsUI2,
-  wrapNode
+  wrapNode,
+  bookmarker,
+  rawData
 } from './aggregation/aggregation-objects';
 import { ProvenanceTreeVisualization } from './provenance-tree-visualization';
 import { addLegend, addCommandsList, addtasksList } from './legend';
@@ -46,7 +48,7 @@ export function addAggregationButtons(
   let ann = true;
   let prov = true;
 
-  const container = provenanceTreeVisualization.container.append('div').attr('class', 'noButtons').attr('id', 'buttonsContainer');
+  const container = provenanceTreeVisualization.container.append('div').attr('id', 'buttonsContainer');
   const holder = container.append('div').attr('class', 'holder').attr('id', 'holderDiv').attr('style', 'display: contents;');
 
   // Data aggregation Div
@@ -69,7 +71,7 @@ export function addAggregationButtons(
 
       showSlider(selectedValue);
       provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
+      // provenanceTreeVisualization.scaleToFit();
     });
 
   selectAggr
@@ -88,7 +90,7 @@ export function addAggregationButtons(
   addSlider(argDiv, val => {
     provenanceTreeVisualization.aggregation.arg = val;
     provenanceTreeVisualization.update();
-    provenanceTreeVisualization.scaleToFit();
+    // provenanceTreeVisualization.scaleToFit();
   });
 
   // const holder = container.append('div');
@@ -154,6 +156,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip1 = d3.select("#upward-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Previous node");
+
+
+  d3.select("#upward-trigger")
+    .on("mouseover", function () { return tooltip1.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip1.style("visibility", "hidden"); });
 
 
 
@@ -213,7 +230,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip2 = d3.select("#downward-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Next node");
 
+
+  d3.select("#downward-trigger")
+    .on("mouseover", function () { return tooltip2.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip2.style("visibility", "hidden"); });
 
 
 
@@ -251,7 +282,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip3 = d3.select("#newAnalysis-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("New analysis");
 
+
+  d3.select("#newAnalysis-trigger")
+    .on("mouseover", function () { return tooltip3.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip3.style("visibility", "hidden"); });
 
 
 
@@ -288,7 +333,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip4 = d3.select("#newAnalysisFromCurrentNode-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("New analysis from current node");
 
+
+  d3.select("#newAnalysisFromCurrentNode-trigger")
+    .on("mouseover", function () { return tooltip4.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip4.style("visibility", "hidden"); });
 
 
 
@@ -321,7 +380,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip5 = d3.select("#splitting-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Node splitting");
 
+
+  d3.select("#splitting-trigger")
+    .on("mouseover", function () { return tooltip5.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip5.style("visibility", "hidden"); });
 
 
 
@@ -372,7 +445,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip6 = d3.select("#transferring-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Node transferring");
 
+
+  d3.select("#transferring-trigger")
+    .on("mouseover", function () { return tooltip6.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip6.style("visibility", "hidden"); });
 
 
 
@@ -425,7 +512,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip7 = d3.select("#merging-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Node merging");
 
+
+  d3.select("#merging-trigger")
+    .on("mouseover", function () { return tooltip7.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip7.style("visibility", "hidden"); });
 
 
 
@@ -478,7 +579,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip8 = d3.select("#copying-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Node copying");
 
+
+  d3.select("#copying-trigger")
+    .on("mouseover", function () { return tooltip8.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip8.style("visibility", "hidden"); });
 
 
 
@@ -499,12 +614,10 @@ export function addAggregationButtons(
         caterpillarButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
         provenanceTreeVisualization.caterpillarActivated = !provenanceTreeVisualization.caterpillarActivated;
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       } else {
         caterpillarButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         provenanceTreeVisualization.caterpillarActivated = !provenanceTreeVisualization.caterpillarActivated;
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       }
     });
 
@@ -529,13 +642,27 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip9 = d3.select("#caterpillar-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Caterpillar mode");
 
+
+  d3.select("#caterpillar-trigger")
+    .on("mouseover", function () { return tooltip9.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip9.style("visibility", "hidden"); });
 
 
 
   const elasticTreeButton = container
     .append('button')
-    .attr('id', 'elastictree-trigger')
+    .attr('id', 'elasticTree-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; color: darkcyan; z-index: 1; top: 31%;')
@@ -545,14 +672,13 @@ export function addAggregationButtons(
         elasticTreeButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
         provenanceTreeVisualization.elasticTreeLayoutActivated = !provenanceTreeVisualization.elasticTreeLayoutActivated;
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       } else {
         elasticTreeButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         provenanceTreeVisualization.elasticTreeLayoutActivated = !provenanceTreeVisualization.elasticTreeLayoutActivated;
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       }
     });
+
 
 
   elasticTreeButton
@@ -575,7 +701,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip10 = d3.select("#elasticTree-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Elastic tree mode");
 
+
+  d3.select("#elasticTree-trigger")
+    .on("mouseover", function () { return tooltip10.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip10.style("visibility", "hidden"); });
 
 
   const storyTreeButton = container
@@ -589,16 +729,15 @@ export function addAggregationButtons(
       if (provenanceTreeVisualization.storyOrderLayoutActivated === false) {
         storyTreeButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
         provenanceTreeVisualization.storyOrderLayoutActivated = !provenanceTreeVisualization.storyOrderLayoutActivated;
+        provenanceTreeVisualization.aggregation.aggregator = bookmarker;
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       } else {
         storyTreeButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         provenanceTreeVisualization.storyOrderLayoutActivated = !provenanceTreeVisualization.storyOrderLayoutActivated;
+        provenanceTreeVisualization.aggregation.aggregator = rawData;
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       }
     });
-
 
   storyTreeButton
     .append('span')
@@ -620,7 +759,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip11 = d3.select("#storyTree-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Story tree mode");
 
+
+  d3.select("#storyTree-trigger")
+    .on("mouseover", function () { return tooltip11.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip11.style("visibility", "hidden"); });
 
 
 
@@ -640,11 +793,9 @@ export function addAggregationButtons(
       if (provenanceTreeVisualization.autoScaling === false) {
         autoScalingButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
         provenanceTreeVisualization.autoScaling = !provenanceTreeVisualization.autoScaling;
-        provenanceTreeVisualization.scaleToFit();
       } else {
         autoScalingButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         provenanceTreeVisualization.autoScaling = !provenanceTreeVisualization.autoScaling;
-        provenanceTreeVisualization.scaleToFit();
       }
     });
 
@@ -669,7 +820,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip12 = d3.select("#autoScaling-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Autoscaling");
 
+
+  d3.select("#autoScaling-trigger")
+    .on("mouseover", function () { return tooltip12.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip12.style("visibility", "hidden"); });
 
 
 
@@ -691,7 +856,6 @@ export function addAggregationButtons(
         activeNodeButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         provenanceTreeVisualization.minimap.followActiveNode = !provenanceTreeVisualization.minimap.followActiveNode;
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       }
     });
 
@@ -715,25 +879,40 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip13 = d3.select("#activeNode-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Active node centering");
 
+
+  d3.select("#activeNode-trigger")
+    .on("mouseover", function () { return tooltip13.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip13.style("visibility", "hidden"); });
 
 
 
 
   const derivationButton = container
     .append('button')
+    .attr('id', 'derivation-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 44%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
-      if (der === true) {
-        derivationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        der = false;
-      } else {
+      if (der === false) {
         derivationButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         der = true;
+      } else {
+        derivationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        der = false;
       }
       if (der) {
         filters.push(filterObjects.find(x => x.name === 'derivation'))
@@ -757,14 +936,12 @@ export function addAggregationButtons(
 
       provenanceTreeVisualization.filter = filters;
       provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
     });
 
   derivationButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
-    .attr('id', 'derivation-trigger')
     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
     .attr('role', 'img')
     .attr('aria-hidden', 'true')
@@ -781,7 +958,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip14 = d3.select("#derivation-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Derivation");
 
+
+  d3.select("#derivation-trigger")
+    .on("mouseover", function () { return tooltip14.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip14.style("visibility", "hidden"); });
 
 
 
@@ -789,18 +980,19 @@ export function addAggregationButtons(
 
   const explorationButton = container
     .append('button')
+    .attr('id', 'exploration-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 46%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
-      if (expl === true) {
-        explorationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        expl = false;
-      } else {
+      if (expl === false) {
         explorationButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         expl = true;
+      } else {
+        explorationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        expl = false;
       }
       if (der) {
         filters.push(filterObjects.find(x => x.name === 'derivation'))
@@ -823,14 +1015,12 @@ export function addAggregationButtons(
 
       provenanceTreeVisualization.filter = filters;
       provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
     });
 
   explorationButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
-    .attr('id', 'exploration-trigger')
     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
     .attr('role', 'img')
     .attr('aria-hidden', 'true')
@@ -847,24 +1037,39 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip15 = d3.select("#exploration-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Exploration");
 
+
+  d3.select("#exploration-trigger")
+    .on("mouseover", function () { return tooltip15.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip15.style("visibility", "hidden"); });
 
 
 
   const configurationButton = container
     .append('button')
+    .attr('id', 'configuration-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 48%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
-      if (conf === true) {
-        configurationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        conf = false;
-      } else {
+      if (conf === false) {
         configurationButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         conf = true;
+      } else {
+        configurationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        conf = false;
       }
       if (der) {
         filters.push(filterObjects.find(x => x.name === 'derivation'))
@@ -887,14 +1092,12 @@ export function addAggregationButtons(
 
       provenanceTreeVisualization.filter = filters;
       provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
     });
 
   configurationButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
-    .attr('id', 'configuration-trigger')
     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
     .attr('role', 'img')
     .attr('aria-hidden', 'true')
@@ -911,7 +1114,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip16 = d3.select("#configuration-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Configuration");
 
+
+  d3.select("#configuration-trigger")
+    .on("mouseover", function () { return tooltip16.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip16.style("visibility", "hidden"); });
 
 
 
@@ -920,18 +1137,19 @@ export function addAggregationButtons(
 
   const selectionButton = container
     .append('button')
+    .attr('id', 'selection-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 50%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
-      if (sel === true) {
-        selectionButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        sel = false;
-      } else {
+      if (sel === false) {
         selectionButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         sel = true;
+      } else {
+        selectionButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        sel = false;
       }
       if (der) {
         filters.push(filterObjects.find(x => x.name === 'derivation'))
@@ -954,14 +1172,12 @@ export function addAggregationButtons(
 
       provenanceTreeVisualization.filter = filters;
       provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
     });
 
   selectionButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
-    .attr('id', 'selection-trigger')
     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
     .attr('role', 'img')
     .attr('aria-hidden', 'true')
@@ -978,7 +1194,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip17 = d3.select("#selection-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Selection");
 
+
+  d3.select("#selection-trigger")
+    .on("mouseover", function () { return tooltip17.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip17.style("visibility", "hidden"); });
 
 
 
@@ -991,18 +1221,19 @@ export function addAggregationButtons(
 
   const annotationButton = container
     .append('button')
+    .attr('id', 'annotation-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 52%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
-      if (ann === true) {
-        annotationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        ann = false;
-      } else {
+      if (ann === false) {
         annotationButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         ann = true;
+      } else {
+        annotationButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        ann = false;
       }
       if (der) {
         filters.push(filterObjects.find(x => x.name === 'derivation'))
@@ -1025,14 +1256,12 @@ export function addAggregationButtons(
 
       provenanceTreeVisualization.filter = filters;
       provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
     });
 
   annotationButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
-    .attr('id', 'annotation-trigger')
     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
     .attr('role', 'img')
     .attr('aria-hidden', 'true')
@@ -1050,7 +1279,21 @@ export function addAggregationButtons(
     .attr('class', 'mat-button-focus-overlay');
 
 
+  var tooltip18 = d3.select("#annotation-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Annotation");
 
+
+  d3.select("#annotation-trigger")
+    .on("mouseover", function () { return tooltip18.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip18.style("visibility", "hidden"); });
 
 
 
@@ -1061,18 +1304,19 @@ export function addAggregationButtons(
 
   const provenanceButton = container
     .append('button')
+    .attr('id', 'provenance-trigger')
     .attr('class', 'mat-icon-button mat-button-base mat-primary')
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 54%;')
     .attr('ng-reflect-color', 'primary')
     .on('mousedown', () => {
       var filters: any[] = [];
-      if (prov === true) {
-        provenanceButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
-        prov = false;
-      } else {
+      if (prov === false) {
         provenanceButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         prov = true;
+      } else {
+        provenanceButton.attr('class', 'mat-icon-button mat-button-base mat-primary checked');
+        prov = false;
       }
       if (der) {
         filters.push(filterObjects.find(x => x.name === 'derivation'))
@@ -1095,14 +1339,12 @@ export function addAggregationButtons(
 
       provenanceTreeVisualization.filter = filters;
       provenanceTreeVisualization.update();
-      provenanceTreeVisualization.scaleToFit();
     });
 
   provenanceButton
     .append('span')
     .attr('class', 'mat-button-wrapper')
     .append('mat-icon')
-    .attr('id', 'provenance-trigger')
     .attr('class', 'mat-icon notranslate material-icons mat-icon-no-color')
     .attr('role', 'img')
     .attr('aria-hidden', 'true')
@@ -1119,7 +1361,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip19 = d3.select("#provenance-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Provenance");
 
+
+  d3.select("#provenance-trigger")
+    .on("mouseover", function () { return tooltip19.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip19.style("visibility", "hidden"); });
 
 
 
@@ -1154,6 +1410,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip20 = d3.select("#saveGraph-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Save graph");
+
+
+  d3.select("#saveGraph-trigger")
+    .on("mouseover", function () { return tooltip20.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip20.style("visibility", "hidden"); });
 
 
 
@@ -1186,7 +1457,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip21 = d3.select("#savesStory-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Save story");
 
+
+  d3.select("#savesStory-trigger")
+    .on("mouseover", function () { return tooltip21.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip21.style("visibility", "hidden"); });
 
 
   // const bookmarkButton = container
@@ -1279,7 +1564,6 @@ export function addAggregationButtons(
         d3.select("#tasksContainer").attr('style', 'display: block; z-index: 11;');
         provenanceTreeVisualization.container.attr('style', 'height: 100%;');
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       } else {
         if (buttonsVisible) {
           activeNodeButton.style('display', 'block');
@@ -1291,7 +1575,6 @@ export function addAggregationButtons(
         d3.select("#tasksContainer").attr('style', 'display: none;');
         provenanceTreeVisualization.container.attr('style', 'height: 80%;');
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       }
     });
 
@@ -1315,7 +1598,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip22 = d3.select("#legend-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Legend");
 
+
+  d3.select("#legend-trigger")
+    .on("mouseover", function () { return tooltip22.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip22.style("visibility", "hidden"); });
 
   // settingsButton
 
@@ -1381,13 +1678,11 @@ export function addAggregationButtons(
         provenanceTreeVisualization.minimap.container.style('display', 'block');
         container.style('height', '100%');
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       } else {
         minimapButton.attr('class', 'mat-icon-button mat-button-base mat-primary');
         provenanceTreeVisualization.minimap.container.style('display', 'none');
         container.style('height', '80%');
         provenanceTreeVisualization.update();
-        provenanceTreeVisualization.scaleToFit();
       }
     });
 
@@ -1411,6 +1706,21 @@ export function addAggregationButtons(
     .append('div')
     .attr('class', 'mat-button-focus-overlay');
 
+  var tooltip23 = d3.select("#minimap-trigger")
+    .append("div")
+    .style("position", "absolute")
+    .style("left", "30px")
+    .style("top", "0px")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "5px").style("visibility", "hidden")
+    .text("Minimap view");
+
+
+  d3.select("#minimap-trigger")
+    .on("mouseover", function () { return tooltip23.style("visibility", "visible"); })
+    .on("mouseout", function () { return tooltip23.style("visibility", "hidden"); });
 }
 
 

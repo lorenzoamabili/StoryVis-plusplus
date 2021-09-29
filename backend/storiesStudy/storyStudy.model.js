@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     story: String,
+    graph: String,
     IDcreator: Number,
     createdDate: { type: Date, default: Date.now }
 });

@@ -78,7 +78,7 @@ export class ProvenanceTreeVisualization {
   public svg: D3SVGSelection;
   public container: any;
   public minimap: ProvenanceMinimap;
-  public minimapFixed: boolean = true;
+  public minimapFixed: boolean = false;
   public aggregation: IAggregation = {
     aggregator: rawData,
     arg: 1
@@ -90,7 +90,6 @@ export class ProvenanceTreeVisualization {
   public topoFilter: boolean = true;
   public filter: NodeFilter<ProvenanceNode>[] = [derivation, exploration, selection, configuration, annotation, provenance];
   private wasManuallyZoomed: boolean;
-  public minimapActive: boolean = false;
   private hierarchyRoot:
     | IHierarchyPointNodeWithMaxDepth<IGroupedTreeNode<ProvenanceNode>>
     | undefined;
@@ -142,7 +141,7 @@ export class ProvenanceTreeVisualization {
     // Append svg element
     this.svg = this.container
       .append('div')
-      .attr('style', ' width: 95%; margin-left:5px;flex: 5') // flex: 4'
+      .attr('style', ' width: 95%; margin-left:5px; flex:5') // flex: 4'
       .append('svg')
       .attr(
         'style',
@@ -183,11 +182,10 @@ export class ProvenanceTreeVisualization {
     //   this.zoomer.scaleExtent(extent);
     // }
 
-    this.minimap = this.createMinimap();
+    this.minimap = new ProvenanceMinimap(this, this.elm, 1 / 2);
 
     provGraphControls(this);
 
-    this.update();
     this.wasManuallyZoomed = false;
 
     // this.zoomer = d3.zoom();
@@ -196,6 +194,7 @@ export class ProvenanceTreeVisualization {
 
     this.svg.call(this.zoomer);
     this.scaleToFit(treeWidth);
+    this.update();
   }
 
   public setView(t: [number, number], s: number, smoothing: number = 0): void {
@@ -216,7 +215,13 @@ export class ProvenanceTreeVisualization {
 
   private zoomed(): void {
     const transform = (d3 as any).event.transform;
-    this.g.attr('transform', (d3 as any).event.transform);
+
+    transform.x = Math.min(300, transform.x);
+    transform.x = Math.max(50, transform.x);
+    // transform.y = Math.min(850, transform.y);
+    // transform.y = Math.max(0, transform.y);
+    this.g.attr("transform", transform.toString());
+
 
     if (!this.wasManuallyZoomed) {
       const scale = transform.k;
@@ -253,7 +258,7 @@ export class ProvenanceTreeVisualization {
       .transition()
       .duration(0)
       .call(this.zoomer.transform, () =>
-        d3.zoomIdentity.translate(moveGraphOnX, 10).scale(scaleFactor)
+        d3.zoomIdentity.translate(moveGraphOnX, 20).scale(scaleFactor)
       );
   }
 
@@ -324,12 +329,7 @@ export class ProvenanceTreeVisualization {
       );
       const originalTree = gratzl(originalHierarchyRoot, originalCurrentHierarchyNode);
       const minimapNodes = originalTree.descendants();
-
-      if (this.storyOrderLayoutActivated) {
-        this.aggregation.aggregator = bookmarker;
-      } else {
-        this.aggregation.aggregator = rawData;
-      }
+      this.minimapFixed = true;
 
       aggregateNodes(this.aggregation, wrappedRoot, this.traverser.graph.current);
       const hierarchyRoot = d3.hierarchy(wrappedRoot); // Updated de treeRoot
@@ -388,7 +388,10 @@ export class ProvenanceTreeVisualization {
         return data;
       });
 
+      // const duration = this.aggregation.aggregator.name === 'Raw data' ? this.duration : this.duration * 2;
+
       oldNodes.exit().remove();
+
 
       // group wrapping a node
       const newNodes = oldNodes
@@ -399,6 +402,7 @@ export class ProvenanceTreeVisualization {
           'transform',
           (d: any) => `translate(${d.x * xScale}, ${d.y * yScale})`
         );
+
 
       // node label
       newNodes
@@ -412,8 +416,6 @@ export class ProvenanceTreeVisualization {
       // .call(this.wrap, 70);
 
 
-
-
       const updateNodes = newNodes.merge(oldNodes as any);
 
       updateNodes.selectAll('g.normal').remove();
@@ -423,6 +425,11 @@ export class ProvenanceTreeVisualization {
       const getNodeSize = (node: IGroupedTreeNode<ProvenanceNode>) => {
         return Math.min(2.7 + 0.3 * node.wrappedNodes.length, 7);
       };
+
+      const getNumberOfAggrNodes = (node: IGroupedTreeNode<ProvenanceNode>) => {
+        return node.wrappedNodes.length;
+      };
+
 
       updateNodes.attr('class', 'node');
 
@@ -438,8 +445,9 @@ export class ProvenanceTreeVisualization {
 
 
       updateNodes.on('contextmenu', (d: any) => {
-        this.traverser.graph.current = this.traverser.graph.getNode(d.data.wrappedNodes[0].id);
+        this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
         this.update();
+        this.traverser.graph.current = this.traverser.graph.getNode(d.data.wrappedNodes[0].id);
         d.data.wrappedNodes[0].metadata.bookmarked = !d.data.wrappedNodes[0].metadata.bookmarked;
         if (!d.data.wrappedNodes[0].metadata.bookmarked) {
           (window as any).slideDeck.onDelete(null, this.traverser.graph.current);
@@ -519,7 +527,16 @@ export class ProvenanceTreeVisualization {
         });
 
 
+        updateNodes
+        .select('g')
+        .append('text')
+        .attr('x', -1)
+        .attr('font-size', "5px")
+        .attr('opacity', (d: any) => (d.x === 0 ? 1 : 0.3))
+        .text((d: any) => getNumberOfAggrNodes(d.data).toString()) // .text(d => d.data.neighbour.toString())
+        .attr('alignment-baseline', 'central');
 
+        
       // hide labels not in branch
       updateNodes
         .select('text.circle-label')
@@ -606,12 +623,10 @@ export class ProvenanceTreeVisualization {
       // set classes on node
 
 
-      const duration = this.aggregation.aggregator.name === 'Raw data' ? this.duration : this.duration / 1.5;
-
       updateNodes
         .data(treeNodes)
         .transition()
-        .duration(duration)
+        .duration(this.duration)
         .attr(
           'transform',
           (d: any) => {
@@ -654,46 +669,43 @@ export class ProvenanceTreeVisualization {
 
       oldLinks
         .merge(newLinks as any)
-        .transition()
-        .duration(duration)
+        // .transition()
+        // .duration(duration)
         .attr('d', (d: any) => this.linkPath(d));
 
 
       const updatedLinks = oldLinks.merge(newLinks as any);
 
+      // let filter: any[] = [];
+      // this.filter.forEach((d: any) => filter.push(d.name));
 
-      if (this.topoFilter) {
-        let nodeTargets: any[] = [];
+      // if (this.topoFilter) {
+      //   let nodeTargets: any[] = [];
 
-        updatedLinks.filter((d: any) => {
-          nodeTargets.push(d.target);
-          let previousNodeX = 0;
-          let filterActive = false;
-          for (let i = nodeTargets.length - 1; i > -1; i--) {
-            filterActive = this.filter.filter((d: any) => d.name === nodeTargets[i].data.wrappedNodes[0].action.metadata.userIntent).length !== 0 ? false : true;
-            if (filterActive) {
-              if (!nodeTargets[i].children) {
-                nodeTargets[i].data.wrappedNodes[0].metadata.noLink = true;
-              } else {
-                if (nodeTargets[i].data.wrappedNodes[0].children[0].metadata.noLink === false && previousNodeX === nodeTargets[i].x) {
-                  nodeTargets[i].data.wrappedNodes[0].metadata.noLink = false;
-                } else if (nodeTargets[i].data.wrappedNodes[0].children[0].metadata.noLink === true && previousNodeX === nodeTargets[i].x) {
-                  nodeTargets[i].data.wrappedNodes[0].metadata.noLink = true;
-                }
-              }
-              previousNodeX = nodeTargets[i].x;
-            } else {
-              nodeTargets[i].data.wrappedNodes[0].metadata.noLink = false;
-            }
-          }
-          return d;
-        });
+      //   updatedLinks.filter((d: any) => {
+      //     nodeTargets.push(d.target);
+      //     let previousNodeX = 0;
+      //     let filterActive = false;
+      //     for (let i = nodeTargets.length - 1; i > -1; i--) {
+      //       filterActive = filter.includes(nodeTargets[i].data.wrappedNodes[0].action.metadata.userIntent) ? false : true;
+      //       if (filterActive) {
+      //         if (!nodeTargets[i].children) {
+      //           nodeTargets[i].data.wrappedNodes[0].metadata.noLink = true;
+      //           previousNodeX = nodeTargets[i].x;
+      //         } else if (nodeTargets[i].data.wrappedNodes[0].children[0].metadata.noLink === true && previousNodeX === nodeTargets[i].x) {
+      //           nodeTargets[i].data.wrappedNodes[0].metadata.noLink = true;
+      //           previousNodeX = nodeTargets[i].x;
+      //         }
+      //       } else {
+      //         nodeTargets[i].data.wrappedNodes[0].metadata.noLink = false;
+      //       }
+      //     }
+      //     return d;
+      //   });
 
-        let filterComplete = ['derivation', 'exploration', 'selection', 'configuration', 'annotation', 'provenance'];
-        if (this.filter.length !== filterComplete.length) {
-          updatedLinks.filter((d: any) => d.target.data.wrappedNodes[0].metadata.noLink === true).attr('class', 'link hiddenClass');
-        }
-      }
+      //     updatedLinks.filter((d: any) => d.target.data.wrappedNodes[0].metadata.noLink === true).attr('class', 'link hiddenClass');
+      // }
+
 
       if (this.storyOrderLayoutActivated) {
         updatedLinks.attr("class", "link crossing");
@@ -703,15 +715,14 @@ export class ProvenanceTreeVisualization {
         caterpillar(updateNodes, treeNodes, updatedLinks, this);
       }
 
-      this.minimapActive = d3.select('#minimap-trigger').attr('class') === 'mat-icon-button mat-button-base mat-primary checked';
-      if (this.minimapActive) {
-        if (this.minimapFixed) {
-          this.minimap.updateNodes(originalTree, minimapNodes);
-        } else {
-          this.minimap.updateNodes(tree, treeNodes);
-        }
+      if (this.minimapFixed) {
+        this.minimap.updateNodes(originalTree, minimapNodes);
+      } else {
+        this.minimap.updateNodes(tree, treeNodes);
       }
 
+
+      // this.minimap.updateNodes(tree, treeNodes);
 
 
       // if (!this.zoomDone) {

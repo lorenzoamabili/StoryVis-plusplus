@@ -161,7 +161,6 @@ const widgetsRuler = (three = window.THREE) => {
       //   this._moving = true;
       //   this._controls.enabled = false;
       // }
-      console.log('1');
 
       this.update();
     }
@@ -197,7 +196,6 @@ const widgetsRuler = (three = window.THREE) => {
       this._handles[1].onMove(evt);
 
       this._hovered = this._handles[0].active || this._handles[1].active || this._labelhovered;
-      console.log('2');
 
       this.update();
     }
@@ -226,18 +224,7 @@ const widgetsRuler = (three = window.THREE) => {
       }
       this._handles[1].selected = this._selected;
 
-
-      if (!this._initialized) {
-        // this._labelOffset = this._handle.screenPosition
-        //   .clone()
-        //   .multiplyScalar(0.5);
-        this.setlabeltext();
-        this._initialized = true;
-      }
-
-console.log('3');
       this._active = this._handles[0].active || this._handles[1].active;
-      this._initialized = true;
       this._dragged = false;
       this._movinglabel = false;
       this._moving = false;
@@ -421,14 +408,6 @@ console.log('3');
     }
 
 
-    setlabeltext() {
-      // called when the user creates a new arrow
-      while (!this._labeltext) {
-        this._labeltext = prompt('Please enter the annotation text', '');
-      }
-      this.displaylabel();
-    }
-
     changelabeltext() {
       // called when the user does double click in the label
       this._labeltext = prompt('Please enter a new annotation text', this._labelTextBox.innerHTML);
@@ -443,12 +422,12 @@ console.log('3');
       // show the label (in css an empty string is used to revert display=none)
       this._label.style.display = '';
       this._dashline.style.display = '';
-      // this._labelTextBox.style.transform = `translate3D(
-      //   ${this._handles[1].screenPosition.x - this._labelOffset.x - this._labelTextBox.offsetWidth / 2}px,
-      //   ${this._handles[1].screenPosition.y -
-      //   this._labelOffset.y -
-      //   this._labelTextBox.offsetHeight / 2 -
-      //   this._container.offsetHeight}px, 0)`;
+      this._label.style.transform = `translate3D(
+        ${this._handles[1].screenPosition.x - this._labelOffset.x - this._label.offsetWidth / 2}px,
+        ${this._handles[1].screenPosition.y -
+          this._labelOffset.y -
+          this._label.offsetHeight / 2 -
+          this._container.offsetHeight}px, 0)`;
     }
 
 

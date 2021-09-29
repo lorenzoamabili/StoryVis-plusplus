@@ -13,7 +13,6 @@ export class AMIRenderer {
     protected _initialized = false;
     public settings = Settings.getInstance(this);
     public _canvas = this.settings._canvas; // to avoid circular dependency
-    public _canvasComparison = this.settings.canvasComparison2;
 
     protected _color = 0x121212;
     protected _targetID = 1;
@@ -35,6 +34,7 @@ export class AMIRenderer {
     protected _stackHelper: AMI.HelpersStack;
 
     constructor(view: View) {
+
         this._domID = view.domId;
         this._domElement = document.getElementById(this._domID);
     }
@@ -76,16 +76,16 @@ export class AMIRenderer {
         this._controls.addEventListener('OnScroll', this.onScroll.bind(this));
         this.domElement.addEventListener('click', this.onShiftClick.bind(this));
         this.domElement.addEventListener('click', this.onAltClick.bind(this));
-        this.domElement.addEventListener('dblclick', this.onDoubleClick.bind(this));
     }
 
 
     protected onScroll(event) {
         if (this._initialized) {
-
             this._canvas.onAxialChanged();
             this._canvas.onCoronalChanged();
             this._canvas.onSagittalChanged();
+            this._canvas.onMulti1Changed();
+            this._canvas.onMulti2Changed();
         }
     }
 
@@ -93,20 +93,19 @@ export class AMIRenderer {
         if (event.altKey) {
             if (this._initialized) {
                 this._canvas.addFrame('datacomics', this._domID);
-                this._canvas.addFrame('scrollytelling', this._domID);
             }
         }
     }
 
     protected onShiftClick(event) {
-        if (this._initialized) {
-            if (event.shiftKey) {
+        if (event.shiftKey) {
+            if (this._initialized) {
                 this._canvas.displayOneView(this._domID);
             }
         }
     }
 
-        protected onDoubleClick(event) {
+    protected onDoubleClick(event) {
         if (this._initialized) {
             const canvas = event.target.parentElement;
             const mouse = {

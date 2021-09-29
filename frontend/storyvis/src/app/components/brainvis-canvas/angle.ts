@@ -63,6 +63,8 @@ export default class Angle {
       worldPosition: startPosition
     });
 
+    this.widget._labeltext = 'DOUBLE CLICK HERE to create an annotation';
+
     this.widget.update();
  
 
@@ -94,6 +96,7 @@ export default class Angle {
     this.renderer.measurementDone = true;
     this.renderer.artifactCreated.emit(this.renderer._measurement.artifact);
     this.renderer.domElement.removeEventListener('contextmenu', this.onContextMenu);
+    this.widget.displaylabel();
 }
 
   onMouseUp = (evt) => {

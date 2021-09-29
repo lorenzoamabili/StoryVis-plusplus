@@ -32,7 +32,7 @@ export class ProvenanceVisualizationComparisonComponent implements OnInit {
   }
 
 
-  createTree(traverser) {
+  createTree(traverser) {    
     return this._viz = new ProvenanceTreeVisualization(
       traverser,
       this.elementRef.nativeElement,

@@ -37,6 +37,7 @@ const widgetsVoxelprobe = (three = window.THREE) => {
       this._dashline = null;
       this._label = null;
       this._labeltext = null;
+      this._labelTextBox = null;
 
       this._labelOffset = new three.Vector3(); // difference between label center and second handle
       this._mouseLabelOffset = new three.Vector3(); // difference between mouse coordinates and label center
@@ -67,6 +68,7 @@ const widgetsVoxelprobe = (three = window.THREE) => {
 
       this._label.addEventListener('mouseenter', this.onHoverlabel);
       this._label.addEventListener('mouseleave', this.notonHoverlabel);
+      this._label.addEventListener('dblclick', this.changelabeltext);
 
       this._container.addEventListener('wheel', this.onMove);
     }
@@ -76,6 +78,7 @@ const widgetsVoxelprobe = (three = window.THREE) => {
 
       this._label.removeEventListener('mouseenter', this.onHoverlabel);
       this._label.removeEventListener('mouseleave', this.notonHoverlabel);
+      this._label.removeEventListener('dblclick', this.changelabeltext);
 
       this._container.removeEventListener('wheel', this.onMove);
     }
@@ -163,6 +166,14 @@ const widgetsVoxelprobe = (three = window.THREE) => {
       //   this._handle.selected = this._selected;
       // }
 
+      if (this._initialized) {
+        // this._labelOffset = this._handle.screenPosition
+        //   .clone()
+        //   .multiplyScalar(0.5);
+        this.setlabeltext();
+      }
+
+
       this._initialized = true;
       this._active = this._handle.active;
       this._dragged = false;
@@ -216,10 +227,13 @@ const widgetsVoxelprobe = (three = window.THREE) => {
       valueContainer.className = 'value';
       measurementsContainer.appendChild(valueContainer);
 
+      this._labelTextBox = document.createElement('div');
+      this._labelTextBox.className = 'valueText';
 
       this._label = document.createElement('div');
       this._label.className = 'widgets-label';
       this._label.appendChild(measurementsContainer);
+      this._label.appendChild(this._labelTextBox);
       this._container.appendChild(this._label);
 
 
@@ -255,8 +269,23 @@ const widgetsVoxelprobe = (three = window.THREE) => {
           ).toFixed();
     }
 
+
+    setlabeltext() {
+      // called when the user creates a new arrow
+      while (!this._labeltext) {
+        this._labeltext = prompt('Please enter the annotation text', '');
+      }
+      this.displaylabel();
+    }
+
+    changelabeltext() {
+      // called when the user does double click in the label
+      this._labeltext = prompt('Please enter a new annotation text', this._labelTextBox.innerHTML);
+      this.displaylabel();
+    }
+
     displaylabel() {
-      this._label.innerHTML =
+      this._labelTextBox.innerHTML =
         typeof this._labeltext === 'string' && this._labeltext.length > 0 // avoid error
           ? this._labeltext
           : ''; // empty string is passed or Cancel is pressed
@@ -332,6 +361,9 @@ const widgetsVoxelprobe = (three = window.THREE) => {
       // ${this._voxel.dataCoordinates.y} :
       // ${this._voxel.dataCoordinates.z}`;
       valueContainer.innerHTML = `Value: ${this._voxel.value}`;
+      const labelValue = this._label.querySelector('.valueText');
+      labelValue.innerHTML = `${this._labeltext}`;
+
         }
 
     updateDOMColor() {

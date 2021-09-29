@@ -4,6 +4,18 @@
 app-brainvis-canvas {
   flex: 1;
 }
+
+
+app-brainvis-canvas-comparison.normal {
+  display: none;
+}
+
+app-brainvis-canvas-comparison.comparison {
+  width: 50%;
+}
+
+
+
 #bottom-container {
   position: absolute;
   bottom: 0;

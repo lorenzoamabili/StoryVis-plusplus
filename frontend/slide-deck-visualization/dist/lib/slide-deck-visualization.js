@@ -196,21 +196,15 @@ class SlideDeckVisualization {
             }
         };
         this.shrink = () => {
-            let correctedShiftAmount = d3.event.x - (this._originPosition - this._timelineShift);
-            let scalingFactor = 0.2;
-            if (this._placeholderX > this._tableWidth / 5) {
-                this._barWidthTimeMultiplier *= 1 - scalingFactor;
-                this._timelineShift -= correctedShiftAmount * scalingFactor;
-            }
+            this.getDeck().slides.forEach((slide) => {
+                slide.duration = slide.duration - 250;
+            });
             this.update();
         };
         this.stretch = () => {
-            let correctedShiftAmount = d3.event.x - (this._originPosition - this._timelineShift);
-            let scalingFactor = 0.2;
-            this._barWidthTimeMultiplier < 0.1 ? this._barWidthTimeMultiplier *= 1 + scalingFactor : this._barWidthTimeMultiplier;
-            if (!(this._placeholderX - this._timelineShift < d3.event.x)) {
-                this._timelineShift < this._placeholderX ? this._timelineShift += correctedShiftAmount * scalingFactor : this._timelineShift;
-            }
+            this.getDeck().slides.forEach((slide) => {
+                slide.duration = slide.duration + 250;
+            });
             this.update();
         };
         this.slideSliceRight = () => {
@@ -403,23 +397,26 @@ class SlideDeckVisualization {
             .call(d3.drag()
             .on("start", firstArgThis(this.seekStarted))
             .on("drag", firstArgThis(this.seekDragged)));
-        this._slideTable
-            .append("rect")
-            .attr("class", "slides_placeholder")
-            .attr("x", this._lineX1 + this._barPadding)
-            .attr("y", 0)
-            .attr("width", this._placeholderWidth)
-            .attr("height", this._placeholderHeight);
-        this._slideTable
-            .append("svg:foreignObject")
-            .attr("class", "slide_add")
-            .attr("x", this._placeholderX + 18)
-            .attr("cursor", "pointer")
-            .attr("width", 30)
-            .attr("height", 30)
-            .append("xhtml:body")
-            .on("click", this.onAdd)
-            .html('<i class="fa fa-file-text-o"></i>');
+        // this._slideTable
+        //     .append("rect")
+        //     .attr('id', 'addSlide')
+        //     .attr("class", "slides_placeholder")
+        //     .attr("cursor", "pointer")
+        //     .attr("x", this._lineX1 + this._barPadding)
+        //     .attr("y", 0)
+        //     .attr("width", this._placeholderWidth)
+        //     .attr("height", this._placeholderHeight)
+        //     .on("click", this.onAdd);
+        // this._slideTable
+        //     .append("svg:foreignObject")
+        //     .attr("cursor", "pointer")
+        //     .attr("class", "slide_add")
+        //     .attr("x", this._placeholderX + 18)
+        //     .attr("width", 30)
+        //     .attr("height", 30)
+        //     .append("xhtml:body")
+        //     .html('<i class="fa fa-file-text-o"></i>')
+        //     .on("click", this.onAdd);
         this._slideTable
             .append("circle")
             .attr("class", "currentTime")
@@ -449,58 +446,224 @@ class SlideDeckVisualization {
             .attr('placeholder', 'Type here to add an annotation')
             .attr("rows", 4);
         d3.select("#slideDeck")
-            .append("input")
+            .append("text")
+            .attr('id', 'addSlide')
+            .attr("type", "button")
+            .attr("class", "button")
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf0fe")
+            .on("click", this.onAdd);
+        var tooltip = d3.select("#addSlide")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Add slide");
+        d3.select("#addSlide")
+            .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });
+        d3.select("#slideDeck")
+            .append("text")
             .attr('id', 'createStoryFromDerivationNodes')
             .attr("type", "button")
             .attr("class", "button")
-            .attr("value", "  o  ")
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf0d0")
             .on("click", this.createStoryFromDerivationNodes);
+        var tooltip1 = d3.select("#createStoryFromDerivationNodes")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Automatic story creation");
+        d3.select("#createStoryFromDerivationNodes")
+            .on("mouseover", function () { return tooltip1.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip1.style("visibility", "hidden"); });
         d3.select("#slideDeck")
-            .append("input")
-            .attr("id", "transitionTimeButton")
-            .attr("type", "button")
+            .append("text")
             .attr("class", "button")
-            .attr("value", " =|= ")
+            .attr("type", "button")
+            .attr('id', 'transitionTimeButton')
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf0c1")
             .on("click", () => {
-            this.calculatedWidth = this.calculatedWidth + 100;
-            d3.selectAll('.slide').each((d) => d.transitionTime = this.calculatedWidth);
+            d3.selectAll('.slide').each((slide) => slide.transitionTime = slide.transitionTime + 100);
             this.update();
         });
+        var tooltip2 = d3.select("#transitionTimeButton")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Increase transition time");
+        d3.select("#transitionTimeButton")
+            .on("mouseover", function () { return tooltip2.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip2.style("visibility", "hidden"); });
         d3.select("#slideDeck")
-            .append("input")
+            .append("text")
             .attr('id', 'shrink')
             .attr("class", "button")
             .attr("type", "button")
-            .attr("value", "  -  ")
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf104")
             .on("click", this.shrink);
+        var tooltip3 = d3.select("#shrink")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Decrease duration time");
+        d3.select("#shrink")
+            .on("mouseover", function () { return tooltip3.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip3.style("visibility", "hidden"); });
         d3.select("#slideDeck")
-            .append("input")
+            .append("text")
             .attr('id', 'stretch')
             .attr("class", "button")
             .attr("type", "button")
-            .attr("value", "  +  ")
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf105")
             .on("click", this.stretch);
+        var tooltip4 = d3.select("#stretch")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Increase duration time");
+        d3.select("#stretch")
+            .on("mouseover", function () { return tooltip4.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip4.style("visibility", "hidden"); });
         d3.select("#slideDeck")
-            .append("input")
+            .append("text")
             .attr('id', 'slideLeft')
             .attr("class", "button")
             .attr("type", "button")
-            .attr("value", "  <  ")
-            .on("click", this.slideSliceLeft);
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf04a")
+            .on("click", this.onBackward);
+        var tooltip5 = d3.select("#slideLeft")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Backward");
+        d3.select("#slideLeft")
+            .on("mouseover", function () { return tooltip5.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip5.style("visibility", "hidden"); });
         d3.select("#slideDeck")
-            .append("input")
+            .append("text")
             .attr('id', 'slideRight')
             .attr("class", "button")
             .attr("type", "button")
-            .attr("value", "  >  ")
-            .on("click", this.slideSliceRight);
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf04e")
+            .on("click", this.onForward);
+        var tooltip6 = d3.select("#slideRight")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Forward");
+        d3.select("#slideRight")
+            .on("mouseover", function () { return tooltip6.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip6.style("visibility", "hidden"); });
         d3.select("#slideDeck")
-            .append("input")
+            .append("text")
             .attr('id', 'addButton')
             .attr("class", "button")
             .attr("type", "button")
-            .attr("value", "Annotate")
+            .append("tspan")
+            .attr("class", "fa")
+            .text("\uf249")
             .on("click", this.addAnnotation);
+        var tooltip7 = d3.select("#addButton")
+            .append("div")
+            .style("position", "absolute")
+            .style("left", "25px")
+            .style("top", "-10px")
+            .style("width", "max-content")
+            .style("font-size", "14px")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("background", "white")
+            .style("z-index", 11)
+            .style("visibility", "hidden")
+            .text("Append annotation");
+        d3.select("#addButton")
+            .on("mouseover", function () { return tooltip7.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip7.style("visibility", "hidden"); });
         slideDeck.on("slideAdded", () => this.update());
         slideDeck.on("slideRemoved", () => this.update());
         slideDeck.on("slidesMoved", () => this.update());
@@ -511,8 +674,7 @@ class SlideDeckVisualization {
         d3.select(this).raise().classed("active", true);
     }
     barTransitionTimeWidth(slide) {
-        this.calculatedWidth =
-            this._barWidthTimeMultiplier * slide.transitionTime;
+        this.calculatedWidth = this._barWidthTimeMultiplier * slide.transitionTime;
         return Math.max(this.calculatedWidth, 0);
     }
     barDurationWidth(slide) {

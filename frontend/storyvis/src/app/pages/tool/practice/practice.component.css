@@ -7,8 +7,21 @@
   app-brainvis-canvas.comparison {
     width: 50%;
   }
+
+  app-brainvis-canvas-comparison.normal {
+    display: none;
+  }
+
   app-brainvis-canvas-comparison.comparison {
     width: 50%;
+  }
+
+  app-provenance-visualization-comparison.normal {
+    display: none;
+  }
+
+  app-provenance-visualization-comparison.comparison {
+    display: block;
   }
 
   #bottom-container {

@@ -14,7 +14,6 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
   public orientationID: number = 0;
   public zoomID: number = 0;
-  public originalSliceOrientation;
   public _artifactID: number = -1;
 
   constructor(view: View) {
@@ -40,7 +39,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
       this._domElement.clientHeight,
       false
     );
-    this._renderer.domElement.setAttribute('style', 'width:100%; height:100%');
+    this._renderer.domElement.setAttribute('style', 'width:100%; height:100%;');
     this._renderer.setClearColor(this._color, 1);
     this._renderer.domElement.id = this._targetID.toString();
     this._domElement.appendChild(this._renderer.domElement);
@@ -62,9 +61,9 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
       this._camera,
       this._renderer.domElement as HTMLCanvasElement
     );
-    this._controls.rotateSpeed = 5.5;
+    this._controls.rotateSpeed = 0.1;
     this._controls.zoomSpeed = 1.2;
-    this._controls.panSpeed = 0.8;
+    this._controls.panSpeed = 0.01;
     this._controls.staticMoving = true;
     this._controls.dynamicDampingFactor = 0.3;
     this._controls.initEventListeners();

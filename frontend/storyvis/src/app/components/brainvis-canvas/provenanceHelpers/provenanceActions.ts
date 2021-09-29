@@ -5,9 +5,14 @@ import { ComparisonComponent } from '../comparison.component';
 const getActions = (canvas: BrainvisCanvasComponent | ComparisonComponent): { [key: string]: ActionFunction } => ({
   setSliceIndex: async (sliceOrientation, newIndex, oldIndex, transitionTime) => {
     canvas.changeSliceRemove(sliceOrientation, oldIndex);
-    canvas.setSliceIndex(sliceOrientation, newIndex, transitionTime);
+    canvas.setSliceIndex(newIndex, transitionTime, sliceOrientation);
     canvas.changeSliceRender(sliceOrientation, newIndex);
   },
+  // setMultipleSliceIndex: async (sliceOrientation, newIndex, oldIndex, domID) => {
+  //   canvas.changeSliceRemove(sliceOrientation, oldIndex);
+  //   canvas.setMultipleSliceIndex(newIndex, domID);
+  //   canvas.changeSliceRender(sliceOrientation, newIndex);
+  // },
 
   setSliceDrag: async (slicePosition, sliceOrientation, transitionTime) => {
     canvas.setSliceDrag(slicePosition, sliceOrientation, transitionTime);
@@ -24,10 +29,12 @@ const getActions = (canvas: BrainvisCanvasComponent | ComparisonComponent): { [k
   deleteArtifact: async (view, artifact) => {
     canvas.deleteArtifact(view, artifact);
   },
-
-  // setWindowLevel: async (valueW, valueC, slider) => {
-  //   canvas.setWindowLevel(valueW, valueC, slider);
-  // },
+  setWindowLevel: async (valueW, valueC, slider) => {
+    canvas.setWindowLevel(valueW, valueC, slider);
+  },
+  navigateVolume: async (sliceOrientation, index) => {
+    canvas.navigateVolume(sliceOrientation, index, 10000);
+  },
 
   setPerspectiveCameraZoomLevel: async (args, transitionTime) => canvas.setPerspectiveCameraZoom(args, transitionTime),
   setPerspectiveCameraOrientation: async (args, transitionTime) => canvas.setPerspectiveCameraOrientation(args, transitionTime),
@@ -35,29 +42,21 @@ const getActions = (canvas: BrainvisCanvasComponent | ComparisonComponent): { [k
   changeView: async (args) => {
     canvas.displayOneView(args);
   },
-  
-  changeSlicesLocation: async (parameters) => {
-    canvas.changeSlicesLocation(parameters);
+  multiplePlanes: async (args) => {
+    canvas.multiplePlanes(args);
   },
-
-  resetSlicesLocation: async () => {
-    canvas.resetSlicesLocation();
-  },
-
-  resetConfig: async () => {
-    canvas.resetConfig();
-  },  
   setConfig: async (parameters) => {
     canvas.setConfig(parameters);
   },
-
+  resetConfig: async () => {
+    canvas.resetConfig();
+  },
   renderMeasurements: async (parameters) => {
     canvas.renderMeasurements(parameters);
   },  
   removeMeasurements: async (parameters) => {
     canvas.removeMeasurements(parameters);
   },
-
   null: async () => {
   }
 });

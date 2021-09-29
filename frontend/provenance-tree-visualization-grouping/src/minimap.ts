@@ -265,13 +265,13 @@ export class ProvenanceMinimap {
         // set node-active class if node contains current provenance node
         updateNodes
             .filter((d: any) => {
-                const yDiff = this.canvasRect.height - d.y * this.nodeScale.yScale;
-                const xDiff = (this.canvasRect.width - this.canvasRect.width / 4) + d.x * this.nodeScale.xScale;
+                // const yDiff = this.canvasRect.height - d.y * this.nodeScale.yScale;
+                // const xDiff = (this.canvasRect.width - this.canvasRect.width / 4) + d.x * this.nodeScale.xScale;
 
-                if (yDiff !== 0 && xDiff !== 0 && (yDiff <= 10 || xDiff <= 10)) {
-                    this.updateScale(this.scale * 0.9);
-                    this.updateNodes(tree, nodes);
-                }
+                // if (yDiff !== 0 && xDiff !== 0 && (yDiff <= 10 || xDiff <= 10)) {
+                //     this.updateScale(this.scale * 0.9);
+                //     this.updateNodes(tree, nodes);
+                // }
 
                 const ref = d.data.wrappedNodes.includes(this.treeVis.traverser.graph.current);
                 if (ref && this.followActiveNode) {

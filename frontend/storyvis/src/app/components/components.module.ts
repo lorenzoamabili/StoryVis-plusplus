@@ -6,7 +6,6 @@ import { StyledSliderPracticeComponent } from './styled-slider-practice/styled-s
 import { StyledSliderExplorationComponent } from './styled-slider-exploration/styled-slider-exploration.component';
 import { TextReportComponent } from './text-report/text-report.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
-import { MenuBarComparisonComponent } from './menu-bar-comparison/menu-bar-comparison.component';
 import { ProvenanceVisualizationComparisonComponent } from './brainvis-canvas/provenance-visualization-comparison/provenance-visualization-comparison.component';
 import { ComparisonComponent } from './brainvis-canvas/comparison.component';
 
@@ -74,7 +73,6 @@ import { HttpClientModule } from '@angular/common/http';
         StyledSliderExplorationComponent,
         TextReportComponent,
         MenuBarComponent,
-        MenuBarComparisonComponent,
         ComparisonComponent
     ],
     exports: [
@@ -85,7 +83,6 @@ import { HttpClientModule } from '@angular/common/http';
         StyledSliderPracticeComponent,
         StyledSliderExplorationComponent,
         MenuBarComponent,
-        MenuBarComparisonComponent,
         TextReportComponent,
         ComparisonComponent
     ]

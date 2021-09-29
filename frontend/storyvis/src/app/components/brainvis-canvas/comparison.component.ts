@@ -29,47 +29,22 @@ import { VIEWS } from './brainvis-canvas.component';
 export class ComparisonComponent extends THREE.EventDispatcher implements OnInit {
   @Input() studyStarted: boolean;
   @Output() magnificationCreated = new EventEmitter<{ domID: String, oneView: boolean }>();
-  @Output() nullCreated = new EventEmitter<any>();
-  @Output() slicesLocationCreated = new EventEmitter<{ slicesPosition: ISlicePosition[], slicesCameraZoom: number[] }>();
-  @Output() resetWLCreated = new EventEmitter<{ valueW: any, valueC: any, slider: string }>();
-  @Output() resetConfigCreated = new EventEmitter<{
-    artifacts: Artifact[],
-    locationParam: {
-      doArgs: {
-        slicesPosition: ISlicePosition[];
-        slicesCameraZoom: number[];
-        sliceOrientation: IOrientation;
-      };
-      undoArgs: {
-        slicesPosition: ISlicePosition[];
-        slicesCameraZoom: number[];
-        sliceOrientation: IOrientation;
-      };
-    },
-    WLParam: {
-      valueW: any;
-      valueC: any;
-      slider: string;
-      setting: string;
-    },
-    magnificationParam: string;
-  }>();
+  @Output() multiplePlanesCreated = new EventEmitter<{ domID: String, multiplePlanes: boolean }>();
+  @Output() navigationVolumeCreated = new EventEmitter<{ sliceOrientation: String, newIndex: number }>();
 
   public _initialized = false;
   public settings = Settings.getInstance(this);
   public screenWidth = window.innerWidth;
   public screenHeight = window.innerHeight;
-  public dashboardOpen;
   public datacomicsOpen;
-  public scrollytellingOpen;
 
   public data;
+  public navigationStartIndex: number;
 
   private stack: any;
   public sliderPractice: StyledSliderPracticeComponent;
   public sliderExploration: StyledSliderExplorationComponent;
   public comparedViews = [];
-  public isComparisonMode: boolean = false;
   public comparisonCompositionMade: boolean = false;
   public canvasComparison: ComparisonComponent;
   public elemParent: ElementRef;
@@ -89,7 +64,7 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
       height: 0.5,
 
       color: 0x121212,
-      sliceOrientation: VIEWS.COMPARISON2D2,
+      sliceOrientation: VIEWS.COMPARISON2D,
       sliceColor: 0x06a0ff,
       targetID: 6
     },
@@ -102,11 +77,31 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
       height: 0.5,
 
       color: 0x121212,
-      sliceOrientation: VIEWS.COMPARISON3D2,
+      sliceOrientation: VIEWS.COMPARISON3D,
       sliceColor: 0x06a0ff,
       targetID: 7
     }
   ];
+
+
+  public originalParameters = {
+    artifactsParam: {
+      artifacts: []
+    },
+    locationParam: {
+      slicesPosition: {},
+      slicesCameraZoom: {},
+      sliceOrientation: {},
+      index: {}
+    },
+    WLParam: {
+      valueW: 350,
+      valueC: 50,
+      slider: 'both',
+      setting: ''
+    },
+    magnificationParam: false
+  }
 
   private textureTarget: THREE.WebGLRenderTarget;
   private contourHelper: AMI.ContourHelper;
@@ -119,16 +114,9 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
 
   constructor(elem: ElementRef, public provenance: ProvenanceService) {
     super();
-
-    if(!this.settings.registryOn){
-      registerActions(provenance.registryComparison, this);
-      this.settings.registryOn = true;
-    }
-
-    this.settings._canvas = this;
-    this.settings.canvasComparison2 = this;
-
     this.elemParent = elem;
+    this.settings.canvasComparison = this;
+    this.settings._canvas = this;
   }
 
   get perspectiveRenderer() {
@@ -155,9 +143,9 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.renderers.forEach(renderer => {
-      if (renderer.scene.children.length > 0) {
+      // if (renderer.scene.children.length > 0) {
         renderer.onWindowResize();
-      }
+      // }
     });
   }
 
@@ -170,13 +158,12 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     this._comparisonRenderer2D2.init();
     this._comparisonRenderer3D2.init();
 
-    this.loadData((this.studyStarted) ?
-      // 'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' : 
-      'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' :
-      'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz');
+    // this.loadData((this.studyStarted) ?
+    //   // 'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' : 
+    //   'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' :
+    //   'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz');
 
-    this.addEventListeners();
-    this.animate();
+    // this.addEventListeners();
 
     this.settings.rulerModeChange.subscribe(this.toggleRulerMode.bind(this));
     this.settings.angleModeChange.subscribe(this.toggleAngleMode.bind(this));
@@ -185,9 +172,6 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
 
     this.settings.datacomicsModeChange.subscribe(this.toggleDatacomicsMode.bind(this));
-    this.settings.scrollytellingModeChange.subscribe(this.toggleScrollytellingMode.bind(this));
-
-    addListeners(this.provenance.trackerComparison, this);
   }
 
   async resize() {
@@ -214,13 +198,20 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
       this.prepareCamera(this._comparisonRenderer3D2);
       this.prepareScene(this._comparisonRenderer2D2);
 
-      // this.presetWindowLevel();
-      this._comparisonRenderer3D2.originalSliceOrientation = this._comparisonRenderer3D2.getCameraOrientation();
-
+      this.originalParameters.locationParam = {
+        slicesPosition: this._comparisonRenderer2D2.originalSlicePosition,
+        slicesCameraZoom: this._comparisonRenderer2D2.camera.zoom,
+        sliceOrientation: this._comparisonRenderer3D2.getCameraOrientation(),
+        index: this._comparisonRenderer2D2.stackHelper.index
+      }
+      this._comparisonRenderer2D2.stackHelper.slice._stack._windowWidth = this.settings.canvas._axialRenderer.stackHelper.slice._stack._windowWidth;
+      this._comparisonRenderer2D2.stackHelper.slice._stack._windowCenter = this.settings.canvas._axialRenderer.stackHelper.slice._stack._windowCenter;
+      this._comparisonRenderer2D2.stackHelper.index = this._comparisonRenderer2D2.stackHelper.index;
 
       // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
       this._initialized = true;
+      this.settings.canvasComparison = this;
       this.resize();
     } catch (error) {
       window.console.log('oops... something went wrong...');
@@ -255,7 +246,6 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
 
     // Freeform slice
     this._comparisonRenderer3D2.initHelpersStack(this.stack);
-
     this._comparisonRenderer2D2.initHelpersStack(this.stack);
     this._comparisonRenderer3D2.scene.add(this._comparisonRenderer2D2.scene);
 
@@ -295,9 +285,14 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   }
 
 
-  loadDataExternal(input){
-    this.loadData(input.value.url);
+  loadExternalData(input){
     this.provenance.newGraphComparison();
+    this.loadData(input.value.url);
+    
+    // this.addEventListeners();
+    this.animate();
+    registerActions(this.provenance.registryComparison, this);
+    addListeners(this.provenance.trackerComparison, this);
   }
 
   // setInitValuesWL() {
@@ -344,7 +339,7 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     frame.setAttribute('id', 'frame' + this.framesCounter);
     frame.setAttribute('class', 'storytelling-item');
     // frame.setAttribute('style', 'display: flex;');
-    dashboard.appendChild(frame);
+    document.getElementById(dashboard).appendChild(frame);
     this.frames.push(frame);
 
 
@@ -355,23 +350,10 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     });
   }
 
-  displayScrollytelling() {
-    if (this.scrollytellingOpen) {
-      document.getElementById('main').setAttribute('style', 'display: none;');
-      document.getElementById('scrollytelling').setAttribute('style', 'display: block;');
-      // this.frames.forEach((frame: any) => frame.setAttribute('style', 'position: static;'));
-      d3.selectAll('.canvas').attr('style', 'width: ' + this.screenWidth / 2 + 'px; height: ' + this.screenWidth / 2 * (this.screenHeight / this.screenWidth) + 'px; padding: 5px 15px; background-color: white;');
-      d3.selectAll('.storytelling-item').attr('style', 'width: fit-content; height: fit-content;');
-      // d3.selectAll('.textArea').attr('style', 'width: ' + this.screenWidth / 2 + 'px; height: 400px; z-index: 13; font-size: 16px; border-radius: 5px; margin: 50px');
-    } else {
-      this.switchToMainView();
-    }
-  }
-
   displayDatacomics() {
     if (this.datacomicsOpen) {
       document.getElementById('main').setAttribute('style', 'display: none;');
-      document.getElementById('datacomics').setAttribute('style', 'display: -webkit-inline-box;')
+      document.getElementById('datacomics').setAttribute('style', 'display: block;')
       this.frames.forEach((frame: any) => frame.setAttribute('style', 'display: block;'));
       const gridFactorX =
         (this.framesCounter < 5) ? 2 :
@@ -403,8 +385,6 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
 
     if (this.datacomicsOpen) {
       document.getElementById('datacomics').appendChild(textArea);
-    } else if (this.scrollytellingOpen) {
-      document.getElementById('scrollytelling').appendChild(textArea);
     }
 
     this.textAreas.push(textArea);
@@ -415,14 +395,11 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   switchToMainView() {
     document.getElementById('main').setAttribute('style', 'display: flex;');
     document.getElementById('datacomics').setAttribute('style', 'display: none;');
-    document.getElementById('scrollytelling').setAttribute('style', 'display: none;');
   }
 
   clearDashboard() {
     if (this.datacomicsOpen) {
       document.getElementById('datacomics').innerHTML = '';
-    } else if (this.scrollytellingOpen) {
-      document.getElementById('scrollytelling').innerHTML = '';
     }
   }
 
@@ -501,9 +478,36 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   }
   onSagittalChanged() {
   }
+  onMulti1Changed() {
+  }
+  onMulti2Changed() {
+  }
   adjustLocalizersOnDoubleClick(ijk: any) {
   }
+  multiplePlanes(){
+  }
 
+
+  windowLevelParam(wlSetting) {
+    const parameters = {
+      valueW: wlSetting.value.width,
+      valueC: wlSetting.value.center,
+      slider: 'both',
+      setting: wlSetting.value.name
+    }
+    return parameters;
+  }
+
+  // presetWindowLevel(wlSetting?: any) {
+  //   this.settings.canvas.presetWindowLevel(wlSetting);
+  // }
+
+
+  setWindowLevel(valueW, valueC, slider) {
+    this.settings.canvas.setWindowLevel(valueW, valueC, slider);
+  }
+
+  
   // onComparisonChanged() {
   //   this._comparisonRenderer1.updateClipPlane(this.clipPlaneComparison1);
   //   this._comparisonRenderer2.updateClipPlane(this.clipPlaneComparison2);
@@ -540,46 +544,13 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   // }
 
 
-  resetSlicesLocationParam() {
-    let slicesPosition: ISlicePosition[] = [];
-    this._comparisonRenderer2D2.getSlicePosition();
-
-    let slicesCameraZoom: number[] = [];
-    this.renderers2D.forEach(renderer => slicesCameraZoom.push(renderer.camera.zoom));
-
-    let sliceOrientation: IOrientation = this._comparisonRenderer3D2.getCameraOrientation();
-
-    const undoArgs = { slicesPosition, slicesCameraZoom, sliceOrientation };
-
-
-    slicesPosition = [];
-    this.renderers2D.forEach(renderer => slicesPosition.push(renderer.originalSlicePosition));
-
-    slicesCameraZoom = [];
-    this.renderers2D.forEach(renderer => slicesCameraZoom.push(renderer.originalCameraZoom));
-
-    sliceOrientation = this._comparisonRenderer3D2.originalSliceOrientation;
-
-    const doArgs = { slicesPosition, slicesCameraZoom, sliceOrientation };
-
-
-    const parameters = { doArgs, undoArgs };
-
-    return parameters;
-  }
-
-
-  resetSlicesLocation() {
-    const parameters = this.resetSlicesLocationParam();
-    this.changeSlicesLocation(parameters.doArgs);
-    this.slicesLocationCreated.emit(parameters.undoArgs);
-    this.provenance.graph.current.metadata.option = 'reset';
-  }
 
   changeSlicesLocation(parameters) {
-    this._comparisonRenderer2D2.setSlicePosition(parameters.slicesPosition[0], 500);
-    this._comparisonRenderer2D2.setSliceZoom(parameters.slicesCameraZoom[0], 500);
-    this._comparisonRenderer3D2.setCameraOrientation(parameters.sliceOrientation, 500)
+    this._comparisonRenderer2D2.setSlicePosition(parameters.slicesPosition, 500);
+    this._comparisonRenderer2D2.setSliceZoom(parameters.slicesCameraZoom, 500);
+    this._comparisonRenderer2D2.stackHelper.index = parameters.index;
+
+    this._comparisonRenderer3D2.setCameraOrientation(parameters.sliceOrientation, 500);
   }
 
   deleteArtifacts() {
@@ -593,38 +564,21 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     }
   }
 
-  resetConfigParam() {
-    let artifacts: Artifact[] = [];
-    this.renderers2D.forEach(renderer => renderer._artifacts.forEach(artifact => artifacts.push(artifact)));
-    const locationParam = this.resetSlicesLocationParam();
-    // const WLParam = this.resetWindowLevelParam('head - soft tissues');
-    const WLParam = null;
-    const magnificationParam = this.settings.isOneView;
-    const parameters = { artifacts, locationParam, WLParam, magnificationParam };
 
-    return parameters;
-  }
-
-  resetConfig(newRoot?: boolean) {
-    const parameters = this.resetConfigParam();
-
-    this.deleteArtifacts();
-    this.changeSlicesLocation(parameters.locationParam.doArgs);
-    // this.presetWindowLevel();
-
-    if (parameters.magnificationParam) {
-      this.create4Views(parameters.magnificationParam);
-    }
-
-    if (newRoot) {
-      this.resetConfigCreated.emit(parameters);
-    }
+  resetConfig() {
+    this.setConfig(this.originalParameters);
   }
 
   setConfig(parameters) {
-    this.restoreArtifacts(parameters.artifacts);
-    this.changeSlicesLocation(parameters.locationParam.undoArgs);
-    // this.setWindowLevel(parameters.WLParam.valueW, parameters.WLParam.valueC, parameters.WLParam.slider);
+    this.changeSlicesLocation(parameters.locationParam);
+    this.setWindowLevel(parameters.WLParam.valueW, parameters.WLParam.valueC, parameters.WLParam.slider);
+
+    if(parameters.artifacts){
+      this.deleteArtifacts();
+    } else {
+      this.restoreArtifacts(parameters.artifactsParam.artifacts);
+    }
+
     if (parameters.magnificationParam) {
       this.createOneView(parameters.magnificationParam);
     }
@@ -693,12 +647,10 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     this._comparisonRenderer2D2.changeSliceIndex(newIndex, transitionTime);
   }
 
-
   navigateVolume(sliceOrientation: VIEWS, newIndex: number, transitionTime: number) {
-    console.log(this._comparisonRenderer2D2.stackHelper.index);
-    // this.renderAllArtifacts(sliceOrientation);
-    this._comparisonRenderer2D2.setSliceIndex(this._comparisonRenderer2D2.stackHelper.index, newIndex, transitionTime);
-    // this.removeAllArtifacts(sliceOrientation);
+    this._comparisonRenderer2D2.changeSliceIndex(newIndex, transitionTime, this._comparisonRenderer2D2.stackHelper.index);
+    this.navigationVolumeCreated.emit({ sliceOrientation, newIndex });
+    this.navigationStartIndex = newIndex;
   }
 
 
@@ -768,13 +720,7 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   };
 
   toggleDatacomicsMode(isEnabled: boolean) {
-    this.dashboardOpen = isEnabled;
     this.datacomicsOpen = isEnabled;
-  }
-
-  toggleScrollytellingMode(isEnabled: boolean) {
-    this.dashboardOpen = isEnabled;
-    this.scrollytellingOpen = isEnabled;
   }
 }
 

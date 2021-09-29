@@ -11,16 +11,16 @@ export class Settings {
 
     public static instance: Settings;
     public canvas: BrainvisCanvasComponent;
-    public canvasComparison1: BrainvisCanvasComponent;
-    public canvasComparison2: ComparisonComponent;
+    public canvasComparison: ComparisonComponent;
     public _canvas: BrainvisCanvasComponent | ComparisonComponent;
 
     public syncScroll: boolean = false;
     public isOneView: string = '';
-    public automaticSettingW: boolean = false;
-    public automaticSettingC: boolean = false;
+
     public slideDeckOpen: boolean = false;
     public localizersOn: boolean = false;
+    public defaultSettingW: boolean = false;
+    public defaultSettingC: boolean = false;
     public isComparisonMode: boolean = false;
     public isEducationMode: boolean = false;
     public treeButtons: boolean = false;
@@ -36,9 +36,8 @@ export class Settings {
     public _thresholdLowerBoundC;
     public _thresholdUpperBoundC;
     private _datacomicsMode = false;
-    private _scrollytellingMode = false;
     
-    public registryOn = false;
+    public dashboardOn = false;
 
     public rulerOn = false;
     public angleOn = false;
@@ -62,7 +61,6 @@ export class Settings {
     get voxelprobeMode() { return Settings.instance.voxelprobeOn; }
     get annotationMode() { return Settings.instance.annotationOn; }
     get datacomicsMode() { return Settings.instance._datacomicsMode; }
-    get scrollytellingMode() { return Settings.instance._scrollytellingMode; }
 
     constructor() {
     }
@@ -93,7 +91,7 @@ export class Settings {
                 this.valueChanged = (valueW !== oldValueW) ? true : false;
 
                 if (this.valueChanged) {
-                    if (!this.automaticSettingW) {
+                    if (!this.defaultSettingW) {
                     this.canvas.dispatchEvent({
                         type: 'thresholdValueChangeStartW',
                         changes: {
@@ -112,9 +110,32 @@ export class Settings {
                         }
                     });
                 }
+
+                if(this.isComparisonMode){
+                    if (!this.defaultSettingW) {
+                        this.canvasComparison.dispatchEvent({
+                            type: 'thresholdValueChangeStartW',
+                            changes: {
+                                valueW: oldValueW,
+                                valueC: oldValueC,
+                                slider: slider
+                            }
+                        });
+    
+                        this.canvasComparison.dispatchEvent({
+                            type: 'thresholdValueChangedW',
+                            changes: {
+                                valueW: valueW,
+                                valueC: oldValueC,
+                                slider: slider
+                            }
+                        });
+                    }
+                }
+
                     this.canvas.setWindowLevel(valueW, oldValueC, slider);
                     this.initW = true;
-                    this.automaticSettingW = false;
+                    this.defaultSettingW = false;
                 }
             }
         }
@@ -131,7 +152,7 @@ export class Settings {
                 this.valueChanged = (valueC !== oldValueC) ? true : false;
 
                 if (this.valueChanged) {
-                    if (!this.automaticSettingC) {
+                    if (!this.defaultSettingC) {
                     this.canvas.dispatchEvent({
                         type: 'thresholdValueChangeStartC',
                         changes: {
@@ -150,9 +171,32 @@ export class Settings {
                         }
                     });
                 }
+
+                if(this.isComparisonMode){
+                        if (!this.defaultSettingC) {
+                        this.canvasComparison.dispatchEvent({
+                            type: 'thresholdValueChangeStartC',
+                            changes: {
+                                valueW: oldValueW,
+                                valueC: oldValueC,
+                                slider: slider
+                            }
+                        });
+    
+                        this.canvasComparison.dispatchEvent({
+                            type: 'thresholdValueChangedC',
+                            changes: {
+                                valueW: oldValueW,
+                                valueC: valueC,
+                                slider: slider
+                            }
+                        });
+                    }
+                }
+
                     this.canvas.setWindowLevel(oldValueW, valueC, slider);
                     this.initC = true;
-                    this.automaticSettingC = false;
+                    this.defaultSettingC = false;
                 }
             }
         }
@@ -271,12 +315,6 @@ export class Settings {
         Settings.instance.datacomicsModeChange.emit(datacomicsMode);
     }
     @Output() datacomicsModeChange = new EventEmitter<boolean>();
-
-    @Input() set scrollytellingMode(scrollytellingMode: boolean) {
-        Settings.instance._scrollytellingMode = scrollytellingMode;
-        Settings.instance.scrollytellingModeChange.emit(scrollytellingMode);
-    }
-    @Output() scrollytellingModeChange = new EventEmitter<boolean>();
 
     static getInstance(canvas) {
         if (!Settings.instance) {
