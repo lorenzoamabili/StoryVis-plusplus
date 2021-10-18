@@ -1,0 +1,71 @@
+:host.comparison{
+  scale: 0.5;
+}
+
+mat-form-field {
+  width: fit-content;
+}
+
+.mat-toolbar.mat-primary {
+  background: #434957;
+  color: #fff;
+  font-family: Times;
+  font-size: 16px;
+}
+mat-button-toggle,
+
+button {
+  color: ivory;
+}
+
+.smallerButton {
+   min-width: 40px;
+   padding: 0px;
+}
+
+.transparent {
+  background-color: transparent;
+  box-shadow: none;
+  border-color: transparent !important;
+}
+
+.save {
+  background-color: #586072;
+}
+
+mat-raised-button.localizers-checked{
+  background-color: #6b707e;
+}
+
+mat-raised-button.localizers{
+  background-color: #444958;
+}
+
+mat-button-toggle.annotation {
+  background-color: #444958;
+  border-width: 1px;
+  border-color: lightgray;
+}
+
+.mat-button-toggle-checked{
+  color: red;
+}
+
+div.right {
+  position: absolute;
+  right: 1em;
+}
+mat-toolbar {
+  min-height: 0;
+}
+mat-toolbar-row {
+  height: auto;
+}
+
+.mat-progress-spinner > svg > circle {
+  stroke: white !important;
+}
+
+mat-form-field{
+  width: min-content;
+}

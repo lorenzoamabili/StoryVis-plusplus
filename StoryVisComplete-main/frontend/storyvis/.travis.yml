@@ -1,0 +1,16 @@
+language: node_js
+script: echo "Run your build here"
+
+# Only use the `after_deploy` step if you are using the `deploy`
+# step. If you're not using `deploy`, then put the following code in
+# the `after_script` step.
+after_deploy:
+  - |
+    curl -u $ASSERTIBLE_TOKEN: -XPOST "https://assertible.com/deployments" -d'{
+        "service": "'"${ASSERTIBLE_SERVICE}"'",
+        "environmentName": "production",
+        "version": "'"${TRAVIS_COMMIT}"'",
+        "ref": "'"${TRAVIS_COMMIT}"'",
+        "github": true
+    }'
+

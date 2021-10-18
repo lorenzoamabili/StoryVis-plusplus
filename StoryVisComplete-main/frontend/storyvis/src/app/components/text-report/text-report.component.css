@@ -1,0 +1,20 @@
+.animationContainer {
+    position: absolute;
+    left: 20px;
+    width: 90%;
+    /* z-index: 11; */
+}
+
+/* #reportnav-trigger {    
+    position: absolute;
+    color: orange;
+    right: -3%;
+    bottom: 2%;
+} */
+
+#textArea{
+    overflow: hidden;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 5px;
+  }

@@ -1,0 +1,16 @@
+iframe{
+    overflow: hidden;
+    position: absolute;
+    display: block;
+    top: 20%;
+    left: 20%;
+    height: 75%;
+    width: 60%;
+    border: 3px black;
+  }
+
+  div.buttonLink{
+    position: absolute;
+    left: 90%;
+    bottom: 5%;
+  }

@@ -1,0 +1,31 @@
+{
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "provenance-core",
+      "provenance-tree-visualization-grouping",
+      "slide-deck-visualization",
+      "ami",
+      "storyvis"
+    ],
+    "nohoist": [
+      "**/@angular*",
+      "**/@angular*/**",
+      "**/@ngtools*",
+      "**/@ngtools*/**"
+    ]
+  },
+  "dependencies": {
+    "@angular/animations": "^10.1.5",
+    "@angular/cdk": "^10.2.4",
+    "@angular/core": "^10.1.5",
+    "@angular/material": "^10.2.4",
+    "tslib": "^2.0.3",
+    "typings": "^2.1.1"
+  },
+  "devDependencies": {
+    "@angular/cli": "^10.1.6",
+    "@types/offscreencanvas": "^2019.6.4",
+    "typescript": "^4.4.3"
+  }
+}

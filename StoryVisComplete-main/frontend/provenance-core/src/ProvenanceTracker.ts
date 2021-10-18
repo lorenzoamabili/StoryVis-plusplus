@@ -1,0 +1,183 @@
+import {
+  StateNode,
+  Action,
+  IProvenanceTracker,
+  IActionFunctionRegistry,
+  IProvenanceGraph,
+  ActionFunctionWithThis,
+  ProvenanceNode,
+  RootNode,
+  IScreenShotProvider,
+  SerializedProvenanceGraph,
+  Artifact
+} from './api';
+import { generateUUID, generateTimestamp } from './utils';
+import { serializeProvenanceGraph } from './ProvenanceGraph';
+
+var nodeCounter: number = 0;
+var allArtifacts: Artifact[] = [];
+
+/**
+ * Provenance Graph Tracker implementation
+ *
+ * @param graph The provenance graph to track (this will serve as storage construct)
+ * @param current Optional parameter to set current node for importing a provenance graph that is non-empty
+ *
+ */
+export class ProvenanceTracker implements IProvenanceTracker {
+  registry: IActionFunctionRegistry;
+
+  /**
+   * When acceptActions is false, the Tracker will ignore calls to applyAction
+   */
+
+  public acceptActions = true;
+
+  private graph: IProvenanceGraph;
+  private username: string;
+  private previousNode: any = null;
+
+  private _screenShotProvider: IScreenShotProvider | null = null;
+  private _autoScreenShot = false;
+
+  constructor(
+    registry: IActionFunctionRegistry,
+    graph: IProvenanceGraph,
+    username: string = 'Unknown',
+  ) {
+    this.registry = registry;
+    this.graph = graph;
+    this.username = username;
+  }
+
+  /**
+   * Calls the action.do function with action.doArguments. This will also create a new StateNode
+   * in the graph corresponding to the action taken. Optionally, the label set in action.metadata.label
+   * will be taken as the label for this node.
+   *
+   * @param action
+   * @param skipFirstDoFunctionCall If set to true, the do-function will not be called this time,
+   *        it will only be called when traversing.
+   */
+  async applyAction(action: Action, skipFirstDoFunctionCall: boolean = false, artifacts?: Artifact | Artifact[], option?: string, newRoot?: ProvenanceNode): Promise<StateNode> {
+    if (!this.acceptActions) {
+      return Promise.resolve(this.graph.current as StateNode);
+    }
+
+    let label = '';
+    if (action.metadata && action.metadata.label) {
+      label = action.metadata.label;
+    } else {
+      label = action.do;
+    }
+    
+    if(artifacts){
+      artifacts.length === 1 ? allArtifacts.push(artifacts as Artifact) : allArtifacts.push(...artifacts as Artifact[]);
+    } 
+
+
+    const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any): StateNode => ({
+      id: generateUUID(),
+      label: label,
+      artifacts: artifacts ? allArtifacts : [],
+      metadata: {
+        option: option ? option : '',
+        mainbranch: false,
+        noLink: false,
+        loaded: false,
+        bookmarked: false,
+        filtered: false,
+        createdBy: this.username,
+        createdOn: generateTimestamp(),
+        creationOrder: 0,
+        graphID: parentNode.metadata.graphID
+      },
+      action,
+      actionResult,
+      parent: parentNode,
+      children: []
+    });
+
+    let newNode: StateNode;
+
+    // Save the current node because the next block could be asynchronous
+    const currentNode = this.graph.current;
+    let parentNode = (option === 'split') ? this.graph.root : this.graph.current;
+    parentNode = newRoot ? newRoot : parentNode;
+    this.previousNode = this.previousNode !== null ? this.previousNode : currentNode;
+
+    if (skipFirstDoFunctionCall) {
+      newNode = createNewStateNode(parentNode, null);
+      nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+      newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
+    } else {
+      // Get the registered function from the action out of the registry
+      const functionNameToExecute: string = action.do;
+      const funcWithThis: ActionFunctionWithThis = this.registry.getFunctionByName(functionNameToExecute);
+      const actionResult = await funcWithThis.func.apply(funcWithThis.thisArg, action.doArguments.args);
+
+      newNode = createNewStateNode(parentNode, actionResult);
+      nodeCounter = this.previousNode.metadata.graphID === newNode.metadata.graphID ? nodeCounter : nodeCounter + 1;
+      newNode.metadata.creationOrder = this.previousNode.metadata.graphID === newNode.metadata.graphID ? this.previousNode.metadata.creationOrder + 1 : nodeCounter;
+    }
+    this.previousNode = newNode;
+
+    if (this.autoScreenShot && this.screenShotProvider) {
+      try {
+        newNode.metadata.screenShot = this.screenShotProvider();
+      } catch (e) {
+        console.warn('Error while getting screenshot', e);
+      }
+    }
+
+
+    // When the node is created, we need to update the graph.
+    if (newRoot) {
+      newRoot.children.push(newNode);
+    } else {
+      if (option === 'split') {
+        this.graph.root.children.push(newNode);
+      } else {
+        currentNode.children.push(newNode);
+      }
+    }
+
+    this.graph.addNode(newNode);
+    this.graph.current = newNode;
+
+    return newNode;
+  }
+
+
+  get screenShotProvider() {
+    return this._screenShotProvider;
+  }
+
+  set screenShotProvider(provider: IScreenShotProvider | null) {
+    this._screenShotProvider = provider;
+  }
+
+  get autoScreenShot(): boolean {
+    return this._autoScreenShot;
+  }
+
+  set autoScreenShot(value: boolean) {
+    this._autoScreenShot = value;
+    if (value && !this._screenShotProvider) {
+      console.warn('Setting autoScreenShot to true, but no screenShotProvider is set');
+    }
+  }
+
+  getGraph(): SerializedProvenanceGraph {
+    return this.graph.getSelf();
+  }
+
+  restoreGraph(sgraph: any): void {
+    Object.setPrototypeOf(sgraph, serializeProvenanceGraph.prototype);
+    alert(JSON.stringify(sgraph));
+    this.graph = this.graph.restoreSelf(sgraph);
+  }
+
+  // updateArtifacts(): void {
+  // }
+}

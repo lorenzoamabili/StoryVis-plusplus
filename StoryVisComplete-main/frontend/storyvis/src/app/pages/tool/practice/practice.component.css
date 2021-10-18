@@ -1,0 +1,82 @@
+:host {
+    display: contents;
+  }
+  app-brainvis-canvas.normal {
+    flex: 1;
+  }
+  app-brainvis-canvas.comparison {
+    width: 50%;
+  }
+
+  app-brainvis-canvas-comparison.normal {
+    display: none;
+  }
+
+  app-brainvis-canvas-comparison.comparison {
+    width: 50%;
+  }
+
+  app-provenance-visualization-comparison.normal {
+    display: none;
+  }
+
+  app-provenance-visualization-comparison.comparison {
+    display: block;
+  }
+
+  #bottom-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0%;
+  }
+  /*New Container for elements on the top of the screen to make way for timeline at the bottom*/
+  #top-container {
+    position: absolute;
+    top: 0;
+    width: 25%;
+  }
+  mat-sidenav {
+    overflow: visible;
+    visibility: visible !important;
+  }
+  mat-sidenav-container.normal{
+    height: 100%;
+  }
+  mat-sidenav-container.isSlideDeckOpen{
+    height: 80%;
+  }
+  mat-sidenav-content {
+    display: flex;
+    flex: 1;
+  }
+  
+  mat-sidenav.comparison {
+    width: fit-content;
+  }
+
+  mat-sidenav.bottom {
+    height: 12%;
+    width: 95%;
+    position: absolute;
+    top: 87%;
+    border-color: white;
+}
+
+  #sidenav-trigger {
+    color: orange;
+    position: absolute;
+    left: -50px;
+  }
+  #sidenavBottom-trigger {
+    color: orange;
+    position: absolute;
+    right: -50px;
+    bottom: 20px;
+  }
+  #next-button {
+    color: orange;
+    position: absolute;
+    right: 50px;
+    bottom: 10px;
+  }

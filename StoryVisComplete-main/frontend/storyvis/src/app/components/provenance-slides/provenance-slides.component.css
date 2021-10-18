@@ -1,0 +1,12 @@
+@import '~@visualstorytelling/slide-deck-visualization/dist/bundle.css';
+
+app-provenance-slides {
+  width: 100%;
+  display: block;
+  border-radius: 5px;
+}
+
+#slideDeck {
+  display: flex;
+  padding: 1%;
+}

@@ -1,0 +1,341 @@
+app-provenance-visualization-comparison {
+  height: 100%;
+  width: 300px;
+  display: block;
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+  background: ghostwhite;
+}
+
+app-provenance-visualization-comparison #buttonsContainer{
+  display: none;
+}
+
+app-provenance-visualization-comparison #legend-trigger{
+  display: none;
+}
+
+.mat-icon{
+  font-size: 22px;
+}
+
+.mat-drawer-inner-container {
+  display: flex;
+  overflow: inherit;
+  }
+
+.visualizationContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.minimapContainer {
+  display: none;
+  position: relative; 
+  border-top: 1px solid black; 
+  height: 20%; 
+  background-color: white;
+}
+
+.withButtons{
+  display: block;
+  width: 50px;
+}
+
+.noButtons{
+  display: none;
+}
+
+.node {
+  fill: #ffffff;
+  stroke: #000000;
+  cursor: pointer;
+}
+
+.node circle {
+  stroke-width: 0.3px;
+  opacity: 0.3;
+}
+
+.node circle.keynode {
+  stroke: #000000;
+  stroke-dasharray: 0;
+}
+
+.node circle.bookmarked {
+  stroke: #ff0000;
+  stroke-width: 1.2px;
+  stroke-dasharray: 0;
+}
+
+.node circle.bookmarkedStory {
+  fill: black;
+  stroke-width: 2px;
+  stroke-dasharray: 0;
+}
+
+.node circle.loaded {
+  stroke: brown;
+  stroke-width: 0.7px;
+  stroke-dasharray: 1;
+}
+
+.node circle.intent_none {
+  fill: #ffffff;
+}
+
+.node circle.intent_exploration {
+  fill: #8dd3c7;
+}
+
+.node circle.intent_configuration {
+  fill: #fdb462;
+}
+
+.node circle.intent_selection {
+  fill: #80b1d3;
+}
+
+.node circle.intent_derivation {
+  fill: #fb8072;
+}
+
+.node circle.intent_provenance {
+  fill: #bebada;
+}
+
+.node circle.intent_annotation {
+  fill: #ffffb3;
+}
+
+.node circle.intent_wrapped {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-dasharray: 3;
+  stroke-width: 0.6px;
+}
+
+.node.branch-active {
+  background-color: #cccccc;
+}
+
+.node.branch-active text {
+  display: block;
+}
+
+.node.node-active text {
+  fill: #000;
+}
+
+.node.branch-active.node circle {
+  opacity: 1;
+}
+
+.node.neighbour .circle-label {
+  font-size: 8px;
+}
+
+.node.node-active .circle-label {
+  font-weight: bolder;
+  font-size: 9px;
+}
+
+.node.node-active circle {
+  stroke: #000000;
+  stroke-width: 1.5px;
+  stroke-dasharray: 0;
+}
+
+.node text {
+  /* fill: white; */
+  fill: #000000;
+  stroke-width: 0;
+  font-family: Times;
+}
+
+.link {
+  fill: none;
+  /* stroke: white; */
+  stroke: rgb(100, 100, 100);
+  stroke-width: 0.2px;
+  opacity: 0.3;
+}
+
+.link.crossing {
+  fill: none;
+  stroke: rgb(100, 100, 100);
+  stroke-width: 0.2px;
+  opacity: 0.7;
+}
+
+.link.hiddenClass {
+  display: none;
+}
+
+.link.active {
+  /* stroke: white; */
+  stroke: #000000;
+  stroke-width: 0.8px;
+  opacity: 1;
+}
+
+.titleAggregation {
+  font-family: Times;
+  font-size: 25px;
+}
+
+#DataAggregationTitle {
+  display: flex;
+  flex: 0.5;
+  justify-content: center;
+  align-items: center;
+}
+
+.controlsBox {
+  padding: 1%;
+}
+
+.aggButton {
+  width: 43%;
+  margin: 5px 10px 0px 5px;
+  font-size: 14px;
+  font-family: Times;
+}
+
+.circle-text {
+  font-size: 6px;
+  display: block;
+}
+
+.circle-label {
+  font-size: 7px;
+}
+
+.hiddenClass {
+  display: none;
+}
+
+.container {
+  background-color: white;
+}
+
+.holder {
+  width: min-content;
+  display: flex;
+  bottom: 30%;
+  left: 1%;
+  position: absolute;
+}
+
+.mat-icon-button{
+  margin: 5px;
+  width: min-content;
+  height: min-content;
+  line-height: 20px;
+}
+
+.checkBox {
+  cursor: pointer;
+  margin: 0 10px;
+  margin-top: 5px;
+}
+
+.filterCheckbox {
+  cursor: pointer;
+  margin: 0 8px;
+}
+
+/*Legend CSS*/
+
+.legend {
+  flex: 1;
+  box-shadow: 0px 0px 4px #888;
+  margin: 5px;
+  width: fit-content;
+  height: fit-content;
+  background-color: white;
+}
+.legend ul {
+  list-style-type: none;
+  padding: 0 5px;
+  margin: 3px 0;
+}
+.legend ul li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3px;
+}
+.legend li .circle {
+  width: 10px;
+  height: 10px;
+  border: 1px solid;
+  border-radius: 6px;
+}
+.legend li .rect {
+  width: 8px;
+  height: 8px;
+  border: 1px solid;
+}
+.legend li span {
+  padding-left: 5px;
+  font-size: 12px;
+}
+
+.legend li .story  {
+  width: 10px;
+  height: 10px;
+  border: 1px dashed;
+  border-color: red;
+  border-radius: 6px;
+}
+
+.legend li .bookmark  {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid;
+  border-color: red;
+  border-radius: 6px;
+}
+
+.legend li .loaded  {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid;
+  border-color: blue;
+  border-radius: 6px;
+}
+
+.legend li .slideAdded  {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid;
+  border-color: rgb(255, 100, 0);
+  border-radius: 6px;
+}
+
+.checked {
+  opacity: 0.3;
+}
+
+
+#annotation-trigger {
+  color: wheat;
+}
+#selection-trigger {
+  color: #80b1d3;
+}
+#configuration-trigger {
+  color: #fdb462;
+}
+#derivation-trigger {
+  color: #fb8072;
+}
+#provenance-trigger {
+  color: #bebada;
+}
+#exploration-trigger {
+  color: #8dd3c7;
+}

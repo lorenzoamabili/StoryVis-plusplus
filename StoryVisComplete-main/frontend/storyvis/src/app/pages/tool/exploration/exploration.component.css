@@ -1,0 +1,52 @@
+:host {
+  display: contents;
+}
+app-brainvis-canvas {
+  flex: 1;
+}
+
+
+app-brainvis-canvas-comparison.normal {
+  display: none;
+}
+
+app-brainvis-canvas-comparison.comparison {
+  width: 50%;
+}
+
+
+
+#bottom-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+}
+/*New Container for elements on the top of the screen to make way for timeline at the bottom*/
+#top-container {
+  position: absolute;
+  top: 0;
+  width: 25%;
+}
+mat-sidenav {
+  overflow: visible;
+  visibility: visible !important;
+}
+mat-sidenav-container,
+mat-sidenav-content {
+  display: flex;
+  flex: 1;
+}
+
+#sidenav-trigger {
+  color: orange;
+  position: absolute;
+  left: -50px;
+}
+
+#next-button {
+  color: orange;
+  position: absolute;
+  right: 50px;
+  bottom: 10px;
+}

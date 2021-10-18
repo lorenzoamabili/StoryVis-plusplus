@@ -1,0 +1,49 @@
+﻿<app-menu-bar [canvas]="canvas" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar>
+
+<!-- <app-menu-bar-comparison [canvasComparison]="canvasComparison" [studyStarted]="studyStarted" [IDcreator]="IDcreator"></app-menu-bar-comparison> -->
+
+<mat-sidenav-container [ngClass]="!provenance.settings.isSlideDeckOpen ? 'normal' : 'isSlideDeckOpen'" hasBackdrop="false">
+
+  <mat-sidenav [class.comparison]="provenance.settings.isComparisonMode" position="end" #sidenav mode="side"
+    [opened]="false" hasBackdrop="false" *ngIf="!isNoProvGraph">
+
+    <button *ngIf="!provenance.settings.dashboardOn" id="sidenav-trigger" mat-icon-button (click)="sidenav.toggle();" matTooltip="Provenance graph view">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <app-provenance-visualization *ngIf="!isNoProvGraph"></app-provenance-visualization>
+    <app-provenance-visualization-comparison *ngIf="!isNoProvGraph && (provenance.settings.isEducationMode || provenance.settings.isComparisonMode)">
+    </app-provenance-visualization-comparison>
+
+
+  </mat-sidenav>
+
+  <!-- <div id="bottom-container"> -->
+
+  <mat-sidenav-content>
+    <app-brainvis-canvas [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvas
+      [studyStarted]="studyStarted"></app-brainvis-canvas>
+      <app-brainvis-canvas-comparison *ngIf="provenance.settings.isComparisonMode"
+      [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvasComparison
+      [studyStarted]="studyStarted"></app-brainvis-canvas-comparison>
+
+
+
+    <!-- </div> -->
+    <a *ngIf="!provenance.settings.dashboardOn" id="next-button" (click)="provenance.saveGraphStudy(IDcreator); provenance.saveStoryStudy(IDcreator); 
+        provenance.saveTextReportStudy(IDcreator);" routerLink='/questionnaire'>
+      <mat-icon><b>NEXT</b></mat-icon>
+    </a>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<mat-sidenav class="bottom" position='start' #sidenavBottom mode="side" [opened]="false" hasBackdrop="false">
+  <button *ngIf="!provenance.settings.dashboardOn" id="sidenavBottom-trigger" 
+  mat-icon-button (click)="sidenavBottom.toggle(); provenance.settings.isSlideDeckOpen = !provenance.settings.isSlideDeckOpen;" matTooltip="Story editor">
+    <mat-icon>message</mat-icon>
+  </button>
+  <!-- <app-slides-container *ngIf="!isNoProvGraph"> -->
+  <app-provenance-slides [canvas]="canvas" #slides *ngIf="!isNoProvGraph"></app-provenance-slides>
+  <!-- </app-slides-container> -->
+  <app-text-report *ngIf="isNoProvGraph"> </app-text-report>
+</mat-sidenav>

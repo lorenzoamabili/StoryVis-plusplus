@@ -1,0 +1,185 @@
+@import "~font-awesome/css/font-awesome.css";
+
+body {
+    background-color: transparent;
+}
+
+#slideDeck {
+    height: 120px;
+    overflow: hidden;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+div.slidedeck__slide {
+    background-color: #ccc;
+    margin-bottom: 0.5em;
+    border: 1px solid #808080;
+}
+
+table.slides__table {
+    width: 300px;
+    padding: 1%;
+}
+
+table.slides__table tr.selected {
+    background-color: #00b8d9;
+}
+
+.add {
+    font-family: "FontAwesome";
+}
+
+div.slidedeck__slide[draggable="true"] {
+    background-color: #00b8d9;
+}
+
+.slides_duration_resize {
+    fill: #fc8d59;
+}
+
+.slides_transitionTime_resize{
+    fill: #91bfdb;
+}
+
+.slides_text {
+    fill: #000000;
+}
+
+.slides_transitionTime_rect {
+    fill: #aaaaaa;
+    fill-opacity: 0.2;
+}
+
+.slides_delete_rect {
+    fill: #aaaaaa;
+}
+
+.slides_placeholder {
+    rx: 5px;
+    ry: 5px;
+    stroke-dasharray: 5;
+    fill-opacity: 0.1;
+    stroke: #808080;
+    stroke-width: 1px;
+}
+
+.slides_durationtext {
+    font-weight: 600;
+}
+
+#playerPlaceholder {
+    display: grid;
+    padding: 5px 8px;
+    border-radius: 5px;
+    fill-opacity: 0.1;
+    stroke: #d3d3d3;
+    stroke-width: 1px;
+    background-color: #dcdcdc;
+}
+
+#annotation-box {
+    stroke-dasharray: none;
+    fill: blue;
+    fill-opacity: 0.05;
+}
+
+svg.annotation-area {
+    position: absolute;
+    right: 2%;
+    top: 2%;
+}
+
+rect.add_annotation {
+    position: absolute;
+    stroke: #000000;
+    stroke-width: 1px;
+}
+
+#textArea{
+    position: absolute;
+    top: 5%;
+    right: 1%;
+    overflow: hidden;
+    width: 32%;
+    height: 60%;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: snow;
+}
+
+#addSlide{
+    right: 31%;
+}
+
+
+#addButton{
+    right: 1%;
+}
+
+#slideRight{
+    right: 10%;
+}
+
+#slideLeft{
+    right: 13%;
+}
+
+#stretch{
+    right: 18%;
+}
+
+#shrink{
+    right: 21%;
+}
+
+#transitionTimeButton{
+    right: 25%;
+}
+#createStoryFromDerivationNodes{
+    right: 28%;
+}
+
+.slides_background_rect {
+    fill: #ffffff;
+    opacity: 0.01;
+    stroke: #aaaaaa;
+}
+  
+.slides_rect {
+    stroke: #d3d3d3;
+    stroke-width: 1px;
+}
+  
+.slides_delay_rect {
+    fill: #dddddd;
+    opacity: 0.7;
+    stroke: #dddddd;
+}
+  
+.slides_rect[selected='true'] {
+    stroke: #000000;
+    stroke-width: 3px;
+    opacity: 0.2;
+}
+
+.slides_delete_icon{
+    color: #000000;
+    background-color: transparent;
+}
+
+.slides_clone_icon{
+    color: #000000;
+    background-color: transparent;
+}
+
+.button{
+    border-color: white;
+    background-color: white;
+    position: absolute;
+    bottom: 5%;
+    border-radius: 5px;
+    border-width: 0px;
+}
