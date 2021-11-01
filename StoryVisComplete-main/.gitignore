@@ -1,6 +1,6 @@
-.DS_Store
 data
 node_modules
 */**/.rpt2_cache
 */**/node_modules
 */**/.idea
+*/**/.DS_Store
