@@ -3,8 +3,10 @@ import * as AMI from 'ami.js';
 import * as d3 from 'd3';
 
 import {
-  Component, ElementRef, HostListener, OnInit, Input, EventEmitter, Output
+  Component, ElementRef, HostListener, OnInit, OnDestroy, Input, EventEmitter, Output
 } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { IOrientation, ISlicePosition, View } from './utils/types';
 import { registerActions } from './provenanceHelpers/provenanceActions';
 import { addListeners, setNewAddListeners } from './provenanceHelpers/provenanceListeners';
@@ -13,9 +15,11 @@ import { Renderer2D } from './renderer2d';
 import { Renderer3D } from './renderer3d';
 import { Artifact } from '@visualstorytelling/provenance-core/src/api';
 import { ProvenanceService } from '../../shared/_services/provenance.service';
+import { FrameMeta } from '../../shared/_services/ai-assistant.service';
 import { StyledSliderPracticeComponent } from '../styled-slider-practice/styled-slider-practice.component';
 import { StyledSliderExplorationComponent } from '../styled-slider-exploration/styled-slider-exploration.component';
 import html2canvas from 'html2canvas';
+import { jsPDF } from "jspdf";
 import { VIEWS } from './brainvis-canvas.component';
 
 
@@ -26,11 +30,12 @@ import { VIEWS } from './brainvis-canvas.component';
 })
 
 
-export class ComparisonComponent extends THREE.EventDispatcher implements OnInit {
+export class ComparisonComponent extends THREE.EventDispatcher implements OnInit, OnDestroy {
   @Input() studyStarted: boolean;
   @Output() magnificationCreated = new EventEmitter<{ domID: String, oneView: boolean }>();
   @Output() multiplePlanesCreated = new EventEmitter<{ domID: String, multiplePlanes: boolean }>();
   @Output() navigationVolumeCreated = new EventEmitter<{ sliceOrientation: String, newIndex: number }>();
+  @Output() aiCaptions = new EventEmitter<void>();
 
   public _initialized = false;
   public settings = Settings.getInstance(this);
@@ -49,8 +54,14 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   public canvasComparison: ComparisonComponent;
   public elemParent: ElementRef;
 
+  private _animating: boolean = false;
+  private _rafId: number = 0;
+  private _destroy$ = new Subject<void>();
+  private _wheelHandler: ((e: WheelEvent) => void) | null = null;
+
   private framesCounter: number = 0;
   private frames: HTMLDivElement[] = [];
+  private _framesMeta: FrameMeta[] = [];
   private textAreas: HTMLTextAreaElement[] = [];
 
   private elem: Element;
@@ -142,10 +153,9 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
 
   @HostListener('window:resize', ['$event'])
   onResize() {
+    if (!this._initialized) { return; }
     this.renderers.forEach(renderer => {
-      // if (renderer.scene.children.length > 0) {
-        renderer.onWindowResize();
-      // }
+      renderer.onWindowResize();
     });
   }
 
@@ -165,13 +175,13 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
 
     // this.addEventListeners();
 
-    this.settings.rulerModeChange.subscribe(this.toggleRulerMode.bind(this));
-    this.settings.angleModeChange.subscribe(this.toggleAngleMode.bind(this));
-    // this.settings.freehandModeChange.subscribe(this.toggleFreehandMode.bind(this));
-    this.settings.voxelprobeModeChange.subscribe(this.toggleVoxelprobeMode.bind(this));
-    this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
+    this.settings.rulerModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleRulerMode.bind(this));
+    this.settings.angleModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleAngleMode.bind(this));
+    // this.settings.freehandModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleFreehandMode.bind(this));
+    this.settings.voxelprobeModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleVoxelprobeMode.bind(this));
+    this.settings.annotationModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleAnnotationMode.bind(this));
 
-    this.settings.datacomicsModeChange.subscribe(this.toggleDatacomicsMode.bind(this));
+    this.settings.datacomicsModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleDatacomicsMode.bind(this));
   }
 
   async resize() {
@@ -204,9 +214,11 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
         sliceOrientation: this._comparisonRenderer3D2.getCameraOrientation(),
         index: this._comparisonRenderer2D2.stackHelper.index
       }
-      this._comparisonRenderer2D2.stackHelper.slice._stack._windowWidth = this.settings.canvas._axialRenderer.stackHelper.slice._stack._windowWidth;
-      this._comparisonRenderer2D2.stackHelper.slice._stack._windowCenter = this.settings.canvas._axialRenderer.stackHelper.slice._stack._windowCenter;
-      this._comparisonRenderer2D2.stackHelper.index = this._comparisonRenderer2D2.stackHelper.index;
+      if (this.settings.canvas && this.settings.canvas._axialRenderer && this.settings.canvas._axialRenderer.stackHelper) {
+        this._comparisonRenderer2D2.stackHelper.slice._stack._windowWidth = this.settings.canvas._axialRenderer.stackHelper.slice._stack._windowWidth;
+        this._comparisonRenderer2D2.stackHelper.slice._stack._windowCenter = this.settings.canvas._axialRenderer.stackHelper.slice._stack._windowCenter;
+        this._comparisonRenderer2D2.stackHelper.index = this.settings.canvas._axialRenderer.stackHelper.index;
+      }
 
       // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
@@ -274,10 +286,21 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   }
 
   animate = () => {
-    requestAnimationFrame(this.animate.bind(this));
-    if (this._initialized) {
+    this._rafId = requestAnimationFrame(this.animate);
+    if (this._initialized && !document.hidden) {
       this.render();
     }
+  }
+
+  ngOnDestroy() {
+    this._destroy$.next();
+    this._destroy$.complete();
+    cancelAnimationFrame(this._rafId);
+    if (this._wheelHandler) {
+      window.removeEventListener('wheel', this._wheelHandler);
+      this._wheelHandler = null;
+    }
+    this.renderers.forEach(r => r.removeEventListeners());
   }
 
   render() {
@@ -288,9 +311,12 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   loadExternalData(input){
     this.provenance.newGraphComparison();
     this.loadData(input.value.url);
-    
+
     // this.addEventListeners();
-    this.animate();
+    if (!this._animating) {
+      this._animating = true;
+      this.animate();
+    }
     registerActions(this.provenance.registryComparison, this);
     addListeners(this.provenance.trackerComparison, this);
   }
@@ -331,37 +357,102 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   }
 
 
+  getFramesMeta(): FrameMeta[] { return this._framesMeta; }
+
   addFrame(dashboard: any, viewID?: string) {
     const elmId = viewID ? viewID : this.settings.isOneView;
     this.framesCounter = this.framesCounter + 1;
 
+    // Capture metadata for this frame
+    const panelName = elmId === 'c1' ? 'axial/freeform' : elmId === 'c3' ? '3D' : elmId || 'unknown';
+    const sliceIndex = this._comparisonRenderer2D2?.stackHelper?.index ?? '?';
+    const ww = this._comparisonRenderer2D2?.stackHelper?.slice?._stack?._windowWidth ?? '?';
+    const wc = this._comparisonRenderer2D2?.stackHelper?.slice?._stack?._windowCenter ?? '?';
+    this._framesMeta.push({ panel: panelName, slice: sliceIndex, wl: `${ww}/${wc}` });
+
     const frame = document.createElement('div');
     frame.setAttribute('id', 'frame' + this.framesCounter);
     frame.setAttribute('class', 'storytelling-item');
-    // frame.setAttribute('style', 'display: flex;');
-    document.getElementById(dashboard).appendChild(frame);
+    document.getElementById('datacomics-comparison').appendChild(frame);
     this.frames.push(frame);
 
-
-    html2canvas(document.getElementById(elmId)).then(canvas => {
+    const captureN = this.framesCounter;
+    html2canvas(document.getElementById(elmId) as any).then(canvas => {
       canvas.className = 'canvas';
-      canvas.id = 'canvas' + this.framesCounter;
+      canvas.id = 'canvas' + captureN;
       frame.appendChild(canvas);
+      this._addFrameSeqControls(frame);
+      this._refreshSeqBadges();
     });
+  }
+
+  private _addFrameSeqControls(frame: HTMLDivElement) {
+    const ctrl = document.createElement('div');
+    ctrl.className = 'frame-seq-controls';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'frame-seq-btn';
+    prevBtn.title = 'Move frame earlier';
+    prevBtn.textContent = '◀';
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const i = this.frames.indexOf(frame);
+      if (i > 0) {
+        [this.frames[i - 1], this.frames[i]] = [this.frames[i], this.frames[i - 1]];
+        const container = document.getElementById('datacomics-comparison');
+        container.insertBefore(frame, this.frames[i + 1] || null);
+        this._refreshSeqBadges();
+      }
+    });
+
+    const badge = document.createElement('span');
+    badge.className = 'frame-seq-badge';
+    badge.textContent = String(this.frames.length);
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'frame-seq-btn';
+    nextBtn.title = 'Move frame later';
+    nextBtn.textContent = '▶';
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const i = this.frames.indexOf(frame);
+      if (i < this.frames.length - 1) {
+        [this.frames[i], this.frames[i + 1]] = [this.frames[i + 1], this.frames[i]];
+        const container = document.getElementById('datacomics-comparison');
+        const after = this.frames[i + 1];
+        if (after.nextSibling) {
+          container.insertBefore(frame, after.nextSibling);
+        } else {
+          container.appendChild(frame);
+        }
+        this._refreshSeqBadges();
+      }
+    });
+
+    ctrl.appendChild(prevBtn);
+    ctrl.appendChild(badge);
+    ctrl.appendChild(nextBtn);
+    frame.appendChild(ctrl);
+  }
+
+  private _refreshSeqBadges() {
+    const container = document.getElementById('datacomics-comparison');
+    if (!container) { return; }
+    const badges = container.querySelectorAll('.frame-seq-badge');
+    badges.forEach((b, i) => { b.textContent = String(i + 1); });
   }
 
   displayDatacomics() {
     if (this.datacomicsOpen) {
-      document.getElementById('main').setAttribute('style', 'display: none;');
-      document.getElementById('datacomics').setAttribute('style', 'display: block;')
+      document.getElementById('comparisonMain2').setAttribute('style', 'display: none;');
+      document.getElementById('datacomics-comparison').setAttribute('style', 'display: block;');
       this.frames.forEach((frame: any) => frame.setAttribute('style', 'display: block;'));
       const gridFactorX =
         (this.framesCounter < 5) ? 2 :
           (this.framesCounter < 10) ? 3 :
             (this.framesCounter < 17) ? 4 : 5;
-      d3.selectAll('.canvas').attr('style', 'width: ' + this.screenWidth / gridFactorX + 'px; height: ' + this.screenWidth / gridFactorX * (this.screenHeight / this.screenWidth) + 'px; padding: 5px 15px; background-color: white;');
-      d3.selectAll('.storytelling-item').attr('style', 'width: fit-content; height: fit-content;');
-      // d3.selectAll('.textArea').attr('style', 'width: ' + this.screenWidth / 2 + 'px; z-index: 13; font-size: 16px; border-radius: 5px; margin: 50px');
+      d3.selectAll('#datacomics-comparison .canvas').attr('style', 'width: ' + this.screenWidth / gridFactorX + 'px; height: ' + this.screenWidth / gridFactorX * (this.screenHeight / this.screenWidth) + 'px; padding: 5px 15px; background-color: white;');
+      d3.selectAll('#datacomics-comparison .storytelling-item').attr('style', 'width: fit-content; height: fit-content;');
     } else {
       this.switchToMainView();
     }
@@ -369,13 +460,8 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
 
   rearrangeFrames() {
     this.frames.forEach((frame: any) => frame.setAttribute('style', 'position: absolute; cursor: move;'));
-    // this.textAreas.forEach((textArea: any) => textArea.setAttribute('style', 'position: absolute; cursor: move; overflow: hidden; z-index: 13; font-size: 16px; border-radius: 5px; height: 100px;'));
     this.frames.forEach((frame: any) => this.dragFrame(frame));
     this.scaleFrames(this.frames);
-
-
-    // this.textAreas.forEach((textArea: any) => this.dragFrame(textArea));
-    // d3.selectAll('.canvas').attr('style', 'cursor: w-resize; resize: both; position: absolute;').each((x : HTMLCanvasElement) => this.makeResizableDiv(x));
   }
 
   addTextArea() {
@@ -384,22 +470,37 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     textArea.setAttribute('placeholder', 'Add some text to the frame here.');
 
     if (this.datacomicsOpen) {
-      document.getElementById('datacomics').appendChild(textArea);
+      document.getElementById('datacomics-comparison').appendChild(textArea);
     }
 
+    const offset = this.textAreas.length * 24;
     this.textAreas.push(textArea);
-    textArea.setAttribute('style', 'width: 300px; position: absolute; cursor: move; resize: both; overflow: hidden; z-index: 13; font-size: 16px; border-radius: 5px; height: 100px; top: 0; left: 0;');
+    textArea.setAttribute('style', `width: 300px; position: absolute; cursor: move; resize: both; overflow: hidden; z-index: 13; font-size: 16px; border-radius: 5px; height: 100px; top: ${offset}px; left: ${offset}px;`);
     this.dragFrame(textArea);
   }
 
+  downloadDashboard() {
+    if (this.datacomicsOpen) {
+      const doc = new jsPDF();
+      doc.html(document.getElementById('datacomics-comparison') as HTMLElement, {
+        callback: function (doc) { doc.save(); },
+        width: 100,
+        windowWidth: window.innerWidth / 2
+      });
+    }
+  }
+
   switchToMainView() {
-    document.getElementById('main').setAttribute('style', 'display: flex;');
-    document.getElementById('datacomics').setAttribute('style', 'display: none;');
+    document.getElementById('comparisonMain2').setAttribute('style', 'display: flex;');
+    document.getElementById('datacomics-comparison').setAttribute('style', 'display: none;');
   }
 
   clearDashboard() {
     if (this.datacomicsOpen) {
-      document.getElementById('datacomics').innerHTML = '';
+      document.getElementById('datacomics-comparison').innerHTML = '';
+      this.frames = [];
+      this.textAreas = [];
+      this.framesCounter = 0;
     }
   }
 
@@ -408,19 +509,15 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
     frame.onmousedown = dragMouseDown;
 
     function dragMouseDown(e) {
-      var evtobj = window.event ? event : e;
+      e = e || window.event;
+      e.preventDefault();
 
-      if (evtobj.ctrlKey) {
-        e = e || window.event;
-        e.preventDefault();
-
-        // get the mouse cursor position at startup:
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
-      }
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
     }
 
     function elementDrag(e) {
@@ -445,25 +542,20 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   }
 
   scaleFrames(contents: HTMLDivElement[]) {
+    if (this._wheelHandler) {
+      window.removeEventListener('wheel', this._wheelHandler);
+    }
     var zX = 1;
-    window.addEventListener('wheel', (e) => {
-      var dir;
-      dir = (e.deltaY > 0) ? 0.1 : -0.1;
+    this._wheelHandler = (e: WheelEvent) => {
+      const dir = (e.deltaY > 0) ? 0.1 : -0.1;
       zX += dir;
-      // if (e.altKey) {
-      //   var x = e.clientX, y = e.clientY,
-      //     elementMouseIsOver = document.elementFromPoint(x, y) as HTMLDivElement;
-      //   elementMouseIsOver.style.transform = 'scale(' + zX + ')';
-      //   return;
-      // } else 
       if (e.ctrlKey) {
         for (var i = 0; i < contents.length; i++) {
           contents[i].style.transform = 'scale(' + zX + ')';
         }
       }
-      // e.preventDefault();
-      return;
-    });
+    };
+    window.addEventListener('wheel', this._wheelHandler);
   }
 
 
@@ -639,11 +731,11 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   }
 
   setSliceIndex(newIndex: number, transitionTime: number, sliceOrientation?: VIEWS) {
-    if (this.settings.syncScroll) {
+    if (this.settings.syncScroll && this.settings.canvas && this.settings.canvas._axialRenderer) {
       if (sliceOrientation === 'axial') {
         this.settings.canvas._axialRenderer.changeSliceIndex(newIndex, transitionTime);
       }
-    } 
+    }
     this._comparisonRenderer2D2.changeSliceIndex(newIndex, transitionTime);
   }
 

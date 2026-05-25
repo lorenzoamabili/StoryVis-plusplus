@@ -1,12 +1,6 @@
 <div class="custom-slider">
-    &nbsp;
-    &nbsp;
-    <a>WindowWidth</a>
-    &nbsp;
-    <ngx-slider #sliderWPrac [(ngModel)]= "valueW" [(value)]="settings.thresholdValueW" [options]="optionsW"></ngx-slider>
-    &nbsp;
-    &nbsp;
-    <a>WindowCenter</a>
-    &nbsp;
-    <ngx-slider #sliderCPrac [(ngModel)]= "valueC" [(value)]="settings.thresholdValueC" [options]="optionsC"></ngx-slider>
+  <span class="wl-label">W</span>
+  <ngx-slider #sliderWPrac [(ngModel)]="valueW" [(value)]="settings.thresholdValueW" [options]="optionsW"></ngx-slider>
+  <span class="wl-label">C</span>
+  <ngx-slider #sliderCPrac [(ngModel)]="valueC" [(value)]="settings.thresholdValueC" [options]="optionsC"></ngx-slider>
 </div>

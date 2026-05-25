@@ -298,6 +298,194 @@ app-provenance-visualization{
   opacity: 0.3;
 }
 
+/* ── Node markers for bookmarks / reflections ──────────────────────────── */
+
+/* Bookmarked node: solid gold ring, full opacity, slightly enlarged */
+.node.prov-has-note circle {
+  stroke: rgb(255, 200, 100) !important;
+  stroke-width: 2.5px !important;
+  stroke-dasharray: 0 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 200, 100, 0.7));
+}
+
+/* Phase-start node: gold fill + gold ring */
+.node.prov-has-note circle.keynode,
+.node.prov-has-note.node-active circle {
+  stroke: rgb(255, 200, 100) !important;
+  stroke-width: 3px !important;
+}
+
+/* Reflection node: purple dashed ring */
+.node.prov-has-reflection circle {
+  stroke: #ce93d8 !important;
+  stroke-width: 2px !important;
+  stroke-dasharray: 3 2 !important;
+  opacity: 1 !important;
+}
+
+/* Both bookmark + reflection */
+.node.prov-has-note.prov-has-reflection circle {
+  stroke: #ce93d8 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 200, 100, 0.8));
+}
+
+/* ── Bookmark / phase HTML label overlays ──────────────────────────────── */
+
+.prov-bm-label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 10px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: rgb(255, 200, 100);
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 3px;
+  padding: 1px 5px 1px 3px;
+  border-left: 2px solid rgb(255, 200, 100);
+  z-index: 10;
+}
+
+.prov-bm-label.is-phase {
+  color: #fff;
+  background: rgba(255, 160, 0, 0.25);
+  border-left-color: #ffa000;
+  font-weight: 700;
+  font-size: 10px;
+}
+
+.prov-bm-icon {
+  font-size: 11px !important;
+  width: 11px !important;
+  height: 11px !important;
+  line-height: 11px !important;
+}
+
+.prov-bm-text {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Current-phase badge (top of provenance panel) ─────────────────────── */
+
+.prov-phase-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 160, 0, 0.18);
+  border-bottom: 1px solid rgba(255, 160, 0, 0.4);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffcc02;
+  letter-spacing: 0.3px;
+}
+
+.prov-phase-icon {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+  color: #ffa000;
+}
+
+/* ── Floating node tooltip ─────────────────────────────────────────────── */
+
+.prov-tooltip {
+  position: absolute;
+  z-index: 1000;
+  background: #1e1e2e;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-width: 180px;
+  max-width: 260px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+  pointer-events: auto;
+}
+
+.pt-section {
+  margin-bottom: 6px;
+}
+
+.pt-section:last-child {
+  margin-bottom: 0;
+}
+
+.pt-section-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 4px;
+}
+
+.pt-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+  line-height: 13px;
+}
+
+.bm-col  { color: rgb(255,200,100); }
+.ref-col { color: #ce93d8; }
+.phase-col { color: rgb(255,200,100); }
+
+.pt-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 2px 0;
+}
+
+.pt-row-icon {
+  font-size: 12px;
+  width: 12px;
+  height: 12px;
+  line-height: 12px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  color: rgba(255,255,255,0.4);
+}
+
+.pt-row-text {
+  font-size: 11px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.pt-empty {
+  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.pt-hint {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+}
+
+kbd {
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: monospace;
+  font-size: 10px;
+}
+
 
 #annotation-trigger {
   color: wheat;

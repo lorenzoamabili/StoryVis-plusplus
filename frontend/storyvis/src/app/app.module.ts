@@ -8,11 +8,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { JwtInterceptor, ErrorInterceptor } from './shared/_helpers';
 import { AlertService, AuthenticationService, UserService } from './shared/_services';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { HttpModule } from '@angular/http';
 
 import { ComponentsModule } from './components/components.module';
-import { ExplorationModule } from './pages/tool/exploration/exploration.module';
-import { PracticeModule } from './pages/tool/practice/practice.module';
 
 import { AppComponent } from './app.component';
 import { NotFoundComponent } from './pages/shared/not-found/not-found.component';
@@ -36,9 +33,6 @@ import { IntroExploComponent } from './pages/tool/intro-explo/intro-explo.compon
         FormsModule,
         AppRoutingModule,
         HttpClientModule,
-        HttpModule,
-        PracticeModule,
-        ExplorationModule,
         ComponentsModule
         ],
     declarations: [

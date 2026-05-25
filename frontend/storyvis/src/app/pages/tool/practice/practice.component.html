@@ -13,6 +13,8 @@
     <app-provenance-visualization-comparison *ngIf="!isNoProvGraph && (provenance.settings.isEducationMode || provenance.settings.isComparisonMode)">
     </app-provenance-visualization-comparison>
 
+    <mat-divider></mat-divider>
+    <app-bookmark-panel></app-bookmark-panel>
 
   </mat-sidenav>
 
@@ -34,6 +36,8 @@
     </a>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<app-tutorial></app-tutorial>
 
 <mat-sidenav class="bottom" position='start' #sidenavBottom mode="side" [opened]="false" hasBackdrop="false">
   <button *ngIf="!provenance.settings.dashboardOn" id="sidenavBottom-trigger" 

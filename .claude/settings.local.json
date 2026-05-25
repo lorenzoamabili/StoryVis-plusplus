@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -1d /c/dev/StoryVis/frontend/storyvis/src/app/components/*/)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(grep -E '\\\\.\\(js|ts\\)$')",
+      "Bash(yarn workspace *)"
+    ]
+  }
+}

@@ -15,6 +15,14 @@
     <app-provenance-visualization-comparison *ngIf="!isNoProvGraph && (provenance.settings.isEducationMode || provenance.settings.isComparisonMode)">
     </app-provenance-visualization-comparison>
 
+    <mat-divider></mat-divider>
+    <app-bookmark-panel></app-bookmark-panel>
+
+    <mat-divider></mat-divider>
+    <app-reflection-panel></app-reflection-panel>
+
+    <mat-divider></mat-divider>
+    <app-ai-assistant-panel #aiPanel [comparisonCanvas]="canvasComparison" [slidesComponent]="slides"></app-ai-assistant-panel>
 
   </mat-sidenav>
 
@@ -25,7 +33,8 @@
       [studyStarted]="studyStarted"></app-brainvis-canvas>
     <app-brainvis-canvas-comparison
       [ngClass]="!provenance.settings.isComparisonMode ? 'normal': 'comparison'" #canvasComparison
-      [studyStarted]="studyStarted"></app-brainvis-canvas-comparison>
+      [studyStarted]="studyStarted"
+      (aiCaptions)="aiPanel.generateReport()"></app-brainvis-canvas-comparison>
 
 
 
@@ -36,6 +45,8 @@
     </a>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<app-tutorial></app-tutorial>
 
 <mat-sidenav class="bottom" position='start' #sidenavBottom mode="side" [opened]="false" hasBackdrop="false">
   <button *ngIf="!provenance.settings.dashboardOn" id="sidenavBottom-trigger" 

@@ -16,6 +16,7 @@ export class Settings {
 
     public syncScroll: boolean = false;
     public isOneView: string = '';
+    public isAdvancedMode: boolean = false;
 
     public slideDeckOpen: boolean = false;
     public localizersOn: boolean = false;
@@ -44,6 +45,7 @@ export class Settings {
     // public freehandOn = false;
     public voxelprobeOn = false;
     public annotationOn = false;
+    public loupeOn = false;
 
     private valueChanged: boolean = false;
     private initW: boolean = false;
@@ -57,6 +59,7 @@ export class Settings {
     get thresholdUpperBoundC() { return Settings.instance._thresholdUpperBoundC; }
     get rulerMode() { return Settings.instance.rulerOn; }
     get angleMode() { return Settings.instance.angleOn; }
+    get loupeMode() { return Settings.instance.loupeOn; }
     // get freehandMode() { return Settings.instance.freehandOn; }
     get voxelprobeMode() { return Settings.instance.voxelprobeOn; }
     get annotationMode() { return Settings.instance.annotationOn; }
@@ -111,7 +114,7 @@ export class Settings {
                     });
                 }
 
-                if(this.isComparisonMode){
+                if(this.isComparisonMode && this.canvasComparison){
                     if (!this.defaultSettingW) {
                         this.canvasComparison.dispatchEvent({
                             type: 'thresholdValueChangeStartW',
@@ -121,7 +124,7 @@ export class Settings {
                                 slider: slider
                             }
                         });
-    
+
                         this.canvasComparison.dispatchEvent({
                             type: 'thresholdValueChangedW',
                             changes: {
@@ -172,8 +175,8 @@ export class Settings {
                     });
                 }
 
-                if(this.isComparisonMode){
-                        if (!this.defaultSettingC) {
+                if(this.isComparisonMode && this.canvasComparison){
+                    if (!this.defaultSettingC) {
                         this.canvasComparison.dispatchEvent({
                             type: 'thresholdValueChangeStartC',
                             changes: {
@@ -182,7 +185,7 @@ export class Settings {
                                 slider: slider
                             }
                         });
-    
+
                         this.canvasComparison.dispatchEvent({
                             type: 'thresholdValueChangedC',
                             changes: {

@@ -1,0 +1,66 @@
+<div class="debrief-wrap">
+  <h2 class="debrief-title">Session Reflection</h2>
+  <p class="debrief-sub">Consolidate your analysis before finishing. Your responses are saved with your provenance graph.</p>
+
+  <!-- Volume coverage summary -->
+  <div class="coverage-block">
+    <div class="block-label">Volume Coverage</div>
+    <div class="cov-row">
+      <span class="cov-name">Axial</span>
+      <mat-progress-bar mode="determinate" [value]="axialPct" [color]="coverageColor(axialPct)"></mat-progress-bar>
+      <span class="cov-pct" [class.low]="axialPct < 40">{{ axialPct }}%</span>
+    </div>
+    <div class="cov-row">
+      <span class="cov-name">Coronal</span>
+      <mat-progress-bar mode="determinate" [value]="coronalPct" [color]="coverageColor(coronalPct)"></mat-progress-bar>
+      <span class="cov-pct" [class.low]="coronalPct < 40">{{ coronalPct }}%</span>
+    </div>
+    <div class="cov-row">
+      <span class="cov-name">Sagittal</span>
+      <mat-progress-bar mode="determinate" [value]="sagittalPct" [color]="coverageColor(sagittalPct)"></mat-progress-bar>
+      <span class="cov-pct" [class.low]="sagittalPct < 40">{{ sagittalPct }}%</span>
+    </div>
+    <p *ngIf="lowCoverage" class="cov-alert">
+      ⚠ Some planes have low coverage — consider reviewing those before concluding.
+    </p>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Reflection questions -->
+  <form [formGroup]="form" class="debrief-form">
+    <mat-form-field appearance="outline" class="full-w">
+      <mat-label>What did you find?</mat-label>
+      <textarea matInput formControlName="findings" rows="3"
+        placeholder="Key findings and observations…"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-w">
+      <mat-label>What would you look at more carefully?</mat-label>
+      <textarea matInput formControlName="wouldRevisit" rows="2"
+        placeholder="Regions or features you'd re-examine…"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-w">
+      <mat-label>What were you uncertain about?</mat-label>
+      <textarea matInput formControlName="uncertain" rows="2"
+        placeholder="Ambiguous findings or diagnostic uncertainty…"></textarea>
+    </mat-form-field>
+
+    <div class="conf-wrap">
+      <span class="conf-label">Diagnostic confidence:</span>
+      <span class="conf-low">Low</span>
+      <mat-slider min="1" max="5" step="1" thumbLabel formControlName="confidence" class="conf-slider"></mat-slider>
+      <span class="conf-high">High</span>
+      <span class="conf-val">{{ form.value.confidence }}/5</span>
+    </div>
+  </form>
+
+  <div class="debrief-actions">
+    <button mat-button (click)="close()">Skip</button>
+    <button mat-raised-button color="primary" (click)="submit()">
+      <mat-icon>{{ saved ? 'check_circle' : 'save' }}</mat-icon>
+      {{ saved ? 'Saved!' : 'Save Reflection' }}
+    </button>
+  </div>
+</div>

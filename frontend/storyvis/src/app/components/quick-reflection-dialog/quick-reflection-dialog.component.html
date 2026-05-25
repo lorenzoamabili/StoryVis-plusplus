@@ -1,0 +1,42 @@
+<h2 mat-dialog-title class="qr-title">
+  <mat-icon class="qr-title-icon">psychology</mat-icon>
+  Add Reflection
+</h2>
+
+<mat-dialog-content class="qr-body">
+<form [formGroup]="form">
+  <!-- Type selector as chips -->
+  <div class="qr-type-row">
+    <button *ngFor="let t of types"
+            class="qr-type-btn"
+            [class.qr-type-active]="form.value.type === t"
+            [style.border-color]="form.value.type === t ? meta[t].color : 'transparent'"
+            [style.color]="form.value.type === t ? meta[t].color : 'rgba(255,255,255,0.45)'"
+            type="button"
+            (click)="form.patchValue({ type: t })">
+      <mat-icon class="qr-chip-icon">{{ meta[t].icon }}</mat-icon>
+      {{ meta[t].label }}
+    </button>
+  </div>
+
+  <!-- Contextual prompt -->
+  <p class="qr-prompt">{{ activeMeta.prompt }}</p>
+
+  <!-- Text input -->
+  <mat-form-field appearance="outline" class="qr-field">
+    <mat-label>Your reflection</mat-label>
+    <textarea matInput formControlName="text" rows="4"
+              placeholder="Write your thoughts here…"></textarea>
+  </mat-form-field>
+</form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="qr-actions">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button class="qr-submit"
+          [style.background-color]="activeMeta.color"
+          [disabled]="form.invalid"
+          (click)="submit()">
+    Save
+  </button>
+</mat-dialog-actions>

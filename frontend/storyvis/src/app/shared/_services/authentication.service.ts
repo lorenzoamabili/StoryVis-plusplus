@@ -13,7 +13,14 @@ export class AuthenticationService {
     public currentUser: Observable<User>;
 
     constructor(private http: HttpClient) {
-        this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
+        let storedUser: User = null;
+        try {
+            const raw = localStorage.getItem('currentUser');
+            storedUser = raw ? JSON.parse(raw) : null;
+        } catch (_) {
+            localStorage.removeItem('currentUser');
+        }
+        this.currentUserSubject = new BehaviorSubject<User>(storedUser);
         this.currentUser = this.currentUserSubject.asObservable();
     }
 

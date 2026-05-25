@@ -44,7 +44,7 @@ import 'core-js/features/reflect';
 
 /** Evergreen browsers require these. **/
 // Used for reflect-metadata in JIT. If you use AOT (and only Angular decorators), you can remove.
-import 'core-js/es7/reflect';
+// core-js/features/reflect is already imported at the top of this file
 
 
 /**

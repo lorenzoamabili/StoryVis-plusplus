@@ -1,18 +1,22 @@
 
-FROM node:12 as start
+# Stage 1: build Angular app
+FROM node:18 AS builder
 WORKDIR /frontend
-RUN chown node:node /frontend
-USER root
-COPY --chown=root:root . /frontend
-RUN apt-get update && apt-get install -y gettext 
+RUN apt-get update && apt-get install -y gettext
+COPY --chown=node:node . /frontend
+RUN yarn install --frozen-lockfile
+RUN cd storyvis && cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng build --configuration=production
 
+# Stage 2: serve with nginx
+FROM nginx:1.25-alpine
+COPY --from=builder /frontend/storyvis/dist/storyvis /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-FROM start
-RUN yarn &&\
-    chmod a+x build.sh 
+# Substitute env vars into env.js at container start, then start nginx
+COPY storyvis/src/assets/env.template.js /env.template.js
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
-ENTRYPOINT ["/bin/bash", "-c"]
-
-CMD ["envsubst < ./storyvis/src/assets/env.template.js > ./storyvis/src/assets/env.js && ./build.sh"]
-
-EXPOSE 4200
+EXPOSE 80
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

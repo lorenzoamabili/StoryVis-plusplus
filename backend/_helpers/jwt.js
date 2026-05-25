@@ -2,33 +2,35 @@ const expressJwt = require('express-jwt');
 const config = require('config.json');
 const userService = require('../users/user.service');
 
+const secret = process.env.JWT_SECRET || config.secret;
+
+// In-memory revocation cache: userId -> true, expires after 1h
+const revokedCache = new Map();
+
 module.exports = jwt;
 
 function jwt() {
-    const secret = config.secret;
-    return expressJwt({ secret, isRevoked }).unless({
+    return expressJwt({ secret, algorithms: ['HS256'], isRevoked }).unless({
         path: [
-            // public routes that don't require authentication
-            '/users/authenticate',
-            '/users/register',
-            '/provGraphs/provenance',
-            '/stories/story',
-            '/provGraphsStudy/provenance',
-            '/storiesStudy/story',
-            '/provGraphs',
-            '/stories',
-            '/textReports',
-            '/textReportsStudy/textReport',
-            '/textReports/textReport'
+            { url: '/ai/chat', methods: ['POST'] },
+            { url: '/users/authenticate', methods: ['POST'] },
+            { url: '/users/register', methods: ['POST'] },
+            { url: '/health', methods: ['GET'] },
         ]
     });
 }
 
 async function isRevoked(req, payload, done) {
-    const user = await userService.getById(payload.sub);
+    const userId = String(payload.sub);
 
-    // revoke token if user no longer exists
+    if (revokedCache.has(userId)) {
+        return done(null, true);
+    }
+
+    const user = await userService.getById(userId);
     if (!user) {
+        revokedCache.set(userId, true);
+        setTimeout(() => revokedCache.delete(userId), 3600_000);
         return done(null, true);
     }
 

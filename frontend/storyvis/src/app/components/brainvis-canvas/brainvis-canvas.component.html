@@ -8,34 +8,57 @@
             matTooltip="Reduce view">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button mat-icon-button class="sliceIndex" matTooltip="Slice index">
+        <button mat-icon-button class="sliceIndex"
+            matTooltip="Scroll the mouse wheel to navigate through slices.">
             Slice {{ getIndex(_axialRenderer) }}
         </button>
         <div *ngIf="settings.isAdvancedMode">
             <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r0');"
-                matTooltip="Add frame to the dashboard">
+                matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
                 (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);"
-                matTooltip="Show next slices">
+                matTooltip="Navigate toward superior (head) slices">
                 <mat-icon>keyboard_arrow_up</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
-                (click)="navigateVolume('axial', 1, 10000);" matTooltip="Show previous slices">
+                (click)="navigateVolume('axial', 1, 10000);" matTooltip="Navigate toward inferior (feet) slices">
                 <mat-icon>keyboard_arrow_down</mat-icon>
             </button>
             <button *ngIf="!settings.isOneView && !settings.isComparisonMode && !settings.multiplePlanesModeOn"
                 mat-icon-button class="comparison" (click)="settings.canvas.multiplePlanes('r0');"
-                matTooltip="Multiple plane mode">
+                matTooltip="Multiple plane mode — show adjacent slices alongside this view">
                 <mat-icon>filter_none</mat-icon>
             </button>
             <button *ngIf="!settings.isOneView && !settings.isComparisonMode && settings.multiplePlanesModeOn"
                 mat-icon-button class="comparisonChecked" (click)="settings.canvas.multiplePlanes('r0');"
-                matTooltip="Multiple plane mode">
+                matTooltip="Multiple plane mode — click to deactivate">
                 <mat-icon>filter_none</mat-icon>
             </button>
         </div>
+        <span class="panel-label">Axial</span>
+        <!-- Coverage heatmap: each segment = a band of slices; lit = visited -->
+        <div class="coverage-wrap" *ngIf="_initialized && coverage.getMax('axial') > 1"
+             matTooltip="Axial coverage — {{ coverage.getVisitedCount('axial') }}/{{ coverage.getMax('axial') }} slices visited ({{ coverage.getCoveragePercent('axial') }}%)&#10;Each bar = 1/20 of the volume. Lit = that band has been scrolled through.">
+            <div class="cov-segs">
+                <div *ngFor="let v of coverageSegs.axial; trackBy: trackByIdx"
+                     class="cov-seg"
+                     [class.cov-visited]="v"
+                     [class.cov-high]="v && coverage.getCoveragePercent('axial') >= 70"
+                     [class.cov-mid]="v && coverage.getCoveragePercent('axial') >= 40 && coverage.getCoveragePercent('axial') < 70"
+                     [class.cov-low]="v && coverage.getCoveragePercent('axial') < 40"></div>
+            </div>
+            <div class="cov-label"
+                 [class.cov-label-high]="coverage.getCoveragePercent('axial') >= 70"
+                 [class.cov-label-mid]="coverage.getCoveragePercent('axial') >= 40 && coverage.getCoveragePercent('axial') < 70"
+                 [class.cov-label-low]="coverage.getCoveragePercent('axial') < 40">
+                {{ coverage.getCoveragePercent('axial') }}%
+            </div>
+        </div>
+        <canvas *ngIf="settings.loupeMode && loupeVisible && _loupeSrcPanel === 'r0'"
+                class="loupe-canvas" width="160" height="160"
+                [style.left.px]="loupeX + 16" [style.top.px]="loupeY - 80"></canvas>
     </div>
 
     <div id="r22" class="rendererNone">
@@ -50,18 +73,20 @@
     </div>
     <div id="r1" class="renderer">
         <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r1');"
-            matTooltip="Magnify view">
+            matTooltip="Expand — fill canvas with the 3D view. Drag to rotate, scroll to zoom, right-drag to pan.">
             <mat-icon>fullscreen</mat-icon>
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="magnification-exit" (click)="displayOneView('r1');"
-            matTooltip="Reduce view">
+            matTooltip="Return to four-panel layout">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
         <div *ngIf="settings.isAdvancedMode">
-            <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r1');">
+            <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r1');"
+                matTooltip="Capture this 3D view as a data-comics frame (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
         </div>
+        <span class="panel-label">3D</span>
     </div>
     <div id="r2" class="renderer">
         <button *ngIf="!settings.isOneView" mat-icon-button class="magnification" (click)="displayOneView('r2');"
@@ -72,34 +97,56 @@
             matTooltip="Reduce view">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button mat-icon-button class="sliceIndex" matTooltip="Slice index">
+        <button mat-icon-button class="sliceIndex"
+            matTooltip="Scroll the mouse wheel to navigate through slices.">
             Slice {{ getIndex(_coronalRenderer) }}
         </button>
         <div *ngIf="settings.isAdvancedMode">
             <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r2');"
-                matTooltip="Add frame to dashboard">
+                matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
                 (click)="navigateVolume('coronal', this._coronalRenderer.stackHelper._orientationMaxIndex -1, 10000);"
-                matTooltip="Show next slices">
+                matTooltip="Navigate toward anterior (front) slices">
                 <mat-icon>keyboard_arrow_up</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
-                (click)="navigateVolume('coronal', 1, 10000);" matTooltip="Show previous slices">
+                (click)="navigateVolume('coronal', 1, 10000);" matTooltip="Navigate toward posterior (back) slices">
                 <mat-icon>keyboard_arrow_down</mat-icon>
             </button>
             <button *ngIf="!settings.isOneView && !settings.isComparisonMode && !settings.multiplePlanesModeOn"
                 mat-icon-button class="comparison" (click)="settings.canvas.multiplePlanes('r2');"
-                matTooltip="Multiple plane mode">
+                matTooltip="Multiple plane mode — show adjacent slices alongside this view">
                 <mat-icon>filter_none</mat-icon>
             </button>
             <button *ngIf="!settings.isOneView && !settings.isComparisonMode && settings.multiplePlanesModeOn"
                 mat-icon-button class="comparisonChecked" (click)="settings.canvas.multiplePlanes('r2');"
-                matTooltip="Multiple plane mode">
+                matTooltip="Multiple plane mode — click to deactivate">
                 <mat-icon>filter_none</mat-icon>
             </button>
         </div>
+        <span class="panel-label">Coronal</span>
+        <div class="coverage-wrap" *ngIf="_initialized && coverage.getMax('coronal') > 1"
+             matTooltip="Coronal coverage — {{ coverage.getVisitedCount('coronal') }}/{{ coverage.getMax('coronal') }} slices visited ({{ coverage.getCoveragePercent('coronal') }}%)&#10;Each bar = 1/20 of the volume. Lit = that band has been scrolled through.">
+            <div class="cov-segs">
+                <div *ngFor="let v of coverageSegs.coronal; trackBy: trackByIdx"
+                     class="cov-seg"
+                     [class.cov-visited]="v"
+                     [class.cov-high]="v && coverage.getCoveragePercent('coronal') >= 70"
+                     [class.cov-mid]="v && coverage.getCoveragePercent('coronal') >= 40 && coverage.getCoveragePercent('coronal') < 70"
+                     [class.cov-low]="v && coverage.getCoveragePercent('coronal') < 40"></div>
+            </div>
+            <div class="cov-label"
+                 [class.cov-label-high]="coverage.getCoveragePercent('coronal') >= 70"
+                 [class.cov-label-mid]="coverage.getCoveragePercent('coronal') >= 40 && coverage.getCoveragePercent('coronal') < 70"
+                 [class.cov-label-low]="coverage.getCoveragePercent('coronal') < 40">
+                {{ coverage.getCoveragePercent('coronal') }}%
+            </div>
+        </div>
+        <canvas *ngIf="settings.loupeMode && loupeVisible && _loupeSrcPanel === 'r2'"
+                class="loupe-canvas" width="160" height="160"
+                [style.left.px]="loupeX + 16" [style.top.px]="loupeY - 80"></canvas>
     </div>
     <div id="r00" class="rendererNone">
         <button mat-icon-button class="sliceIndex" matTooltip="Slice index">
@@ -120,34 +167,56 @@
             matTooltip="Reduce view">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button mat-icon-button class="sliceIndex" matTooltip="Slice index">
+        <button mat-icon-button class="sliceIndex"
+            matTooltip="Scroll the mouse wheel to navigate through slices.">
             Slice {{ getIndex(_sagittalRenderer) }}
         </button>
         <div *ngIf="settings.isAdvancedMode">
             <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r3');"
-                matTooltip="Add frame to dashboard">
+                matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
                 (click)="navigateVolume('sagittal', this._sagittalRenderer.stackHelper._orientationMaxIndex -1, 10000);"
-                matTooltip="Show next slices">
+                matTooltip="Navigate toward left slices">
                 <mat-icon>keyboard_arrow_up</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
-                (click)="navigateVolume('sagittal', 1, 10000);" matTooltip="Show previous slices">
+                (click)="navigateVolume('sagittal', 1, 10000);" matTooltip="Navigate toward right slices">
                 <mat-icon>keyboard_arrow_down</mat-icon>
             </button>
             <button *ngIf="!settings.isOneView && !settings.isComparisonMode && !settings.multiplePlanesModeOn"
                 mat-icon-button class="comparison" (click)="settings.canvas.multiplePlanes('r3');"
-                matTooltip="Multiple plane mode">
+                matTooltip="Multiple plane mode — show adjacent slices alongside this view">
                 <mat-icon>filter_none</mat-icon>
             </button>
             <button *ngIf="!settings.isOneView && !settings.isComparisonMode && settings.multiplePlanesModeOn"
                 mat-icon-button class="comparisonChecked" (click)="settings.canvas.multiplePlanes('r3');"
-                matTooltip="Multiple plane mode">
+                matTooltip="Multiple plane mode — click to deactivate">
                 <mat-icon>filter_none</mat-icon>
             </button>
         </div>
+        <span class="panel-label">Sagittal</span>
+        <div class="coverage-wrap" *ngIf="_initialized && coverage.getMax('sagittal') > 1"
+             matTooltip="Sagittal coverage — {{ coverage.getVisitedCount('sagittal') }}/{{ coverage.getMax('sagittal') }} slices visited ({{ coverage.getCoveragePercent('sagittal') }}%)&#10;Each bar = 1/20 of the volume. Lit = that band has been scrolled through.">
+            <div class="cov-segs">
+                <div *ngFor="let v of coverageSegs.sagittal; trackBy: trackByIdx"
+                     class="cov-seg"
+                     [class.cov-visited]="v"
+                     [class.cov-high]="v && coverage.getCoveragePercent('sagittal') >= 70"
+                     [class.cov-mid]="v && coverage.getCoveragePercent('sagittal') >= 40 && coverage.getCoveragePercent('sagittal') < 70"
+                     [class.cov-low]="v && coverage.getCoveragePercent('sagittal') < 40"></div>
+            </div>
+            <div class="cov-label"
+                 [class.cov-label-high]="coverage.getCoveragePercent('sagittal') >= 70"
+                 [class.cov-label-mid]="coverage.getCoveragePercent('sagittal') >= 40 && coverage.getCoveragePercent('sagittal') < 70"
+                 [class.cov-label-low]="coverage.getCoveragePercent('sagittal') < 40">
+                {{ coverage.getCoveragePercent('sagittal') }}%
+            </div>
+        </div>
+        <canvas *ngIf="settings.loupeMode && loupeVisible && _loupeSrcPanel === 'r3'"
+                class="loupe-canvas" width="160" height="160"
+                [style.left.px]="loupeX + 16" [style.top.px]="loupeY - 80"></canvas>
     </div>
     <div id="r000" class="rendererNone">
         <button mat-icon-button class="sliceIndex" matTooltip="Slice index">
@@ -179,7 +248,7 @@
             <mat-icon>grid_on</mat-icon>
         </button>
         <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
-            (click)="navigateVolume('axial', this._comparisonRenderer2D1.stackHelper._orientationMaxIndex -1, 10000);"
+            (click)="navigateVolume('axial', _axialRenderer.stackHelper._orientationMaxIndex -1, 10000);"
             matTooltip="Show next slices">
             <mat-icon>keyboard_arrow_up</mat-icon>
         </button>

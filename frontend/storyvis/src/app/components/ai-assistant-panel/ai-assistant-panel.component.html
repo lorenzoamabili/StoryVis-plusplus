@@ -1,0 +1,90 @@
+<div class="ai-panel">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="ai-header">
+    <mat-icon class="ai-icon">auto_awesome</mat-icon>
+    <span class="ai-title">AI Assistant</span>
+    <button mat-icon-button class="ai-clear-btn" (click)="clearChat()"
+            matTooltip="Clear conversation">
+      <mat-icon>delete_sweep</mat-icon>
+    </button>
+  </div>
+
+  <!-- ── Quick-action tabs ────────────────────────────────────────────────── -->
+  <div class="ai-tabs">
+    <button class="ai-tab" [class.active]="activeTab === 'session'" (click)="analyzeSession()"
+            [disabled]="loading"
+            matTooltip="Analyse your exploration session — coverage gaps, reflection patterns, blind spots">
+      <mat-icon>analytics</mat-icon><span>Session</span>
+    </button>
+    <button class="ai-tab" [class.active]="activeTab === 'report'" (click)="generateReport()"
+            [disabled]="loading"
+            matTooltip="Generate captions and a structured written report from your Data-Comics frames">
+      <mat-icon>article</mat-icon><span>Report</span>
+    </button>
+    <button class="ai-tab" [class.active]="activeTab === 'story'" (click)="suggestStory()"
+            [disabled]="loading"
+            matTooltip="Suggest improved titles and annotations for your Story Deck slides">
+      <mat-icon>auto_stories</mat-icon><span>Story</span>
+    </button>
+  </div>
+
+  <!-- ── Chat history ─────────────────────────────────────────────────────── -->
+  <div class="ai-chat">
+
+    <!-- Empty state -->
+    <div class="ai-empty" *ngIf="history.length === 0 && !loading">
+      <mat-icon class="ai-empty-icon">psychology_alt</mat-icon>
+      <p>Use the buttons above for quick actions, or type a question below.</p>
+      <p class="ai-examples">
+        <em>Try:</em> "What regions did I spend the most time on?"<br>
+        "Write a caption for my axial frame at slice 45."<br>
+        "Summarise my hypotheses in one paragraph."
+      </p>
+    </div>
+
+    <!-- Messages -->
+    <div *ngFor="let msg of history; trackBy: trackByIdx"
+         class="ai-msg"
+         [class.user]="msg.role === 'user'"
+         [class.assistant]="msg.role === 'assistant'">
+      <mat-icon class="ai-msg-icon">
+        {{ msg.role === 'user' ? 'person' : 'auto_awesome' }}
+      </mat-icon>
+      <div class="ai-msg-bubble">
+        <pre class="ai-msg-text">{{ msg.content }}</pre>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div class="ai-loading" *ngIf="loading">
+      <span class="ai-dot"></span><span class="ai-dot"></span><span class="ai-dot"></span>
+    </div>
+
+    <!-- Scroll anchor -->
+    <div #chatEnd></div>
+  </div>
+
+  <!-- ── Copy last response ────────────────────────────────────────────────── -->
+  <div class="ai-copy-row" *ngIf="history.length > 0">
+    <button mat-stroked-button class="ai-copy-btn" (click)="copyLast()" [disabled]="copied">
+      <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
+      {{ copied ? 'Copied!' : 'Copy last response' }}
+    </button>
+  </div>
+
+  <!-- ── Chat input ───────────────────────────────────────────────────────── -->
+  <div class="ai-input-row">
+    <input class="ai-input"
+           [(ngModel)]="userInput"
+           placeholder="Ask the AI anything about your analysis…"
+           (keydown.enter)="send()"
+           [disabled]="loading" />
+    <button mat-icon-button class="ai-send-btn" (click)="send()"
+            [disabled]="loading || !userInput.trim()"
+            matTooltip="Send">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+
+</div>

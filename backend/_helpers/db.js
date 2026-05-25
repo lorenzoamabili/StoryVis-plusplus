@@ -1,6 +1,17 @@
 const config = require('config.json');
 const mongoose = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI || config.connectionString, { useUnifiedTopology: true, useCreateIndex: true, useNewUrlParser: true });
+
+const uri = process.env.MONGODB_URI || config.connectionString;
+mongoose.connect(uri, {
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    maxPoolSize: 10,
+    minPoolSize: 2,
+}).catch(err => {
+    console.error('MongoDB connection failed:', err.message);
+    process.exit(1);
+});
 mongoose.Promise = global.Promise;
 
 module.exports = {

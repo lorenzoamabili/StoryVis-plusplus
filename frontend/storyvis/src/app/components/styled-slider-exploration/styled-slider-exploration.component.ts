@@ -15,7 +15,7 @@ export class StyledSliderExplorationComponent implements DoCheck {
   public valueC = (3070 - 2048) / 2;
 
   constructor() {
-    this.settings.canvas.sliderExploration = this;
+    if (this.settings.canvas) { this.settings.canvas.sliderExploration = this; }
     this.settings._thresholdValueC = this.valueC;
     this.settings._thresholdValueW = this.valueW;
   }

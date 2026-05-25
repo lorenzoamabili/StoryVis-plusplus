@@ -16,7 +16,9 @@ function saveStory(req, res, next) {
         .catch(err => next(err));
 }
 function getAllStories(req, res, next) {
-    storyService.getAll()
+    const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+    const skip = parseInt(req.query.skip) || 0;
+    storyService.getAll({ limit, skip })
         .then(stories => res.json(stories))
         .catch(err => next(err));
 }

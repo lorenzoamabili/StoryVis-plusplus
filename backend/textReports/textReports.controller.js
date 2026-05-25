@@ -16,7 +16,9 @@ function saveTextReport(req, res, next) {
         .catch(err => next(err));
 }
 function getAllTextReports(req, res, next) {
-    textReportService.getAll()
+    const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+    const skip = parseInt(req.query.skip) || 0;
+    textReportService.getAll({ limit, skip })
         .then(textReports => res.json(textReports))
         .catch(err => next(err));
 }

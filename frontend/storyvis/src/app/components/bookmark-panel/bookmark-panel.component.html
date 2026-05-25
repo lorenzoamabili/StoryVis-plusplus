@@ -1,0 +1,65 @@
+<div class="bm-panel">
+
+  <!-- Header -->
+  <div class="bm-header">
+    <mat-icon class="bm-icon">bookmarks</mat-icon>
+    <span class="bm-title">Bookmarks</span>
+    <span class="bm-count">{{ bookmarks.length }}</span>
+  </div>
+
+  <!-- "You are here" indicator when current node is bookmarked -->
+  <div class="bm-here" *ngIf="currentNodeId && bookmarkService.hasNode(currentNodeId)">
+    <mat-icon class="bm-here-icon">my_location</mat-icon>
+    Current state is bookmarked — see highlighted entry below.
+  </div>
+
+  <div class="bm-empty" *ngIf="bookmarks.length === 0">
+    No bookmarks yet.<br>
+    Press <kbd>B</kbd> or click <mat-icon class="inline-icon">bookmark_border</mat-icon>
+    in the toolbar to save the current provenance state.<br>
+    <span class="bm-hint">Bookmarked nodes appear with a <span class="bm-hint-gold">gold ring</span> in the provenance graph.</span>
+  </div>
+
+  <div class="bm-list">
+    <div class="bm-item"
+         *ngFor="let bm of bookmarks; trackBy: trackById"
+         [class.bm-phase]="bm.isPhase"
+         [class.bm-current]="bm.nodeId === currentNodeId">
+
+      <!-- "Here" dot for the active state -->
+      <span class="bm-here-dot" *ngIf="bm.nodeId === currentNodeId"
+            matTooltip="You are currently at this state"></span>
+
+      <mat-icon class="bm-type-icon" [class.phase-icon]="bm.isPhase">
+        {{ bm.isPhase ? 'flag' : 'bookmark' }}
+      </mat-icon>
+
+      <!-- Label display / edit -->
+      <div class="bm-label-wrap" *ngIf="editingId !== bm.id" (dblclick)="startEdit(bm)">
+        <span class="bm-label">{{ bm.label }}</span>
+        <span class="bm-time">{{ bm.timestamp | date:'HH:mm:ss' }}</span>
+      </div>
+      <input class="bm-edit-input" *ngIf="editingId === bm.id"
+             [(ngModel)]="editLabel"
+             (blur)="commitEdit(bm)"
+             (keydown.enter)="commitEdit(bm)"
+             (keydown.escape)="editingId = null"
+             autofocus />
+
+      <!-- Actions -->
+      <button mat-icon-button class="bm-action" (click)="navigateTo(bm)"
+              matTooltip="Jump to this state in the provenance graph">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="bm-action" (click)="startEdit(bm)"
+              matTooltip="Rename">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button class="bm-action bm-delete" (click)="remove(bm)"
+              matTooltip="Remove bookmark">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</div>

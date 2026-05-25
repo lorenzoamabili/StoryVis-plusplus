@@ -16,7 +16,9 @@ function saveGraph(req, res, next) {
         .catch(err => next(err));
 }
 function getAllGraphs(req, res, next) {
-    provenanceService.getAll()
+    const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+    const skip = parseInt(req.query.skip) || 0;
+    provenanceService.getAll({ limit, skip })
         .then(graphs => res.json(graphs))
         .catch(err => next(err));
 }

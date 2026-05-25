@@ -20,16 +20,27 @@
         </div>
         <div class="form-group">
             <label for="role">Role</label>
-            <input type="role" formControlName="role" class="form-control"
-                [ngClass]="{ 'is-invalid': submitted && f.role.errors }" />
+            <select formControlName="role" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f.role.errors }">
+                <option value="">-- Select a role --</option>
+                <option value="Admin">Admin</option>
+                <option value="Author">Author</option>
+                <option value="Reader">Reader</option>
+            </select>
             <div *ngIf="submitted && f.role.errors" class="invalid-feedback">
                 <div *ngIf="f.role.errors.required">Role is required</div>
             </div>
         </div>
         <div class="form-group">
-            <label for="group">Group</label>
-            <input type="group" formControlName="group" class="form-control"
-                [ngClass]="{ 'is-invalid': submitted && f.group.errors }" />
+            <label for="group">User Interface</label>
+            <select formControlName="group" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f.group.errors }">
+                <option value="">-- Select a user interface --</option>
+                <option value="NoProvGraph">No Provenance Graph</option>
+                <option value="ProvGraph">Provenance Graph</option>
+                <option value="PlotTrimmerG">Plot Trimmer (Graph)</option>
+                <option value="PlotTrimmerC">Plot Trimmer (Canvas)</option>
+            </select>
             <div *ngIf="submitted && f.group.errors" class="invalid-feedback">
                 <div *ngIf="f.group.errors.required">User Interface is required</div>
             </div>

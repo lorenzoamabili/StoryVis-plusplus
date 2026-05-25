@@ -8,6 +8,9 @@
       "node"
     ]
   },
+  "angularCompilerOptions": {
+    "strictInjectionParameters": false
+  },
   "exclude": [
     "src/test.ts",
     "**/*.spec.ts",

@@ -1,0 +1,122 @@
+.debrief-wrap {
+  padding: 4px 4px 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.debrief-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: #2d3142;
+}
+
+.debrief-sub {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 14px;
+}
+
+/* ── Coverage ── */
+.coverage-block {
+  margin-bottom: 14px;
+}
+
+.block-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.cov-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.cov-name {
+  width: 58px;
+  font-size: 12px;
+  color: #555;
+}
+
+mat-progress-bar {
+  flex: 1;
+}
+
+.cov-pct {
+  width: 36px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.cov-pct.low {
+  color: #c62828;
+}
+
+.cov-alert {
+  font-size: 12px;
+  color: #b71c1c;
+  background: #fff3f3;
+  border-left: 3px solid #e57373;
+  padding: 6px 10px;
+  border-radius: 0 4px 4px 0;
+  margin: 6px 0 0;
+}
+
+mat-divider {
+  margin: 12px 0;
+}
+
+/* ── Form ── */
+.debrief-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 10px;
+}
+
+.full-w {
+  width: 100%;
+}
+
+.conf-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.conf-label {
+  font-size: 13px;
+  color: #444;
+  white-space: nowrap;
+}
+
+.conf-low, .conf-high {
+  font-size: 11px;
+  color: #999;
+}
+
+.conf-slider {
+  flex: 1;
+}
+
+.conf-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1976d2;
+  width: 28px;
+}
+
+/* ── Actions ── */
+.debrief-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 0 4px;
+}

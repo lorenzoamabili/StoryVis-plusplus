@@ -1,0 +1,37 @@
+<ng-container *ngIf="tutorial.active">
+
+  <!-- Dark backdrop — clicking advances to next step -->
+  <div class="tut-backdrop"></div>
+
+  <!-- Glowing spotlight ring around the target element -->
+  <div *ngIf="highlight" class="tut-highlight" [ngStyle]="{
+    top:    highlight.top    + 'px',
+    left:   highlight.left   + 'px',
+    width:  highlight.width  + 'px',
+    height: highlight.height + 'px'
+  }"></div>
+
+  <!-- Floating info card -->
+  <div class="tut-card" [ngStyle]="cardStyle">
+    <div class="tut-counter">Step {{ tutorial.currentIndex + 1 }} of {{ tutorial.steps.length }}</div>
+    <h3 class="tut-title">{{ tutorial.current.title }}</h3>
+    <p class="tut-body">{{ tutorial.current.content }}</p>
+    <div *ngIf="tutorial.current?.tryIt" class="tut-try">
+      <span class="tut-try-icon">▶</span>{{ tutorial.current.tryIt }}
+    </div>
+    <div *ngIf="tutorial.current?.tip" class="tut-tip">
+      <span class="tut-tip-icon">💡</span>{{ tutorial.current.tip }}
+    </div>
+    <div class="tut-actions">
+      <button class="tut-skip" (click)="tutorial.stop()">Skip tour</button>
+      <div class="tut-nav">
+        <button class="tut-btn-icon" [disabled]="tutorial.currentIndex === 0"
+          (click)="tutorial.prev()" title="Previous">&#8592;</button>
+        <button class="tut-btn-primary" (click)="tutorial.next()">
+          {{ tutorial.currentIndex === tutorial.steps.length - 1 ? 'Finish' : 'Next' }} &#8594;
+        </button>
+      </div>
+    </div>
+  </div>
+
+</ng-container>

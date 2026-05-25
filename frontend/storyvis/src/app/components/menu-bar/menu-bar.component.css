@@ -3,20 +3,58 @@
 }
 
 .mat-toolbar.mat-primary {
-  background: #434957;
+  background: #3d4455;
   color: #fff;
-  font-family: Times;
-  font-size: 16px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
 }
-mat-button-toggle,
 
+/* Tighter toolbar row */
+mat-toolbar {
+  min-height: 0;
+}
+
+mat-toolbar-row {
+  height: 40px !important;
+  padding: 0 6px !important;
+  gap: 1px;
+  display: flex;
+  align-items: center;
+}
+
+mat-button-toggle,
 button {
   color: ivory;
 }
 
-.smallerButton {
-   min-width: 40px;
-   padding: 0px;
+/* All mat-icon-button compact at 32×32 */
+.mat-icon-button {
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+}
+
+.mat-icon-button .mat-icon {
+  font-size: 18px !important;
+  line-height: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+/* mat-button-toggle compact */
+.mat-button-toggle-button {
+  height: 32px !important;
+  padding: 0 6px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mat-button-toggle .mat-icon {
+  font-size: 18px !important;
+  line-height: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
 }
 
 .transparent {
@@ -29,39 +67,132 @@ button {
   background-color: #586072;
 }
 
-mat-raised-button.localizers-checked{
-  background-color: #6b707e;
-}
-
-mat-raised-button.localizers{
-  background-color: #444958;
-}
-
+/* Annotation tool — subtle highlight so learners notice it */
 mat-button-toggle.annotation {
-  background-color: #444958;
+  background-color: rgba(68, 73, 88, 0.6);
   border-width: 1px;
-  border-color: lightgray;
+  border-color: rgba(200, 200, 200, 0.25);
+  border-radius: 4px;
 }
 
-.mat-button-toggle-checked{
-  color: red;
+/* Active tool toggle — gold accent */
+.mat-button-toggle-checked {
+  color: rgb(255, 200, 100) !important;
+  background-color: rgba(255, 200, 100, 0.12) !important;
+}
+
+/* Vertical separator between tool groups */
+.toolbar-sep {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Clock */
+.toolbar-clock {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-left: 6px;
+  white-space: nowrap;
 }
 
 div.right {
   position: absolute;
   right: 1em;
 }
-mat-toolbar {
-  min-height: 0;
-}
-mat-toolbar-row {
-  height: auto;
-}
 
 .mat-progress-spinner > svg > circle {
   stroke: white !important;
 }
 
-mat-form-field{
+/* Form fields — compact */
+mat-form-field {
   width: min-content;
+}
+
+.compact-select {
+  font-size: 11px;
+  width: 80px;
+}
+
+.compact-select .mat-form-field-wrapper {
+  padding-bottom: 0 !important;
+}
+
+.compact-select .mat-form-field-infix {
+  padding: 2px 0 4px !important;
+  border-top: 0 !important;
+  width: auto !important;
+}
+
+.compact-select .mat-form-field-label {
+  font-size: 10px !important;
+}
+
+#tutorial-wl-preset {
+  width: 90px;
+}
+
+/* W/L form field labels */
+.mat-form-field-label {
+  font-size: 11px;
+}
+
+/* Cine play button — gold highlight when active */
+button.cine-active {
+  color: rgb(255, 200, 100) !important;
+  background-color: rgba(255, 200, 100, 0.12) !important;
+}
+
+/* Compact fps native select */
+.cine-fps-select {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 3px;
+  color: ivory;
+  font-size: 11px;
+  height: 22px;
+  padding: 0 2px;
+  width: 36px;
+  cursor: pointer;
+  outline: none;
+  vertical-align: middle;
+}
+
+.cine-fps-select option {
+  background: #3d4455;
+  color: ivory;
+}
+
+.cine-fps-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  margin-left: 2px;
+  vertical-align: middle;
+}
+
+/* Plane selector next to cine button */
+.cine-plane-select {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 3px;
+  color: ivory;
+  font-size: 11px;
+  height: 22px;
+  padding: 0 2px;
+  width: 68px;
+  cursor: pointer;
+  outline: none;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.cine-plane-select option {
+  background: #3d4455;
+  color: ivory;
 }

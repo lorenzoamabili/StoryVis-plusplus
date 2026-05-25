@@ -25,18 +25,21 @@ export class PracticeComponent implements OnInit {
         public provenance: ProvenanceService
     ) {
         this.currentUser = this.authenticationService.currentUserValue;
-        this.IDcreator = this.currentUser.username;
+        this.IDcreator = this.currentUser ? (this.currentUser as any).username : 0;
         this.provenance.timeStart = new Date().getTime();
 
-        this.userService.getAllGraphs().pipe(first()).subscribe(graphs => {
-            this.graphs = graphs;
-        });
-        this.userService.getAllStories().pipe(first()).subscribe(stories => {
-            this.stories = stories;
-        });
-        this.userService.getAllTextReports().pipe(first()).subscribe(textReports => {
-            this.textReports = textReports;
-        });
+        this.userService.getAllGraphs().pipe(first()).subscribe(
+            graphs => { this.graphs = graphs; },
+            err => { console.warn('getAllGraphs failed', err); }
+        );
+        this.userService.getAllStories().pipe(first()).subscribe(
+            stories => { this.stories = stories; },
+            err => { console.warn('getAllStories failed', err); }
+        );
+        this.userService.getAllTextReports().pipe(first()).subscribe(
+            textReports => { this.textReports = textReports; },
+            err => { console.warn('getAllTextReports failed', err); }
+        );
     }
 
     ngOnInit() {

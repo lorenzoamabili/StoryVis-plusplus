@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import * as AMI from 'ami.js';
 import * as d3 from 'd3';
 
-import { Component, ElementRef, HostListener, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, OnDestroy, Input, EventEmitter, Output, NgZone } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { IOrientation, ISlicePosition, View } from './utils/types';
 import { registerActions } from './provenanceHelpers/provenanceActions';
 import { addListeners, setNewAddListeners } from './provenanceHelpers/provenanceListeners';
@@ -16,6 +18,12 @@ import { StyledSliderExplorationComponent } from '../styled-slider-exploration/s
 import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import { ComparisonComponent } from './comparison.component';
+import { MatDialog } from '@angular/material/dialog';
+import { CoverageService } from '../../shared/_services/coverage.service';
+import { DebriefModalComponent } from '../debrief-modal/debrief-modal.component';
+import { BookmarkService } from '../../shared/_services/bookmark.service';
+import { ReflectionService } from '../../shared/_services/reflection.service';
+import { QuickReflectionDialogComponent } from '../quick-reflection-dialog/quick-reflection-dialog.component';
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -38,7 +46,7 @@ export enum VIEWS {
   templateUrl: './brainvis-canvas.component.html',
   styleUrls: ['./brainvis-canvas.component.css']
 })
-export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
+export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit, OnDestroy {
   @Input() studyStarted: boolean;
   @Output() magnificationCreated = new EventEmitter<{ domID: String, oneView: boolean }>();
   @Output() multiplePlanesCreated = new EventEmitter<{ domID: String, sliceOrientation: String, multiplePlanes: boolean }>();
@@ -46,6 +54,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   public _initialized = false;
   public settings = Settings.getInstance(this);
+
+  /** Precomputed 20-segment heatmap arrays, refreshed on every coverage change. */
+  public coverageSegs: Record<string, boolean[]> = { axial: [], coronal: [], sagittal: [] };
   public screenWidth = window.innerWidth;
   public screenHeight = window.innerHeight;
   public datacomicsOpen: boolean;
@@ -58,6 +69,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   public comparisonCompositionMade: boolean = false;
   public canvasComparison: ComparisonComponent;
   public elemParent: ElementRef;
+
+  private _rafId: number = 0;
+  private _destroy$ = new Subject<void>();
+  private _wheelHandler: ((e: WheelEvent) => void) | null = null;
 
   private framesCounter: number = 0;
   private frames: HTMLDivElement[] = [];
@@ -247,7 +262,29 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     magnificationParam: false
   }
 
-  constructor(elem: ElementRef, public provenance: ProvenanceService) {
+  // ── Cine playback ─────────────────────────────────────────────────────────
+  public _cineTimer: any = null;
+  public cineSpeed: number = 200; // ms per frame (default ~5 fps)
+  /** Which plane the Cine should scroll — chosen explicitly by the user. */
+  public cinePlaneChoice: 'axial' | 'coronal' | 'sagittal' = 'axial';
+  get cineActive(): boolean { return !!this._cineTimer; }
+
+
+  // ── Magnifying glass loupe ─────────────────────────────────────────────────
+  public loupeVisible: boolean = false;
+  public loupeX: number = 0;
+  public loupeY: number = 0;
+  public _loupeSrcPanel: string | null = null;
+
+  constructor(
+    elem: ElementRef,
+    public provenance: ProvenanceService,
+    private _dialog: MatDialog,
+    public coverage: CoverageService,
+    private _bookmarks: BookmarkService,
+    public reflections: ReflectionService,
+    private _zone: NgZone,
+  ) {
     super();
 
     registerActions(provenance.registry, this);
@@ -297,6 +334,65 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this._sagittalRenderer];
   }
 
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    const tag = (event.target as HTMLElement).tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') { return; }
+    const ctrl = event.ctrlKey || event.metaKey;
+    if (!ctrl && event.key === 'b') {
+      event.preventDefault(); this._quickBookmark();
+    } else if (!ctrl && event.key === 'r') {
+      event.preventDefault(); this.openReflection();
+    }
+  }
+
+  private _updateCoverageSegs() {
+    (['axial', 'coronal', 'sagittal'] as const).forEach(o => {
+      this.coverageSegs[o] = this.coverage.getSegments(o);
+    });
+  }
+
+  trackByIdx(i: number) { return i; }
+
+  private _quickBookmark() {
+    const g = this.provenance.graph;
+    if (!g || !g.current) { return; }
+    const nodeId = (g.current as any).id;
+    if (!nodeId) { return; }
+    const count = this._bookmarks.getAll().length + 1;
+    this._bookmarks.add(nodeId, `Bookmark ${count}`);
+  }
+
+  /** Open a quick reflection dialog attached to the current provenance node. */
+  openReflection(prefill?: string) {
+    const g = this.provenance.graph;
+    if (!g || !g.current) { return; }
+    const nodeId = (g.current as any).id;
+    if (!nodeId) { return; }
+    const ref = this._dialog.open(QuickReflectionDialogComponent, {
+      width: '440px',
+      data: { nodeId, prefill: prefill || '' },
+    });
+    ref.afterClosed().subscribe(result => {
+      if (result && result.text) {
+        this.reflections.add(nodeId, result.text, result.type);
+      }
+    });
+  }
+
+  @HostListener('click', ['$event'])
+  onHostClick(event: MouseEvent) {
+    if (!event.altKey || !this.datacomicsOpen) { return; }
+    const target = event.target as HTMLElement;
+    const panel = target.closest('#r0, #r1, #r2, #r3') as HTMLElement;
+    if (panel) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.addFrame('datacomics', panel.id);
+    }
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.activeRenderers.forEach(renderer => {
@@ -328,13 +424,17 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.addEventListeners();
     this.animate();
 
-    this.settings.rulerModeChange.subscribe(this.toggleRulerMode.bind(this));
-    this.settings.angleModeChange.subscribe(this.toggleAngleMode.bind(this));
-    // this.settings.freehandModeChange.subscribe(this.toggleFreehandMode.bind(this));
-    this.settings.voxelprobeModeChange.subscribe(this.toggleVoxelprobeMode.bind(this));
-    this.settings.annotationModeChange.subscribe(this.toggleAnnotationMode.bind(this));
+    this.settings.rulerModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleRulerMode.bind(this));
+    this.settings.angleModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleAngleMode.bind(this));
+    // this.settings.freehandModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleFreehandMode.bind(this));
+    this.settings.voxelprobeModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleVoxelprobeMode.bind(this));
+    this.settings.annotationModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleAnnotationMode.bind(this));
 
-    this.settings.datacomicsModeChange.subscribe(this.toggleDatacomicsMode.bind(this));
+    this.settings.datacomicsModeChange.pipe(takeUntil(this._destroy$)).subscribe(this.toggleDatacomicsMode.bind(this));
+
+    this.coverage.change$.pipe(takeUntil(this._destroy$)).subscribe(() => {
+      this._zone.run(() => this._updateCoverageSegs());
+    });
 
     addListeners(this.provenance.tracker);
   }
@@ -368,6 +468,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.originalParameters.locationParam.sliceOrientation = this._perspectiveRenderer.getCameraOrientation();
       this.renderers2D.forEach(renderer => this.originalParameters.locationParam.indexes.push(renderer.originalSliceIndex));
       this.presetWindowLevel();
+
+      // Initialise coverage tracking with actual slice counts
+      this.coverage.setMax('axial',    this._axialRenderer.stackHelper._orientationMaxIndex);
+      this.coverage.setMax('coronal',  this._coronalRenderer.stackHelper._orientationMaxIndex);
+      this.coverage.setMax('sagittal', this._sagittalRenderer.stackHelper._orientationMaxIndex);
+      this.coverage.recordVisit('axial',    this._axialRenderer.stackHelper.index);
+      this.coverage.recordVisit('coronal',  this._coronalRenderer.stackHelper.index);
+      this.coverage.recordVisit('sagittal', this._sagittalRenderer.stackHelper.index);
 
       // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
@@ -437,10 +545,115 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   animate = () => {
-    requestAnimationFrame(this.animate.bind(this));
-    if (this._initialized) {
+    this._rafId = requestAnimationFrame(this.animate);
+    if (this._initialized && !document.hidden) {
       this.render();
     }
+  }
+
+  ngOnDestroy() {
+    this._destroy$.next();
+    this._destroy$.complete();
+    cancelAnimationFrame(this._rafId);
+    if (this._wheelHandler) {
+      window.removeEventListener('wheel', this._wheelHandler);
+      this._wheelHandler = null;
+    }
+    if (this._cineTimer) { clearInterval(this._cineTimer); this._cineTimer = null; }
+    this.renderers.forEach(r => r.removeEventListeners());
+  }
+
+  // ── Cine playback ─────────────────────────────────────────────────────────
+  toggleCine() {
+    if (this._cineTimer) {
+      clearInterval(this._cineTimer);
+      this._cineTimer = null;
+    } else {
+      this._cineTimer = setInterval(() => {
+        const choice = this.cinePlaneChoice;
+        let renderer: any;
+        let covKey: 'axial' | 'coronal' | 'sagittal';
+        if (choice === 'coronal') {
+          renderer = this._coronalRenderer; covKey = 'coronal';
+        } else if (choice === 'sagittal') {
+          renderer = this._sagittalRenderer; covKey = 'sagittal';
+        } else {
+          renderer = this._axialRenderer; covKey = 'axial';
+        }
+        if (!renderer?.stackHelper) { return; }
+        const max = renderer.stackHelper._orientationMaxIndex - 1;
+        let next = renderer.stackHelper.index + 1;
+        if (next >= max) { next = 1; }
+        renderer.stackHelper.index = next;
+        this._zone.run(() => this.coverage.recordVisit(covKey, next));
+      }, this.cineSpeed);
+    }
+  }
+
+  setCineSpeed(fps: number) {
+    this.cineSpeed = Math.max(50, Math.round(1000 / fps));
+    if (this._cineTimer) { this.toggleCine(); this.toggleCine(); } // restart
+  }
+
+
+  // ── Magnifying glass loupe ─────────────────────────────────────────────────
+  @HostListener('mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (!this.settings.loupeOn) { this.loupeVisible = false; return; }
+    const target = event.target as HTMLElement;
+    const panel = target.closest('#r0, #r2, #r3') as HTMLElement;
+    if (!panel) { this.loupeVisible = false; return; }
+    const rect = panel.getBoundingClientRect();
+    this.loupeX = event.clientX - rect.left;
+    this.loupeY = event.clientY - rect.top;
+    this._loupeSrcPanel = panel.id;
+    this.loupeVisible = true;
+    requestAnimationFrame(() => this._drawLoupe(panel));
+  }
+
+  @HostListener('mouseleave')
+  onMouseLeave() { this.loupeVisible = false; }
+
+  private _drawLoupe(panel: HTMLElement) {
+    if (!this.loupeVisible) { return; }
+    const srcCanvas = panel.querySelector('canvas') as HTMLCanvasElement;
+    const loupeCanvas = panel.querySelector('.loupe-canvas') as HTMLCanvasElement;
+    if (!srcCanvas || !loupeCanvas) { return; }
+    const ctx = loupeCanvas.getContext('2d');
+    if (!ctx) { return; }
+
+    const W = loupeCanvas.width;   // 160
+    const H = loupeCanvas.height;  // 160
+    const zoom = 3;
+    const srcRect = W / zoom;      // how many source pixels to sample
+
+    // Map CSS coordinates to canvas pixel coordinates (may differ by dpr)
+    const scaleX = srcCanvas.width / srcCanvas.clientWidth;
+    const scaleY = srcCanvas.height / srcCanvas.clientHeight;
+    const cx = this.loupeX * scaleX;
+    const cy = this.loupeY * scaleY;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.drawImage(
+      srcCanvas,
+      cx - srcRect / 2, cy - srcRect / 2, srcRect, srcRect,
+      0, 0, W, H
+    );
+
+    // crosshair
+    ctx.strokeStyle = 'rgba(255, 200, 100, 0.7)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+  }
+
+  // ── Session debrief modal ─────────────────────────────────────────────────
+  openDebrief() {
+    this._dialog.open(DebriefModalComponent, {
+      width: '500px',
+      maxHeight: '90vh',
+      data: { provenance: this.provenance, coverage: this.coverage }
+    });
   }
 
   render() {
@@ -501,7 +714,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   loadExternalData(input) {
-    this.settings.canvasComparison.loadExternalData(input);
+    if (this.settings.canvasComparison) {
+      this.settings.canvasComparison.loadExternalData(input);
+    }
   }
 
   comparisonSetting() {
@@ -599,11 +814,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     if (this.settings.multiplePlanesModeOn) {
       this.presetWindowLevel();
       this.setSliceIndexMultiplePlanes(this.renderersMultiplePlane2D[0].stackHelper.index, 10);
-
-      // this.activeRenderers.forEach(renderer => renderer.addEventListeners());
-      this.animate();
-      this.resize();
     }
+
+    this.resize();
   }
 
 
@@ -636,7 +849,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     const frame = document.createElement('div');
     frame.setAttribute('id', 'frame' + this.framesCounter);
     frame.setAttribute('class', 'storytelling-item');
-    // frame.setAttribute('style', 'display: flex;');
     const resizerR = document.createElement('div');
     const resizerB = document.createElement('div');
     resizerR.setAttribute('class', 'resizer resizer-r');
@@ -646,13 +858,98 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     document.getElementById(dashboard).appendChild(frame);
     this.frames.push(frame);
 
+    // Snapshot current state for caption before async capture
+    const panelRenderer = this._panelRenderer(elmId);
+    const sliceIdx  = panelRenderer ? Math.round(panelRenderer.stackHelper.index) : null;
+    const ww = this._axialRenderer?.stackHelper?.slice?._stack?._windowWidth;
+    const wl = this._axialRenderer?.stackHelper?.slice?._stack?._windowCenter;
+    const captureN = this.framesCounter;
 
     html2canvas(document.getElementById(elmId) as any).then(canvas => {
       canvas.className = 'canvas';
-      canvas.id = 'canvas' + this.framesCounter;
+      canvas.id = 'canvas' + captureN;
       this.canvases.push(canvas);
       frame.appendChild(canvas);
+
+      // Auto-caption: panel name · slice index · W/L
+      const caption = document.createElement('div');
+      caption.className = 'frame-caption';
+      const panelName = { r0: 'Axial', r1: '3D', r2: 'Coronal', r3: 'Sagittal' }[elmId] ?? elmId.toUpperCase();
+      const slicePart = sliceIdx != null ? `Slice ${sliceIdx}` : '';
+      const wlPart    = ww != null && wl != null ? `W${Math.round(ww)}/L${Math.round(wl)}` : '';
+      caption.textContent = [panelName, slicePart, wlPart].filter(Boolean).join(' · ');
+      frame.appendChild(caption);
+
+      // Sequence controls: ← [N] →
+      this._addFrameSeqControls(frame, dashboard);
+      this._refreshSeqBadges(dashboard);
     });
+  }
+
+  private _addFrameSeqControls(frame: HTMLDivElement, dashboard: string) {
+    const ctrl = document.createElement('div');
+    ctrl.className = 'frame-seq-controls';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'frame-seq-btn';
+    prevBtn.title = 'Move frame earlier';
+    prevBtn.textContent = '◀';
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const i = this.frames.indexOf(frame);
+      if (i > 0) {
+        [this.frames[i - 1], this.frames[i]] = [this.frames[i], this.frames[i - 1]];
+        const container = document.getElementById(dashboard);
+        const before = this.frames[i - 1];
+        container.insertBefore(frame, before);
+        this._refreshSeqBadges(dashboard);
+      }
+    });
+
+    const badge = document.createElement('span');
+    badge.className = 'frame-seq-badge';
+    badge.textContent = String(this.frames.length);
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'frame-seq-btn';
+    nextBtn.title = 'Move frame later';
+    nextBtn.textContent = '▶';
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const i = this.frames.indexOf(frame);
+      if (i < this.frames.length - 1) {
+        [this.frames[i], this.frames[i + 1]] = [this.frames[i + 1], this.frames[i]];
+        const container = document.getElementById(dashboard);
+        const after = this.frames[i + 1];
+        if (after.nextSibling) {
+          container.insertBefore(frame, after.nextSibling);
+        } else {
+          container.appendChild(frame);
+        }
+        this._refreshSeqBadges(dashboard);
+      }
+    });
+
+    ctrl.appendChild(prevBtn);
+    ctrl.appendChild(badge);
+    ctrl.appendChild(nextBtn);
+    frame.appendChild(ctrl);
+  }
+
+  private _refreshSeqBadges(dashboard: string) {
+    const container = document.getElementById(dashboard);
+    if (!container) { return; }
+    const badges = container.querySelectorAll('.frame-seq-badge');
+    badges.forEach((b, i) => { b.textContent = String(i + 1); });
+  }
+
+  private _panelRenderer(panelId: string): Renderer2D | null {
+    switch (panelId) {
+      case 'r0': return this._axialRenderer;
+      case 'r2': return this._coronalRenderer;
+      case 'r3': return this._sagittalRenderer;
+      default:   return null;
+    }
   }
 
   downloadDashboard() {
@@ -732,8 +1029,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       document.getElementById('datacomics').appendChild(textArea);
     }
 
+    const offset = this.textAreas.length * 24;
     this.textAreas.push(textArea);
-    textArea.setAttribute('style', 'width: 300px; position: absolute; cursor: move; resize: both; overflow: hidden; z-index: 13; font-size: 16px; border-radius: 5px; height: 100px; top: 0; left: 0;');
+    textArea.setAttribute('style', `width: 300px; position: absolute; cursor: move; resize: both; overflow: hidden; z-index: 13; font-size: 16px; border-radius: 5px; height: 100px; top: ${offset}px; left: ${offset}px;`);
     this.dragFrame(textArea);
   }
 
@@ -837,25 +1135,20 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   scaleFrames(contents: HTMLDivElement[]) {
+    if (this._wheelHandler) {
+      window.removeEventListener('wheel', this._wheelHandler);
+    }
     var zX = 1;
-    window.addEventListener('wheel', (e) => {
-      var dir;
-      dir = (e.deltaY > 0) ? 0.1 : -0.1;
+    this._wheelHandler = (e: WheelEvent) => {
+      const dir = (e.deltaY > 0) ? 0.1 : -0.1;
       zX += dir;
-      // if (e.altKey) {
-      //   var x = e.clientX, y = e.clientY,
-      //     elementMouseIsOver = document.elementFromPoint(x, y) as HTMLDivElement;
-      //   elementMouseIsOver.style.transform = 'scale(' + zX + ')';
-      //   return;
-      // } else 
       if (e.ctrlKey) {
         for (var i = 0; i < contents.length; i++) {
           contents[i].style.transform = 'scale(' + zX + ')';
         }
       }
-      // e.preventDefault();
-      return;
-    });
+    };
+    window.addEventListener('wheel', this._wheelHandler);
   }
 
   resizeCanvas(canvas: any) {
@@ -1103,7 +1396,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   resetConfig(emit?: boolean) {
     const parameters = this.configParam();
     this.setConfig(this.originalParameters);
-    if (this.settings.isComparisonMode) {
+    if (this.settings.isComparisonMode && this.settings.canvasComparison) {
       this.settings.canvasComparison.resetConfig();
     }
 
@@ -1175,10 +1468,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
     this.renderers2D.forEach(renderer => renderer.stackHelper.index = renderer.stackHelper.index);
 
-    if (this.settings.isComparisonMode) {
+    if (this.settings.isComparisonMode && this.settings.canvasComparison && this.settings.canvasComparison._comparisonRenderer2D2) {
       this.settings.canvasComparison._comparisonRenderer2D2.stackHelper.slice._stack._windowWidth = this._axialRenderer.stackHelper.slice._stack._windowWidth;
       this.settings.canvasComparison._comparisonRenderer2D2.stackHelper.slice._stack._windowCenter = this._axialRenderer.stackHelper.slice._stack._windowCenter;
-      this.settings.canvasComparison._comparisonRenderer2D2.stackHelper.index = this.settings.canvasComparison._comparisonRenderer2D2.stackHelper.index;
+      this.settings.canvasComparison._comparisonRenderer2D2.stackHelper.index = this._axialRenderer.stackHelper.index;
     }
 
     this.onAxialChanged();
@@ -1227,17 +1520,20 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   setSliceIndex(newIndex: number, transitionTime: number, sliceOrientation?: VIEWS) {
-    if (this.settings.syncScroll) {
+    if (this.settings.syncScroll && this.settings.canvasComparison && this.settings.canvasComparison._comparisonRenderer2D2) {
       if (sliceOrientation === 'axial') {
         this.settings.canvasComparison._comparisonRenderer2D2.changeSliceIndex(newIndex, transitionTime);
       }
     }
     if (sliceOrientation === 'axial') {
       this._axialRenderer.changeSliceIndex(newIndex, transitionTime, this._axialRenderer.stackHelper.index);
+      this.coverage.recordVisit('axial', newIndex);
     } else if (sliceOrientation === 'coronal') {
       this._coronalRenderer.changeSliceIndex(newIndex, transitionTime, this._coronalRenderer.stackHelper.index);
+      this.coverage.recordVisit('coronal', newIndex);
     } else if (sliceOrientation === 'sagittal') {
       this._sagittalRenderer.changeSliceIndex(newIndex, transitionTime, this._sagittalRenderer.stackHelper.index);
+      this.coverage.recordVisit('sagittal', newIndex);
     }
   }
 
@@ -1404,6 +1700,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         return Math.round(renderer.stackHelper.index);
       }
     }
+    return 0;
   }
 
 

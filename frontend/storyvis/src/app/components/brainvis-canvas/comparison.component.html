@@ -8,16 +8,17 @@
             matTooltip="Reduce view">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'c1');"
-            matTooltip="Add frame to dashboard">
-            <mat-icon>grid_on</mat-icon>
+        <button *ngIf="settings.datacomicsMode" mat-icon-button class="datacomics"
+            (click)="addFrame('datacomics-comparison', 'c1');"
+            matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
+            <mat-icon>add_photo_alternate</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
-            (click)="navigateVolume('axial', this._axialRenderer.stackHelper._orientationMaxIndex -1, 10000);"
+        <button *ngIf="settings.isOneView && _initialized" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('axial', _comparisonRenderer2D2.stackHelper._orientationMaxIndex -1, 10000);"
             matTooltip="Show next slices">
             <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+        <button *ngIf="settings.isOneView && _initialized" mat-icon-button class="navigation-down"
             (click)="navigateVolume('axial', 1, 10000);" matTooltip="Show previous slices">
             <mat-icon>keyboard_arrow_down</mat-icon>
         </button>
@@ -31,18 +32,43 @@
             matTooltip="Reduce view">
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
-        <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'c3');"
-            matTooltip="Add frame to dashboard">
-            <mat-icon>grid_on</mat-icon>
+        <button *ngIf="settings.datacomicsMode" mat-icon-button class="datacomics"
+            (click)="addFrame('datacomics-comparison', 'c3');"
+            matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
+            <mat-icon>add_photo_alternate</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
-            (click)="navigateVolume('freeform', this._perspectiveRenderer.stackHelper._orientationMaxIndex -1, 10000);"
+        <button *ngIf="settings.isOneView && _initialized" mat-icon-button class="navigation-up"
+            (click)="navigateVolume('freeform', _comparisonRenderer2D2.stackHelper._orientationMaxIndex -1, 10000);"
             matTooltip="Show next slices">
             <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
-        <button *ngIf="settings.isOneView" mat-icon-button class="navigation-down"
+        <button *ngIf="settings.isOneView && _initialized" mat-icon-button class="navigation-down"
             (click)="navigateVolume('freeform', 1, 10000);" matTooltip="Show previous slices">
             <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+    </div>
+</div>
+
+<!-- Data-Comics canvas for comparison panel -->
+<div id="datacomics-comparison" class="storytelling-container" style="display: none; position: relative; overflow: auto; width: 100%; height: 100%;">
+    <div class="datacomics-toolbar">
+        <button mat-icon-button (click)="aiCaptions.emit()" matTooltip="Generate AI captions for all frames">
+            <mat-icon>auto_awesome</mat-icon>
+        </button>
+        <button mat-icon-button (click)="rearrangeFrames();" matTooltip="Rearrange Frames">
+            <mat-icon>grid_off</mat-icon>
+        </button>
+        <button mat-icon-button (click)="addTextArea();" matTooltip="Add Text Box">
+            <mat-icon>mode_comment</mat-icon>
+        </button>
+        <button mat-icon-button (click)="clearDashboard();" matTooltip="Clear Dashboard">
+            <mat-icon>clear</mat-icon>
+        </button>
+        <button mat-icon-button (click)="downloadDashboard();" matTooltip="Download Dashboard">
+            <mat-icon>save_alt</mat-icon>
+        </button>
+        <button mat-icon-button (click)="displayDatacomics();" matTooltip="Back to Viewer">
+            <mat-icon>close</mat-icon>
         </button>
     </div>
 </div>

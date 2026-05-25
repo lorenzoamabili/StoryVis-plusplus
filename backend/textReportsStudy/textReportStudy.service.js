@@ -15,8 +15,8 @@ async function create(textReportStudy) {
     await savedTextReport.save();
 }
 
-async function getAll() {
-    return await TextReportStudy.find();
+async function getAll({ limit = 100, skip = 0 } = {}) {
+    return await TextReportStudy.find().sort({ createdDate: -1 }).skip(skip).limit(limit);
 }
 
 async function getById(id) {
@@ -24,5 +24,5 @@ async function getById(id) {
 }
 
 async function _delete(id) {
-    await TextReportStudy.findByIdAndRemove(id);
+    await TextReportStudy.findByIdAndDelete(id);
 }

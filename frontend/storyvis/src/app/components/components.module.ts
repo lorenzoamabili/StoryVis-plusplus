@@ -8,6 +8,12 @@ import { TextReportComponent } from './text-report/text-report.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
 import { ProvenanceVisualizationComparisonComponent } from './brainvis-canvas/provenance-visualization-comparison/provenance-visualization-comparison.component';
 import { ComparisonComponent } from './brainvis-canvas/comparison.component';
+import { TutorialComponent } from './tutorial/tutorial.component';
+import { DebriefModalComponent } from './debrief-modal/debrief-modal.component';
+import { BookmarkPanelComponent } from './bookmark-panel/bookmark-panel.component';
+import { QuickReflectionDialogComponent } from './quick-reflection-dialog/quick-reflection-dialog.component';
+import { ReflectionPanelComponent } from './reflection-panel/reflection-panel.component';
+import { AiAssistantPanelComponent } from './ai-assistant-panel/ai-assistant-panel.component';
 
 import { MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -73,7 +79,17 @@ import { HttpClientModule } from '@angular/common/http';
         StyledSliderExplorationComponent,
         TextReportComponent,
         MenuBarComponent,
-        ComparisonComponent
+        ComparisonComponent,
+        TutorialComponent,
+        DebriefModalComponent,
+        BookmarkPanelComponent,
+        QuickReflectionDialogComponent,
+        ReflectionPanelComponent,
+        AiAssistantPanelComponent,
+    ],
+    entryComponents: [
+        DebriefModalComponent,
+        QuickReflectionDialogComponent,
     ],
     exports: [
         BrainvisCanvasComponent,
@@ -84,7 +100,11 @@ import { HttpClientModule } from '@angular/common/http';
         StyledSliderExplorationComponent,
         MenuBarComponent,
         TextReportComponent,
-        ComparisonComponent
+        ComparisonComponent,
+        TutorialComponent,
+        BookmarkPanelComponent,
+        ReflectionPanelComponent,
+        AiAssistantPanelComponent,
     ]
 })
 

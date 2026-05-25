@@ -15,8 +15,8 @@ async function create(story) {
     await savedStory.save();
 }
 
-async function getAll() {
-    return await Story.find();
+async function getAll({ limit = 100, skip = 0 } = {}) {
+    return await Story.find().sort({ createdDate: -1 }).skip(skip).limit(limit);
 }
 
 async function getById(id) {
@@ -24,5 +24,5 @@ async function getById(id) {
 }
 
 async function _delete(id) {
-    await Story.findByIdAndRemove(id);
+    await Story.findByIdAndDelete(id);
 }

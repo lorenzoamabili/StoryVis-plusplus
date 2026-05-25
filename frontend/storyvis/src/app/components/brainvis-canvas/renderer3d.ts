@@ -4,12 +4,6 @@ import { IAMIRenderer, View, IOrientation } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
 import { Trackball } from './utils/trackball';
 import { UninitializedError } from './utils/exceptions';
-import { Component } from '@angular/core';
-
-@Component({
-  template: ''
-})
-
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
   public orientationID: number = 0;

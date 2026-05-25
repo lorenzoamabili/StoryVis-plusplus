@@ -15,8 +15,8 @@ async function create(provenance) {
     await savedGraph.save();
 }
 
-async function getAll() {
-    return await Provenance.find();
+async function getAll({ limit = 100, skip = 0 } = {}) {
+    return await Provenance.find().sort({ createdDate: -1 }).skip(skip).limit(limit);
 }
 
 async function getById(id) {
@@ -24,5 +24,5 @@ async function getById(id) {
 }
 
 async function _delete(id) {
-    await Provenance.findByIdAndRemove(id);
+    await Provenance.findByIdAndDelete(id);
 }

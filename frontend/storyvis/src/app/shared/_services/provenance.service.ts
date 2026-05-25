@@ -198,9 +198,13 @@ export class ProvenanceService {
   }
 
   public compareGraph(graphInput: any) {
-    const dataGraph = JSON.parse(graphInput.serializedGraph);
-    this.graphComparison = restoreProvenanceGraph(dataGraph) as any;
-    this.newGraphComparison(this.graphComparison);
+    try {
+      const dataGraph = JSON.parse(graphInput.serializedGraph);
+      this.graphComparison = restoreProvenanceGraph(dataGraph) as any;
+      this.newGraphComparison(this.graphComparison);
+    } catch (e) {
+      console.error('compareGraph: failed to parse graph', e);
+    }
   }
 
 
@@ -211,11 +215,13 @@ export class ProvenanceService {
   }
 
   public loadGraph(graphInput: any) {
-    const dataGraph = JSON.parse(graphInput.serializedGraph);
-    this.graph = restoreProvenanceGraph(dataGraph) as any;
-    // this.graphLoaded = true;
-
-    this.newProvenanceGraph(this.graph);
+    try {
+      const dataGraph = JSON.parse(graphInput.serializedGraph);
+      this.graph = restoreProvenanceGraph(dataGraph) as any;
+      this.newProvenanceGraph(this.graph);
+    } catch (e) {
+      console.error('loadGraph: failed to parse graph', e);
+    }
   }
 
 
@@ -226,9 +232,13 @@ export class ProvenanceService {
   }
 
   public loadGraphEducation(graphInput: any) {
-    const dataGraph = JSON.parse(graphInput.serializedGraph);
-    this.graphEducation = restoreProvenanceGraph(dataGraph) as any;
-    this.newGraphEducation(this.graphEducation);
+    try {
+      const dataGraph = JSON.parse(graphInput.serializedGraph);
+      this.graphEducation = restoreProvenanceGraph(dataGraph) as any;
+      this.newGraphEducation(this.graphEducation);
+    } catch (e) {
+      console.error('loadGraphEducation: failed to parse graph', e);
+    }
   }
 
 
@@ -381,9 +391,12 @@ export class ProvenanceService {
       deckComparison: this.deckComparison
     };
 
-    (window as any).treeComparison._viz.free();
-    (window as any).treeComparison._viz = (window as any).treeComparison.createTree(this.traverserComparison);
-    (window as any).treeComparison._viz.update();
+    const tc = (window as any).treeComparison;
+    if (tc && tc._viz) { tc._viz.free(); }
+    if (tc) {
+      tc._viz = tc.createTree(this.traverserComparison);
+      tc._viz.update();
+    }
     
     // if(!this.settings.isEducationMode){
     //   setNewAddListeners(this.registryComparison, this.trackerComparison);
@@ -395,10 +408,11 @@ export class ProvenanceService {
     this.trackerEducation = new ProvenanceTracker(this.registry, this.graphEducation);
     this.traverserEducation = new ProvenanceGraphTraverser(this.registry, this.graphEducation, this.tracker);
 
-    if((window as any).treeComparison){
-      (window as any).treeComparison._viz.free();
-      (window as any).treeComparison._viz = (window as any).treeComparison.createTree(this.traverserEducation);
-      (window as any).treeComparison._viz.update();
+    const tcEdu = (window as any).treeComparison;
+    if (tcEdu) {
+      if (tcEdu._viz) { tcEdu._viz.free(); }
+      tcEdu._viz = tcEdu.createTree(this.traverserEducation);
+      tcEdu._viz.update();
     }
 
     this.settings.isEducationMode = true;
@@ -422,9 +436,12 @@ export class ProvenanceService {
     };
 
 
-    (window as any).tree._viz.free();
-    (window as any).tree._viz = (window as any).tree.createTree(this.traverser);
-    (window as any).tree._viz.update();
+    const t = (window as any).tree;
+    if (t && t._viz) { t._viz.free(); }
+    if (t) {
+      t._viz = t.createTree(this.traverser);
+      t._viz.update();
+    }
     setNewAddListeners(this.registry, this.tracker);
   }
 

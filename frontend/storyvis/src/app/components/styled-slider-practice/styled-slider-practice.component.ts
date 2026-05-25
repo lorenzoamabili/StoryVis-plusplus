@@ -15,7 +15,7 @@ export class StyledSliderPracticeComponent implements DoCheck {
   public valueC = (2012 + 0) / 2;
 
   constructor() {
-    this.settings.canvas.sliderPractice = this;
+    if (this.settings.canvas) { this.settings.canvas.sliderPractice = this; }
     this.settings._thresholdValueC = this.valueC;
     this.settings._thresholdValueW = this.valueW;
   }

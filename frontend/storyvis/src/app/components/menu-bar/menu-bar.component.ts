@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
 import { ProvenanceService, UserService, AuthenticationService } from '../../shared/_services';
@@ -6,18 +6,22 @@ import { Role, Provenance, Story, TextReport, User } from '../../shared/_models'
 import { MatSelectChange } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { Settings } from '../brainvis-canvas/utils/settings';
+import { TutorialService } from '../tutorial/tutorial.service';
+import { BookmarkService } from '../../shared/_services/bookmark.service';
 
 @Component({
   selector: 'app-menu-bar',
   templateUrl: './menu-bar.component.html',
   styleUrls: ['./menu-bar.component.css']
 })
-export class MenuBarComponent implements OnInit {
+export class MenuBarComponent implements OnInit, OnDestroy {
   @Input() canvas: BrainvisCanvasComponent;
+  @Input() canvasComparison: any;
   @Input() IDcreator: number;
   @Input() studyStarted: boolean;
   public now: string;
   public settings = Settings.getInstance(this);
+  private _clockInterval: any;
 
   currentUser: User;
   graphs: Provenance[] = [];
@@ -28,18 +32,23 @@ export class MenuBarComponent implements OnInit {
     public userService: UserService,
     public provenance: ProvenanceService,
     public router: Router,
-    public authenticationService: AuthenticationService
+    public authenticationService: AuthenticationService,
+    public tutorialService: TutorialService,
+    public bookmarkService: BookmarkService
   ) {
 
-    this.userService.getAllGraphs().pipe(first()).subscribe(graphs => {
-      this.graphs = graphs;
-    });
-    this.userService.getAllStories().pipe(first()).subscribe(stories => {
-      this.stories = stories;
-    });
-    this.userService.getAllTextReports().pipe(first()).subscribe(textReports => {
-      this.textReports = textReports;
-    });
+    this.userService.getAllGraphs().pipe(first()).subscribe(
+      graphs => { this.graphs = graphs; },
+      err => { console.warn('getAllGraphs failed', err); }
+    );
+    this.userService.getAllStories().pipe(first()).subscribe(
+      stories => { this.stories = stories; },
+      err => { console.warn('getAllStories failed', err); }
+    );
+    this.userService.getAllTextReports().pipe(first()).subscribe(
+      textReports => { this.textReports = textReports; },
+      err => { console.warn('getAllTextReports failed', err); }
+    );
   }
 
   reset(){
@@ -47,9 +56,10 @@ export class MenuBarComponent implements OnInit {
   }
 
   load(){
-    this.userService.getAllGraphs().pipe(first()).subscribe(graphs => {
-      this.graphs = graphs;
-    });  
+    this.userService.getAllGraphs().pipe(first()).subscribe(
+      graphs => { this.graphs = graphs; },
+      err => { console.warn('getAllGraphs failed', err); }
+    );
   }
 
   public wlSettings = [
@@ -88,11 +98,27 @@ export class MenuBarComponent implements OnInit {
 
   ngOnInit() {
     const numFormat = (i: number) => ('0' + i).slice(-2);
-    setInterval(() => {
+    this._clockInterval = setInterval(() => {
       const date = new Date();
       this.now = `${numFormat(date.getHours())}:${numFormat(date.getMinutes())}`;
     }, 1000);
+  }
 
+  ngOnDestroy() {
+    clearInterval(this._clockInterval);
+  }
+
+  startTutorial() { this.tutorialService.startMain(); }
+
+  bookmarkCurrent(isPhase = false) {
+    const g = this.provenance.graph;
+    if (!g || !g.current) { return; }
+    const nodeId = (g.current as any).id;
+    if (!nodeId) { return; }
+    const label = isPhase
+      ? (window.prompt('Phase name:', `Phase ${this.bookmarkService.getAll().filter(b => b.isPhase).length + 1}`) || 'Phase')
+      : (window.prompt('Bookmark label:', `State ${this.bookmarkService.getAll().length + 1}`) || 'Bookmark');
+    this.bookmarkService.add(nodeId, label, isPhase);
   }
 
   get isAdmin() {

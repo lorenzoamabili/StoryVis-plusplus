@@ -1,0 +1,71 @@
+<div class="rp-panel">
+
+  <!-- Header -->
+  <div class="rp-header">
+    <mat-icon class="rp-header-icon">psychology</mat-icon>
+    <span class="rp-title">Reflections</span>
+    <span class="rp-count">{{ reflections.length }}</span>
+  </div>
+
+  <!-- Type summary badges -->
+  <div class="rp-summary" *ngIf="reflections.length > 0">
+    <ng-container *ngFor="let t of types">
+      <span *ngIf="countOf(t) > 0" class="rp-badge"
+            [style.color]="meta[t].color"
+            [style.border-color]="meta[t].color"
+            [matTooltip]="meta[t].label + ': ' + countOf(t)">
+        <mat-icon class="rp-badge-icon">{{ meta[t].icon }}</mat-icon>{{ countOf(t) }}
+      </span>
+    </ng-container>
+  </div>
+
+  <!-- Empty state -->
+  <div class="rp-empty" *ngIf="reflections.length === 0">
+    No reflections yet.<br>
+    Press <kbd>R</kbd> or click <mat-icon class="rp-inline-icon">psychology</mat-icon> in the toolbar to reflect on the current state.
+  </div>
+
+  <!-- Reflection list -->
+  <div class="rp-list">
+    <div class="rp-item" *ngFor="let r of reflections; trackBy: trackById"
+         [style.border-left-color]="meta[r.type].color">
+
+      <!-- Type icon + time -->
+      <div class="rp-item-header">
+        <mat-icon class="rp-type-icon" [style.color]="meta[r.type].color">{{ meta[r.type].icon }}</mat-icon>
+        <span class="rp-type-label" [style.color]="meta[r.type].color">{{ meta[r.type].label }}</span>
+        <span class="rp-time">{{ r.timestamp | date:'HH:mm:ss' }}</span>
+      </div>
+
+      <!-- Text display / edit -->
+      <div class="rp-text-wrap" *ngIf="editingId !== r.id" (dblclick)="startEdit(r)">
+        <p class="rp-text">{{ r.text }}</p>
+      </div>
+      <textarea class="rp-edit-input" *ngIf="editingId === r.id"
+                [(ngModel)]="editText"
+                (blur)="commitEdit(r)"
+                (keydown.enter)="commitEdit(r)"
+                (keydown.escape)="editingId = null"
+                rows="3"
+                autofocus></textarea>
+
+      <!-- Actions -->
+      <div class="rp-actions">
+        <button mat-icon-button class="rp-action" (click)="navigateTo(r)"
+                matTooltip="Jump to this provenance state">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+        <button mat-icon-button class="rp-action" (click)="startEdit(r)"
+                matTooltip="Edit reflection">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button class="rp-action rp-delete" (click)="remove(r)"
+                matTooltip="Delete reflection">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

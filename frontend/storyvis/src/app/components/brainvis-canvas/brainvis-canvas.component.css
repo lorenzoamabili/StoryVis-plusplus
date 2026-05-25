@@ -54,13 +54,13 @@
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  background-color: silver;  
+  background-color: #111;
 }
 
 .visualizerOne {
   width: 100%;
   height: 100%;
-  background-color: silver;  
+  background-color: #111;
 }
 
 
@@ -72,7 +72,7 @@
   display: block;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  background-color: silver;  
+  background-color: #111;
 }
 
 .rendererComparison {
@@ -81,7 +81,7 @@
   height: 50%;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: none;
   position: relative;
   overflow: hidden;
@@ -93,7 +93,7 @@
   height: 50%;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: none;
   position: relative;
   overflow: hidden;
@@ -128,11 +128,15 @@
   top: 5%;
 }
 
-.sliceIndex {    
+.sliceIndex {
   position: absolute;
-  color: rgb(255, 200, 100);
+  color: rgba(255, 200, 100, 0.80);
   left: 1%;
   top: 1%;
+  font-size: 11px;
+  font-family: system-ui, -apple-system, monospace;
+  letter-spacing: 0.5px;
+  pointer-events: none;
 }
 
 .datacomics {    
@@ -172,23 +176,144 @@
   display: none;
 }
 
-/* 
-#r0 {
-  border-top: 2px solid #03a9f4;
-  border-left: 2px solid #03a9f4;
+/* ── Per-panel orientation color coding ──────────────────────────────────────
+   Standard radiology colour conventions help learners orient quickly:
+     Axial → blue  |  3D → gray  |  Coronal → green  |  Sagittal → red
+   ────────────────────────────────────────────────────────────────────────── */
+#r0 { border-top: 3px solid #03a9f4; }   /* Axial          — blue    */
+#r1 { border-top: 3px solid #90a4ae; }   /* 3D Perspective — gray    */
+#r2 { border-top: 3px solid #66bb6a; }   /* Coronal        — green   */
+#r3 { border-top: 3px solid #ef5350; }   /* Sagittal       — red     */
+
+/* ── Orientation label (bottom-right of each panel) ─────────────────────── */
+.panel-label {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+  font-family: system-ui, -apple-system, sans-serif;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.renderer:hover .panel-label { opacity: 1; }
+
+#r0 .panel-label { color: #03a9f4; }
+#r1 .panel-label { color: #90a4ae; }
+#r2 .panel-label { color: #66bb6a; }
+#r3 .panel-label { color: #ef5350; }
+
+
+/* ── Coverage heatmap (right edge of each 2D panel) ─────────────────────── */
+.coverage-wrap {
+  position: absolute;
+  right: 5px;
+  bottom: 28px;
+  top: 28px;
+  width: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
-#r1 {
-  border-top: 2px solid #f44336;
-  border-right: 2px solid #f44336;
+/* Stack of 20 equal-height segments running top→bottom (superior→inferior) */
+.cov-segs {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
-#r2 {
-  border-bottom: 2px solid #ffeb3b;
-  border-left: 2px solid #ffeb3b;
+.cov-seg {
+  flex: 1;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.3s;
 }
 
-#r3 {
-  border-bottom: 2px solid #8bc34a;
-  border-right: 2px solid #8bc34a;
-} */
+/* Visited colours keyed off overall coverage level */
+.cov-seg.cov-visited.cov-low  { background: #ef5350; }
+.cov-seg.cov-visited.cov-mid  { background: #ffa726; }
+.cov-seg.cov-visited.cov-high { background: #66bb6a; }
+
+/* Percentage label below the strip */
+.cov-label {
+  font-size: 9px;
+  font-weight: 700;
+  font-family: system-ui, monospace;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.35);
+}
+.cov-label.cov-label-low  { color: #ef5350; }
+.cov-label.cov-label-mid  { color: #ffa726; }
+.cov-label.cov-label-high { color: #66bb6a; }
+
+/* ── Magnifying glass loupe ──────────────────────────────────────────────── */
+.loupe-canvas {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 200, 100, 0.7);
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  background: #000;
+}
+
+/* ── Data-comics frame sequence controls ─────────────────────────────────── */
+.frame-seq-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(45, 49, 66, 0.9);
+  padding: 3px 8px;
+  border-top: 1px solid rgba(255, 200, 100, 0.25);
+}
+
+.frame-seq-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 200, 100, 0.7);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.frame-seq-btn:hover {
+  color: rgb(255, 200, 100);
+  background: rgba(255, 200, 100, 0.1);
+}
+
+.frame-seq-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(255, 200, 100);
+  min-width: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Data-comics frame caption ───────────────────────────────────────────── */
+.frame-caption {
+  width: 100%;
+  font-size: 11px;
+  color: #444;
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+  padding: 3px 8px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -1,4 +1,4 @@
 ﻿{
     "connectionString": "mongodb://localhost:27017/try",
-    "secret": "STUPIDISWHOSTUPIDDOES"
+    "secret": "change-me-via-JWT_SECRET-env-var"
 }

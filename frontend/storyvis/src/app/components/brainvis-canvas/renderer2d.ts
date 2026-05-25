@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as AMI from "ami.js";
 import { IAMIRenderer, View, ISlicePosition } from "./utils/types";
 import { AMIRenderer } from "./amiRenderer";
-import { EventEmitter, Output, ViewChild, Component, ɵbypassSanitizationTrustResourceUrl } from "@angular/core";
+import { EventEmitter } from "@angular/core";
 import { UninitializedError } from "./utils/exceptions";
 import Ruler from "./ruler";
 import Angle from "./angle";
@@ -10,10 +10,6 @@ import Angle from "./angle";
 import Voxelprobe from "./voxelprobe";
 import Annotation from "./annotation";
 import { Artifact } from "@visualstorytelling/provenance-core/src/api";
-
-// @Component({
-//   template: ''
-// })
 
 var artifactID: number = -1;
 
@@ -33,6 +29,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   public annotationCounter: number = 0;
   public click: boolean = false;
   public sliceIndexTransition = false;
+  private _sliceIntervalId: any = null;
+  private _cameraIntervalId: any = null;
+  private _zoomIntervalId: any = null;
   public measurementDone: boolean = true;
 
   public findingCoord: {
@@ -76,8 +75,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
 
-  @Output() artifactCreated = new EventEmitter<Artifact>();
-  @Output() artifactDeleted = new EventEmitter<Artifact>();
+  artifactCreated = new EventEmitter<Artifact>();
+  artifactDeleted = new EventEmitter<Artifact>();
 
   init() {
     if (this._initialized) {
@@ -194,6 +193,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     // this._renderer.domElement.addEventListener("click", this.onClick.bind(this));
     this._renderer.domElement.addEventListener("mouseup", this.onPlane.bind(this));
+
+    // resize event — registered once here instead of in updateClipPlane()
+    this._renderer.domElement.addEventListener("resize", this.onWindowResize, false);
 
     // this.scene.add()
     this._initialized = true;
@@ -349,12 +351,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
 
 
-    // resize event
-    this._renderer.domElement.addEventListener(
-      "resize",
-      this.onWindowResize,
-      false
-    );
   }
 
 
@@ -576,21 +572,20 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   changeSliceIndex(newIndex: number, milliseconds: number, oldIndex?: number, done?: () => void) {
-    let changeTimeout;
     if (this._stackHelper.index === newIndex) {
       return;
     }
     if (milliseconds <= 0) {
       this._stackHelper.index = newIndex;
     } else {
-      if (changeTimeout !== undefined) {
-        clearInterval(changeTimeout);
-        changeTimeout = undefined;
+      if (this._sliceIntervalId !== null) {
+        clearInterval(this._sliceIntervalId);
+        this._sliceIntervalId = null;
       }
       this.sliceIndexTransition = true;
       let changeTime = 0;
       const delta = 30 / milliseconds;
-      changeTimeout = setInterval((fromSlice, toSlice) => {
+      this._sliceIntervalId = setInterval((fromSlice, toSlice) => {
         const t = changeTime;
         const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; //  ease in/out function
 
@@ -602,7 +597,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
         if (this.click) {
           this.click = false;
-          clearInterval(changeTimeout);
+          clearInterval(this._sliceIntervalId);
+          this._sliceIntervalId = null;
           this.sliceIndexTransition = false;
 
           let stopIndex;
@@ -634,8 +630,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         changeTime += delta;
         if (changeTime > 1.0) {
           this.changeSliceIndex(toSlice, 0);
-          clearInterval(changeTimeout);
-          changeTimeout = undefined;
+          clearInterval(this._sliceIntervalId);
+          this._sliceIntervalId = null;
           if (done) {
             done();
           }
@@ -647,7 +643,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
 
   changeCamera2D(newPosition: THREE.Vector3, newTarget: THREE.Vector3, milliseconds: number, done?: () => void) {
-    let changeTimeout;
     if (this._controls.target.equals(newTarget) && this.camera.position.equals(newPosition)) {
       return;
     }
@@ -656,13 +651,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this.camera.position.copy(newPosition);
       this.camera.lookAt(this._controls.target);
     } else {
-      if (changeTimeout !== undefined) {
-        clearInterval(changeTimeout);
-        changeTimeout = undefined;
+      if (this._cameraIntervalId !== null) {
+        clearInterval(this._cameraIntervalId);
+        this._cameraIntervalId = null;
       }
       let changeTime = 0;
       const delta = 30 / milliseconds;
-      changeTimeout = setInterval((fromTarget, fromPosition, toTarget, toPosition) => {
+      this._cameraIntervalId = setInterval((fromTarget, fromPosition, toTarget, toPosition) => {
         const t = changeTime;
         const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; //  ease in/out function
 
@@ -680,8 +675,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         changeTime += delta;
         if (changeTime > 1.0) {
           this.changeCamera2D(toPosition, toTarget, 0);
-          clearInterval(changeTimeout);
-          changeTimeout = undefined;
+          clearInterval(this._cameraIntervalId);
+          this._cameraIntervalId = null;
           if (done) {
             done();
           }
@@ -693,7 +688,6 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
 
   changeCamera2DZoom(newZoom: number, milliseconds: number, done?: () => void) {
-    let changeTimeout;
     if (this._camera.zoom === newZoom) {
       return;
     }
@@ -701,13 +695,13 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this.camera.zoom = newZoom;
       this.camera.updateProjectionMatrix();
     } else {
-      if (changeTimeout !== undefined) {
-        clearInterval(changeTimeout);
-        changeTimeout = undefined;
+      if (this._zoomIntervalId !== null) {
+        clearInterval(this._zoomIntervalId);
+        this._zoomIntervalId = null;
       }
       let changeTime = 0;
       const delta = 30 / milliseconds;
-      changeTimeout = setInterval((fromZoom, toZoom) => {
+      this._zoomIntervalId = setInterval((fromZoom, toZoom) => {
         const t = changeTime;
         const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; //  ease in/out function
 
@@ -718,8 +712,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         changeTime += delta;
         if (changeTime > 1.0) {
           this.changeCamera2DZoom(toZoom, 0);
-          clearInterval(changeTimeout);
-          changeTimeout = undefined;
+          clearInterval(this._zoomIntervalId);
+          this._zoomIntervalId = null;
           if (done) {
             done();
           }
@@ -761,15 +755,21 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
   renderElms(artifact: Artifact) {
     if (this._artifactInit) {
-      this._measurements.find((measurement) => measurement.artifact.id === artifact.id).widget.show(); //show
-      this._measurements.find((measurement) => measurement.artifact.id === artifact.id).artifact.displayed = true;
+      const m = this._measurements.find((measurement) => measurement.artifact.id === artifact.id);
+      if (m) {
+        m.widget.show();
+        m.artifact.displayed = true;
+      }
     }
   }
 
   removeElms(artifactToRemove: Artifact) {
     if (this.measurementDone) {
-      this._measurements.find((measurement) => measurement.artifact.id === artifactToRemove.id).widget.hide(); //hide
-      this._measurements.find((measurement) => measurement.artifact.id === artifactToRemove.id).artifact.displayed = false;
+      const m = this._measurements.find((measurement) => measurement.artifact.id === artifactToRemove.id);
+      if (m) {
+        m.widget.hide();
+        m.artifact.displayed = false;
+      }
     }
   }
 

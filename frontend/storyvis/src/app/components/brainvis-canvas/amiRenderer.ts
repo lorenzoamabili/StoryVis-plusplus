@@ -2,12 +2,8 @@ import { View } from './utils/types';
 
 import * as AMI from 'ami.js';
 import * as THREE from 'three';
-import { EventEmitter, Output, Component } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { Settings } from './utils/settings';
-
-@Component({
-    template: ''
-})
 
 export class AMIRenderer {
     protected _initialized = false;
@@ -32,6 +28,11 @@ export class AMIRenderer {
     protected _sliceColor: number;
 
     protected _stackHelper: AMI.HelpersStack;
+
+    private _boundOnScroll: (e: any) => void;
+    private _boundOnShiftClick: (e: MouseEvent) => void;
+    private _boundOnAltClick: (e: MouseEvent) => void;
+    private _listenersAdded = false;
 
     constructor(view: View) {
 
@@ -72,10 +73,24 @@ export class AMIRenderer {
     }
 
     addEventListeners() {
-        this._controls.addEventListener('mousewheel', this.onScroll.bind(this));
-        this._controls.addEventListener('OnScroll', this.onScroll.bind(this));
-        this.domElement.addEventListener('click', this.onShiftClick.bind(this));
-        this.domElement.addEventListener('click', this.onAltClick.bind(this));
+        if (this._listenersAdded) { return; }
+        this._listenersAdded = true;
+        this._boundOnScroll = this.onScroll.bind(this);
+        this._boundOnShiftClick = this.onShiftClick.bind(this);
+        this._boundOnAltClick = this.onAltClick.bind(this);
+        this._controls.addEventListener('mousewheel', this._boundOnScroll);
+        this._controls.addEventListener('OnScroll', this._boundOnScroll);
+        this.domElement.addEventListener('click', this._boundOnShiftClick);
+        this.domElement.addEventListener('click', this._boundOnAltClick);
+    }
+
+    removeEventListeners() {
+        if (!this._listenersAdded) { return; }
+        this._controls.removeEventListener('mousewheel', this._boundOnScroll);
+        this._controls.removeEventListener('OnScroll', this._boundOnScroll);
+        this.domElement.removeEventListener('click', this._boundOnShiftClick);
+        this.domElement.removeEventListener('click', this._boundOnAltClick);
+        this._listenersAdded = false;
     }
 
 
