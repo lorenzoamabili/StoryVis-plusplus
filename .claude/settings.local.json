@@ -9,7 +9,8 @@
       "Bash(yarn workspace *)",
       "Bash(git -C /c/dev/StoryVis status --short)",
       "Bash(git -C /c/dev/StoryVis diff backend/server.js)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('workspaces', {}\\), indent=2\\)\\)\")"
     ]
   }
 }
