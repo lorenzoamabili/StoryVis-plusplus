@@ -1,0 +1,36 @@
+[build]
+  base    = "frontend"
+  command = "yarn install --ignore-engines && node storyvis/scripts/inject-env.js && cd storyvis && cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng build --configuration=production"
+  publish = "storyvis/dist/storyvis"
+
+[build.environment]
+  NODE_VERSION = "20"
+  DEBUG        = "false"
+
+# Angular SPA routing — all paths fall back to index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# Cache hashed JS/CSS bundles for 1 year
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Never cache index.html or env.js
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/assets/env.js"
+  [headers.values]
+    Cache-Control = "no-store"
