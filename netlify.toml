@@ -1,6 +1,6 @@
 [build]
   base    = "frontend"
-  command = "yarn install --ignore-engines && node storyvis/scripts/inject-env.js && cd storyvis && cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng build --configuration=production"
+  command = "yarn install --ignore-engines && cd provenance-tree-visualization-grouping && npm run build && cd .. && node storyvis/scripts/inject-env.js && cd storyvis && cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng build --configuration=production"
   publish = "storyvis/dist/storyvis"
 
 [build.environment]
