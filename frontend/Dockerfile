@@ -1,10 +1,10 @@
 
 # Stage 1: build Angular app
-FROM node:18 AS builder
+FROM node:20 AS builder
 WORKDIR /frontend
 RUN apt-get update && apt-get install -y gettext
 COPY --chown=node:node . /frontend
-RUN yarn install --frozen-lockfile
+RUN yarn install --ignore-engines
 RUN cd storyvis && cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng build --configuration=production
 
 # Stage 2: serve with nginx

@@ -17,7 +17,7 @@ services:
       - PORT=4000
       - MONGODB_URI=mongodb://mongo:27017/try
       - JWT_SECRET=${JWT_SECRET}
-      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:4200}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
       - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
       - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
     depends_on:
