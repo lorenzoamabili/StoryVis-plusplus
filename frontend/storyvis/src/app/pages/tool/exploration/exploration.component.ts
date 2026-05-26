@@ -1,14 +1,17 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProvenanceService } from '../../../shared/_services';
 
 import { AuthenticationService } from '../../../shared/_services';
 import { User, Role } from '../../../shared/_models';
 import { Router } from '@angular/router';
+import { AiAssistantPanelComponent } from '../../../components/ai-assistant-panel/ai-assistant-panel.component';
 
 @Component({ templateUrl: 'exploration.component.html', styleUrls: ['exploration.component.css'] })
 
 export class ExplorationComponent implements OnInit {
     title = 'exploration';
+
+    @ViewChild('aiPanel') aiPanel: AiAssistantPanelComponent;
 
     currentUser: User;
     studyStarted: boolean = true;
@@ -19,7 +22,7 @@ export class ExplorationComponent implements OnInit {
         public provenance: ProvenanceService
     ) {
         this.currentUser = this.authenticationService.currentUserValue;
-        this.IDcreator = this.currentUser.username;
+        this.IDcreator = this.currentUser ? (this.currentUser as any).username : 0;
         this.provenance.timeStart = new Date().getTime();
     }
 
