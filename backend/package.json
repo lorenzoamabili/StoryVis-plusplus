@@ -6,7 +6,8 @@
         "start-dev": "nodemon ./server.js",
         "start-prod": "pm2 start pm2.config.js --env production",
         "stop-prod": "pm2 stop storyvis-backend",
-        "prune": "npm prune --production"
+        "prune": "npm prune --production",
+        "seed": "node ./scripts/seed.js"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
