@@ -6,7 +6,10 @@
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
       "Bash(grep -E '\\\\.\\(js|ts\\)$')",
-      "Bash(yarn workspace *)"
+      "Bash(yarn workspace *)",
+      "Bash(git -C /c/dev/StoryVis status --short)",
+      "Bash(git -C /c/dev/StoryVis diff backend/server.js)",
+      "Bash(git *)"
     ]
   }
 }
