@@ -2,8 +2,8 @@
     "name": "backend-storyvis",
     "version": "1.0.0",
     "scripts": {
-        "start": "node ./server.js",
-        "start-dev": "nodemon ./server.js",
+        "start": "node --no-deprecation ./server.js",
+        "start-dev": "nodemon --exec \"node --no-deprecation\" ./server.js",
         "start-prod": "pm2 start pm2.config.js --env production",
         "stop-prod": "pm2 stop storyvis-backend",
         "prune": "npm prune --production",

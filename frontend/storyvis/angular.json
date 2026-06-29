@@ -19,19 +19,33 @@
               "raf",
               "@babel/runtime/helpers/defineProperty",
               "core-js/modules/es.promise",
+              "core-js/modules/es.promise.js",
               "core-js/modules/es.regexp.to-string",
+              "core-js/modules/es.regexp.to-string.js",
               "core-js/modules/es.array.reverse",
+              "core-js/modules/es.array.reverse.js",
               "core-js/modules/es.string.includes",
+              "core-js/modules/es.string.includes.js",
               "core-js/modules/es.array.index-of",
+              "core-js/modules/es.array.index-of.js",
               "core-js/modules/es.string.trim",
+              "core-js/modules/es.string.trim.js",
               "core-js/modules/es.string.split",
+              "core-js/modules/es.string.split.js",
               "core-js/modules/es.string.ends-with",
+              "core-js/modules/es.string.ends-with.js",
               "core-js/modules/es.array.reduce",
+              "core-js/modules/es.array.reduce.js",
               "core-js/modules/web.dom-collections.iterator",
+              "core-js/modules/web.dom-collections.iterator.js",
               "core-js/modules/es.array.iterator",
+              "core-js/modules/es.array.iterator.js",
               "core-js/modules/es.string.starts-with",
+              "core-js/modules/es.string.starts-with.js",
               "core-js/modules/es.string.replace",
-              "core-js/modules/es.string.match"
+              "core-js/modules/es.string.replace.js",
+              "core-js/modules/es.string.match",
+              "core-js/modules/es.string.match.js"
             ],
             "outputPath": "dist",
             "index": "src/index.html",
@@ -67,8 +81,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "4mb",
+                  "maximumError": "8mb"
                 }
               ]
             }

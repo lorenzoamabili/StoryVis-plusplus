@@ -44,10 +44,11 @@
       <textarea class="rp-edit-input" *ngIf="editingId === r.id"
                 [(ngModel)]="editText"
                 (blur)="commitEdit(r)"
-                (keydown.enter)="commitEdit(r)"
+                (keydown.control.enter)="commitEdit(r)"
                 (keydown.escape)="editingId = null"
                 rows="3"
                 autofocus></textarea>
+      <span class="rp-edit-hint" *ngIf="editingId === r.id">Ctrl+Enter to save · Esc to cancel</span>
 
       <!-- Actions -->
       <div class="rp-actions">

@@ -4,9 +4,11 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.comp
 import { ProvenanceService, UserService, SessionService } from '../../shared/_services';
 import { Provenance, Story, TextReport } from '../../shared/_models';
 import { MatSelectChange } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
 import { Settings } from '../brainvis-canvas/utils/settings';
 import { TutorialService } from '../tutorial/tutorial.service';
 import { BookmarkService } from '../../shared/_services/bookmark.service';
+import { BookmarkLabelDialogComponent } from '../bookmark-label-dialog/bookmark-label-dialog.component';
 
 @Component({
   selector: 'app-menu-bar',
@@ -27,21 +29,23 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   textReports: TextReport[] = [];
 
   public dataSources = [
-    { name: 'Brain MRI', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
     { name: 'Chest CT 1', url: 'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' },
+    { name: 'Brain MRI', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
     { name: 'Custom URL…', url: '__custom__' }
   ];
 
   public selectedDataUrl: string = this.dataSources[0].url;
   public customUrl: string = '';
   public showCustomInput: boolean = false;
+  public saving = false;
 
   constructor(
     public userService: UserService,
     public provenance: ProvenanceService,
     public sessionService: SessionService,
     public tutorialService: TutorialService,
-    public bookmarkService: BookmarkService
+    public bookmarkService: BookmarkService,
+    private dialog: MatDialog
   ) {
     const id = this.sessionService.getId();
     this.userService.getAllGraphs(id).pipe(first()).subscribe(
@@ -117,9 +121,25 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     if (!g || !g.current) { return; }
     const nodeId = (g.current as any).id;
     if (!nodeId) { return; }
-    const label = isPhase
-      ? (window.prompt('Phase name:', `Phase ${this.bookmarkService.getAll().filter(b => b.isPhase).length + 1}`) || 'Phase')
-      : (window.prompt('Bookmark label:', `State ${this.bookmarkService.getAll().length + 1}`) || 'Bookmark');
-    this.bookmarkService.add(nodeId, label, isPhase);
+    const count = this.bookmarkService.getAll();
+    const defaultLabel = isPhase
+      ? `Phase ${count.filter(b => b.isPhase).length + 1}`
+      : `State ${count.length + 1}`;
+    this.dialog.open(BookmarkLabelDialogComponent, {
+      data: { isPhase, defaultLabel },
+      width: '360px',
+      autoFocus: true,
+    }).afterClosed().subscribe(label => {
+      if (label) { this.bookmarkService.add(nodeId, label, isPhase); }
+    });
+  }
+
+  saveSession() {
+    const id = this.IDcreator;
+    this.saving = true;
+    this.provenance.saveGraphStudy(id as any);
+    this.provenance.saveStoryStudy(id as any);
+    this.provenance.saveTextReportStudy(id as any);
+    setTimeout(() => this.saving = false, 1500);
   }
 }

@@ -5,4 +5,4 @@ USER node
 COPY --chown=node:node . /backend
 RUN npm install --omit=dev
 EXPOSE 4000
-CMD ["node", "server.js"]
+CMD ["node", "--no-deprecation", "server.js"]

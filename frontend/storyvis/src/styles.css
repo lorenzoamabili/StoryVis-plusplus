@@ -51,6 +51,17 @@ div.cont {
   flex-direction: column;
 }
 
+/* ── Material form field accent override (indigo-pink → gold) ────────────── */
+.mat-form-field.mat-focused .mat-form-field-label { color: rgb(255, 200, 100) !important; }
+.mat-form-field.mat-focused .mat-form-field-ripple { background-color: rgb(255, 200, 100) !important; }
+.mat-form-field.mat-focused .mat-form-field-outline-thick { color: rgb(255, 200, 100) !important; }
+.mat-select-panel .mat-option.mat-selected:not(.mat-option-disabled) { color: rgb(255, 200, 100) !important; }
+.mat-primary .mat-option.mat-selected:not(.mat-option-disabled) { color: rgb(255, 200, 100) !important; }
+.mat-slider.mat-accent .mat-slider-track-fill,
+.mat-slider.mat-accent .mat-slider-thumb,
+.mat-slider.mat-accent .mat-slider-thumb-label { background-color: rgb(255, 200, 100) !important; }
+.mat-progress-bar.mat-accent .mat-progress-bar-fill::after { background-color: rgb(255, 200, 100) !important; }
+
 /* ── Material tooltip overrides ──────────────────────────────────────────────
    Wider + multi-line (pre-line) so educational tooltips render HU reference
    values, technique tips and usage context across multiple lines.
@@ -67,7 +78,7 @@ div.cont {
 
 /* ── Metacognition snackbar ───────────────────────────────────────────────── */
 .metacog-snack {
-  background: #2d2b55 !important;
+  background: #1e1e2e !important;
   color: #e0e0ff !important;
   font-size: 13px !important;
   border-left: 4px solid #ce93d8 !important;

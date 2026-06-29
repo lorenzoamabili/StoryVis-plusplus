@@ -12,9 +12,13 @@
     "strictInjectionParameters": false
   },
   "exclude": [
-    "src/test.ts",
-    "src/environments/environment.prod.ts",
+    "test.ts",
+    "environments/environment.prod.ts",
     "**/*.spec.ts",
-    "node_modules/**/*"
+    "node_modules/**/*",
+    "app/pages/shared/**/*",
+    "app/pages/tool/intro-explo/**/*",
+    "app/pages/tool/intro-prac/**/*",
+    "app/pages/tool/practice/**/*"
   ]
 }

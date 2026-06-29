@@ -1,0 +1,16 @@
+<h2 mat-dialog-title class="bld-title">
+  <mat-icon class="bld-icon">{{ data.isPhase ? 'flag' : 'bookmark' }}</mat-icon>
+  {{ data.isPhase ? 'Name this phase' : 'Name this bookmark' }}
+</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="bld-field">
+    <mat-label>{{ data.isPhase ? 'Phase name' : 'Bookmark label' }}</mat-label>
+    <input matInput [(ngModel)]="label" (keydown.enter)="submit()" cdkFocusInitial />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" (click)="submit()" [disabled]="!label.trim()">Save</button>
+</mat-dialog-actions>

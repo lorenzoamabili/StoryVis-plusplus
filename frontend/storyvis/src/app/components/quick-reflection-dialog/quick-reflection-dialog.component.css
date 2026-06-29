@@ -16,7 +16,7 @@
 }
 
 .qr-body {
-  min-width: 380px;
+  min-width: min(380px, 92vw);
   padding: 8px 24px 4px !important;
 }
 

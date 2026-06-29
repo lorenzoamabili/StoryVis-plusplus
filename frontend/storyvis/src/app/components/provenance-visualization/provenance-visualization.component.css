@@ -2,12 +2,14 @@ app-provenance-visualization{
   height: 100%;
   width: 400px;
   display: block;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 
-.mat-icon{
-  font-size: 22px;
+/* scoped to provenance panel controls only */
+.controlsBox .mat-icon,
+.holder .mat-icon {
+  font-size: 18px;
 }
 
 .mat-drawer-inner-container {
@@ -23,9 +25,9 @@ app-provenance-visualization{
 
 .minimapContainer {
   display: none;
-  position: relative; 
-  border-top: 1px solid black; 
-  height: 20%; 
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  height: 20%;
 }
 
 .withButtons{
@@ -49,7 +51,7 @@ app-provenance-visualization{
 }
 
 .node circle.bookmarked {
-  stroke: #ff0000;
+  stroke: rgb(255, 200, 100);
   stroke-width: 1.2px;
   stroke-dasharray: 0;
 }
@@ -133,10 +135,9 @@ app-provenance-visualization{
 }
 
 .node text {
-  /* fill: white; */
-  fill: #000000;
+  fill: rgba(0, 0, 0, 0.75);
   stroke-width: 0;
-  font-family: Times;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 .link {
@@ -166,8 +167,9 @@ app-provenance-visualization{
 }
 
 .titleAggregation {
-  font-family: Times;
-  font-size: 25px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 #DataAggregationTitle {
@@ -178,14 +180,14 @@ app-provenance-visualization{
 }
 
 .controlsBox {
-  padding: 1%;
+  padding: 6px 8px;
 }
 
 .aggButton {
   width: 43%;
-  margin: 5px 10px 0px 5px;
-  font-size: 14px;
-  font-family: Times;
+  margin: 5px 10px 0 5px;
+  font-size: 12px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 .circle-text {
@@ -231,7 +233,7 @@ app-provenance-visualization{
 
 .legend {
   flex: 1;
-  box-shadow: 0px 0px 4px #888;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
   margin: 5px;
   width: fit-content;
   height: fit-content;
@@ -266,7 +268,7 @@ app-provenance-visualization{
   width: 10px;
   height: 10px;
   border: 1px dashed;
-  border-color: red;
+  border-color: rgb(255, 200, 100);
   border-radius: 6px;
 }
 
@@ -274,7 +276,7 @@ app-provenance-visualization{
   width: 10px;
   height: 10px;
   border: 1.5px solid;
-  border-color: red;
+  border-color: rgb(255, 200, 100);
   border-radius: 6px;
 }
 
@@ -282,7 +284,7 @@ app-provenance-visualization{
   width: 10px;
   height: 10px;
   border: 1.5px solid;
-  border-color: blue;
+  border-color: #03a9f4;
   border-radius: 6px;
 }
 
@@ -290,7 +292,7 @@ app-provenance-visualization{
   width: 10px;
   height: 10px;
   border: 1.5px solid;
-  border-color: rgb(255, 100, 0);
+  border-color: #ce93d8;
   border-radius: 6px;
 }
 

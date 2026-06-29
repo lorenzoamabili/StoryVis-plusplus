@@ -57,7 +57,7 @@
   </form>
 
   <div class="debrief-actions">
-    <button mat-button (click)="close()">Skip</button>
+    <button mat-button (click)="close()" matTooltip="Close without saving">Skip</button>
     <button mat-raised-button color="primary" (click)="submit()">
       <mat-icon>{{ saved ? 'check_circle' : 'save' }}</mat-icon>
       {{ saved ? 'Saved!' : 'Save Reflection' }}

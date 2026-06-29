@@ -2,6 +2,7 @@ module.exports = {
   apps: [{
     name: 'storyvis-backend',
     script: './server.js',
+    node_args: '--no-deprecation',
     instances: 'max',
     exec_mode: 'cluster',
     watch: false,

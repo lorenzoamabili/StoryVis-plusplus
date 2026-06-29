@@ -14,6 +14,7 @@ import { BookmarkPanelComponent } from './bookmark-panel/bookmark-panel.componen
 import { QuickReflectionDialogComponent } from './quick-reflection-dialog/quick-reflection-dialog.component';
 import { ReflectionPanelComponent } from './reflection-panel/reflection-panel.component';
 import { AiAssistantPanelComponent } from './ai-assistant-panel/ai-assistant-panel.component';
+import { BookmarkLabelDialogComponent } from './bookmark-label-dialog/bookmark-label-dialog.component';
 
 import { MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -86,10 +87,12 @@ import { HttpClientModule } from '@angular/common/http';
         QuickReflectionDialogComponent,
         ReflectionPanelComponent,
         AiAssistantPanelComponent,
+        BookmarkLabelDialogComponent,
     ],
     entryComponents: [
         DebriefModalComponent,
         QuickReflectionDialogComponent,
+        BookmarkLabelDialogComponent,
     ],
     exports: [
         BrainvisCanvasComponent,

@@ -57,33 +57,33 @@
     </ng-container>
 
     <!-- ── Measurement tools ──────────────────────────────────────────────── -->
-    <mat-button-toggle id="tutorial-ruler" class="transparent" [checked]="settings.rulerMode"
+    <mat-button-toggle id="tutorial-ruler" class="transparent mobile-hide" [checked]="settings.rulerMode"
       (change)="settings.rulerMode = $event.source.checked"
       matTooltip="Ruler — click two points to measure distance in mm.">
-      <mat-icon>space_bar</mat-icon>
+      <mat-icon>straighten</mat-icon>
     </mat-button-toggle>
 
-    <mat-button-toggle id="tutorial-angle" class="transparent" [checked]="settings.angleMode"
+    <mat-button-toggle id="tutorial-angle" class="transparent mobile-hide" [checked]="settings.angleMode"
       (change)="settings.angleMode = $event.source.checked"
       matTooltip="Protractor — click three points to measure an angle.">
-      <mat-icon>launch</mat-icon>
+      <mat-icon>square_foot</mat-icon>
     </mat-button-toggle>
 
-    <mat-button-toggle id="tutorial-voxelprobe" class="transparent" [checked]="settings.voxelprobeMode"
+    <mat-button-toggle id="tutorial-voxelprobe" class="transparent mobile-hide" [checked]="settings.voxelprobeMode"
       (change)="settings.voxelprobeMode = $event.source.checked"
       matTooltip="HU Probe — click any voxel to read its Hounsfield Unit value.">
-      <mat-icon>fingerprint</mat-icon>
+      <mat-icon>colorize</mat-icon>
     </mat-button-toggle>
 
     <!-- ── Annotation ─────────────────────────────────────────────────────── -->
-    <mat-button-toggle id="tutorial-annotation" class="transparent annotation" [checked]="settings.annotationMode"
+    <mat-button-toggle id="tutorial-annotation" class="transparent annotation mobile-hide" [checked]="settings.annotationMode"
       (change)="settings.annotationMode = $event.source.checked"
       matTooltip="Text Annotation — click a location to place a labelled marker.">
       <mat-icon>speaker_notes</mat-icon>
     </mat-button-toggle>
 
     <!-- ── Loupe ──────────────────────────────────────────────────────────── -->
-    <mat-button-toggle class="transparent" [checked]="settings.loupeMode"
+    <mat-button-toggle class="transparent mobile-hide" [checked]="settings.loupeMode"
       (change)="settings.loupeOn = $event.source.checked"
       matTooltip="Magnifying glass — hover any 2D panel for a 3× zoomed loupe.">
       <mat-icon>search</mat-icon>
@@ -124,16 +124,16 @@
     </button>
 
     <!-- Compact fps selector: native select avoids mat-form-field vertical space -->
-    <select class="cine-fps-select" (change)="canvas.setCineSpeed(+$event.target['value'])"
+    <select class="cine-fps-select mobile-hide" (change)="canvas.setCineSpeed(+$event.target['value'])"
             matTooltip="Cine speed (fps)">
       <option value="2">2</option>
       <option value="5" selected>5</option>
       <option value="10">10</option>
       <option value="20">20</option>
     </select>
-    <span class="cine-fps-label">fps</span>
+    <span class="cine-fps-label mobile-hide">fps</span>
 
-    <select class="cine-plane-select" [(ngModel)]="canvas.cinePlaneChoice"
+    <select class="cine-plane-select mobile-hide" [(ngModel)]="canvas.cinePlaneChoice"
             matTooltip="Cine plane — choose which orientation to auto-scroll">
       <option value="axial">Axial</option>
       <option value="coronal">Coronal</option>
@@ -230,8 +230,15 @@
       [checked]="settings.isAdvancedMode"
       (change)="settings.isAdvancedMode = !settings.isAdvancedMode;"
       matTooltip="Advanced Mode — unlock Data-Comics, comparison tools and extended provenance features.">
-      <mat-icon>supervisor_account</mat-icon>
+      <mat-icon>tune</mat-icon>
     </mat-button-toggle>
+
+    <button mat-icon-button class="transparent"
+      [class.save-active]="saving"
+      matTooltip="Save session — persist provenance graph, story deck and text report."
+      (click)="saveSession()">
+      <mat-icon>{{ saving ? 'check' : 'save' }}</mat-icon>
+    </button>
 
     <span class="toolbar-clock">{{ now }}</span>
 

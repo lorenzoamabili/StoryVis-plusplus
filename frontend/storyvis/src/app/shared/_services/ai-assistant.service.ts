@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { map, timeout, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { BookmarkService } from './bookmark.service';
 import { ReflectionService } from './reflection.service';
@@ -53,11 +53,21 @@ export class AiAssistantService {
     const messages = this.history$.value.map(m => ({ role: m.role, content: m.content }));
 
     return this.http.post<{ content: string }>(this._chatUrl, { messages, context }).pipe(
+      timeout(30000),
       map(res => {
         const reply: ChatMessage = { role: 'assistant', content: res.content };
         this.history$.next([...this.history$.value, reply]);
         this.loading$.next(false);
         return res.content;
+      }),
+      catchError(err => {
+        const msg = err.name === 'TimeoutError'
+          ? 'Request timed out (30s). Check that Ollama is running and try again.'
+          : (err.error?.error || err.message || 'AI service unavailable.');
+        const errReply: ChatMessage = { role: 'assistant', content: `⚠ ${msg}` };
+        this.history$.next([...this.history$.value, errReply]);
+        this.loading$.next(false);
+        return throwError(err);
       }),
     );
   }

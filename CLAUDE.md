@@ -43,56 +43,55 @@ cd backend && npm install
 ## Architecture
 
 ### Backend (`backend/`)
-Express.js + MongoDB (Mongoose) + JWT auth on port 4000. Single `.env` at repo root (loaded by `dotenv` with `path: '../.env'`). All routes are JWT-protected except `/health` and the rate-limited `/users/authenticate` + `/users/register`.
+Express.js + MongoDB (Mongoose) + port 4000. Auth bypassed — `_helpers/jwt.js` is a passthrough. All routes open. Single `.env` at repo root.
 
-Route modules:
-- `users/` — auth, registration, user model
-- `provGraphs/` / `provGraphsStudy/` — provenance graph storage (practice vs study)
-- `stories/` / `storiesStudy/` — data-comics story decks
-- `textReports/` / `textReportsStudy/` — text reports
-- `ai/ai.controller.js` — Ollama proxy; model configurable via `OLLAMA_MODEL` env var (default `llama3.2`, host via `OLLAMA_HOST`)
+Route modules: `users/`, `provGraphs/`, `provGraphsStudy/`, `stories/`, `storiesStudy/`, `textReports/`, `textReportsStudy/`, `ai/ai.controller.js` (Ollama proxy, `OLLAMA_MODEL` env var, default `llama3.2`).
 
 ### Frontend (`frontend/`)
-Yarn workspace containing:
-- `storyvis/` — Angular 10 main app
-- `provenance-core/` — local lib: provenance graph data model
-- `provenance-tree-visualization-grouping/` — local lib: D3 provenance tree component
+Yarn workspace. Main app: `storyvis/` (Angular 10). Local libs: `provenance-core`, `provenance-tree-visualization-grouping`.
 
-**Node.js / build quirks:**
-- Node v17+ requires `NODE_OPTIONS=--openssl-legacy-provider` (webpack 4 / OpenSSL conflict)
-- TypeScript pinned at `~4.0.3` (Angular 10 incompatible with TS ≥ 4.1)
-- Local libs must be built before the Angular app
+**Routing**: Single route `/` → lazy-loads `ExplorationModule`. All `**` redirect to `/`. Dead pages (`pages/shared/**`, `pages/tool/practice/**`, intro pages) excluded from TS compilation via `tsconfig.app.json`.
+
+**Session identity**: No login. `SessionService` generates UUID in `localStorage` (`storyvis_session_id`). Used as `IDcreator` for all data ops.
+
+**Node.js / build quirks**: Node v17+ needs `NODE_OPTIONS=--openssl-legacy-provider`. TypeScript pinned `~4.0.3`. Local libs must be built before Angular app.
 
 ### Frontend app structure (`frontend/storyvis/src/app/`)
 ```
-pages/
-  shared/     — login, register, home, questionnaire, thanks
-  tool/       — practice + exploration study sessions
-    practice/
-    exploration/
+pages/tool/exploration/   — only active page (single-page app)
 components/
-  brainvis-canvas/     — WebGL medical image viewer (AMI.js)
-  menu-bar/            — toolbar: undo/redo, cine, loupe, bookmarks, reflection
-  bookmark-panel/      — side panel for bookmark management
-  debrief-modal/       — post-session reflection dialog
-  quick-reflection-dialog/
-  reflection-panel/
-  ai-assistant-panel/  — Ollama chat UI
-  provenance-slides/   — story deck slide editor
-  provenance-visualization/ — D3 provenance tree
-  text-report/
-  tutorial/
-shared/
-  _services/   — AuthService, CoverageService, BookmarkService, etc.
-  _helpers/    — JWT interceptor, error interceptor, auth guard
-  _models/
+  brainvis-canvas/        — WebGL 4-panel viewer (AMI.js); auto-loads Chest CT 1 on init
+  menu-bar/               — toolbar: dataset picker, W/L, cine, bookmarks, reflections, save, AI
+  bookmark-panel/         — dark-themed side panel (BookmarkService)
+  bookmark-label-dialog/  — Material dialog replaces window.prompt for bookmark naming
+  debrief-modal/          — session reflection (coverage bars + questions + confidence)
+  quick-reflection-dialog/— type-chip reflection entry dialog
+  reflection-panel/       — dark-themed; Ctrl+Enter to save edits
+  ai-assistant-panel/     — Ollama chat; 30s timeout + error display
+  provenance-visualization/ — D3 tree; dark-themed borders + gold bookmark markers
+  provenance-slides/      — story deck slide editor
+shared/_services/
+  session.service.ts      — UUID session identity
+  bookmark.service.ts     — bookmark storage
+  ai-assistant.service.ts — Ollama HTTP client with timeout/catchError
 ```
 
-### Key data flows
-- `brainvis-canvas` is the WebGL viewer; it calls `CoverageService.recordVisit()` on every slice scroll.
-- Provenance graph records every viewer action; `BookmarkService` tags nodes.
-- `ai-assistant-panel` calls `POST /ai/chat` with session context (bookmarks, reflections, coverage, frames, slides, provenance path) — Ollama handles LLM inference locally.
-- API base URL configured at runtime via `frontend/storyvis/src/assets/env.js` (`window.env.apiUrl`); change this file for local dev, `env.template.js` handles deploy-time substitution.
+## Feature Status
+- **Auth**: Removed. UUID sessions. — ✅
+- **Single-page tool**: All routes → ExplorationComponent. — ✅
+- **Dataset picker**: CT1 auto-loads; Brain MRI switchable. — ✅
+- **Bookmarks**: Material dialog (no window.prompt). — ✅
+- **AI assistant**: 30s timeout + error bubbles in chat. — ✅
+- **Mobile**: Secondary toolbar tools hidden ≤767px. — ✅
+- **Build**: Zero errors/warnings. Production exit 0. — ✅
+- **Style**: Unified dark theme all panels; gold accent system-wide. — ✅
 
-### Study vs Practice
-The app has two parallel data namespaces: `provGraphs`/`stories`/`textReports` (practice) and `provGraphsStudy`/`storiesStudy`/`textReportsStudy` (study). Both share the same schema/controllers pattern.
+## Session Log
+Last session: `.claude/sessions/2026-06-29.md`
+
+## Next Steps
+1. End-to-end test with Docker stack (MongoDB + backend + frontend)
+2. Verify AI panel + Ollama timeout path
+3. Check D3 provenance tree after CSS font/color changes
+4. Consider lazy-loading AMI.js / Three.js (reduce 2.8MB bundle)
+5. CSP header allowing Ollama localhost without `unsafe-inline`

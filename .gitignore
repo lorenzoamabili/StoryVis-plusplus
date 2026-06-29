@@ -10,3 +10,5 @@ node_modules
 backend/logs/
 *.log
 backups/
+
+build-errors.txt
