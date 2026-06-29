@@ -1,10 +1,9 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
-import { ProvenanceService, UserService, AuthenticationService } from '../../shared/_services';
-import { Role, Provenance, Story, TextReport, User } from '../../shared/_models';
+import { ProvenanceService, UserService, SessionService } from '../../shared/_services';
+import { Provenance, Story, TextReport } from '../../shared/_models';
 import { MatSelectChange } from '@angular/material/select';
-import { Router } from '@angular/router';
 import { Settings } from '../brainvis-canvas/utils/settings';
 import { TutorialService } from '../tutorial/tutorial.service';
 import { BookmarkService } from '../../shared/_services/bookmark.service';
@@ -17,49 +16,72 @@ import { BookmarkService } from '../../shared/_services/bookmark.service';
 export class MenuBarComponent implements OnInit, OnDestroy {
   @Input() canvas: BrainvisCanvasComponent;
   @Input() canvasComparison: any;
-  @Input() IDcreator: number;
+  @Input() IDcreator: string;
   @Input() studyStarted: boolean;
   public now: string;
   public settings = Settings.getInstance(this);
   private _clockInterval: any;
 
-  currentUser: User;
   graphs: Provenance[] = [];
   stories: Story[] = [];
   textReports: TextReport[] = [];
 
+  public dataSources = [
+    { name: 'Brain MRI', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
+    { name: 'Chest CT 1', url: 'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' },
+    { name: 'Custom URL…', url: '__custom__' }
+  ];
+
+  public selectedDataUrl: string = this.dataSources[0].url;
+  public customUrl: string = '';
+  public showCustomInput: boolean = false;
+
   constructor(
     public userService: UserService,
     public provenance: ProvenanceService,
-    public router: Router,
-    public authenticationService: AuthenticationService,
+    public sessionService: SessionService,
     public tutorialService: TutorialService,
     public bookmarkService: BookmarkService
   ) {
-
-    this.userService.getAllGraphs().pipe(first()).subscribe(
+    const id = this.sessionService.getId();
+    this.userService.getAllGraphs(id).pipe(first()).subscribe(
       graphs => { this.graphs = graphs; },
       err => { console.warn('getAllGraphs failed', err); }
     );
-    this.userService.getAllStories().pipe(first()).subscribe(
+    this.userService.getAllStories(id).pipe(first()).subscribe(
       stories => { this.stories = stories; },
       err => { console.warn('getAllStories failed', err); }
     );
-    this.userService.getAllTextReports().pipe(first()).subscribe(
+    this.userService.getAllTextReports(id).pipe(first()).subscribe(
       textReports => { this.textReports = textReports; },
       err => { console.warn('getAllTextReports failed', err); }
     );
   }
 
-  reset(){
-    this.graphs = [];
-  }
-
-  load(){
-    this.userService.getAllGraphs().pipe(first()).subscribe(
+  load() {
+    const id = this.sessionService.getId();
+    this.userService.getAllGraphs(id).pipe(first()).subscribe(
       graphs => { this.graphs = graphs; },
       err => { console.warn('getAllGraphs failed', err); }
     );
+  }
+
+  onDataSourceChange(change: MatSelectChange) {
+    const url: string = change.value;
+    if (url === '__custom__') {
+      this.showCustomInput = true;
+    } else {
+      this.showCustomInput = false;
+      if (this.canvas) { this.canvas.loadData(url); }
+    }
+  }
+
+  loadCustomUrl() {
+    const url = this.customUrl.trim();
+    if (url && this.canvas) {
+      this.canvas.loadData(url);
+      this.showCustomInput = false;
+    }
   }
 
   public wlSettings = [
@@ -75,26 +97,6 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     { name: 'spine - bone', width: '250', center: '50' },
     { name: 'spine - soft tissues', width: '1800', center: '400' }
   ];
-
-  // public dataSources = [{ name: 'Study Data', url: 'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' },
-  // { name: 'Practice Data', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' }];
-
-  public dataSources = [
-    { name: 'brain', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
-    { name: 'chest1', url: 'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' },
-    { name: 'chest2', url: 'https://glcdn.githack.com/lorenzo.amabili/dicomdatalab/raw/master/data/prova1.nii.gz' }
-  ];
-
-  // public setDataSource(change: MatSelectChange) {
-  //   // this.canvas.loadData(change.value);
-  //   this.canvasComparison.loadData(change.value.url);
-  //   // console.log(change.value);
-  // }
-
-  logout() {
-    this.authenticationService.logout();
-    this.router.navigateByUrl('/login');
-  }
 
   ngOnInit() {
     const numFormat = (i: number) => ('0' + i).slice(-2);
@@ -119,9 +121,5 @@ export class MenuBarComponent implements OnInit, OnDestroy {
       ? (window.prompt('Phase name:', `Phase ${this.bookmarkService.getAll().filter(b => b.isPhase).length + 1}`) || 'Phase')
       : (window.prompt('Bookmark label:', `State ${this.bookmarkService.getAll().length + 1}`) || 'Bookmark');
     this.bookmarkService.add(nodeId, label, isPhase);
-  }
-
-  get isAdmin() {
-    return this.currentUser && this.currentUser.role === Role.Admin;
   }
 }

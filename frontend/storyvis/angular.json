@@ -13,7 +13,26 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["lodash", "canvg", "raf", "@babel/runtime/helpers/defineProperty"],
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "canvg",
+              "raf",
+              "@babel/runtime/helpers/defineProperty",
+              "core-js/modules/es.promise",
+              "core-js/modules/es.regexp.to-string",
+              "core-js/modules/es.array.reverse",
+              "core-js/modules/es.string.includes",
+              "core-js/modules/es.array.index-of",
+              "core-js/modules/es.string.trim",
+              "core-js/modules/es.string.split",
+              "core-js/modules/es.string.ends-with",
+              "core-js/modules/es.array.reduce",
+              "core-js/modules/web.dom-collections.iterator",
+              "core-js/modules/es.array.iterator",
+              "core-js/modules/es.string.starts-with",
+              "core-js/modules/es.string.replace",
+              "core-js/modules/es.string.match"
+            ],
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",

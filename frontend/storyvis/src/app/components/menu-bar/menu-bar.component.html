@@ -1,6 +1,25 @@
 <mat-toolbar color="primary" style="width: 100%">
   <mat-toolbar-row class="toolbar-row">
 
+    <!-- ── Dataset picker ───────────────────────────────────────────────────── -->
+    <mat-form-field class="toolbar-select dataset-select"
+      matTooltip="Choose the medical imaging dataset to visualise.">
+      <mat-label>Dataset</mat-label>
+      <mat-select [(ngModel)]="selectedDataUrl" (selectionChange)="onDataSourceChange($event)">
+        <mat-option *ngFor="let ds of dataSources" [value]="ds.url">{{ ds.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <ng-container *ngIf="showCustomInput">
+      <input class="custom-url-input" [(ngModel)]="customUrl" placeholder="Paste NIfTI / DICOM URL…"
+        (keyup.enter)="loadCustomUrl()" />
+      <button mat-icon-button class="transparent" (click)="loadCustomUrl()" matTooltip="Load URL">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </ng-container>
+
+    <span class="toolbar-sep"></span>
+
     <!-- ── Data-Comics tools (Advanced mode) ─────────────────────────────── -->
     <ng-container *ngIf="settings.isAdvancedMode">
       <mat-button-toggle id="tutorial-datacomics" class="transparent dashboardBtn"

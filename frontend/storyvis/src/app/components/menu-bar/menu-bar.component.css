@@ -220,3 +220,33 @@ button.cine-active {
   background: #3d4455;
   color: ivory;
 }
+
+/* Dataset picker */
+.dataset-select {
+  font-size: 11px;
+  width: 110px;
+  flex-shrink: 0;
+}
+
+/* Custom URL input */
+.custom-url-input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 3px;
+  color: ivory;
+  font-size: 11px;
+  height: 24px;
+  padding: 0 6px;
+  width: 220px;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.custom-url-input::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+
+@media (max-width: 600px) {
+  .custom-url-input { width: 140px; }
+  .dataset-select { width: 90px; }
+}

@@ -2,3 +2,4 @@
 export * from './user.service';
 export * from './alert.service';
 export * from './provenance.service';
+export * from './session.service';
