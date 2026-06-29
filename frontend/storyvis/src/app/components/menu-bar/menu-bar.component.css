@@ -20,6 +20,30 @@ mat-toolbar-row {
   gap: 1px;
   display: flex;
   align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+mat-toolbar-row::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  mat-toolbar-row {
+    height: auto !important;
+    min-height: 40px !important;
+    flex-wrap: nowrap;
+  }
+
+  .toolbar-clock {
+    display: none;
+  }
+
+  .compact-select {
+    width: 70px;
+  }
 }
 
 mat-button-toggle,

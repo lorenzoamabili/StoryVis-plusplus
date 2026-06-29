@@ -41,6 +41,13 @@ router.post('/chat', async (req, res) => {
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages array is required' });
     }
+    if (messages.length > 50) {
+      return res.status(400).json({ error: 'Too many messages (max 50)' });
+    }
+    const contextSize = JSON.stringify(context || {}).length;
+    if (contextSize > 100_000) {
+      return res.status(400).json({ error: 'Context payload too large (max 100 KB)' });
+    }
 
     // Prepend session context to the first user message
     let contextBlock = '';

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     serializedGraph: String,
-    IDcreator: Number,
+    IDcreator: String,
     findingsCoord: [{
         coordinates: [{x: Number, y: Number, z: Number}],
         sliceIndex: Number,
@@ -16,8 +16,7 @@ const schema = new Schema({
     createdDate: { type: Date, default: Date.now }
 });
 
-schema.index({ IDcreator: 1 });
-schema.index({ createdDate: -1 });
+schema.index({ IDcreator: 1, createdDate: -1 });
 
 schema.set('toJSON', { virtuals: true });
 

@@ -1,0 +1,55 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.home-card {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+a {
+  color: #3f51b5;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  :host {
+    padding: 1rem 0.75rem;
+    align-items: flex-start;
+  }
+
+  .home-card {
+    padding: 1.25rem;
+    box-shadow: none;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+}

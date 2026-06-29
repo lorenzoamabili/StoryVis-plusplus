@@ -1,5 +1,10 @@
 ﻿require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 require('rootpath')();
+
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET env var must be set in production');
+    process.exit(1);
+}
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -35,6 +40,14 @@ const authLimiter = rateLimit({
 });
 app.use('/users/authenticate', authLimiter);
 app.use('/users/register', authLimiter);
+
+// rate limiting on AI endpoint (slow, expensive per request)
+const aiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    message: { message: 'Too many AI requests, please wait before sending another' }
+});
+app.use('/ai/chat', aiLimiter);
 
 // health check (before JWT so it's always accessible)
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));

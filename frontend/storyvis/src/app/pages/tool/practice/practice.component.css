@@ -63,6 +63,32 @@
     border-color: white;
 }
 
+@media (max-width: 767px) {
+  mat-sidenav-container.normal,
+  mat-sidenav-container.isSlideDeckOpen {
+    height: 100% !important;
+  }
+
+  mat-sidenav.bottom {
+    height: 40vh;
+    width: 100%;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+  }
+
+  app-brainvis-canvas.normal,
+  app-brainvis-canvas.comparison {
+    width: 100%;
+  }
+
+  app-brainvis-canvas-comparison.comparison {
+    display: none;
+  }
+}
+
   #sidenav-trigger {
     color: orange;
     position: absolute;

@@ -18,19 +18,25 @@ function saveTextReport(req, res, next) {
 function getAllTextReports(req, res, next) {
     const limit = Math.min(parseInt(req.query.limit) || 100, 500);
     const skip = parseInt(req.query.skip) || 0;
-    textReportService.getAll({ limit, skip })
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    textReportService.getAll({ limit, skip, userId, isAdmin })
         .then(textReports => res.json(textReports))
         .catch(err => next(err));
 }
 
 function getByIdTextReports(req, res, next) {
-    textReportService.getById(req.params.id)
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    textReportService.getById(req.params.id, userId, isAdmin)
         .then(textReport => textReport ? res.json(textReport) : res.sendStatus(404))
         .catch(err => next(err));
 }
 
 function _deleteTextReports(req, res, next) {
-    textReportService.delete(req.params.id)
-        .then(() => res.json({}))
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    textReportService.delete(req.params.id, userId, isAdmin)
+        .then(result => result ? res.json({}) : res.sendStatus(403))
         .catch(err => next(err));
 }

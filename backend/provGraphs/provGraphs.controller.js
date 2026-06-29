@@ -18,19 +18,25 @@ function saveGraph(req, res, next) {
 function getAllGraphs(req, res, next) {
     const limit = Math.min(parseInt(req.query.limit) || 100, 500);
     const skip = parseInt(req.query.skip) || 0;
-    provenanceService.getAll({ limit, skip })
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    provenanceService.getAll({ limit, skip, userId, isAdmin })
         .then(graphs => res.json(graphs))
         .catch(err => next(err));
 }
 
 function getByIdGraphs(req, res, next) {
-    provenanceService.getById(req.params.id)
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    provenanceService.getById(req.params.id, userId, isAdmin)
         .then(graph => graph ? res.json(graph) : res.sendStatus(404))
         .catch(err => next(err));
 }
 
 function _deleteGraphs(req, res, next) {
-    provenanceService.delete(req.params.id)
-        .then(() => res.json({}))
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    provenanceService.delete(req.params.id, userId, isAdmin)
+        .then(result => result ? res.json({}) : res.sendStatus(403))
         .catch(err => next(err));
 }

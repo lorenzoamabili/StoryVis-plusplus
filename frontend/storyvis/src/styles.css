@@ -11,6 +11,15 @@ html, body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
+/* On small screens allow vertical scroll (non-tool pages need it) */
+@media (max-width: 767px) {
+  html, body {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100%;
+  }
+}
+
 /* Thin, clean scrollbars */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.15); }
@@ -23,6 +32,13 @@ html, body {
   flex-direction: column;
   font-size: 14px;
   padding-bottom: 1px;
+}
+
+@media (max-width: 767px) {
+  #app {
+    font-size: 13px;
+    min-height: 100vh;
+  }
 }
 
 div {

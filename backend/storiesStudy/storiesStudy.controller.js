@@ -18,19 +18,25 @@ function saveStory(req, res, next) {
 function getAllStories(req, res, next) {
     const limit = Math.min(parseInt(req.query.limit) || 100, 500);
     const skip = parseInt(req.query.skip) || 0;
-    storyService.getAll({ limit, skip })
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    storyService.getAll({ limit, skip, userId, isAdmin })
         .then(stories => res.json(stories))
         .catch(err => next(err));
 }
 
 function getByIdStories(req, res, next) {
-    storyService.getById(req.params.id)
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    storyService.getById(req.params.id, userId, isAdmin)
         .then(story => story ? res.json(story) : res.sendStatus(404))
         .catch(err => next(err));
 }
 
 function _deleteStories(req, res, next) {
-    storyService.delete(req.params.id)
-        .then(() => res.json({}))
+    const userId = String(req.user.sub);
+    const isAdmin = req.user.role === 'Admin';
+    storyService.delete(req.params.id, userId, isAdmin)
+        .then(result => result ? res.json({}) : res.sendStatus(403))
         .catch(err => next(err));
 }

@@ -12,7 +12,6 @@ module.exports = jwt;
 function jwt() {
     return expressJwt({ secret, algorithms: ['HS256'], isRevoked }).unless({
         path: [
-            { url: '/ai/chat', methods: ['POST'] },
             { url: '/users/authenticate', methods: ['POST'] },
             { url: '/users/register', methods: ['POST'] },
             { url: '/health', methods: ['GET'] },

@@ -14,15 +14,17 @@ module.exports = {
     delete: _delete
 };
 
+const DUMMY_HASH = '$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345';
+
 async function authenticate({ username, password }) {
     const user = await User.findOne({ username });
-    if (user && bcrypt.compareSync(password, user.hash)) {
-        const { hash, ...userWithoutHash } = user.toObject();
-        const token = jwt.sign({ sub: user.id }, secret, { expiresIn: '7d' });
-        return {
-            ...userWithoutHash,
-            token
-        };
+    // always run bcrypt to prevent username enumeration via timing
+    const hash = user ? user.hash : DUMMY_HASH;
+    const valid = bcrypt.compareSync(password, hash);
+    if (user && valid) {
+        const { hash: _h, ...userWithoutHash } = user.toObject();
+        const token = jwt.sign({ sub: user.id, role: user.role }, secret, { expiresIn: '7d' });
+        return { ...userWithoutHash, token };
     }
 }
 

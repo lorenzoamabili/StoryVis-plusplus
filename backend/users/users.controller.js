@@ -23,9 +23,13 @@ function authenticate(req, res, next) {
 }
 
 function register(req, res, next) {
-    const { username, password, role, group } = req.body;
+    const { username, password, role, group, inviteCode } = req.body;
     if (!username || !password) {
         return res.status(400).json({ message: 'Username and password are required' });
+    }
+    const requiredInvite = process.env.INVITE_CODE;
+    if (requiredInvite && inviteCode !== requiredInvite) {
+        return res.status(403).json({ message: 'Invalid invite code' });
     }
     if (role && !VALID_ROLES.includes(role)) {
         return res.status(400).json({ message: 'Invalid role' });

@@ -9,20 +9,26 @@ module.exports = {
 };
 
 async function create(story) {
-
     const savedStory = new Story(story);
-
     await savedStory.save();
 }
 
-async function getAll({ limit = 100, skip = 0 } = {}) {
-    return await Story.find().sort({ createdDate: -1 }).skip(skip).limit(limit);
+async function getAll({ limit = 100, skip = 0, userId, isAdmin } = {}) {
+    const filter = isAdmin ? {} : { IDcreator: userId };
+    return await Story.find(filter).sort({ createdDate: -1 }).skip(skip).limit(limit);
 }
 
-async function getById(id) {
-    return await Story.findById(id);
+async function getById(id, userId, isAdmin) {
+    const story = await Story.findById(id);
+    if (!story) return null;
+    if (!isAdmin && String(story.IDcreator) !== userId) return null;
+    return story;
 }
 
-async function _delete(id) {
-    await Story.findByIdAndDelete(id);
+async function _delete(id, userId, isAdmin) {
+    const story = await Story.findById(id);
+    if (!story) return false;
+    if (!isAdmin && String(story.IDcreator) !== userId) return false;
+    await story.deleteOne();
+    return true;
 }

@@ -1,5 +1,6 @@
 :host {
   display: block;
+  touch-action: none; /* let WebGL handle all touch events */
 }
 :host.comparison {
   display: flex;
