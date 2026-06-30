@@ -54,7 +54,7 @@ app-provenance-visualization{
   display: block;
   position: relative;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  background: #1a1a2e;
+  background: #12122a;
   overflow: hidden;
 }
 
@@ -67,16 +67,19 @@ app-provenance-visualization{
 
 /* Force SVG background dark so white text is legible */
 svg {
-  background: #1a1a2e;
+  background: #12122a;
+  display: block;
+  margin: 0 auto;
 }
 
 .node circle {
-  stroke-width: 0.3px;
-  opacity: 0.65;
+  stroke-width: 1px;
+  opacity: 0.85;
 }
 
 .node circle.keynode {
-  stroke: rgba(255, 255, 255, 0.6);
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 2px;
   stroke-dasharray: 0;
 }
 
@@ -147,39 +150,40 @@ svg {
 
 
 .node.neighbour .circle-label {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .node.node-active .circle-label {
-  font-weight: bolder;
-  font-size: 9px;
+  font-weight: 700;
+  font-size: 11px;
+  fill: #7ec8e3;
 }
 
 .node.node-active circle {
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 1.5px;
+  stroke: #7ec8e3;
+  stroke-width: 2.5px;
   stroke-dasharray: 0;
+  filter: drop-shadow(0 0 5px rgba(126, 200, 227, 0.7));
 }
 
 .node text {
-  fill: rgba(255, 255, 255, 0.75);
+  fill: rgba(255, 255, 255, 0.9);
   stroke-width: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 .link {
   fill: none;
-  /* stroke: white; */
-  stroke: rgb(100, 100, 100);
-  stroke-width: 0.2px;
-  opacity: 0.3;
+  stroke: rgba(150, 150, 180, 0.5);
+  stroke-width: 1px;
+  opacity: 0.6;
 }
 
 .link.crossing {
   fill: none;
-  stroke: rgb(100, 100, 100);
-  stroke-width: 0.2px;
-  opacity: 0.7;
+  stroke: rgba(150, 150, 180, 0.7);
+  stroke-width: 1px;
+  opacity: 0.85;
 }
 
 .link.hiddenClass {
@@ -187,18 +191,18 @@ svg {
 }
 
 .link.active {
-  stroke: rgba(255, 255, 255, 0.7);
-  stroke-width: 0.8px;
+  stroke: rgba(126, 200, 227, 0.85);
+  stroke-width: 2px;
   opacity: 1;
 }
 
 .circle-text {
-  font-size: 6px;
+  font-size: 9px;
   display: block;
 }
 
 .circle-label {
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .hiddenClass {

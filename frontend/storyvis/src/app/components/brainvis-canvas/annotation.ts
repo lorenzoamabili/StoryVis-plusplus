@@ -96,8 +96,8 @@ export default class Annotation {
     this.widget.free();
   }
 
-  onContextMenu = () => { 
-    this.renderer._measurement.artifact.sliceIndexEnd = this.renderer.stackHelper.index;
+  onContextMenu = () => {
+    // Keep sliceIndexEnd === sliceIndexStart so the annotation only shows on the exact creation slice
     this.renderer.saveCoordinates(this.renderer._measurement.artifact);
     this.renderer.measurementDone = true;
     this.renderer.artifactCreated.emit(this.renderer._measurement.artifact);

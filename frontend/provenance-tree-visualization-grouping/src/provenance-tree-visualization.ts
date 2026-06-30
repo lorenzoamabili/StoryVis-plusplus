@@ -46,12 +46,12 @@ import {
 } from './filtering';
 import { ProvenanceMinimap } from './minimap';
 
-var xScale = -20;
-var yScale = 20;
+var xScale = -24;
+var yScale = 26;
 var treeWidth = 1;
 var treePaddingX = 15;
 var p = 3;
-const fontSize = 8;
+const fontSize = 11;
 
 export type D3SVGSelection = d3.Selection<SVGSVGElement, any, null, undefined>;
 export type D3SVGGSelection = d3.Selection<SVGGElement, any, null, undefined>;
@@ -141,7 +141,7 @@ export class ProvenanceTreeVisualization {
     // Append svg element
     this.svg = this.container
       .append('div')
-      .attr('style', ' width: 95%; margin-left:5px; flex:5') // flex: 4'
+      .attr('style', 'width: 100%; flex: 5')
       .append('svg')
       .attr(
         'style',
@@ -409,7 +409,7 @@ export class ProvenanceTreeVisualization {
         .append('text')
         .attr('class', 'circle-label')
         .text(d => groupNodeLabel(d.data)) // .text(d => d.data.neighbour.toString())
-        .attr('x', 7)
+        .attr('x', 13)
         .attr('alignment-baseline', 'central');
       // .text(function(d: any) { return d.subtitle; })
       // .call(this.make_editable, "subtitle");
@@ -423,7 +423,7 @@ export class ProvenanceTreeVisualization {
       updateNodes.selectAll('.circle-text').remove();
 
       const getNodeSize = (node: IGroupedTreeNode<ProvenanceNode>) => {
-        return Math.min(2.7 + 0.3 * node.wrappedNodes.length, 7);
+        return Math.min(3.5 + 0.5 * node.wrappedNodes.length, 10);
       };
 
       const getNumberOfAggrNodes = (node: IGroupedTreeNode<ProvenanceNode>) => {
@@ -531,7 +531,7 @@ export class ProvenanceTreeVisualization {
         .select('g')
         .append('text')
         .attr('x', -1)
-        .attr('font-size', "5px")
+        .attr('font-size', "8px")
         .attr('opacity', (d: any) => (d.x === 0 ? 1 : 0.3))
         .text((d: any) => getNumberOfAggrNodes(d.data).toString()) // .text(d => d.data.neighbour.toString())
         .attr('alignment-baseline', 'central');
