@@ -339,7 +339,6 @@
   }
 
   var nodeCounter = 0;
-  var allArtifacts = [];
   /**
    * Provenance Graph Tracker implementation
    *
@@ -373,7 +372,7 @@
       ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifacts, option, newRoot) {
           if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
           return __awaiter(this, void 0, void 0, function () {
-              var label, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
+              var label, nodeArtifacts, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
               var _this = this;
               return __generator(this, function (_a) {
                   switch (_a.label) {
@@ -388,13 +387,13 @@
                           else {
                               label = action.do;
                           }
-                          if (artifacts) {
-                              artifacts.length === 1 ? allArtifacts.push(artifacts) : allArtifacts.push.apply(allArtifacts, artifacts);
-                          }
+                          nodeArtifacts = artifacts
+                              ? Array.isArray(artifacts) ? __spreadArrays(artifacts) : [artifacts]
+                              : [];
                           createNewStateNode = function (parentNode, actionResult) { return ({
                               id: generateUUID(),
                               label: label,
-                              artifacts: artifacts ? allArtifacts : [],
+                              artifacts: nodeArtifacts,
                               metadata: {
                                   option: option ? option : '',
                                   mainbranch: false,
@@ -487,8 +486,6 @@
           return this.graph.getSelf();
       };
       ProvenanceTracker.prototype.restoreGraph = function (sgraph) {
-          Object.setPrototypeOf(sgraph, serializeProvenanceGraph.prototype);
-          alert(JSON.stringify(sgraph));
           this.graph = this.graph.restoreSelf(sgraph);
       };
       return ProvenanceTracker;
@@ -1077,11 +1074,16 @@
               return this._selectedSlide;
           },
           set: function (slide) {
-              if (slide && slide.node) {
-                  this._traverser.toStateNode(slide.node.id, slide.transitionTime);
-              }
+              var _this = this;
               this._selectedSlide = slide;
-              this._mitt.emit('slideSelected', slide);
+              if (slide && slide.node) {
+                  this._traverser.toStateNode(slide.node.id, slide.transitionTime)
+                      .then(function () { return _this._mitt.emit('slideSelected', slide); })
+                      .catch(function () { return _this._mitt.emit('slideSelected', slide); });
+              }
+              else {
+                  this._mitt.emit('slideSelected', slide);
+              }
           },
           enumerable: false,
           configurable: true

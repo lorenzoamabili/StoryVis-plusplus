@@ -12,7 +12,12 @@
       "Bash(git *)",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('workspaces', {}\\), indent=2\\)\\)\")",
       "PowerShell(cd C:\\\\dev\\\\StoryVis\\\\frontend\\\\storyvis; $env:NODE_OPTIONS=\"--openssl-legacy-provider\"; npx ng build --configuration=production 2>&1 | Select-Object -Last 100)",
-      "PowerShell(Out-File *)"
+      "PowerShell(Out-File *)",
+      "Bash(set NODE_OPTIONS=--openssl-legacy-provider)",
+      "Bash(npm test *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d['projects']['storyvis']['architect'].get\\('test',{}\\), indent=2\\)\\)\")",
+      "Skill(code-review)",
+      "PowerShell(cd C:\\\\dev\\\\StoryVis\\\\frontend\\\\storyvis; $env:NODE_OPTIONS=\"--openssl-legacy-provider\"; npx ng build --configuration=production 2>&1 | Select-Object -Last 40)"
     ]
   }
 }

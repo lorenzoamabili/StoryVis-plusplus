@@ -1,4 +1,5 @@
 import { Component, ViewChild, HostListener } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ProvenanceService, SessionService } from '../../../shared/_services';
 import { AiAssistantPanelComponent } from '../../../components/ai-assistant-panel/ai-assistant-panel.component';
 import { ProvenanceVisualizationComponent } from '../../../components/provenance-visualization/provenance-visualization.component';
@@ -13,7 +14,11 @@ export class ExplorationComponent {
 
     studyStarted = true;
     IDcreator: string;
-    readonly isNoProvGraph = false;
+
+    /** True when URL contains ?mode=text-report — routes NoProvGraph study participants. */
+    get isNoProvGraph(): boolean {
+        return this.route.snapshot.queryParamMap.get('mode') === 'text-report';
+    }
 
     get settings(): Settings { return this.provenance.settings; }
 
@@ -30,8 +35,10 @@ export class ExplorationComponent {
     constructor(
         private sessionService: SessionService,
         private provenance: ProvenanceService,
+        private route: ActivatedRoute,
     ) {
         this.IDcreator = this.sessionService.getId();
+        this.provenance.creatorId = this.IDcreator;
         this.provenance.timeStart = new Date().getTime();
     }
 

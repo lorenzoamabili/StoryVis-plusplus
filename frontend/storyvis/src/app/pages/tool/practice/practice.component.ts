@@ -1,19 +1,18 @@
-﻿import { Component, OnInit } from '@angular/core';
-import { ProvenanceService, UserService } from '../../../shared/_services';
-
-import { AuthenticationService } from '../../../shared/_services';
-import { User, Role, Provenance, Story, TextReport } from '../../../shared/_models';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ProvenanceService, UserService, SessionService } from '../../../shared/_services';
+import { Provenance, Story, TextReport } from '../../../shared/_models';
+import { BrainvisCanvasComponent } from '../../../components/brainvis-canvas/brainvis-canvas.component';
 import { first } from 'rxjs/operators';
 
-
 @Component({ templateUrl: 'practice.component.html', styleUrls: ['practice.component.css'] })
-
 export class PracticeComponent implements OnInit {
     title = 'practice';
 
-    currentUser: User;
+    @ViewChild('canvas') canvas: BrainvisCanvasComponent;
+
     studyStarted: boolean = false;
-    IDcreator: number;
+    IDcreator: string;
+    readonly isNoProvGraph = false;
 
     graphs: Provenance[] = [];
     stories: Story[] = [];
@@ -21,47 +20,25 @@ export class PracticeComponent implements OnInit {
 
     constructor(
         private userService: UserService,
-        private authenticationService: AuthenticationService,
+        private sessionService: SessionService,
         public provenance: ProvenanceService
     ) {
-        this.currentUser = this.authenticationService.currentUserValue;
-        this.IDcreator = this.currentUser ? (this.currentUser as any).username : 0;
+        this.IDcreator = this.sessionService.getId();
         this.provenance.timeStart = new Date().getTime();
 
-        this.userService.getAllGraphs().pipe(first()).subscribe(
+        this.userService.getAllGraphs(this.IDcreator).pipe(first()).subscribe(
             graphs => { this.graphs = graphs; },
             err => { console.warn('getAllGraphs failed', err); }
         );
-        this.userService.getAllStories().pipe(first()).subscribe(
+        this.userService.getAllStories(this.IDcreator).pipe(first()).subscribe(
             stories => { this.stories = stories; },
             err => { console.warn('getAllStories failed', err); }
         );
-        this.userService.getAllTextReports().pipe(first()).subscribe(
+        this.userService.getAllTextReports(this.IDcreator).pipe(first()).subscribe(
             textReports => { this.textReports = textReports; },
             err => { console.warn('getAllTextReports failed', err); }
         );
     }
 
-    ngOnInit() {
-    }
-
-    get isAdmin() {
-        return this.currentUser && this.currentUser.role === Role.Admin;
-    }
-
-    get isProvGraph() {
-        return this.currentUser && this.currentUser.group === "ProvGraph";
-    }
-
-    get isPlotTrimmerG() {
-        return this.currentUser && this.currentUser.group === "PlotTrimmerG";
-    }
-
-    get isPlotTrimmerC() {
-        return this.currentUser && this.currentUser.group === "PlotTrimmerC";
-    }
-
-    get isNoProvGraph() {
-        return this.currentUser && this.currentUser.group === "NoProvGraph";
-    }
+    ngOnInit() {}
 }

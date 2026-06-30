@@ -180,7 +180,7 @@
 
     <!-- Comparison sub-menu (advanced) -->
     <mat-menu #compareMenu="matMenu">
-      <button mat-menu-item *ngFor="let ds of dataSources" (click)="canvas.loadExternalData({value: ds})">
+      <button mat-menu-item *ngFor="let ds of dataSources" (click)="canvas.loadData(ds.url)">
         {{ ds.name }}
       </button>
     </mat-menu>

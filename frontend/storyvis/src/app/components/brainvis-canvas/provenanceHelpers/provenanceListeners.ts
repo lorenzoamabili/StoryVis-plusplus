@@ -55,9 +55,18 @@ export function setNewAddListeners(registry, tracker, thisCanvasComparison?: Com
 //   canvas.removeEventListener('thresholdValueChangedC', wLChangeEndListenerC);
 // }
 
+// Tracks the cleanup function for the most-recently registered listener set per canvas.
+// Calling the cleanup removes all previously attached THREE.EventDispatcher listeners
+// so re-calling addListeners (e.g. after newProvenanceGraph) doesn't accumulate stale handlers.
+const _listenerCleanups = new WeakMap<object, (() => void)>();
+
 export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: ComparisonComponent): any => {
   let settings = Settings.getInstance(this);
   let canvas = thisCanvasComparison ? thisCanvasComparison : settings.canvas;
+
+  // Remove listeners from any previous call for this canvas
+  const prevCleanup = _listenerCleanups.get(canvas);
+  if (prevCleanup) { prevCleanup(); }
 
   // Naive way to reset the canvas after restoring a provenance graph 
   // let elem = document.createElement('button');
@@ -116,7 +125,8 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('sliceIndexChanged', sliceIndexEndListener);
   };
-  canvas.addEventListener('sliceIndexChangeStart', debounce(sliceIndexStartListener, 500, { leading: true }));
+  const _dSliceIndexStart = debounce(sliceIndexStartListener, 500, { leading: true });
+  canvas.addEventListener('sliceIndexChangeStart', _dSliceIndexStart);
 
 
   // // Slice Index Listener for all orientations - Debounced
@@ -197,7 +207,8 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('perspectiveCameraZoomChanged', perspectiveZoomEndListener);
   };
-  canvas.addEventListener('perspectiveCameraZoomChangeStart', debounce(perspectiveZoomStartListener, 500, { leading: true }));
+  const _dPerspectiveZoomStart = debounce(perspectiveZoomStartListener, 500, { leading: true });
+  canvas.addEventListener('perspectiveCameraZoomChangeStart', _dPerspectiveZoomStart);
 
 
   // Perspective canvas orientation Listener - Debounced
@@ -206,9 +217,6 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     canvas.removeEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
     perspectiveOrientationEndListener = debounce((event: any) => {
       let label = '3D-XYZ ';
-      // label += ' ' + event.orientation.position[0].toFixed(0);
-      // label += '/' + event.orientation.position[1].toFixed(0);
-      // label += '/' + event.orientation.position[2].toFixed(0);
       label += ' #' + event.id;
 
       tracker.applyAction({
@@ -225,10 +233,11 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
   };
-  canvas.addEventListener('perspectiveCameraOrientationChangeStart', debounce(perspectiveOrientationStartListener, 500, { leading: true }));
+  const _dPerspectiveOrientationStart = debounce(perspectiveOrientationStartListener, 500, { leading: true });
+  canvas.addEventListener('perspectiveCameraOrientationChangeStart', _dPerspectiveOrientationStart);
 
 
-  // Slice Index Listener for all orientations - Debounced
+  // Slice drag Listener - Debounced
   let sliceDragEndListener: EventListener = null;
   const sliceDragStartListener = (startEvent) => {
     canvas.removeEventListener('sliceDragChanged', sliceDragEndListener);
@@ -274,10 +283,11 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('sliceDragChanged', sliceDragEndListener);
   };
-  canvas.addEventListener('sliceDragChangeStart', debounce(sliceDragStartListener, 500, { leading: true }));
+  const _dSliceDragStart = debounce(sliceDragStartListener, 500, { leading: true });
+  canvas.addEventListener('sliceDragChangeStart', _dSliceDragStart);
 
 
-  // Slice Index Listener for all orientations - Debounced
+  // Slice zoom Listener - Debounced
   let sliceZoomEndListener: EventListener = null;
   const sliceZoomStartListener = (startEvent) => {
     canvas.removeEventListener('sliceZoomChanged', sliceZoomEndListener);
@@ -317,7 +327,8 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('sliceZoomChanged', sliceZoomEndListener);
   };
-  canvas.addEventListener('sliceZoomChangeStart', debounce(sliceZoomStartListener, 500, { leading: true }));
+  const _dSliceZoomStart = debounce(sliceZoomStartListener, 500, { leading: true });
+  canvas.addEventListener('sliceZoomChangeStart', _dSliceZoomStart);
 
 
   let navigationEndListener: EventListener = null;
@@ -363,11 +374,13 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('navigateChanged', navigationEndListener);
   };
-  canvas.addEventListener('navigateChangeStart', debounce(navigationStartListener, 500, { leading: true }));
+  const _dNavigationStart = debounce(navigationStartListener, 500, { leading: true });
+  canvas.addEventListener('navigateChangeStart', _dNavigationStart);
 
+  const _artifactCreatedSubs = [];
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
-      renderer.artifactCreated.subscribe((artifact: Artifact) => {
+      const sub = renderer.artifactCreated.subscribe((artifact: Artifact) => {
         const action = {
           metadata: {
             userIntent: artifact.measurementType === 'annotation' ? 'annotation' : 'derivation',
@@ -383,10 +396,11 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
         };
         tracker.applyAction(action, true, artifact);
       });
+      _artifactCreatedSubs.push(sub);
     }
   });
 
-  canvas.navigationVolumeCreated.subscribe((sliceOrientation, index) => {
+  const _navVolumeSub = canvas.navigationVolumeCreated.subscribe((sliceOrientation, index) => {
     const action = {
       metadata: {
         userIntent: 'selection',
@@ -401,9 +415,10 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     tracker.applyAction(action, true);
   });
 
+  const _artifactDeletedSubs = [];
   canvas.renderers.forEach(renderer => {
     if (renderer instanceof Renderer2D) {
-      renderer.artifactDeleted.subscribe((artifact: Artifact) => {
+      const sub = renderer.artifactDeleted.subscribe((artifact: Artifact) => {
         const action = {
           metadata: {
             userIntent: artifact.measurementType === 'annotation' ? 'annotation' : 'derivation',
@@ -417,6 +432,7 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
         };
         tracker.applyAction(action, true, artifact);
       });
+      _artifactDeletedSubs.push(sub);
     }
   });
 
@@ -444,8 +460,8 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('thresholdValueChangedC', wLChangeEndListenerC);
   };
-  canvas.addEventListener('thresholdValueChangeStartC', debounce(wLChangeListenerC, 500, { leading: true }));
-
+  const _dWLChangeC = debounce(wLChangeListenerC, 500, { leading: true });
+  canvas.addEventListener('thresholdValueChangeStartC', _dWLChangeC);
 
 
   // Preset Window Level Changes Listener - Debounced
@@ -471,11 +487,11 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('thresholdValueChangedW', wLChangeEndListenerW);
   };
-  canvas.addEventListener('thresholdValueChangeStartW', debounce(wLChangeListenerW, 500, { leading: true }));
+  const _dWLChangeW = debounce(wLChangeListenerW, 500, { leading: true });
+  canvas.addEventListener('thresholdValueChangeStartW', _dWLChangeW);
 
 
-
-  canvas.magnificationCreated.subscribe((args) => {
+  const _magnificationSub = canvas.magnificationCreated.subscribe((args) => {
     const action = {
       metadata: {
         userIntent: 'configuration',
@@ -513,7 +529,8 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('WLChanged', resetWLEndListener);
   };
-  canvas.addEventListener('WLChangeStarted', debounce(resetWLListener, 500, { leading: true }));
+  const _dResetWL = debounce(resetWLListener, 500, { leading: true });
+  canvas.addEventListener('WLChangeStarted', _dResetWL);
 
 
   let resetConfigEndListener: EventListener = null;
@@ -538,5 +555,24 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }, 500, { trailing: true });
     canvas.addEventListener('configChanged', resetConfigEndListener);
   };
-  canvas.addEventListener('configChangeStarted', debounce(resetConfigListener, 500, { leading: true }));
+  const _dResetConfig = debounce(resetConfigListener, 500, { leading: true });
+  canvas.addEventListener('configChangeStarted', _dResetConfig);
+
+  // Register cleanup so re-calling addListeners (e.g. after newProvenanceGraph) removes stale handlers.
+  _listenerCleanups.set(canvas, () => {
+    canvas.removeEventListener('sliceIndexChangeStart', _dSliceIndexStart);
+    canvas.removeEventListener('perspectiveCameraZoomChangeStart', _dPerspectiveZoomStart);
+    canvas.removeEventListener('perspectiveCameraOrientationChangeStart', _dPerspectiveOrientationStart);
+    canvas.removeEventListener('sliceDragChangeStart', _dSliceDragStart);
+    canvas.removeEventListener('sliceZoomChangeStart', _dSliceZoomStart);
+    canvas.removeEventListener('navigateChangeStart', _dNavigationStart);
+    canvas.removeEventListener('thresholdValueChangeStartC', _dWLChangeC);
+    canvas.removeEventListener('thresholdValueChangeStartW', _dWLChangeW);
+    canvas.removeEventListener('WLChangeStarted', _dResetWL);
+    canvas.removeEventListener('configChangeStarted', _dResetConfig);
+    _navVolumeSub.unsubscribe();
+    _magnificationSub.unsubscribe();
+    _artifactCreatedSubs.forEach(s => s.unsubscribe());
+    _artifactDeletedSubs.forEach(s => s.unsubscribe());
+  });
 }

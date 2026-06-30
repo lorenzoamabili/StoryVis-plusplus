@@ -35,12 +35,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProvenanceTracker = void 0;
 var utils_1 = require("./utils");
-var ProvenanceGraph_1 = require("./ProvenanceGraph");
 var nodeCounter = 0;
-var allArtifacts = [];
 /**
  * Provenance Graph Tracker implementation
  *
@@ -74,7 +79,7 @@ var ProvenanceTracker = /** @class */ (function () {
     ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifacts, option, newRoot) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var label, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
+            var label, nodeArtifacts, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -89,13 +94,13 @@ var ProvenanceTracker = /** @class */ (function () {
                         else {
                             label = action.do;
                         }
-                        if (artifacts) {
-                            artifacts.length === 1 ? allArtifacts.push(artifacts) : allArtifacts.push.apply(allArtifacts, artifacts);
-                        }
+                        nodeArtifacts = artifacts
+                            ? Array.isArray(artifacts) ? __spreadArrays(artifacts) : [artifacts]
+                            : [];
                         createNewStateNode = function (parentNode, actionResult) { return ({
                             id: utils_1.generateUUID(),
                             label: label,
-                            artifacts: artifacts ? allArtifacts : [],
+                            artifacts: nodeArtifacts,
                             metadata: {
                                 option: option ? option : '',
                                 mainbranch: false,
@@ -188,8 +193,6 @@ var ProvenanceTracker = /** @class */ (function () {
         return this.graph.getSelf();
     };
     ProvenanceTracker.prototype.restoreGraph = function (sgraph) {
-        Object.setPrototypeOf(sgraph, ProvenanceGraph_1.serializeProvenanceGraph.prototype);
-        alert(JSON.stringify(sgraph));
         this.graph = this.graph.restoreSelf(sgraph);
     };
     return ProvenanceTracker;

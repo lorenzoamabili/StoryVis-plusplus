@@ -10,7 +10,7 @@ const VALID_GROUPS = ['A', 'B', 'Control', 'Experimental'];
 routerUsers.post('/authenticate', authenticate);
 routerUsers.post('/register', register);
 routerUsers.get('/', authorize('Admin'), getAll);
-routerUsers.get('/current', getCurrent);
+routerUsers.get('/current', (req, res) => res.sendStatus(404));
 routerUsers.get('/:id', authorize(), getById);
 routerUsers.delete('/:id', authorize('Admin'), _delete);
 

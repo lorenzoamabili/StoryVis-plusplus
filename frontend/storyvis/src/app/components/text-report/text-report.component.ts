@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { trigger, style, animate, transition, state } from '@angular/animations';
+import { ProvenanceService } from '../../shared/_services';
 
 @Component({
   selector: 'app-text-report',
@@ -12,11 +13,15 @@ import { trigger, style, animate, transition, state } from '@angular/animations'
       transition('open <=> closed', [animate('300ms ease-in-out')])
     ])
   ]
-  })
-
-
+})
 export class TextReportComponent {
   opened: string = 'closed';
+
+  constructor(private provenance: ProvenanceService) {}
+
+  onInput(event: Event) {
+    this.provenance.textReport = (event.target as HTMLTextAreaElement).value;
+  }
 
   toggle() {
     this.opened = this.opened === 'open' ? 'closed' : 'open';

@@ -31,7 +31,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   textReports: TextReport[] = [];
 
   public dataSources = [
-    { name: 'Chest CT 1', url: 'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' },
+    { name: 'Chest CT',  url: 'https://rawcdn.githack.com/lorenzoamabili/DICOMdata/1596c8cf93a5505166375daf67c9d450e0f3bbda/data/prova1.nii.gz' },
     { name: 'Brain MRI', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
     { name: 'Custom URL…', url: '__custom__' }
   ];
@@ -108,6 +108,11 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit() {
+    // Sync selector to whichever URL canvas auto-loads based on studyStarted
+    this.selectedDataUrl = this.studyStarted
+      ? this.dataSources[0].url   // Chest CT 1 (study mode)
+      : this.dataSources[1].url;  // Brain MRI  (practice/exploration mode)
+
     const numFormat = (i: number) => ('0' + i).slice(-2);
     this._clockInterval = setInterval(() => {
       const date = new Date();
@@ -146,9 +151,10 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   saveSession() {
     const id = this.IDcreator;
     this.saving = true;
-    this.provenance.saveGraphStudy(id as any);
-    this.provenance.saveStoryStudy(id as any);
-    this.provenance.saveTextReportStudy(id as any);
-    setTimeout(() => this.saving = false, 1500);
+    this.provenance.saveGraphStudy(id);
+    this.provenance.saveStoryStudy(id);
+    this.provenance.saveTextReportStudy(id);
+    // saving flag cleared after 2s — longer than typical network round-trip
+    setTimeout(() => { this.saving = false; }, 2000);
   }
 }

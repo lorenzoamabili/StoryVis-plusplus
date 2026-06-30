@@ -455,6 +455,15 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this._zone.run(() => this._updateCoverageSegs());
     });
 
+    // Record coverage on every live slice scroll (provenance uses skipFirstDoFunctionCall=true
+    // so the action function never runs during live interaction — coverage must be recorded here).
+    this.addEventListener('sliceIndexChanged', (e: any) => {
+      const { sliceOrientation, newIndex } = e.changes ?? {};
+      if (sliceOrientation && newIndex !== undefined) {
+        this.coverage.recordVisit(sliceOrientation, newIndex);
+      }
+    });
+
     addListeners(this.provenance.tracker);
   }
 

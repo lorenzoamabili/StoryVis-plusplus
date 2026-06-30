@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 import { Application, StateNode } from '../../../../../provenance-core/src/api';
 import {
@@ -51,8 +52,11 @@ export class ProvenanceService {
   
   public application: Application;
 
-  public textReport: String;
+  public textReport: string = '';
+  public creatorId: string = '';
   public initialized = false;
+  /** Emits whenever newProvenanceGraph() creates a fresh graph+traverser. */
+  readonly graphReset$ = new Subject<void>();
   public findingsCoord: any[] = [];
   public timeStart: number = 0;
   public comparison: number = null;
@@ -61,7 +65,7 @@ export class ProvenanceService {
   public settings = Settings.getInstance(this);
 
 
-  public async saveGraph(IDcreator: number) {
+  public saveGraph(IDcreator: string | number) {
     if (this.tracker) {
       const sJson = JSON.stringify(this.tracker.getGraph());
       this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
@@ -83,7 +87,7 @@ export class ProvenanceService {
     }
   }
 
-  public async saveStory(IDcreator: number) {
+  public saveStory(IDcreator: string | number) {
     if (this.deck && this.tracker) {
       const sJson = JSON.stringify(this.deck.serializeSelf());
       const sJsonGraph = JSON.stringify(this.tracker.getGraph());
@@ -104,28 +108,18 @@ export class ProvenanceService {
     }
   }
 
-  public async saveTextReport(IDcreator: number) {
-    const textReportArea = document.getElementById("textReportArea") as HTMLTextAreaElement;
-    if (textReportArea) {
-      this.textReport = textReportArea.value;
-      this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
-        {
-          textReport: this.textReport,
-          IDcreator: IDcreator
-        })
-        .subscribe(
-          data => {
-            console.log("POST Request is successful", data);
-          },
-          error => {
-            console.log("Error", error);
-          }
-        );
-    }
+  public saveTextReport(IDcreator: string | number) {
+    if (!this.textReport) { return; }
+    this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
+      { textReport: this.textReport, IDcreator })
+      .subscribe(
+        data => { console.log("POST Request is successful", data); },
+        error => { console.log("Error", error); }
+      );
   }
 
 
-  public async saveGraphStudy(IDcreator: number) {
+  public saveGraphStudy(IDcreator: string | number) {
     if (this.tracker) {
       const sJson = JSON.stringify(this.tracker.getGraph());
       this.http.post<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/provenance`,
@@ -147,7 +141,7 @@ export class ProvenanceService {
     }
   }
 
-  public async saveStoryStudy(IDcreator: number) {
+  public saveStoryStudy(IDcreator: string | number) {
     if (this.deck && this.tracker) {
       const sJson = JSON.stringify(this.deck.serializeSelf());
       const sJsonGraph = JSON.stringify(this.tracker.getGraph());
@@ -168,24 +162,14 @@ export class ProvenanceService {
     }
   }
 
-  public async saveTextReportStudy(IDcreator: number) {
-    const textReportArea = document.getElementById("textReportArea") as HTMLTextAreaElement;
-    if (textReportArea) {
-      this.textReport = textReportArea.value;
-      this.http.post<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/textReport`,
-        {
-          textReport: this.textReport,
-          IDcreator: IDcreator
-        })
-        .subscribe(
-          data => {
-            console.log("POST Request is successful", data);
-          },
-          error => {
-            console.log("Error", error);
-          }
-        );
-    }
+  public saveTextReportStudy(IDcreator: string | number) {
+    if (!this.textReport) { return; }
+    this.http.post<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/textReport`,
+      { textReport: this.textReport, IDcreator })
+      .subscribe(
+        data => { console.log("POST Request is successful", data); },
+        error => { console.log("Error", error); }
+      );
   }
 
 
@@ -272,7 +256,7 @@ export class ProvenanceService {
 
   generation(newGraph?: boolean) {
     if (newGraph) {
-      this.saveGraph(0);
+      this.saveGraph(this.creatorId);
       this.newProvenanceGraph();
       this.graph.root.label = 'New Root';
     } else {
@@ -315,7 +299,7 @@ export class ProvenanceService {
 
 
   transferring(toNode: StateNode) {
-    this.saveGraph(0);
+    this.saveGraph(this.creatorId);
     this.traverser.copyNodes(toNode.id, null, true);
     let traverser = this.traverser;
     let currentNodeID = traverser.graph.current.id;
@@ -352,7 +336,7 @@ export class ProvenanceService {
 
 
   copying(toNode: StateNode) {
-    this.saveGraph(0);
+    this.saveGraph(this.creatorId);
     this.traverser.copyNodes(toNode.id, null);
     let traverser = this.traverser;
     let currentNodeID = traverser.graph.current.id;
@@ -398,8 +382,9 @@ export class ProvenanceService {
 
   newGraphEducation(graph?: ProvenanceGraph) {
     this.graphEducation = graph ? graph : new ProvenanceGraph({ name: 'storyvisEducation', version: '1.0.0' });
-    this.trackerEducation = new ProvenanceTracker(this.registry, this.graphEducation);
-    this.traverserEducation = new ProvenanceGraphTraverser(this.registry, this.graphEducation, this.tracker);
+    const registryEdu = new ActionFunctionRegistry();
+    this.trackerEducation = new ProvenanceTracker(registryEdu, this.graphEducation);
+    this.traverserEducation = new ProvenanceGraphTraverser(registryEdu, this.graphEducation, this.trackerEducation);
 
     if (this.treeComparison) { this.treeComparison.rewire(this.traverserEducation); }
 
@@ -413,19 +398,19 @@ export class ProvenanceService {
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
-    this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
+    // Do NOT assign this.deck here — ProvenanceSlidesComponent owns deck lifecycle.
+    // graphReset$ notifies it to create a new deck bound to the fresh traverser.
 
     (window as any).prov = {
       graph: this.graph,
       registry: this.registry,
       tracker: this.tracker,
       traverser: this.traverser,
-      deck: this.deck
     };
-
 
     if (this.tree) { this.tree.rewire(this.traverser); }
     setNewAddListeners(this.registry, this.tracker);
+    this.graphReset$.next();
   }
 
 

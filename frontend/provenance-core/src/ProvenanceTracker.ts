@@ -12,10 +12,8 @@ import {
   Artifact
 } from './api';
 import { generateUUID, generateTimestamp } from './utils';
-import { serializeProvenanceGraph } from './ProvenanceGraph';
 
 var nodeCounter: number = 0;
-var allArtifacts: Artifact[] = [];
 
 /**
  * Provenance Graph Tracker implementation
@@ -71,15 +69,14 @@ export class ProvenanceTracker implements IProvenanceTracker {
       label = action.do;
     }
     
-    if(artifacts){
-      artifacts.length === 1 ? allArtifacts.push(artifacts as Artifact) : allArtifacts.push(...artifacts as Artifact[]);
-    } 
-
+    const nodeArtifacts: Artifact[] = artifacts
+      ? Array.isArray(artifacts) ? [...artifacts] : [artifacts]
+      : [];
 
     const createNewStateNode = (parentNode: ProvenanceNode, actionResult: any): StateNode => ({
       id: generateUUID(),
       label: label,
-      artifacts: artifacts ? allArtifacts : [],
+      artifacts: nodeArtifacts,
       metadata: {
         option: option ? option : '',
         mainbranch: false,
@@ -173,8 +170,6 @@ export class ProvenanceTracker implements IProvenanceTracker {
   }
 
   restoreGraph(sgraph: any): void {
-    Object.setPrototypeOf(sgraph, serializeProvenanceGraph.prototype);
-    alert(JSON.stringify(sgraph));
     this.graph = this.graph.restoreSelf(sgraph);
   }
 

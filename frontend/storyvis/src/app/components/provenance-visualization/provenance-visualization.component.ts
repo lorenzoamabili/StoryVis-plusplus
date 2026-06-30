@@ -122,6 +122,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   private _lastWidth = 0;
   private _svgObserveRetries = 0;
   private _nodeAddedUnlisten: (() => void) | null = null;
+  private _boundGraph: any = null;
 
   constructor(
     private elementRef: ElementRef,
@@ -134,7 +135,9 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   ngOnInit() {
     // Register with service so newProvenanceGraph() can rewire the viz
     this.provenance.tree = this;
-    this._bindGraph();
+    (window as any).tree = this;
+    this._viz = this._createViz(this.provenance.traverser);
+    this._bindListener();
 
     this._bmSub = this.bookmarkService.bookmarks$.subscribe(() => {
       this._refreshOverlays();
@@ -154,7 +157,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
 
     this._resizeObserver = new (window as any).ResizeObserver((entries: any[]) => {
       const w = entries[0]?.contentRect.width ?? 0;
-      if (w > 0 && this._lastWidth === 0) {
+      if (w > 0 && w !== this._lastWidth) {
         this._forceTreeRedraw();
       }
       this._lastWidth = w;
@@ -177,7 +180,12 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     this._nodeAddedUnlisten?.();
     try { (this._viz as any)?.free?.(); } catch (_) {}
     this._viz = this._createViz(traverser);
-    this._bindGraph();
+    (window as any).tree = this;
+    this._bindListener();
+    // Disconnect observer from the old SVG and re-attach to the new one
+    this._observer?.disconnect();
+    this._svgObserveRetries = 0;
+    this._tryObserveSvg();
     try { (this._viz as any).update(); } catch (_) {}
   }
 
@@ -200,16 +208,16 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     );
   }
 
-  /** Subscribe to nodeAdded on the current graph; store unlisten fn to clean up on rewire. */
-  private _bindGraph() {
+  /** Bind the nodeAdded handler to the current graph. Skip if already bound to this graph. */
+  private _bindListener() {
     this._nodeAddedUnlisten?.();
     const g = this.provenance.graph;
-    if (!g) { return; }
+    if (!g || g === this._boundGraph) { return; }
+    this._boundGraph = g;
     const handler = () => this.cdr.detectChanges();
     g.on('nodeAdded', handler);
-    // mitt has no off() — store a no-op; the old graph is GC'd on reset anyway
-    this._nodeAddedUnlisten = () => {};
-    this._viz = this._createViz(this.provenance.traverser);
+    // mitt has no off(); unlisten clears _boundGraph so next bind on same graph is allowed
+    this._nodeAddedUnlisten = () => { this._boundGraph = null; };
   }
 
   private _tryObserveSvg() {

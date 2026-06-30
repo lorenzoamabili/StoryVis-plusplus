@@ -45,7 +45,7 @@
     <mat-icon>message</mat-icon>
   </button>
   <!-- <app-slides-container *ngIf="!isNoProvGraph"> -->
-  <app-provenance-slides [canvas]="canvas" #slides *ngIf="!isNoProvGraph"></app-provenance-slides>
+  <app-provenance-slides #slides *ngIf="!isNoProvGraph"></app-provenance-slides>
   <!-- </app-slides-container> -->
   <app-text-report *ngIf="isNoProvGraph"> </app-text-report>
 </mat-sidenav>

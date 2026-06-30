@@ -68,11 +68,16 @@ var ProvenanceSlidedeck = /** @class */ (function () {
             return this._selectedSlide;
         },
         set: function (slide) {
-            if (slide && slide.node) {
-                this._traverser.toStateNode(slide.node.id, slide.transitionTime);
-            }
+            var _this = this;
             this._selectedSlide = slide;
-            this._mitt.emit('slideSelected', slide);
+            if (slide && slide.node) {
+                this._traverser.toStateNode(slide.node.id, slide.transitionTime)
+                    .then(function () { return _this._mitt.emit('slideSelected', slide); })
+                    .catch(function () { return _this._mitt.emit('slideSelected', slide); });
+            }
+            else {
+                this._mitt.emit('slideSelected', slide);
+            }
         },
         enumerable: false,
         configurable: true
