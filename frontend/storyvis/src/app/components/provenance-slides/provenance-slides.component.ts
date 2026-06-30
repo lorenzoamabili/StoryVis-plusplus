@@ -1,33 +1,32 @@
-import { Component, ElementRef, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 import { ProvenanceSlidedeck } from '../../../../../provenance-core';
 import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
 import { ProvenanceService } from '../../shared/_services';
-import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
 
 @Component({
   selector: 'app-provenance-slides',
-  template: '<div id="slideDeck"></div>',
+  template: '<div class="slide-deck-root" #deckRoot></div>',
   styleUrls: ['./provenance-slides.component.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class ProvenanceSlidesComponent implements OnInit {
-  @Input() canvas: BrainvisCanvasComponent;
-  
-  public _deck: ProvenanceSlidedeck;
-  public _deckViz: SlideDeckVisualization;
+  @ViewChild('deckRoot', { static: true }) private deckRoot: ElementRef<HTMLDivElement>;
 
-  constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {
-  }
+  private _deck: ProvenanceSlidedeck;
+  private _deckViz: SlideDeckVisualization;
 
-  get deck() {
-    return this._deck;
-  }
+  constructor(private provenance: ProvenanceService) {}
+
+  get deck(): ProvenanceSlidedeck { return this._deck; }
 
   ngOnInit() {
-    this._deck = new ProvenanceSlidedeck(this.provenance.graph.application, this.provenance.traverser);
-    this._deckViz = new SlideDeckVisualization(this._deck, this.elementRef.nativeElement.children[0]);
-    (window as any).deck = this._deck;
-    (window as any).slideDeck = this._deckViz;
+    const g = this.provenance.graph;
+    if (!g) { return; }
+    this._deck = new ProvenanceSlidedeck(g.application, this.provenance.traverser);
+    this._deckViz = new SlideDeckVisualization(this._deck, this.deckRoot.nativeElement);
+    // Register deck with service so saveStory/saveStoryStudy can access it
+    this.provenance.deck = this._deck;
+    this.provenance.slideDeck = this._deckViz;
   }
 }

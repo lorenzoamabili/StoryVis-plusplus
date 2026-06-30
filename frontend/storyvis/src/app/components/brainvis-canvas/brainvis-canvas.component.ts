@@ -20,11 +20,13 @@ import { jsPDF } from "jspdf";
 import { ComparisonComponent } from './comparison.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CoverageService } from '../../shared/_services/coverage.service';
+import { SessionStateService } from '../../shared/_services/session-state.service';
 import { DebriefModalComponent } from '../debrief-modal/debrief-modal.component';
 import { BookmarkService } from '../../shared/_services/bookmark.service';
 import { ReflectionService } from '../../shared/_services/reflection.service';
 import { QuickReflectionDialogComponent } from '../quick-reflection-dialog/quick-reflection-dialog.component';
 import { AnnotationDialogComponent } from '../annotation-dialog/annotation-dialog.component';
+import { KeyboardShortcutsDialogComponent } from '../keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -285,6 +287,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     private _bookmarks: BookmarkService,
     public reflections: ReflectionService,
     private _zone: NgZone,
+    private _sessionState: SessionStateService,
   ) {
     super();
 
@@ -345,6 +348,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       event.preventDefault(); this._quickBookmark();
     } else if (!ctrl && event.key === 'r') {
       event.preventDefault(); this.openReflection();
+    } else if (!ctrl && event.key === '?') {
+      event.preventDefault();
+      this._dialog.open(KeyboardShortcutsDialogComponent, { width: '520px', autoFocus: false });
     }
   }
 
@@ -355,6 +361,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   trackByIdx(i: number) { return i; }
+
+  undoStep() {
+    const current: any = this.provenance.graph?.current;
+    if (!current || !current.parent) { return; }
+    this.provenance.traverser.toStateNode(current.parent.id, 0);
+  }
+
+  redoStep() {
+    const current: any = this.provenance.graph?.current;
+    if (!current || !current.children || current.children.length === 0) { return; }
+    this.provenance.traverser.toStateNode(current.children[0].id, 0);
+  }
 
   private _quickBookmark() {
     const g = this.provenance.graph;
@@ -478,6 +496,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.coverage.recordVisit('coronal',  this._coronalRenderer.stackHelper.index);
       this.coverage.recordVisit('sagittal', this._sagittalRenderer.stackHelper.index);
 
+      this._sessionState.setSlices({
+        axial:    this._axialRenderer.stackHelper.index,
+        coronal:  this._coronalRenderer.stackHelper.index,
+        sagittal: this._sagittalRenderer.stackHelper.index,
+      });
+
       // event listeners
       this.renderers.forEach(renderer => renderer.addEventListeners());
       this._initialized = true;
@@ -586,7 +610,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         let next = renderer.stackHelper.index + 1;
         if (next >= max) { next = 1; }
         renderer.stackHelper.index = next;
-        this._zone.run(() => this.coverage.recordVisit(covKey, next));
+        this._zone.run(() => {
+          this.coverage.recordVisit(covKey, next);
+          this._sessionState.setSlices({ [covKey]: next } as any);
+        });
       }, this.cineSpeed);
     }
   }

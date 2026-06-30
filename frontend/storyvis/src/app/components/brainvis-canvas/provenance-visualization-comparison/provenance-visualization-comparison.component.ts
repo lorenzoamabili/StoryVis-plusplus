@@ -1,7 +1,7 @@
-import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
-import { ProvenanceService, AuthenticationService } from '../../../shared/_services';
+import { Component, ElementRef, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ProvenanceService } from '../../../shared/_services';
 import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
-import { User } from 'src/app/shared/_models';
+import { ProvenanceGraphTraverser } from '@visualstorytelling/provenance-core';
 import { Settings } from '../utils/settings';
 
 @Component({
@@ -10,37 +10,38 @@ import { Settings } from '../utils/settings';
   styleUrls: ['./provenance-visualization-comparison.component.css'],
   encapsulation: ViewEncapsulation.None
 })
+export class ProvenanceVisualizationComparisonComponent implements OnInit, OnDestroy {
+  private _viz: ProvenanceTreeVisualization;
+  private settings = Settings.getInstance(this);
 
-export class ProvenanceVisualizationComparisonComponent implements OnInit {
-  public _viz: ProvenanceTreeVisualization;
-  public currentUser: User;
-  public settings = Settings.getInstance(this);
-
-  constructor(public elementRef: ElementRef, public provenance: ProvenanceService, private authenticationService: AuthenticationService) {
-    this.currentUser = this.authenticationService.currentUserValue;
-  }
+  constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {}
 
   ngOnInit() {
-    (window as any).treeComparison = this;
+    this.provenance.treeComparison = this;
     if (this.settings.isEducationMode) {
-      var traverser = this.provenance.traverserEducation;
-      this.createTree(traverser);
+      this.createTree(this.provenance.traverserEducation);
     } else if (this.settings.isComparisonMode) {
-      var traverser = this.provenance.traverserComparison;
-      this.createTree(traverser);
+      this.createTree(this.provenance.traverserComparison);
     }
   }
 
+  ngOnDestroy() {
+    if (this.provenance.treeComparison === this) { this.provenance.treeComparison = null; }
+  }
 
-  createTree(traverser) {    
+  rewire(traverser: ProvenanceGraphTraverser) {
+    try { (this._viz as any)?.free?.(); } catch (_) {}
+    this._viz = this.createTree(traverser);
+    try { (this._viz as any).update(); } catch (_) {}
+  }
+
+  createTree(traverser: ProvenanceGraphTraverser): ProvenanceTreeVisualization {
     return this._viz = new ProvenanceTreeVisualization(
       traverser,
       this.elementRef.nativeElement,
-      "ProvGraph"
+      'ProvGraph',
     );
   }
 
-  public getElement(): any {
-    return this.elementRef;
-  }
+  getElement() { return this.elementRef; }
 }

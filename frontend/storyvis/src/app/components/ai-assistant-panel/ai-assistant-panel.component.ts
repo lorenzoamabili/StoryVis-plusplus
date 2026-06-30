@@ -91,9 +91,9 @@ export class AiAssistantPanelComponent implements OnInit, OnDestroy {
   }
 
   private _getSlidesMeta(): SlideMeta[] {
-    if (!this.slidesComponent?._deck) { return []; }
+    if (!this.slidesComponent?.deck) { return []; }
     try {
-      const slides: any[] = (this.slidesComponent._deck as any).slides || [];
+      const slides: any[] = (this.slidesComponent.deck as any).slides || [];
       return slides.map(s => ({
         title:      s.name || s.label || '(untitled)',
         annotation: s.notes || s.annotation || undefined,

@@ -1,3 +1,53 @@
+/* ── Empty state overlay ───────────────────────────────────────────────── */
+.prov-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  background: rgba(26, 26, 46, 0.82);
+  z-index: 50;
+  pointer-events: none;
+  text-align: center;
+}
+.prov-empty-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  color: rgba(255,255,255,0.15);
+  margin-bottom: 4px;
+}
+.prov-empty-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.3px;
+}
+.prov-empty-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  line-height: 1.6;
+  max-width: 220px;
+}
+.prov-empty-keys {
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+}
+.prov-empty-keys kbd {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+}
+
 app-provenance-visualization{
   height: 100%;
   width: 100%;
@@ -8,34 +58,6 @@ app-provenance-visualization{
   overflow: hidden;
 }
 
-
-/* scoped to provenance panel controls only */
-.controlsBox .mat-icon,
-.holder .mat-icon {
-  font-size: 18px;
-}
-
-.mat-drawer-inner-container {
-  display: flex;
-  /* overflow: inherit; */
-  }
-
-.visualizationContainer {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.minimapContainer {
-  display: none;
-  position: relative;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  height: 20%;
-}
-
-.withButtons{
-  display: block;
-}
 
 .node {
   fill: #ffffff;
@@ -170,30 +192,6 @@ svg {
   opacity: 1;
 }
 
-.titleAggregation {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-#DataAggregationTitle {
-  display: flex;
-  flex: 0.5;
-  justify-content: center;
-  align-items: center;
-}
-
-.controlsBox {
-  padding: 6px 8px;
-}
-
-.aggButton {
-  width: 43%;
-  margin: 5px 10px 0 5px;
-  font-size: 12px;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-}
-
 .circle-text {
   font-size: 6px;
   display: block;
@@ -205,103 +203,6 @@ svg {
 
 .hiddenClass {
   display: none;
-}
-
-.holder {
-  width: min-content;
-  display: flex;
-  bottom: 30%;
-  left: 1%;
-  position: absolute;
-}
-
-.mat-icon-button{
-  margin: 5px;
-  width: min-content;
-  height: min-content;
-  line-height: 20px;
-}
-
-.checkBox {
-  cursor: pointer;
-  margin: 0 10px;
-  margin-top: 5px;
-}
-
-.filterCheckbox {
-  cursor: pointer;
-  margin: 0 8px;
-}
-
-/*Legend CSS*/
-
-.legend {
-  flex: 1;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-  margin: 5px;
-  width: fit-content;
-  height: fit-content;
-}
-.legend ul {
-  list-style-type: none;
-  padding: 0 5px;
-  margin: 3px 0;
-}
-.legend ul li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 3px;
-}
-.legend li .circle {
-  width: 10px;
-  height: 10px;
-  border: 1px solid;
-  border-radius: 6px;
-}
-.legend li .rect {
-  width: 8px;
-  height: 8px;
-  border: 1px solid;
-}
-.legend li span {
-  padding-left: 5px;
-  font-size: 12px;
-}
-
-.legend li .story  {
-  width: 10px;
-  height: 10px;
-  border: 1px dashed;
-  border-color: rgb(255, 200, 100);
-  border-radius: 6px;
-}
-
-.legend li .bookmark  {
-  width: 10px;
-  height: 10px;
-  border: 1.5px solid;
-  border-color: rgb(255, 200, 100);
-  border-radius: 6px;
-}
-
-.legend li .loaded  {
-  width: 10px;
-  height: 10px;
-  border: 1.5px solid;
-  border-color: #03a9f4;
-  border-radius: 6px;
-}
-
-.legend li .slideAdded  {
-  width: 10px;
-  height: 10px;
-  border: 1.5px solid;
-  border-color: #ce93d8;
-  border-radius: 6px;
-}
-
-.checked {
-  opacity: 0.3;
 }
 
 /* ── Node markers for bookmarks / reflections ──────────────────────────── */

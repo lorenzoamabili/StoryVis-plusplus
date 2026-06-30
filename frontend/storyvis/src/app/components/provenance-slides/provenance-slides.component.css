@@ -6,7 +6,7 @@ app-provenance-slides {
   display: block;
 }
 
-#slideDeck {
+.slide-deck-root {
   display: flex;
   height: 100%;
   padding: 4px 8px 0;

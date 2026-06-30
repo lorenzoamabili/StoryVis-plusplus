@@ -3,11 +3,11 @@ import {
   HostListener, OnDestroy, OnInit, ViewEncapsulation,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ProvenanceService, AuthenticationService } from '../../shared/_services';
+import { ProvenanceService } from '../../shared/_services';
 import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
+import { ProvenanceGraphTraverser } from '@visualstorytelling/provenance-core';
 import { BookmarkService, Bookmark } from '../../shared/_services/bookmark.service';
 import { ReflectionService, Reflection, REFLECTION_META } from '../../shared/_services/reflection.service';
-import { User } from 'src/app/shared/_models';
 
 interface NodeTooltipData {
   nodeId: string;
@@ -35,6 +35,16 @@ interface BmOverlay {
          [class.is-phase]="bm.isPhase">
       <mat-icon class="prov-bm-icon">{{ bm.isPhase ? 'flag' : 'bookmark' }}</mat-icon>
       <span class="prov-bm-text">{{ bm.label }}</span>
+    </div>
+
+    <!-- ── Empty-state overlay (shown until first action beyond root) ───── -->
+    <div class="prov-empty" *ngIf="_isEmpty">
+      <mat-icon class="prov-empty-icon">account_tree</mat-icon>
+      <span class="prov-empty-title">No history yet</span>
+      <span class="prov-empty-hint">Interact with the viewer to start building your exploration history — scroll slices, adjust W/L, place annotations.</span>
+      <span class="prov-empty-keys">
+        <kbd>B</kbd> bookmark &nbsp;·&nbsp; <kbd>R</kbd> reflect
+      </span>
     </div>
 
     <!-- ── Current-phase badge ──────────────────────────────────────────── -->
@@ -85,8 +95,7 @@ interface BmOverlay {
   encapsulation: ViewEncapsulation.None,
 })
 export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, OnDestroy {
-  public _viz: ProvenanceTreeVisualization;
-  public currentUser: User;
+  private _viz: ProvenanceTreeVisualization;
 
   /** Positions + labels of all bookmarked/phase nodes, re-computed after every tree render. */
   bmOverlays: BmOverlay[] = [];
@@ -98,27 +107,34 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   _tooltipHovered = false;
   readonly meta = REFLECTION_META;
 
+  get _isEmpty(): boolean {
+    const g = this.provenance.graph;
+    if (!g) { return true; }
+    const root = g.root as any;
+    return !root || !root.children || root.children.length === 0;
+  }
+
   private _hideTimer: any;
   private _observer: MutationObserver;
   private _resizeObserver: any;
   private _bmSub: Subscription;
   private _rfSub: Subscription;
   private _lastWidth = 0;
+  private _svgObserveRetries = 0;
+  private _nodeAddedUnlisten: (() => void) | null = null;
 
   constructor(
-    public elementRef: ElementRef,
-    public provenance: ProvenanceService,
-    private authenticationService: AuthenticationService,
+    private elementRef: ElementRef,
+    private provenance: ProvenanceService,
     private bookmarkService: BookmarkService,
     private reflectionService: ReflectionService,
     private cdr: ChangeDetectorRef,
-  ) {
-    this.currentUser = this.authenticationService.currentUserValue;
-  }
+  ) {}
 
   ngOnInit() {
-    (window as any).tree = this;
-    this.createTree(this.provenance.traverser);
+    // Register with service so newProvenanceGraph() can rewire the viz
+    this.provenance.tree = this;
+    this._bindGraph();
 
     this._bmSub = this.bookmarkService.bookmarks$.subscribe(() => {
       this._refreshOverlays();
@@ -128,27 +144,17 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   }
 
   ngAfterViewInit() {
-    // Watch for D3 tree re-renders so overlays stay in sync
+    const host = this.elementRef.nativeElement as HTMLElement;
+
     this._observer = new MutationObserver(() => {
       this._refreshOverlays();
       this._refreshCurrentPhase();
     });
-    const host = this.elementRef.nativeElement as HTMLElement;
-    const tryObserve = () => {
-      const svg = host.querySelector('svg');
-      if (svg) {
-        this._observer.observe(svg, { childList: true, subtree: true });
-      } else {
-        setTimeout(tryObserve, 200);
-      }
-    };
-    tryObserve();
+    this._tryObserveSvg();
 
-    // Re-render D3 tree when container transitions from 0-width to visible
     this._resizeObserver = new (window as any).ResizeObserver((entries: any[]) => {
       const w = entries[0]?.contentRect.width ?? 0;
       if (w > 0 && this._lastWidth === 0) {
-        // Panel just became visible — force D3 to recalculate layout
         this._forceTreeRedraw();
       }
       this._lastWidth = w;
@@ -161,12 +167,60 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     this._resizeObserver?.disconnect();
     this._bmSub?.unsubscribe();
     this._rfSub?.unsubscribe();
+    this._nodeAddedUnlisten?.();
     clearTimeout(this._hideTimer);
+    if (this.provenance.tree === this) { this.provenance.tree = null; }
   }
 
-  /** Force the D3 tree to re-render at current container dimensions. */
-  refresh() {
-    this._forceTreeRedraw();
+  /** Called by ProvenanceService.newProvenanceGraph() to rewire after graph reset. */
+  rewire(traverser: ProvenanceGraphTraverser) {
+    this._nodeAddedUnlisten?.();
+    try { (this._viz as any)?.free?.(); } catch (_) {}
+    this._viz = this._createViz(traverser);
+    this._bindGraph();
+    try { (this._viz as any).update(); } catch (_) {}
+  }
+
+  refresh() { this._forceTreeRedraw(); }
+
+  createTree(traverser: ProvenanceGraphTraverser): ProvenanceTreeVisualization {
+    this._viz = this._createViz(traverser);
+    return this._viz;
+  }
+
+  getElement() { return this.elementRef; }
+
+  // ── Private ───────────────────────────────────────────────────────────────
+
+  private _createViz(traverser: ProvenanceGraphTraverser): ProvenanceTreeVisualization {
+    return new ProvenanceTreeVisualization(
+      traverser,
+      this.elementRef.nativeElement,
+      'ProvGraph',
+    );
+  }
+
+  /** Subscribe to nodeAdded on the current graph; store unlisten fn to clean up on rewire. */
+  private _bindGraph() {
+    this._nodeAddedUnlisten?.();
+    const g = this.provenance.graph;
+    if (!g) { return; }
+    const handler = () => this.cdr.detectChanges();
+    g.on('nodeAdded', handler);
+    // mitt has no off() — store a no-op; the old graph is GC'd on reset anyway
+    this._nodeAddedUnlisten = () => {};
+    this._viz = this._createViz(this.provenance.traverser);
+  }
+
+  private _tryObserveSvg() {
+    const host = this.elementRef.nativeElement as HTMLElement;
+    const svg = host.querySelector('svg');
+    if (svg) {
+      this._observer.observe(svg, { childList: true, subtree: true });
+    } else if (this._svgObserveRetries < 20) {
+      this._svgObserveRetries++;
+      setTimeout(() => this._tryObserveSvg(), 200);
+    }
   }
 
   private _forceTreeRedraw() {
@@ -174,36 +228,20 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     const w = host.offsetWidth;
     const h = host.offsetHeight;
 
-    // Try calling the lib's own update method
     if (this._viz) {
       try { (this._viz as any).update(); } catch (_) {}
       try { (this._viz as any).resize(); } catch (_) {}
     }
 
-    // Resize the SVG element to match the container
     const svg = host.querySelector('svg');
     if (svg && w > 0) {
       svg.setAttribute('width', String(w));
       if (h > 0) { svg.setAttribute('height', String(h)); }
     }
 
-    // D3 trees typically respond to window.resize
-    window.dispatchEvent(new Event('resize'));
     this._refreshOverlays();
     this._refreshCurrentPhase();
   }
-
-  createTree(traverser) {
-    return this._viz = new ProvenanceTreeVisualization(
-      traverser,
-      this.elementRef.nativeElement,
-      'ProvGraph',
-    );
-  }
-
-  public getElement(): any { return this.elementRef; }
-
-  // ── Overlays: bookmark/phase labels rendered as HTML above the SVG ────────
 
   private _refreshOverlays() {
     const host = this.elementRef.nativeElement as HTMLElement;
@@ -219,11 +257,9 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
       const id = this._nodeIdFrom(nodeEl as Element);
       if (!id) { return; }
 
-      // CSS class markers (keep for ring styling)
       nodeEl.classList.toggle('prov-has-note', bmIds.has(id));
       nodeEl.classList.toggle('prov-has-reflection', rfIds.has(id));
 
-      // HTML label overlay for bookmarks
       const bms = bookmarks.filter(b => b.nodeId === id);
       bms.forEach(bm => {
         const circle = nodeEl.querySelector('circle') as SVGElement;
@@ -243,14 +279,12 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   }
 
   private _refreshCurrentPhase() {
-    // Walk from current node back to root; find the most-recent phase bookmark
     const g = this.provenance.graph;
     if (!g || !g.current) { this.currentPhase = null; return; }
 
     const phases = this.bookmarkService.getAll().filter(b => b.isPhase);
     if (!phases.length) { this.currentPhase = null; return; }
 
-    // Collect the id path from root → current
     const path: string[] = [];
     let node: any = g.current;
     while (node) {
@@ -258,7 +292,6 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
       node = node.parent;
     }
 
-    // Find the last phase bookmark whose nodeId appears in the path
     let found: string | null = null;
     for (const id of path) {
       const phase = phases.find(b => b.nodeId === id);
@@ -268,7 +301,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     this.cdr.detectChanges();
   }
 
-  // ── Tooltip on node hover ─────────────────────────────────────────────────
+  // ── Tooltip ───────────────────────────────────────────────────────────────
 
   @HostListener('mouseover', ['$event'])
   onMouseOver(event: MouseEvent) {
@@ -280,14 +313,22 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     clearTimeout(this._hideTimer);
     this._tooltipHovered = false;
 
-    const hostRect = (this.elementRef.nativeElement as HTMLElement).getBoundingClientRect();
+    const host = this.elementRef.nativeElement as HTMLElement;
+    const hostRect = host.getBoundingClientRect();
     const elRect = nodeEl.getBoundingClientRect();
+
+    const rawX = elRect.left - hostRect.left + elRect.width / 2;
+    const rawY = elRect.top  - hostRect.top  + elRect.height + 4;
+    const tooltipW = 260;
+    const x = Math.min(rawX, hostRect.width - tooltipW - 4);
+    const y = Math.min(rawY, hostRect.height - 120);
+
     this.tooltip = {
       nodeId,
       bookmarks:   this.bookmarkService.getAll().filter(b => b.nodeId === nodeId),
       reflections: this.reflectionService.getForNode(nodeId),
-      x: elRect.left - hostRect.left + elRect.width / 2,
-      y: elRect.top  - hostRect.top  + elRect.height + 4,
+      x: Math.max(0, x),
+      y: Math.max(0, y),
     };
     this.cdr.detectChanges();
   }
@@ -304,7 +345,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     }, 200);
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── DOM helpers ───────────────────────────────────────────────────────────
 
   private _findNodeEl(el: Element | null): Element | null {
     while (el && el !== this.elementRef.nativeElement) {

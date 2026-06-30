@@ -9,10 +9,23 @@ export interface Bookmark {
   timestamp: number;
 }
 
+const LS_KEY = 'storyvis_bookmarks';
+
 @Injectable({ providedIn: 'root' })
 export class BookmarkService {
-  private _bookmarks: Bookmark[] = [];
-  bookmarks$ = new BehaviorSubject<Bookmark[]>([]);
+  private _bookmarks: Bookmark[] = this._load();
+  bookmarks$ = new BehaviorSubject<Bookmark[]>(this._bookmarks);
+
+  private _load(): Bookmark[] {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+
+  private _persist() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(this._bookmarks)); } catch {}
+  }
 
   add(nodeId: string, label: string, isPhase = false): Bookmark {
     const bm: Bookmark = {
@@ -24,12 +37,14 @@ export class BookmarkService {
     };
     this._bookmarks = [...this._bookmarks, bm];
     this.bookmarks$.next(this._bookmarks);
+    this._persist();
     return bm;
   }
 
   remove(id: string) {
     this._bookmarks = this._bookmarks.filter(b => b.id !== id);
     this.bookmarks$.next(this._bookmarks);
+    this._persist();
   }
 
   updateLabel(id: string, label: string) {
@@ -37,6 +52,7 @@ export class BookmarkService {
     if (bm) {
       bm.label = label;
       this.bookmarks$.next([...this._bookmarks]);
+      this._persist();
     }
   }
 
@@ -51,5 +67,6 @@ export class BookmarkService {
   reset() {
     this._bookmarks = [];
     this.bookmarks$.next([]);
+    this._persist();
   }
 }

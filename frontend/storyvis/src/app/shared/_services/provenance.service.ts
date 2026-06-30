@@ -84,7 +84,6 @@ export class ProvenanceService {
   }
 
   public async saveStory(IDcreator: number) {
-    this.deck = (window as any).deck;
     if (this.deck && this.tracker) {
       const sJson = JSON.stringify(this.deck.serializeSelf());
       const sJsonGraph = JSON.stringify(this.tracker.getGraph());
@@ -149,7 +148,6 @@ export class ProvenanceService {
   }
 
   public async saveStoryStudy(IDcreator: number) {
-    this.deck = (window as any).deck;
     if (this.deck && this.tracker) {
       const sJson = JSON.stringify(this.deck.serializeSelf());
       const sJsonGraph = JSON.stringify(this.tracker.getGraph());
@@ -391,12 +389,7 @@ export class ProvenanceService {
       deckComparison: this.deckComparison
     };
 
-    const tc = (window as any).treeComparison;
-    if (tc && tc._viz) { tc._viz.free(); }
-    if (tc) {
-      tc._viz = tc.createTree(this.traverserComparison);
-      tc._viz.update();
-    }
+    if (this.treeComparison) { this.treeComparison.rewire(this.traverserComparison); }
     
     // if(!this.settings.isEducationMode){
     //   setNewAddListeners(this.registryComparison, this.trackerComparison);
@@ -408,12 +401,7 @@ export class ProvenanceService {
     this.trackerEducation = new ProvenanceTracker(this.registry, this.graphEducation);
     this.traverserEducation = new ProvenanceGraphTraverser(this.registry, this.graphEducation, this.tracker);
 
-    const tcEdu = (window as any).treeComparison;
-    if (tcEdu) {
-      if (tcEdu._viz) { tcEdu._viz.free(); }
-      tcEdu._viz = tcEdu.createTree(this.traverserEducation);
-      tcEdu._viz.update();
-    }
+    if (this.treeComparison) { this.treeComparison.rewire(this.traverserEducation); }
 
     this.settings.isEducationMode = true;
   }
@@ -436,12 +424,7 @@ export class ProvenanceService {
     };
 
 
-    const t = (window as any).tree;
-    if (t && t._viz) { t._viz.free(); }
-    if (t) {
-      t._viz = t.createTree(this.traverser);
-      t._viz.update();
-    }
+    if (this.tree) { this.tree.rewire(this.traverser); }
     setNewAddListeners(this.registry, this.tracker);
   }
 

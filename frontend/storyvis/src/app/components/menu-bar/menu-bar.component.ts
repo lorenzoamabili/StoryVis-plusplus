@@ -9,6 +9,8 @@ import { Settings } from '../brainvis-canvas/utils/settings';
 import { TutorialService } from '../tutorial/tutorial.service';
 import { BookmarkService } from '../../shared/_services/bookmark.service';
 import { BookmarkLabelDialogComponent } from '../bookmark-label-dialog/bookmark-label-dialog.component';
+import { SessionStateService } from '../../shared/_services/session-state.service';
+import { KeyboardShortcutsDialogComponent } from '../keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
 
 @Component({
   selector: 'app-menu-bar',
@@ -45,7 +47,8 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     public sessionService: SessionService,
     public tutorialService: TutorialService,
     public bookmarkService: BookmarkService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private sessionState: SessionStateService,
   ) {
     const id = this.sessionService.getId();
     this.userService.getAllGraphs(id).pipe(first()).subscribe(
@@ -76,6 +79,8 @@ export class MenuBarComponent implements OnInit, OnDestroy {
       this.showCustomInput = true;
     } else {
       this.showCustomInput = false;
+      const ds = this.dataSources.find(d => d.url === url);
+      if (ds) { this.sessionState.setDataset(ds.name); }
       if (this.canvas) { this.canvas.loadData(url); }
     }
   }
@@ -115,6 +120,10 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   }
 
   startTutorial() { this.tutorialService.startMain(); }
+
+  openShortcuts() {
+    this.dialog.open(KeyboardShortcutsDialogComponent, { width: '520px', autoFocus: false });
+  }
 
   bookmarkCurrent(isPhase = false) {
     const g = this.provenance.graph;

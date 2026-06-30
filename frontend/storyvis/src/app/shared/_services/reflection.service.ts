@@ -18,10 +18,23 @@ export const REFLECTION_META: Record<ReflectionType, { label: string; color: str
   uncertainty: { label: 'Uncertainty',  color: '#ef9a9a', icon: 'warning_amber',  prompt: 'What is still unclear to you?' },
 };
 
+const LS_KEY = 'storyvis_reflections';
+
 @Injectable({ providedIn: 'root' })
 export class ReflectionService {
-  private _items: Reflection[] = [];
-  reflections$ = new BehaviorSubject<Reflection[]>([]);
+  private _items: Reflection[] = this._load();
+  reflections$ = new BehaviorSubject<Reflection[]>(this._items);
+
+  private _load(): Reflection[] {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+
+  private _persist() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(this._items)); } catch {}
+  }
 
   add(nodeId: string, text: string, type: ReflectionType = 'observation'): Reflection {
     const r: Reflection = {
@@ -33,17 +46,19 @@ export class ReflectionService {
     };
     this._items = [...this._items, r];
     this.reflections$.next(this._items);
+    this._persist();
     return r;
   }
 
   remove(id: string) {
     this._items = this._items.filter(r => r.id !== id);
     this.reflections$.next(this._items);
+    this._persist();
   }
 
   updateText(id: string, text: string) {
     const r = this._items.find(x => x.id === id);
-    if (r) { r.text = text.trim(); this.reflections$.next([...this._items]); }
+    if (r) { r.text = text.trim(); this.reflections$.next([...this._items]); this._persist(); }
   }
 
   getForNode(nodeId: string): Reflection[] {
@@ -56,5 +71,5 @@ export class ReflectionService {
 
   getAll(): Reflection[] { return this._items; }
 
-  reset() { this._items = []; this.reflections$.next([]); }
+  reset() { this._items = []; this.reflections$.next([]); this._persist(); }
 }

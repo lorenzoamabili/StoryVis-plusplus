@@ -7,6 +7,7 @@ import { BookmarkService } from './bookmark.service';
 import { ReflectionService } from './reflection.service';
 import { CoverageService } from './coverage.service';
 import { ProvenanceService } from './provenance.service';
+import { SessionStateService } from './session-state.service';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -38,6 +39,7 @@ export class AiAssistantService {
     private reflectionService: ReflectionService,
     private coverageService: CoverageService,
     private provenance: ProvenanceService,
+    private sessionState: SessionStateService,
   ) {}
 
   // ── Public API ────────────────────────────────────────────────────────────
@@ -79,8 +81,12 @@ export class AiAssistantService {
   private _buildBaseContext(): SessionContext {
     const bookmarks = this.bookmarkService.getAll();
     const reflections = this.reflectionService.getAll();
+    const { dataset, slices, windowLevel } = this.sessionState.snapshot;
 
     return {
+      dataset,
+      currentSlices: slices,
+      windowLevel,
       coverage: {
         axial:    this.coverageService.getCoveragePercent('axial'),
         coronal:  this.coverageService.getCoveragePercent('coronal'),
@@ -158,6 +164,9 @@ export class AiAssistantService {
 }
 
 interface SessionContext {
+  dataset?: string;
+  currentSlices?: { axial: number; coronal: number; sagittal: number };
+  windowLevel?: { w: number; c: number };
   coverage?: { axial: number; coronal: number; sagittal: number; axialCount?: number; axialMax?: number };
   phases?: { label: string; time: string }[];
   bookmarks?: { label: string; isPhase: boolean; time: string }[];

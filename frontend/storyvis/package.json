@@ -9,7 +9,7 @@
         "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider ng build",
         "build-prod": "node scripts/inject-env.js && cross-env NODE_OPTIONS=--openssl-legacy-provider ng build --configuration=production",
         "lint": "tslint --project .",
-        "test": "ng test",
+        "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider ng test --browsers=ChromeHeadless",
         "e2e": "ng e2e",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook"

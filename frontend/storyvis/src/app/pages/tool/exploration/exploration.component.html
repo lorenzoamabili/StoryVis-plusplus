@@ -7,11 +7,11 @@
   <!-- Canvas fills all remaining space -->
   <div class="canvas-area">
     <app-brainvis-canvas
-      [ngClass]="!provenance.settings.isComparisonMode ? 'normal' : 'comparison'"
+      [ngClass]="!settings.isComparisonMode ? 'normal' : 'comparison'"
       #canvas [studyStarted]="studyStarted">
     </app-brainvis-canvas>
     <app-brainvis-canvas-comparison
-      [ngClass]="!provenance.settings.isComparisonMode ? 'normal' : 'comparison'"
+      [ngClass]="!settings.isComparisonMode ? 'normal' : 'comparison'"
       #canvasComparison [studyStarted]="studyStarted"
       (aiCaptions)="aiPanel.generateReport()">
     </app-brainvis-canvas-comparison>
@@ -32,24 +32,28 @@
             (click)="togglePanel('prov')"
             matTooltip="Provenance graph — exploration history" matTooltipPosition="left">
       <mat-icon>account_tree</mat-icon>
+      <span class="strip-label">History</span>
     </button>
 
     <button class="strip-btn" [class.strip-active]="rightOpen && activePanel==='bm'"
             (click)="togglePanel('bm')"
             matTooltip="Bookmarks" matTooltipPosition="left">
       <mat-icon>bookmarks</mat-icon>
+      <span class="strip-label">Marks</span>
     </button>
 
     <button class="strip-btn" [class.strip-active]="rightOpen && activePanel==='ref'"
             (click)="togglePanel('ref')"
             matTooltip="Reflections" matTooltipPosition="left">
       <mat-icon>psychology</mat-icon>
+      <span class="strip-label">Notes</span>
     </button>
 
     <button class="strip-btn" [class.strip-active]="rightOpen && activePanel==='ai'"
             (click)="togglePanel('ai')"
             matTooltip="AI Assistant" matTooltipPosition="left">
       <mat-icon>auto_awesome</mat-icon>
+      <span class="strip-label">AI</span>
     </button>
 
   </div>
@@ -79,10 +83,10 @@
 
     <!-- Panels shown/hidden via CSS — keeps components alive -->
     <div class="rp-content">
-      <div [hidden]="activePanel !== 'prov'">
-        <app-provenance-visualization></app-provenance-visualization>
+      <div class="prov-wrap" [hidden]="activePanel !== 'prov'">
+        <app-provenance-visualization #provViz></app-provenance-visualization>
         <app-provenance-visualization-comparison
-          *ngIf="provenance.settings.isEducationMode || provenance.settings.isComparisonMode">
+          *ngIf="settings.isEducationMode || settings.isComparisonMode">
         </app-provenance-visualization-comparison>
       </div>
 
@@ -107,8 +111,11 @@
 </div>
 
 <!-- ── Bottom panel (story deck) ──────────────────────────────────────── -->
-<div class="bottom-panel" [class.bottom-panel-open]="bottomOpen">
-  <app-provenance-slides [canvas]="canvas" #slides *ngIf="!isNoProvGraph"></app-provenance-slides>
+<div class="bottom-panel" [class.bottom-panel-open]="bottomOpen"
+     [style.height.px]="bottomOpen ? bottomHeight : 0">
+  <div class="bottom-resize-handle" (mousedown)="onResizeStart($event)"
+       matTooltip="Drag to resize"></div>
+  <app-provenance-slides #slides *ngIf="!isNoProvGraph"></app-provenance-slides>
   <app-text-report *ngIf="isNoProvGraph"></app-text-report>
 </div>
 

@@ -1,9 +1,9 @@
-<mat-toolbar color="primary" style="width: 100%">
+<mat-toolbar class="app-toolbar" color="primary">
   <mat-toolbar-row class="toolbar-row">
 
-    <!-- ── Dataset picker ───────────────────────────────────────────────────── -->
+    <!-- ── Dataset ──────────────────────────────────────────────────────── -->
     <mat-form-field class="toolbar-select dataset-select"
-      matTooltip="Choose the medical imaging dataset to visualise.">
+      matTooltip="Switch the imaging dataset loaded in the viewer.">
       <mat-label>Dataset</mat-label>
       <mat-select [(ngModel)]="selectedDataUrl" (selectionChange)="onDataSourceChange($event)">
         <mat-option *ngFor="let ds of dataSources" [value]="ds.url">{{ ds.name }}</mat-option>
@@ -11,232 +11,184 @@
     </mat-form-field>
 
     <ng-container *ngIf="showCustomInput">
-      <input class="custom-url-input" [(ngModel)]="customUrl" placeholder="Paste NIfTI / DICOM URL…"
-        (keyup.enter)="loadCustomUrl()" />
-      <button mat-icon-button class="transparent" (click)="loadCustomUrl()" matTooltip="Load URL">
+      <input class="custom-url-input" [(ngModel)]="customUrl"
+        placeholder="Paste NIfTI / DICOM URL…" (keyup.enter)="loadCustomUrl()" />
+      <button mat-icon-button class="tool-btn" (click)="loadCustomUrl()" matTooltip="Load URL">
         <mat-icon>arrow_forward</mat-icon>
       </button>
     </ng-container>
 
     <span class="toolbar-sep"></span>
 
-    <!-- ── Data-Comics tools (Advanced mode) ─────────────────────────────── -->
-    <ng-container *ngIf="settings.isAdvancedMode">
-      <mat-button-toggle id="tutorial-datacomics" class="transparent dashboardBtn"
-        [checked]="canvas.settings.datacomicsMode"
-        (click)="canvas.displayDatacomics()"
-        (change)="canvas.settings.datacomicsMode = $event.source.checked"
-        matTooltip="Data-Comics Editor — Alt-click any panel to capture it as a frame.">
-        <mat-icon>grid_on</mat-icon>
-      </mat-button-toggle>
-
-      <ng-container *ngIf="canvas.datacomicsOpen">
-        <button mat-icon-button class="transparent"
-          matTooltip="Rearrange Frames"
-          (click)="canvas.rearrangeFrames();">
-          <mat-icon>grid_off</mat-icon>
-        </button>
-        <button mat-icon-button class="transparent"
-          matTooltip="Add Text Box"
-          (click)="canvas.addTextArea();">
-          <mat-icon>mode_comment</mat-icon>
-        </button>
-        <button mat-icon-button class="transparent"
-          matTooltip="Clear Dashboard"
-          (click)="canvas.clearDashboard();">
-          <mat-icon>clear</mat-icon>
-        </button>
-        <button mat-icon-button class="transparent"
-          matTooltip="Download Dashboard"
-          (click)="settings.canvas.downloadDashboard();">
-          <mat-icon>save_alt</mat-icon>
-        </button>
-      </ng-container>
-
-      <span class="toolbar-sep"></span>
-    </ng-container>
-
-    <!-- ── Measurement tools ──────────────────────────────────────────────── -->
-    <mat-button-toggle id="tutorial-ruler" class="transparent mobile-hide" [checked]="settings.rulerMode"
-      (change)="settings.rulerMode = $event.source.checked"
-      matTooltip="Ruler — click two points to measure distance in mm.">
-      <mat-icon>straighten</mat-icon>
-    </mat-button-toggle>
-
-    <mat-button-toggle id="tutorial-angle" class="transparent mobile-hide" [checked]="settings.angleMode"
-      (change)="settings.angleMode = $event.source.checked"
-      matTooltip="Protractor — click three points to measure an angle.">
-      <mat-icon>square_foot</mat-icon>
-    </mat-button-toggle>
-
-    <mat-button-toggle id="tutorial-voxelprobe" class="transparent mobile-hide" [checked]="settings.voxelprobeMode"
-      (change)="settings.voxelprobeMode = $event.source.checked"
-      matTooltip="HU Probe — click any voxel to read its Hounsfield Unit value.">
-      <mat-icon>colorize</mat-icon>
-    </mat-button-toggle>
-
-    <!-- ── Annotation ─────────────────────────────────────────────────────── -->
-    <mat-button-toggle id="tutorial-annotation" class="transparent annotation mobile-hide" [checked]="settings.annotationMode"
-      (change)="settings.annotationMode = $event.source.checked"
-      matTooltip="Text Annotation — click a location to place a labelled marker.">
-      <mat-icon>speaker_notes</mat-icon>
-    </mat-button-toggle>
-
-    <!-- ── Loupe ──────────────────────────────────────────────────────────── -->
-    <mat-button-toggle class="transparent mobile-hide" [checked]="settings.loupeMode"
-      (change)="settings.loupeOn = $event.source.checked"
-      matTooltip="Magnifying glass — hover any 2D panel for a 3× zoomed loupe.">
-      <mat-icon>search</mat-icon>
-    </mat-button-toggle>
-
-    <span class="toolbar-sep"></span>
-
-    <!-- ── Window / Level ─────────────────────────────────────────────────── -->
-    <span id="tutorial-wl-slider">
+    <!-- ── Window / Level ────────────────────────────────────────────────── -->
+    <span class="wl-group" id="tutorial-wl-slider">
       <app-styled-slider-practice *ngIf="!studyStarted"></app-styled-slider-practice>
       <app-styled-slider-exploration *ngIf="studyStarted"></app-styled-slider-exploration>
     </span>
 
-    <mat-form-field id="tutorial-wl-preset" class="toolbar-select compact-select"
-      matTooltip="W/L Presets — apply optimised window/level for common tissue types.">
-      <mat-label>WL</mat-label>
-      <mat-select (selectionChange)="canvas.presetWindowLevel($event);">
-        <mat-option *ngFor="let wlSetting of wlSettings" [value]="wlSetting">
-          {{ wlSetting.name }}
-        </mat-option>
+    <mat-form-field id="tutorial-wl-preset" class="toolbar-select wl-preset-select"
+      matTooltip="Apply a preset window/level for common tissue types.">
+      <mat-label>W/L</mat-label>
+      <mat-select (selectionChange)="canvas.presetWindowLevel($event)">
+        <mat-option *ngFor="let wl of wlSettings" [value]="wl">{{ wl.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
-    <!-- ── Reset ──────────────────────────────────────────────────────────── -->
-    <button id="tutorial-reset" mat-icon-button class="transparent"
-      matTooltip="Reset — restore all panels to the initial state.">
-      <mat-icon>settings_backup_restore</mat-icon>
-    </button>
-
     <span class="toolbar-sep"></span>
 
-    <!-- ── Cine playback ──────────────────────────────────────────────────── -->
-    <button mat-icon-button class="transparent"
-      [class.cine-active]="canvas.cineActive"
-      (click)="canvas.toggleCine();"
-      [matTooltip]="'Cine — auto-scroll ' + canvas.cinePlaneChoice + ' slices. Click to play/pause.'">
-      <mat-icon>{{ canvas.cineActive ? 'pause' : 'play_arrow' }}</mat-icon>
-    </button>
+    <!-- ── Measurement tools ─────────────────────────────────────────────── -->
+    <div class="tool-group" role="toolbar" aria-label="Measurement tools">
 
-    <!-- Compact fps selector: native select avoids mat-form-field vertical space -->
-    <select class="cine-fps-select mobile-hide" (change)="canvas.setCineSpeed(+$event.target['value'])"
-            matTooltip="Cine speed (fps)">
-      <option value="2">2</option>
-      <option value="5" selected>5</option>
-      <option value="10">10</option>
-      <option value="20">20</option>
-    </select>
-    <span class="cine-fps-label mobile-hide">fps</span>
-
-    <select class="cine-plane-select mobile-hide" [(ngModel)]="canvas.cinePlaneChoice"
-            matTooltip="Cine plane — choose which orientation to auto-scroll">
-      <option value="axial">Axial</option>
-      <option value="coronal">Coronal</option>
-      <option value="sagittal">Sagittal</option>
-    </select>
-
-    <!-- ── Flexible spacer ────────────────────────────────────────────────── -->
-    <span class="flex-spacer"></span>
-
-    <!-- ── Comparison / Analysis tools (Advanced mode) ───────────────────── -->
-    <ng-container *ngIf="settings.isAdvancedMode">
-      <span class="toolbar-sep"></span>
-
-      <button id="tutorial-compare" mat-icon-button class="transparent"
-        matTooltip="Compare Analyses — split the canvas and load a second dataset side by side.">
-        <mat-icon>compare_arrows</mat-icon>
-      </button>
-
-      <mat-button-toggle id="tutorial-sync" *ngIf="settings.isComparisonMode" class="transparent dashboardBtn"
-        [checked]="settings.syncScroll" (change)="settings.syncScroll = !settings.syncScroll;"
-        matTooltip="Synchronise Scrolling — link slice navigation across both panels.">
-        <mat-icon>sync</mat-icon>
+      <mat-button-toggle id="tutorial-ruler" class="tool-toggle mobile-hide"
+        [checked]="settings.rulerMode" (change)="settings.rulerMode = $event.source.checked"
+        matTooltip="Ruler — click two points to measure distance in mm">
+        <mat-icon>straighten</mat-icon>
       </mat-button-toggle>
 
-      <mat-form-field class="toolbar-select compact-select" *ngIf="settings.isComparisonMode"
-        matTooltip="Compare With — choose a second dataset.">
-        <mat-label>Compare</mat-label>
-        <mat-select (selectionChange)="canvas.loadExternalData($event);">
-          <mat-option *ngFor="let data of dataSources" [value]="data">{{ data.name }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <mat-button-toggle id="tutorial-angle" class="tool-toggle mobile-hide"
+        [checked]="settings.angleMode" (change)="settings.angleMode = $event.source.checked"
+        matTooltip="Angle — click three points to measure an angle">
+        <mat-icon>square_foot</mat-icon>
+      </mat-button-toggle>
 
-      <mat-form-field id="tutorial-analysis-support" class="toolbar-select compact-select" *ngIf="!settings.isComparisonMode"
-        matTooltip="Analysis Support — overlay a reference provenance graph.">
-        <mat-label>Support</mat-label>
-        <mat-select (selectionChange)="canvas.restoreGraphEducation($event);">
-          <mat-option *ngFor="let graph of graphs" [value]="graph">{{ graph._id }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <mat-button-toggle id="tutorial-voxelprobe" class="tool-toggle mobile-hide"
+        [checked]="settings.voxelprobeMode" (change)="settings.voxelprobeMode = $event.source.checked"
+        matTooltip="HU Probe — click a voxel to read its Hounsfield Unit value">
+        <mat-icon>colorize</mat-icon>
+      </mat-button-toggle>
 
-      <mat-form-field id="tutorial-load-analysis" class="toolbar-select compact-select" *ngIf="!settings.isComparisonMode"
-        matTooltip="Load Analysis — restore a previously saved session.">
-        <mat-label>Load</mat-label>
-        <mat-select (selectionChange)="canvas.restoreGraph($event);">
-          <mat-option *ngFor="let graph of graphs" [value]="graph">{{ graph._id }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <mat-button-toggle id="tutorial-annotation" class="tool-toggle mobile-hide"
+        [checked]="settings.annotationMode" (change)="settings.annotationMode = $event.source.checked"
+        matTooltip="Annotate — click to place a text label on the image">
+        <mat-icon>speaker_notes</mat-icon>
+      </mat-button-toggle>
 
-      <button mat-icon-button class="transparent"
-        matTooltip="Refresh — reload the list of saved analyses."
-        (click)="load();">
-        <mat-icon>forward</mat-icon>
-      </button>
-    </ng-container>
+      <mat-button-toggle class="tool-toggle mobile-hide"
+        [checked]="settings.loupeMode" (change)="settings.loupeOn = $event.source.checked"
+        matTooltip="Loupe — hover a 2D panel for a 3× magnified view">
+        <mat-icon>search</mat-icon>
+      </mat-button-toggle>
 
-    <!-- ── Bookmarks ──────────────────────────────────────────────────────── -->
+    </div>
+
     <span class="toolbar-sep"></span>
 
-    <button mat-icon-button class="transparent"
-      matTooltip="Bookmark State (B) — save the current state with a label."
-      (click)="bookmarkCurrent(false)">
+    <!-- ── Cine play/pause ───────────────────────────────────────────────── -->
+    <button mat-icon-button class="tool-btn cine-btn"
+      [class.tool-active]="canvas.cineActive"
+      (click)="canvas.toggleCine()"
+      [matTooltip]="canvas.cineActive ? 'Pause cine' : 'Play cine — auto-scroll slices'">
+      <mat-icon>{{ canvas.cineActive ? 'pause_circle' : 'play_circle_outline' }}</mat-icon>
+    </button>
+
+    <!-- Flex spacer -->
+    <span class="flex-spacer"></span>
+
+    <!-- ── Provenance actions ─────────────────────────────────────────────── -->
+    <button mat-icon-button class="tool-btn"
+      (click)="bookmarkCurrent(false)"
+      matTooltip="Bookmark (B) — save this state with a label">
       <mat-icon>bookmark_border</mat-icon>
     </button>
 
-    <button mat-icon-button class="transparent"
-      matTooltip="Mark Phase — tag the current state as the start of a new analysis phase."
-      (click)="bookmarkCurrent(true)">
+    <button mat-icon-button class="tool-btn"
+      (click)="bookmarkCurrent(true)"
+      matTooltip="Mark phase — tag this state as the start of a new analysis phase">
       <mat-icon>flag</mat-icon>
     </button>
 
-    <!-- ── Node Reflection (R key) ────────────────────────────────────────── -->
-    <button mat-icon-button class="transparent"
-      matTooltip="Reflect (R) — attach an observation, question, hypothesis or uncertainty to the current state."
-      (click)="canvas.openReflection()">
+    <button mat-icon-button class="tool-btn"
+      (click)="canvas.openReflection()"
+      matTooltip="Reflect (R) — attach a note to the current state">
       <mat-icon>psychology</mat-icon>
     </button>
 
-    <!-- ── Tour / Advanced toggle / Clock ────────────────────────────────── -->
     <span class="toolbar-sep"></span>
 
-    <button mat-icon-button class="transparent"
-      matTooltip="Session Reflection — open a debrief to record your findings and review coverage."
-      (click)="canvas.openDebrief();">
-      <mat-icon>rate_review</mat-icon>
+    <!-- ── More menu ─────────────────────────────────────────────────────── -->
+    <button mat-icon-button class="tool-btn" [matMenuTriggerFor]="moreMenu"
+      matTooltip="More tools and settings">
+      <mat-icon>more_horiz</mat-icon>
     </button>
 
-    <button mat-icon-button class="transparent"
-      matTooltip="Interactive Tour — step-by-step walkthrough of the viewer."
-      (click)="startTutorial();">
-      <mat-icon>help_outline</mat-icon>
-    </button>
+    <mat-menu #moreMenu="matMenu" class="app-more-menu" xPosition="before">
 
-    <mat-button-toggle id="tutorial-advanced" class="transparent dashboardBtn"
-      [checked]="settings.isAdvancedMode"
-      (change)="settings.isAdvancedMode = !settings.isAdvancedMode;"
-      matTooltip="Advanced Mode — unlock Data-Comics, comparison tools and extended provenance features.">
-      <mat-icon>tune</mat-icon>
-    </mat-button-toggle>
+      <button mat-menu-item disabled class="more-section-label">Playback</button>
+      <button mat-menu-item [matMenuTriggerFor]="cineSpeedMenu">
+        <mat-icon>speed</mat-icon><span>Cine speed</span>
+      </button>
+      <button mat-menu-item [matMenuTriggerFor]="cinePlaneMenu">
+        <mat-icon>flip</mat-icon>
+        <span>Plane — {{ canvas.cinePlaneChoice | titlecase }}</span>
+      </button>
 
-    <button mat-icon-button class="transparent"
-      [class.save-active]="saving"
-      matTooltip="Save session — persist provenance graph, story deck and text report."
-      (click)="saveSession()">
+      <mat-divider></mat-divider>
+      <button mat-menu-item disabled class="more-section-label">History</button>
+      <button mat-menu-item (click)="canvas.undoStep()">
+        <mat-icon>undo</mat-icon><span>Undo</span>
+      </button>
+      <button mat-menu-item (click)="canvas.redoStep()">
+        <mat-icon>redo</mat-icon><span>Redo</span>
+      </button>
+
+      <mat-divider></mat-divider>
+      <button mat-menu-item disabled class="more-section-label">Session</button>
+      <button mat-menu-item (click)="canvas.openDebrief()">
+        <mat-icon>rate_review</mat-icon><span>Session Reflection</span>
+      </button>
+      <button mat-menu-item (click)="startTutorial()">
+        <mat-icon>help_outline</mat-icon><span>Interactive Tour</span>
+      </button>
+      <button mat-menu-item (click)="openShortcuts()">
+        <mat-icon>keyboard</mat-icon><span>Keyboard Shortcuts</span>
+      </button>
+
+      <mat-divider></mat-divider>
+      <button mat-menu-item disabled class="more-section-label">Advanced</button>
+      <button mat-menu-item (click)="settings.isAdvancedMode = !settings.isAdvancedMode">
+        <mat-icon>{{ settings.isAdvancedMode ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+        <span>Advanced Mode</span>
+      </button>
+      <ng-container *ngIf="settings.isAdvancedMode">
+        <button mat-menu-item (click)="canvas.displayDatacomics()">
+          <mat-icon>grid_on</mat-icon><span>Data-Comics Editor</span>
+        </button>
+        <button mat-menu-item [matMenuTriggerFor]="compareMenu">
+          <mat-icon>compare_arrows</mat-icon><span>Comparison Mode</span>
+        </button>
+        <button mat-menu-item (click)="load()">
+          <mat-icon>folder_open</mat-icon><span>Load Saved Analysis</span>
+        </button>
+      </ng-container>
+
+    </mat-menu>
+
+    <!-- Cine speed sub-menu -->
+    <mat-menu #cineSpeedMenu="matMenu">
+      <button mat-menu-item (click)="canvas.setCineSpeed(2)">2 fps — slow</button>
+      <button mat-menu-item (click)="canvas.setCineSpeed(5)">5 fps — default</button>
+      <button mat-menu-item (click)="canvas.setCineSpeed(10)">10 fps</button>
+      <button mat-menu-item (click)="canvas.setCineSpeed(20)">20 fps — fast</button>
+    </mat-menu>
+
+    <!-- Cine plane sub-menu -->
+    <mat-menu #cinePlaneMenu="matMenu">
+      <button mat-menu-item (click)="canvas.cinePlaneChoice = 'axial'">Axial</button>
+      <button mat-menu-item (click)="canvas.cinePlaneChoice = 'coronal'">Coronal</button>
+      <button mat-menu-item (click)="canvas.cinePlaneChoice = 'sagittal'">Sagittal</button>
+    </mat-menu>
+
+    <!-- Comparison sub-menu (advanced) -->
+    <mat-menu #compareMenu="matMenu">
+      <button mat-menu-item *ngFor="let ds of dataSources" (click)="canvas.loadExternalData({value: ds})">
+        {{ ds.name }}
+      </button>
+    </mat-menu>
+
+    <!-- ── Save + Clock ───────────────────────────────────────────────────── -->
+    <button mat-icon-button class="tool-btn" [class.save-active]="saving"
+      (click)="saveSession()"
+      matTooltip="Save session">
       <mat-icon>{{ saving ? 'check' : 'save' }}</mat-icon>
     </button>
 

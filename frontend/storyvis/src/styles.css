@@ -108,6 +108,56 @@ div.cont {
   font-weight: 700 !important;
 }
 
+/* ── mat-menu dark theme ─────────────────────────────────────────────────── */
+.mat-menu-panel {
+  background: #23273a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  min-width: 180px !important;
+}
+.mat-menu-item {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 13px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+}
+.mat-menu-item:hover:not([disabled]) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.mat-menu-item[disabled] {
+  color: rgba(255, 255, 255, 0.25) !important;
+}
+.mat-menu-item .mat-icon {
+  color: rgba(255, 255, 255, 0.45) !important;
+  margin-right: 10px !important;
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  line-height: 18px !important;
+  vertical-align: middle;
+}
+.mat-menu-item:hover .mat-icon {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+/* Menu section label (non-interactive div between groups) */
+.more-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.28);
+  padding: 10px 16px 2px;
+  pointer-events: none;
+  user-select: none;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+/* Divider inside dark menu panels */
+.mat-menu-panel .mat-divider {
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+  margin: 3px 0 !important;
+}
+
 /* ── Dialog dark overlay ─────────────────────────────────────────────────── */
 .mat-dialog-container {
   background: #1e1e2e !important;

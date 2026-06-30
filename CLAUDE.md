@@ -28,6 +28,12 @@ cd frontend/storyvis
 NODE_OPTIONS=--openssl-legacy-provider npx ng build --configuration=production
 ```
 
+### Run tests
+```bash
+cd frontend/storyvis
+npm test -- --include="**/provenance-graph-nodes.spec.ts" --watch=false
+```
+
 ### Build workspace libs (required when dist/ missing)
 ```bash
 cd frontend/provenance-core && npm run build
@@ -50,48 +56,52 @@ Route modules: `users/`, `provGraphs/`, `provGraphsStudy/`, `stories/`, `stories
 ### Frontend (`frontend/`)
 Yarn workspace. Main app: `storyvis/` (Angular 10). Local libs: `provenance-core`, `provenance-tree-visualization-grouping`.
 
-**Routing**: Single route `/` → lazy-loads `ExplorationModule`. All `**` redirect to `/`. Dead pages (`pages/shared/**`, `pages/tool/practice/**`, intro pages) excluded from TS compilation via `tsconfig.app.json`.
+**Routing**: Single route `/` → lazy-loads `ExplorationModule`. All `**` redirect to `/`.
 
 **Session identity**: No login. `SessionService` generates UUID in `localStorage` (`storyvis_session_id`). Used as `IDcreator` for all data ops.
 
 **Node.js / build quirks**: Node v17+ needs `NODE_OPTIONS=--openssl-legacy-provider`. TypeScript pinned `~4.0.3`. Local libs must be built before Angular app.
 
+### Key service wiring
+- `ProvenanceVisualizationComponent` registers itself on `provenance.tree` in `ngOnInit` — service calls `this.tree.rewire(traverser)` on graph reset (no window globals).
+- `ProvenanceSlidesComponent` assigns `provenance.deck` + `provenance.slideDeck` after constructing them — `saveStory` reads from service fields directly.
+- `SessionStateService` — dataset/slice/W-L bus between canvas and AI service.
+- `BookmarkService` + `ReflectionService` — localStorage persisted (`storyvis_bookmarks`, `storyvis_reflections`).
+
 ### Frontend app structure (`frontend/storyvis/src/app/`)
 ```
-pages/tool/exploration/   — only active page (single-page app)
+pages/tool/exploration/   — only active page; bottomHeight persisted to localStorage
 components/
-  brainvis-canvas/        — WebGL 4-panel viewer (AMI.js); auto-loads Chest CT 1 on init
-  menu-bar/               — toolbar: dataset picker, W/L, cine, bookmarks, reflections, save, AI
-  bookmark-panel/         — dark-themed side panel (BookmarkService)
-  bookmark-label-dialog/  — Material dialog replaces window.prompt for bookmark naming
-  debrief-modal/          — session reflection (coverage bars + questions + confidence)
-  quick-reflection-dialog/— type-chip reflection entry dialog
-  reflection-panel/       — dark-themed; Ctrl+Enter to save edits
-  ai-assistant-panel/     — Ollama chat; 30s timeout + error display
-  provenance-visualization/ — D3 tree; dark-themed borders + gold bookmark markers
-  provenance-slides/      — story deck slide editor
+  brainvis-canvas/        — WebGL 4-panel viewer (AMI.js); undoStep/redoStep via traverser
+  menu-bar/               — compact 44px toolbar; dark mat-menu; keyboard shortcuts dialog
+  provenance-visualization/ — D3 tree; rewire() on graph reset; nodeAdded CD trigger
+  provenance-slides/      — story deck; ViewChild DOM; no window globals
+  ai-assistant-panel/     — Ollama chat; session context from SessionStateService
+  bookmark-panel/         — dark-themed side panel
+  reflection-panel/       — dark-themed; Ctrl+Enter to save
+  keyboard-shortcuts-dialog/ — inline dialog; ? key shortcut
 shared/_services/
-  session.service.ts      — UUID session identity
-  bookmark.service.ts     — bookmark storage
-  ai-assistant.service.ts — Ollama HTTP client with timeout/catchError
+  session-state.service.ts — dataset/slice/W-L reactive bus
+  bookmark.service.ts     — localStorage persisted
+  reflection.service.ts   — localStorage persisted
 ```
 
 ## Feature Status
 - **Auth**: Removed. UUID sessions. — ✅
-- **Single-page tool**: All routes → ExplorationComponent. — ✅
-- **Dataset picker**: CT1 auto-loads; Brain MRI switchable. — ✅
-- **Bookmarks**: Material dialog (no window.prompt). — ✅
-- **AI assistant**: 30s timeout + error bubbles in chat. — ✅
-- **Mobile**: Secondary toolbar tools hidden ≤767px. — ✅
+- **Provenance tree**: Empty state; nodeAdded CD; rewire on graph reset; no window globals. — ✅
+- **Story deck**: No window globals; proper service wiring; ViewChild DOM. — ✅
+- **Undo/Redo**: `undoStep`/`redoStep` on canvas via `traverser.toStateNode`. — ✅
+- **AI assistant**: 30s timeout; session context (dataset/slices/W-L). — ✅
+- **Bookmarks + Reflections**: Material dialogs; localStorage persisted. — ✅
+- **Tests**: Karma + ChromeHeadless; 12 provenance graph node tests pass. — ✅
 - **Build**: Zero errors/warnings. Production exit 0. — ✅
-- **Style**: Unified dark theme all panels; gold accent system-wide. — ✅
 
 ## Session Log
-Last session: `.claude/sessions/2026-06-29.md`
+Last session: `.claude/sessions/2026-06-30.md`
 
 ## Next Steps
 1. End-to-end test with Docker stack (MongoDB + backend + frontend)
-2. Verify AI panel + Ollama timeout path
-3. Check D3 provenance tree after CSS font/color changes
-4. Consider lazy-loading AMI.js / Three.js (reduce 2.8MB bundle)
-5. CSP header allowing Ollama localhost without `unsafe-inline`
+2. Test story deck: add slides, save story, reload — verify save/restore flow
+3. Test undo/redo with real provenance actions in the viewer
+4. Verify AI panel + Ollama timeout path with real Ollama instance
+5. Consider lazy-loading AMI.js / Three.js (reduce 2.8MB bundle)
