@@ -1,24 +1,22 @@
-services:
+﻿services:
   - type: web
     name: storyvis-backend
     runtime: node
     rootDir: backend
     buildCommand: npm install
-    startCommand: node server.js
-    healthCheckPath: /health
-    autoDeploy: true
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 4000
       - key: JWT_SECRET
-        generateValue: true
+        sync: false
       - key: MONGODB_URI
-        sync: false          # set manually in Render dashboard (MongoDB Atlas URI)
+        sync: false
       - key: CORS_ORIGIN
-        sync: false          # set to your Netlify URL e.g. https://your-app.netlify.app
+        value: https://storyvis.netlify.app
       - key: OLLAMA_HOST
-        value: http://localhost:11434
+        sync: false
       - key: OLLAMA_MODEL
         value: llama3.2
