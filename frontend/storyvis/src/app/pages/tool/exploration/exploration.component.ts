@@ -10,8 +10,14 @@ export class ExplorationComponent implements OnInit {
 
     studyStarted: boolean = true;
     IDcreator: string;
-
     readonly isNoProvGraph = false;
+
+    /** Right panel state */
+    rightOpen = false;
+    activePanel: 'prov' | 'bm' | 'ref' | 'ai' = 'prov';
+
+    /** Bottom panel state */
+    bottomOpen = false;
 
     constructor(
         private sessionService: SessionService,
@@ -22,4 +28,13 @@ export class ExplorationComponent implements OnInit {
     }
 
     ngOnInit() {}
+
+    togglePanel(panel: 'prov' | 'bm' | 'ref' | 'ai') {
+        if (this.rightOpen && this.activePanel === panel) {
+            this.rightOpen = false;
+        } else {
+            this.activePanel = panel;
+            this.rightOpen = true;
+        }
+    }
 }
