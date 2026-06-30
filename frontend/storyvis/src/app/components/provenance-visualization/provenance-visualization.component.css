@@ -2,7 +2,10 @@ app-provenance-visualization{
   height: 100%;
   width: 100%;
   display: block;
+  position: relative;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: #1a1a2e;
+  overflow: hidden;
 }
 
 
@@ -18,7 +21,7 @@ app-provenance-visualization{
   }
 
 .visualizationContainer {
-  height: 80%;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -36,17 +39,22 @@ app-provenance-visualization{
 
 .node {
   fill: #ffffff;
-  stroke: #000000;
+  stroke: rgba(255, 255, 255, 0.3);
   cursor: pointer;
+}
+
+/* Force SVG background dark so white text is legible */
+svg {
+  background: #1a1a2e;
 }
 
 .node circle {
   stroke-width: 0.3px;
-  opacity: 0.3;
+  opacity: 0.65;
 }
 
 .node circle.keynode {
-  stroke: #000000;
+  stroke: rgba(255, 255, 255, 0.6);
   stroke-dasharray: 0;
 }
 
@@ -103,8 +111,8 @@ app-provenance-visualization{
   stroke-width: 0.6px;
 }
 
-.node.branch-active {
-  background-color: #cccccc;
+.node.branch-active circle {
+  opacity: 1;
 }
 
 .node.branch-active text {
@@ -112,12 +120,9 @@ app-provenance-visualization{
 }
 
 .node.node-active text {
-  fill: #000;
+  fill: #fff;
 }
 
-.node.branch-active.node circle {
-  opacity: 1;
-}
 
 .node.neighbour .circle-label {
   font-size: 8px;
@@ -129,13 +134,13 @@ app-provenance-visualization{
 }
 
 .node.node-active circle {
-  stroke: #000000;
+  stroke: rgba(255, 255, 255, 0.9);
   stroke-width: 1.5px;
   stroke-dasharray: 0;
 }
 
 .node text {
-  fill: rgba(0, 0, 0, 0.75);
+  fill: rgba(255, 255, 255, 0.75);
   stroke-width: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
@@ -160,8 +165,7 @@ app-provenance-visualization{
 }
 
 .link.active {
-  /* stroke: white; */
-  stroke: #000000;
+  stroke: rgba(255, 255, 255, 0.7);
   stroke-width: 0.8px;
   opacity: 1;
 }

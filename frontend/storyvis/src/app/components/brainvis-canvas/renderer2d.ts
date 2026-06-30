@@ -1018,7 +1018,31 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
         handles[1].worldPosition
       ]
     };
-    this.createArtifact(this._measurement.artifact);
+    // Hide AMI.js default label; dialog will set the text and make it visible
+    if (this._measurement.widget._label) {
+      this._measurement.widget._label.style.display = 'none';
+    }
+    (this._canvas as any).promptAnnotationText(this);
+  }
+
+  finishAnnotation(text: string) {
+    if (this._measurement && this._measurement.widget) {
+      const label = this._measurement.widget._label;
+      if (label) {
+        label.textContent = text;
+        label.style.display = '';
+      }
+      this._measurement.widget._labeltext = text;
+      if (this._measurement.artifact) {
+        if (label) { this._measurement.artifact.elmHTML[2] = label.outerHTML; }
+        this.createArtifact(this._measurement.artifact);
+      }
+    }
+    this._canvas.settings.annotationMode = false;
+  }
+
+  cancelAnnotation() {
+    if (this._measurement) { this._measurement.remove(); }
     this._canvas.settings.annotationMode = false;
   }
 

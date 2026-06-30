@@ -24,6 +24,7 @@ import { DebriefModalComponent } from '../debrief-modal/debrief-modal.component'
 import { BookmarkService } from '../../shared/_services/bookmark.service';
 import { ReflectionService } from '../../shared/_services/reflection.service';
 import { QuickReflectionDialogComponent } from '../quick-reflection-dialog/quick-reflection-dialog.component';
+import { AnnotationDialogComponent } from '../annotation-dialog/annotation-dialog.component';
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -1723,6 +1724,19 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   toggleAnnotationMode(isEnabled: boolean) {
     this.renderers2D.forEach(renderer => renderer.annotationMode = isEnabled)
   };
+
+  promptAnnotationText(renderer: any) {
+    this._dialog.open(AnnotationDialogComponent, {
+      width: '440px',
+      disableClose: false,
+    }).afterClosed().subscribe((text: string | undefined) => {
+      if (text) {
+        renderer.finishAnnotation(text);
+      } else {
+        renderer.cancelAnnotation();
+      }
+    });
+  }
 
   toggleDatacomicsMode(isEnabled: boolean) {
     this.datacomicsOpen = isEnabled;

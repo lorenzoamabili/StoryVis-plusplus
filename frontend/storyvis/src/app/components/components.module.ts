@@ -15,6 +15,7 @@ import { QuickReflectionDialogComponent } from './quick-reflection-dialog/quick-
 import { ReflectionPanelComponent } from './reflection-panel/reflection-panel.component';
 import { AiAssistantPanelComponent } from './ai-assistant-panel/ai-assistant-panel.component';
 import { BookmarkLabelDialogComponent } from './bookmark-label-dialog/bookmark-label-dialog.component';
+import { AnnotationDialogComponent } from './annotation-dialog/annotation-dialog.component';
 
 import { MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -88,11 +89,13 @@ import { HttpClientModule } from '@angular/common/http';
         ReflectionPanelComponent,
         AiAssistantPanelComponent,
         BookmarkLabelDialogComponent,
+        AnnotationDialogComponent,
     ],
     entryComponents: [
         DebriefModalComponent,
         QuickReflectionDialogComponent,
         BookmarkLabelDialogComponent,
+        AnnotationDialogComponent,
     ],
     exports: [
         BrainvisCanvasComponent,

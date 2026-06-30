@@ -57,10 +57,29 @@ div.cont {
 .mat-form-field.mat-focused .mat-form-field-outline-thick { color: rgb(255, 200, 100) !important; }
 .mat-select-panel .mat-option.mat-selected:not(.mat-option-disabled) { color: rgb(255, 200, 100) !important; }
 .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) { color: rgb(255, 200, 100) !important; }
+
+/* Sliders — gold throughout */
 .mat-slider.mat-accent .mat-slider-track-fill,
 .mat-slider.mat-accent .mat-slider-thumb,
-.mat-slider.mat-accent .mat-slider-thumb-label { background-color: rgb(255, 200, 100) !important; }
+.mat-slider.mat-accent .mat-slider-thumb-label,
+.mat-slider.mat-primary .mat-slider-track-fill,
+.mat-slider.mat-primary .mat-slider-thumb,
+.mat-slider.mat-primary .mat-slider-thumb-label { background-color: rgb(255, 200, 100) !important; }
+.mat-slider-thumb-label-text { color: #1a1a2e !important; }
+/* Track background (unthumb'd portion) — subtle on dark */
+.mat-slider.mat-accent .mat-slider-track-background,
+.mat-slider.mat-primary .mat-slider-track-background { background-color: rgba(255,200,100,0.2) !important; }
+
+/* Progress bars — readable tracks on dark */
+.mat-progress-bar-buffer { background-color: rgba(255,255,255,0.12) !important; }
 .mat-progress-bar.mat-accent .mat-progress-bar-fill::after { background-color: rgb(255, 200, 100) !important; }
+.mat-progress-bar.mat-primary .mat-progress-bar-fill::after { background-color: #42a5f5 !important; }
+.mat-progress-bar.mat-warn .mat-progress-bar-fill::after { background-color: #ef5350 !important; }
+
+/* Select panel on dark */
+.mat-select-panel { background: #2a2a3e !important; }
+.mat-option { color: #e0e0e0 !important; }
+.mat-option:hover:not(.mat-option-disabled) { background: rgba(255,255,255,0.08) !important; }
 
 /* ── Material tooltip overrides ──────────────────────────────────────────────
    Wider + multi-line (pre-line) so educational tooltips render HU reference
@@ -89,10 +108,51 @@ div.cont {
   font-weight: 700 !important;
 }
 
-/* ── Quick reflection dialog dark overlay ────────────────────────────────── */
+/* ── Dialog dark overlay ─────────────────────────────────────────────────── */
 .mat-dialog-container {
   background: #1e1e2e !important;
   color: #e0e0e0 !important;
+}
+
+/* mat-form-field dark theme for dialogs (indigo-pink is light by default) */
+.mat-dialog-container .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: rgba(255, 255, 255, 0.25) !important;
+}
+.mat-dialog-container .mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: rgb(255, 200, 100) !important;
+}
+.mat-dialog-container .mat-form-field-label { color: rgba(255, 255, 255, 0.5) !important; }
+.mat-dialog-container .mat-input-element { color: #e0e0e0 !important; caret-color: rgb(255,200,100) !important; }
+.mat-dialog-container .mat-form-field-wrapper { background: transparent !important; }
+.mat-dialog-container h2 { color: #e0e0e0; margin-top: 0; }
+.mat-dialog-container .mat-dialog-actions .mat-button { color: rgba(255,255,255,0.55); }
+.mat-dialog-container .mat-divider { border-top-color: rgba(255,255,255,0.12); }
+
+/* ── AMI.js annotation label (injected into WebGL container) ─────────────── */
+[id^="textBox"],
+[class*="annotation-label"],
+[class*="AMIWidgetAnnotation"] {
+  background: rgba(20, 22, 40, 0.92) !important;
+  color: rgb(255, 200, 100) !important;
+  border: 1px solid rgba(255, 200, 100, 0.5) !important;
+  border-radius: 4px !important;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px !important;
+  padding: 3px 8px !important;
+  outline: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+  min-width: 80px !important;
+}
+
+/* Ruler / angle / voxel probe inline labels */
+.ami-widget-label,
+.ami-annotation-helper {
+  background: rgba(20, 22, 40, 0.88) !important;
+  color: rgb(255, 200, 100) !important;
+  border: 1px solid rgba(255, 200, 100, 0.4) !important;
+  border-radius: 3px !important;
+  font-size: 11px !important;
+  padding: 2px 6px !important;
 }
 
 /*! normalize.css v8.0.0 | MIT License | github.com/necolas/normalize.css */

@@ -189,13 +189,22 @@ app-brainvis-canvas-comparison.comparison { width: 50%; }
 .rp-content > div {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
+}
+
+/* AI panel manages its own scroll — don't double-scroll */
+.rp-content > .ai-wrap {
+  overflow: hidden;
 }
 
 /* AI panel fills height so chat scrolls correctly */
 .ai-wrap {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ── Bottom panel (story deck) ────────────────────────────────────────── */

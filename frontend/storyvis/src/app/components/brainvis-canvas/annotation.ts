@@ -67,7 +67,7 @@ export default class Annotation {
 
 
     this.widget.update();
-    this.widget._labeltext = 'DOUBLE CLICK HERE to create an annotation';
+    this.widget._labeltext = '';
 
     // if(this.renderer._canvas.provenance.graphLoaded){
     //   this.widget._labeltext = 'empty';

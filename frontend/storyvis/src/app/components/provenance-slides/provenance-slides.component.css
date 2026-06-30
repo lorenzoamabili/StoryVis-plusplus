@@ -2,11 +2,15 @@
 
 app-provenance-slides {
   width: 100%;
+  height: 100%;
   display: block;
-  border-radius: 5px;
 }
 
 #slideDeck {
   display: flex;
-  padding: 1%;
+  height: 100%;
+  padding: 4px 8px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-sizing: border-box;
 }

@@ -1,7 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .ai-panel {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   min-height: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: #e0e0e0;

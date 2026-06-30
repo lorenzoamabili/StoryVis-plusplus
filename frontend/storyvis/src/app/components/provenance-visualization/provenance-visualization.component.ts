@@ -100,8 +100,10 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
 
   private _hideTimer: any;
   private _observer: MutationObserver;
+  private _resizeObserver: any;
   private _bmSub: Subscription;
   private _rfSub: Subscription;
+  private _lastWidth = 0;
 
   constructor(
     public elementRef: ElementRef,
@@ -132,7 +134,6 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
       this._refreshCurrentPhase();
     });
     const host = this.elementRef.nativeElement as HTMLElement;
-    // Observe the SVG subtree once it appears
     const tryObserve = () => {
       const svg = host.querySelector('svg');
       if (svg) {
@@ -142,13 +143,54 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
       }
     };
     tryObserve();
+
+    // Re-render D3 tree when container transitions from 0-width to visible
+    this._resizeObserver = new (window as any).ResizeObserver((entries: any[]) => {
+      const w = entries[0]?.contentRect.width ?? 0;
+      if (w > 0 && this._lastWidth === 0) {
+        // Panel just became visible — force D3 to recalculate layout
+        this._forceTreeRedraw();
+      }
+      this._lastWidth = w;
+    });
+    this._resizeObserver.observe(host);
   }
 
   ngOnDestroy() {
     this._observer?.disconnect();
+    this._resizeObserver?.disconnect();
     this._bmSub?.unsubscribe();
     this._rfSub?.unsubscribe();
     clearTimeout(this._hideTimer);
+  }
+
+  /** Force the D3 tree to re-render at current container dimensions. */
+  refresh() {
+    this._forceTreeRedraw();
+  }
+
+  private _forceTreeRedraw() {
+    const host = this.elementRef.nativeElement as HTMLElement;
+    const w = host.offsetWidth;
+    const h = host.offsetHeight;
+
+    // Try calling the lib's own update method
+    if (this._viz) {
+      try { (this._viz as any).update(); } catch (_) {}
+      try { (this._viz as any).resize(); } catch (_) {}
+    }
+
+    // Resize the SVG element to match the container
+    const svg = host.querySelector('svg');
+    if (svg && w > 0) {
+      svg.setAttribute('width', String(w));
+      if (h > 0) { svg.setAttribute('height', String(h)); }
+    }
+
+    // D3 trees typically respond to window.resize
+    window.dispatchEvent(new Event('resize'));
+    this._refreshOverlays();
+    this._refreshCurrentPhase();
   }
 
   createTree(traverser) {
