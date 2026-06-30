@@ -43,13 +43,17 @@ NODE_OPTIONS=--openssl-legacy-provider npx ng build --configuration=production
 
 ## Environment
 
-Copy `.env.example` to `.env` at the repo root:
+Copy `.env.example` to `.env` at the repo root and fill in values:
 ```
 JWT_SECRET=changeme
-MONGO_URI=mongodb://localhost:27017/storyvis
+MONGODB_URI=mongodb://localhost:27017/storyvis
+CORS_ORIGIN=http://localhost:4200
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_MODEL=llama3.2
+PORT=4000
+NODE_ENV=development
 ```
+For production, `MONGODB_URI` points to MongoDB Atlas (with real password) and `CORS_ORIGIN` to the Netlify URL.
 
 ## Architecture
 
@@ -63,5 +67,13 @@ OLLAMA_MODEL=llama3.2
 docker compose up -d
 ```
 See `docker-compose.yml` and `Caddyfile` for reverse-proxy and HTTPS config.
+
+## Cloud Deployment
+
+| Layer | Host | Config |
+|-------|------|--------|
+| Frontend | Netlify | `netlify.toml` — set `API_URL` + `DEBUG` env vars in Netlify dashboard |
+| Backend | Render | `render.yaml` — set `JWT_SECRET` + `MONGODB_URI` secret env vars in Render dashboard |
+| Database | MongoDB Atlas | Whitelist `0.0.0.0/0` for Render; use Atlas connection string for `MONGODB_URI` |
 
 For questions: l.amabili@rug.nl

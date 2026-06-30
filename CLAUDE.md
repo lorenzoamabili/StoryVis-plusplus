@@ -18,7 +18,8 @@ cd backend && node server.js   # port 4000
 ### Frontend dev server
 ```bash
 cd frontend/storyvis
-NODE_OPTIONS=--openssl-legacy-provider npx ng serve   # port 4200
+# PowerShell:
+$env:NODE_OPTIONS="--openssl-legacy-provider"; npx ng serve   # port 4200
 # or: npm run start
 ```
 
@@ -95,13 +96,19 @@ shared/_services/
 - **Bookmarks + Reflections**: Material dialogs; localStorage persisted. — ✅
 - **Tests**: Karma + ChromeHeadless; 12 provenance graph node tests pass. — ✅
 - **Build**: Zero errors/warnings. Production exit 0. — ✅
+- **Deployment**: `netlify.toml` fixed (provenance-core build added); `render.yaml` created. — ✅
+
+## Local Dev Notes
+- Docker Desktop must be running before `docker start storyvis-mongo`
+- `.env` for local: set `MONGODB_URI=mongodb://localhost:27017/storyvis`, `CORS_ORIGIN=http://localhost:4200`
+- `.env` for production: Atlas URI with real password; never commit password to repo
 
 ## Session Log
-Last session: `.claude/sessions/2026-06-30.md`
+Last session: `.claude/sessions/2026-07-01.md`
 
 ## Next Steps
-1. End-to-end test with Docker stack (MongoDB + backend + frontend)
-2. Test story deck: add slides, save story, reload — verify save/restore flow
-3. Test undo/redo with real provenance actions in the viewer
-4. Verify AI panel + Ollama timeout path with real Ollama instance
+1. Set Atlas password + Render secret env vars (`JWT_SECRET`, `MONGODB_URI`) in dashboards
+2. Set Netlify env vars (`API_URL`, `DEBUG`) and verify build succeeds
+3. End-to-end test: Docker stack locally (MongoDB + backend + frontend)
+4. Test story deck: add slides, save story, reload — verify save/restore flow
 5. Consider lazy-loading AMI.js / Three.js (reduce 2.8MB bundle)
