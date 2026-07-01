@@ -1,5 +1,6 @@
 import { ProvenanceTreeVisualization } from './provenance-tree-visualization';
 import { StateNode } from '@visualstorytelling/provenance-core';
+import { storyVisBridge } from './bridge';
 
 
 export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVisualization) {
@@ -33,7 +34,7 @@ export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVis
         // ctrl + Q  / add the current node to the story
         else if (evtobj.keyCode === 81 && evtobj.altKey) {
             graph.current.metadata.story = true;
-            (window as any).slideDeck.onAdd(graph.current);
+            storyVisBridge.slideDeck?.onAdd(graph.current);
         }
         // ctrl + IntlBackslash  / create a story with all nodes (by creation order)
         else if (evtobj.keyCode === 192 && evtobj.altKey) {
@@ -41,7 +42,7 @@ export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVis
             for (const nodeId of Object.keys(nodes)) {
                 let node = nodes[nodeId];
                 node.metadata.story = true;
-                (window as any).slideDeck.onAdd(node);
+                storyVisBridge.slideDeck?.onAdd(node);
             }
         }
         // ctrl + 1  / all neighbour nodes are added to the slide deck (by creation order)
@@ -58,7 +59,7 @@ export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVis
                 if (((node.metadata.creationOrder > graph.current.metadata.creationOrder - 2) == true) &&     // the range can be adjusted
                     ((node.metadata.creationOrder < graph.current.metadata.creationOrder + 2) == true)) {
                     node.metadata.story = true;
-                    (window as any).slideDeck.onAdd(node);
+                    storyVisBridge.slideDeck?.onAdd(node);
                 }
             }
         }
@@ -77,7 +78,7 @@ export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVis
 
             for (const node of (arrayNodes as any).filter((node: any) => node.action.metadata.userIntent == 'derivation' || 'annotation')) {
                 node.metadata.story = true;
-                (window as any).slideDeck.onAdd(node);
+                storyVisBridge.slideDeck?.onAdd(node);
             }
         }
         provenanceTreeVisualization.update();

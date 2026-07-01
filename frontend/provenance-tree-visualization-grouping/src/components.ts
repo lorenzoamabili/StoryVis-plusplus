@@ -8,6 +8,7 @@ import {
   rawData
 } from './aggregation/aggregation-objects';
 import { ProvenanceTreeVisualization } from './provenance-tree-visualization';
+import { storyVisBridge } from './bridge';
 import { addLegend, addCommandsList, addtasksList } from './legend';
 import { StateNode, ProvenanceNode } from '@visualstorytelling/provenance-core';
 import { filterObjects } from './filtering';
@@ -259,8 +260,8 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 8%;')
     .attr('ng-reflect-color', 'primary')
-    .on('contextmenu', () => { (window as any).canvas.provenance.generation(true); })
-    .on('click', () => { (window as any).canvas.provenance.generation(); });
+    .on('contextmenu', () => { storyVisBridge.provenance?.generation(true); })
+    .on('click', () => { storyVisBridge.provenance?.generation(); });
 
   newAnalysisButton
     .append('span')
@@ -310,7 +311,7 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 11%;')
     .attr('ng-reflect-color', 'primary')
-    .on('click', () => { (window as any).canvas.provenance.fission(); })
+    .on('click', () => { storyVisBridge.provenance?.fission(); })
 
 
   newAnalysisFromCurrentNodeButton
@@ -358,7 +359,7 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; top: 14%;')
     .attr('ng-reflect-color', 'primary')
-    .on('mousedown', () => { (window as any).canvas.provenance.splitting(); });
+    .on('mousedown', () => { storyVisBridge.provenance?.splitting(); });
 
   splittingButton
     .append('span')
@@ -1388,7 +1389,7 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; color: firebrick; top: 68%;')
     .attr('ng-reflect-color', 'primary')
-    .on('click', () => { (window as any).canvas.provenance.saveGraph(); })
+    .on('click', () => { storyVisBridge.provenance?.saveGraph(); })
 
   saveGraphButton
     .append('span')
@@ -1435,7 +1436,7 @@ export function addAggregationButtons(
     .attr('color', 'primary')
     .attr('style', 'position: absolute; z-index: 1; color: firebrick; top: 71%;')
     .attr('ng-reflect-color', 'primary')
-    .on('click', () => { (window as any).canvas.provenance.saveStory(); })
+    .on('click', () => { storyVisBridge.provenance?.saveStory(); })
 
   saveStoryButton
     .append('span')

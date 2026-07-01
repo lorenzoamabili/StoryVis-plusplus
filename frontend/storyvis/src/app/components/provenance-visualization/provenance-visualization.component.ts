@@ -135,7 +135,6 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   ngOnInit() {
     // Register with service so newProvenanceGraph() can rewire the viz
     this.provenance.tree = this;
-    (window as any).tree = this;
     this._viz = this._createViz(this.provenance.traverser);
     this._bindListener();
 
@@ -180,7 +179,6 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     this._nodeAddedUnlisten?.();
     try { (this._viz as any)?.free?.(); } catch (_) {}
     this._viz = this._createViz(traverser);
-    (window as any).tree = this;
     this._bindListener();
     // Disconnect observer from the old SVG and re-attach to the new one
     this._observer?.disconnect();

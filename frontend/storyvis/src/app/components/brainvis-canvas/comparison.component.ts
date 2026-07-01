@@ -160,9 +160,6 @@ export class ComparisonComponent extends THREE.EventDispatcher implements OnInit
   }
 
   ngOnInit() {
-    // todo: remove object from window
-    (window as any).canvasComparison = this;
-
     this._comparisonRenderer2D2 = new Renderer2D(this.comparisonViews[0]);
     this._comparisonRenderer3D2 = new Renderer3D(this.comparisonViews[1]);
     this._comparisonRenderer2D2.init();

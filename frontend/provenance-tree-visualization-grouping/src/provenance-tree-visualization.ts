@@ -6,6 +6,8 @@ import {
   StateNode
 } from '@visualstorytelling/provenance-core';
 
+import { storyVisBridge } from './bridge';
+export { storyVisBridge } from './bridge';
 import gratzl from './gratzl';
 import { IHierarchyPointNodeWithMaxDepth } from './gratzl';
 import { IGroupedTreeNode } from './utils';
@@ -450,10 +452,9 @@ export class ProvenanceTreeVisualization {
         this.traverser.graph.current = this.traverser.graph.getNode(d.data.wrappedNodes[0].id);
         d.data.wrappedNodes[0].metadata.bookmarked = !d.data.wrappedNodes[0].metadata.bookmarked;
         if (!d.data.wrappedNodes[0].metadata.bookmarked) {
-          (window as any).slideDeck.onDelete(null, this.traverser.graph.current);
+          storyVisBridge.slideDeck?.onDelete(null, this.traverser.graph.current);
         } else {
-          (window as any).slideDeck.onAdd(this.traverser.graph.current);
-          // (window as any).canvas.duplicateView();
+          storyVisBridge.slideDeck?.onAdd(this.traverser.graph.current);
         }
       });
 
@@ -593,19 +594,19 @@ export class ProvenanceTreeVisualization {
 
       updateNodes.on('click', d => {
         if (this.transferringEnabled) {
-          (window as any).canvas.provenance.transferring(d.data.wrappedNodes[0]);
+          storyVisBridge.provenance?.transferring(d.data.wrappedNodes[0]);
           this.update();
           this.transferringEnabled = false;
           d3.select("#transferring-trigger").attr('class', 'mat-icon-button mat-button-base mat-primary');
         } else if (this.mergingEnabled) {
           let currentNode = this.traverser.graph.current;
           this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
-          (window as any).canvas.provenance.merging(currentNode, d.data.wrappedNodes[0]);
+          storyVisBridge.provenance?.merging(currentNode, d.data.wrappedNodes[0]);
           this.update();
           this.mergingEnabled = false;
           d3.select("#merging-trigger").attr('class', 'mat-icon-button mat-button-base mat-primary');
         } else if (this.copyingEnabled) {
-          (window as any).canvas.provenance.copying(d.data.wrappedNodes[0]);
+          storyVisBridge.provenance?.copying(d.data.wrappedNodes[0]);
           this.copyingEnabled = false;
           d3.select("#copying-trigger").attr('class', 'mat-icon-button mat-button-base mat-primary');
         } else {

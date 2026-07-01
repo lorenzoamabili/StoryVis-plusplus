@@ -422,9 +422,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   ngOnInit() {
-    // todo: remove object from window
-    (window as any).canvas = this;
-
     this._axialRenderer = new Renderer2D(this.views[0]);
     this._perspectiveRenderer = new Renderer3D(this.views[1]);
     this._coronalRenderer = new Renderer2D(this.views[2]);

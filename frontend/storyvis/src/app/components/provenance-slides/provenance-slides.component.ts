@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { ProvenanceSlidedeck } from '../../../../../provenance-core';
 import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
 import { ProvenanceService } from '../../shared/_services';
+import { storyVisBridge } from '@visualstorytelling/provenance-tree-visualization';
 
 @Component({
   selector: 'app-provenance-slides',
@@ -42,6 +43,6 @@ export class ProvenanceSlidesComponent implements OnInit, OnDestroy {
     this._deckViz = new SlideDeckVisualization(this._deck, this.deckRoot.nativeElement);
     this.provenance.deck = this._deck;
     this.provenance.slideDeck = this._deckViz;
-    (window as any).slideDeck = this._deckViz;
+    storyVisBridge.slideDeck = this._deckViz;
   }
 }

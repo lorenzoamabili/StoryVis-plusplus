@@ -25,6 +25,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
 import { restoreProvenanceGraph } from '@visualstorytelling/provenance-core/src/ProvenanceGraph';
 import { ProvenanceVisualizationComparisonComponent } from 'src/app/components/brainvis-canvas/provenance-visualization-comparison/provenance-visualization-comparison.component';
+import { storyVisBridge } from '@visualstorytelling/provenance-tree-visualization';
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +66,7 @@ export class ProvenanceService {
   public settings = Settings.getInstance(this);
 
 
-  public saveGraph(IDcreator: string | number) {
+  public saveGraph(IDcreator: string | number = this.creatorId) {
     if (this.tracker) {
       const sJson = JSON.stringify(this.tracker.getGraph());
       this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
@@ -87,7 +88,7 @@ export class ProvenanceService {
     }
   }
 
-  public saveStory(IDcreator: string | number) {
+  public saveStory(IDcreator: string | number = this.creatorId) {
     if (this.deck && this.tracker) {
       const sJson = JSON.stringify(this.deck.serializeSelf());
       const sJsonGraph = JSON.stringify(this.tracker.getGraph());
@@ -225,27 +226,6 @@ export class ProvenanceService {
 
 
 
-  // public async restoreStory(input: MatSelectChange) {
-  //   const storyInput = input.value;
-  //   this.loadStory(storyInput);
-  // }
-
-  // public loadStory(storyInput: any) {
-  //   const dataStory = JSON.parse(storyInput.story);
-  //   this.slideDeck = (window as any).slideDeck;
-  //   this.slideDeck.setDeck(this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.application));
-  //   this.slideDeck.update();
-  // }
-
-  // public async restoreTextReport(input: MatSelectChange) {
-  //   const textReportInput = input.value;
-  //   this.loadTextReport(textReportInput);
-  // }
-
-  // public loadTextReport(textReportInput: any) {
-  //   (document.getElementById("textArea") as HTMLTextAreaElement).value = textReportInput.textReport;
-  // }
-
 
 
 
@@ -345,33 +325,12 @@ export class ProvenanceService {
   }
 
 
-  // newGraphComparison(graph?: ProvenanceGraph) {
-  //   this.graphComparison = graph ? graph : new ProvenanceGraph({ name: 'storyvisComparison', version: '1.0.0' });
-  //   this.registryComparison = new ActionFunctionRegistry();
-  //   this.trackerComparison = new ProvenanceTracker(this.registryComparison, this.graphComparison);
-  //   this.traverserEducation = new ProvenanceGraphTraverser(this.registryComparison, this.graphComparison, this.trackerComparison);
-  //   // this.deck = new ProvenanceSlidedeck(this.application, this.traverserComparison);
-
-  //   this.settings.isComparisonMode = true;
-
-  //   // setNewAddListeners(this.registryComparison, this.trackerComparison);  
-  // }
-
-
   newGraphComparison(graph?: ProvenanceGraph) {
     this.graphComparison = graph ? graph : new ProvenanceGraph({ name: 'storyvis', version: '1.0.0' });
     this.registryComparison = new ActionFunctionRegistry();
     this.trackerComparison = new ProvenanceTracker(this.registryComparison, this.graphComparison);
     this.traverserComparison = new ProvenanceGraphTraverser(this.registryComparison, this.graphComparison, this.trackerComparison);
     this.deckComparison = new ProvenanceSlidedeck(this.application, this.traverserComparison);
-
-    (window as any).prov = {
-      graphComparison: this.graphComparison,
-      registryComparison: this.registryComparison,
-      trackerComparison: this.trackerComparison,
-      traverserComparison: this.traverserComparison,
-      deckComparison: this.deckComparison
-    };
 
     if (this.treeComparison) { this.treeComparison.rewire(this.traverserComparison); }
     
@@ -401,13 +360,6 @@ export class ProvenanceService {
     // Do NOT assign this.deck here — ProvenanceSlidesComponent owns deck lifecycle.
     // graphReset$ notifies it to create a new deck bound to the fresh traverser.
 
-    (window as any).prov = {
-      graph: this.graph,
-      registry: this.registry,
-      tracker: this.tracker,
-      traverser: this.traverser,
-    };
-
     if (this.tree) { this.tree.rewire(this.traverser); }
     setNewAddListeners(this.registry, this.tracker);
     this.graphReset$.next();
@@ -420,21 +372,13 @@ export class ProvenanceService {
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
-    this.deck = new ProvenanceSlidedeck(this.application, this.traverser);
 
     this.graphComparison = new ProvenanceGraph({ name: 'storyvisComparison', version: '1.0.0' });
     this.registryComparison = new ActionFunctionRegistry();
     this.trackerComparison = new ProvenanceTracker(this.registryComparison, this.graphComparison);
     this.traverserComparison = new ProvenanceGraphTraverser(this.registryComparison, this.graphComparison, this.trackerComparison);
-    this.deckComparison = new ProvenanceSlidedeck(this.application, this.traverserComparison);
 
-    (window as any).prov = {
-      graph: this.graph,
-      registry: this.registry,
-      tracker: this.tracker,
-      traverser: this.traverser,
-      deck: this.deck
-    };
+    storyVisBridge.provenance = this;
   }
 
   constructor(private http: HttpClient) {
