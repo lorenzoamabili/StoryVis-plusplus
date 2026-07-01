@@ -17,7 +17,8 @@
       "Bash(npm test *)",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d['projects']['storyvis']['architect'].get\\('test',{}\\), indent=2\\)\\)\")",
       "Skill(code-review)",
-      "PowerShell(cd C:\\\\dev\\\\StoryVis\\\\frontend\\\\storyvis; $env:NODE_OPTIONS=\"--openssl-legacy-provider\"; npx ng build --configuration=production 2>&1 | Select-Object -Last 40)"
+      "PowerShell(cd C:\\\\dev\\\\StoryVis\\\\frontend\\\\storyvis; $env:NODE_OPTIONS=\"--openssl-legacy-provider\"; npx ng build --configuration=production 2>&1 | Select-Object -Last 40)",
+      "PowerShell(git *)"
     ]
   }
 }

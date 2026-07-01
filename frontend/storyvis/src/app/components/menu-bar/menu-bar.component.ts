@@ -71,7 +71,14 @@ export class MenuBarComponent implements OnInit, OnDestroy {
       graphs => { this.graphs = graphs; },
       err => { console.warn('getAllGraphs failed', err); }
     );
+    this.userService.getAllStories(id).pipe(first()).subscribe(
+      stories => { this.stories = stories; },
+      err => { console.warn('getAllStories failed', err); }
+    );
   }
+
+  loadGraph(graph: any) { this.provenance.loadGraph(graph); }
+  loadStory(story: any) { this.provenance.loadStory(story); }
 
   onDataSourceChange(change: MatSelectChange) {
     const url: string = change.value;

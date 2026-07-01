@@ -209,6 +209,30 @@ export class ProvenanceService {
 
 
 
+  public async restoreStory(input: MatSelectChange) {
+    this.loadStory(input.value);
+  }
+
+  public loadStory(storyInput: any) {
+    try {
+      if (storyInput.graph) {
+        const dataGraph = JSON.parse(storyInput.graph);
+        this.graph = restoreProvenanceGraph(dataGraph) as any;
+        this.newProvenanceGraph(this.graph);
+      }
+      // graphReset$ fires synchronously → _initDeck() ran → deck + slideDeck are fresh
+      if (this.deck && this.slideDeck && storyInput.story) {
+        const dataStory = JSON.parse(storyInput.story);
+        const restoredDeck = this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.graph.application);
+        this.deck = restoredDeck;
+        this.slideDeck.setDeck(restoredDeck);
+        this.slideDeck.update();
+      }
+    } catch (e) {
+      console.error('loadStory: failed', e);
+    }
+  }
+
   public async restoreGraphEducation(input: MatSelectChange) {
     const graphInput = input.value;
     this.loadGraphEducation(graphInput);
@@ -256,6 +280,7 @@ export class ProvenanceService {
 
 
   fission() {
+      if (!this.settings.canvas) { return; }
       const parameters = this.settings.canvas.configParam();
       const action = {
         metadata: {
@@ -290,6 +315,7 @@ export class ProvenanceService {
 
 
   merging(currentNode: StateNode, nodeTo: StateNode) {
+    if (!this.settings.canvas) { return; }
     let newBranchArtifacts = [];
     this.settings.canvas.renderers2D.forEach(renderer => renderer._artifacts.forEach(artifact => newBranchArtifacts.push(artifact)));
     if (newBranchArtifacts.length !== 0) {

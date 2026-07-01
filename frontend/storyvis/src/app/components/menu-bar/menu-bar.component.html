@@ -156,8 +156,11 @@
         <button mat-menu-item [matMenuTriggerFor]="compareMenu">
           <mat-icon>compare_arrows</mat-icon><span>Comparison Mode</span>
         </button>
-        <button mat-menu-item (click)="load()">
+        <button mat-menu-item [matMenuTriggerFor]="loadAnalysisMenu" (menuOpened)="load()">
           <mat-icon>folder_open</mat-icon><span>Load Saved Analysis</span>
+        </button>
+        <button mat-menu-item [matMenuTriggerFor]="loadStoryMenu" (menuOpened)="load()">
+          <mat-icon>auto_stories</mat-icon><span>Load Saved Story</span>
         </button>
       </ng-container>
 
@@ -183,6 +186,30 @@
       <button mat-menu-item *ngFor="let ds of dataSources" (click)="canvas.loadData(ds.url)">
         {{ ds.name }}
       </button>
+    </mat-menu>
+
+    <!-- Load analysis sub-menu -->
+    <mat-menu #loadAnalysisMenu="matMenu">
+      <ng-container *ngIf="graphs.length; else noGraphs">
+        <button mat-menu-item *ngFor="let g of graphs" (click)="loadGraph(g)">
+          {{ g.IDcreator }} — {{ g.timeEnd | date:'short' }}
+        </button>
+      </ng-container>
+      <ng-template #noGraphs>
+        <button mat-menu-item disabled>No saved analyses</button>
+      </ng-template>
+    </mat-menu>
+
+    <!-- Load story sub-menu -->
+    <mat-menu #loadStoryMenu="matMenu">
+      <ng-container *ngIf="stories.length; else noStories">
+        <button mat-menu-item *ngFor="let s of stories" (click)="loadStory(s)">
+          {{ s.IDcreator }} — {{ s._id }}
+        </button>
+      </ng-container>
+      <ng-template #noStories>
+        <button mat-menu-item disabled>No saved stories</button>
+      </ng-template>
     </mat-menu>
 
     <!-- ── Save + Clock ───────────────────────────────────────────────────── -->

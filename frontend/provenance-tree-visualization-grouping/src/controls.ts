@@ -3,11 +3,15 @@ import { StateNode } from '@visualstorytelling/provenance-core';
 import { storyVisBridge } from './bridge';
 
 
+let _keyPressListener: ((e: any) => void) | null = null;
+
 export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVisualization) {
     var graph = provenanceTreeVisualization.traverser.graph;
     var traverser = provenanceTreeVisualization.traverser;
 
-    document.onkeydown = keyPress;
+    if (_keyPressListener) { document.removeEventListener('keydown', _keyPressListener); }
+    document.addEventListener('keydown', keyPress);
+    _keyPressListener = keyPress;
 
 
     function keyPress(e: any) {
