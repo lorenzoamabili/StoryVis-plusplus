@@ -64,10 +64,18 @@ Yarn workspace. Main app: `storyvis/` (Angular 10). Local libs: `provenance-core
 **Node.js / build quirks**: Node v17+ needs `NODE_OPTIONS=--openssl-legacy-provider`. TypeScript pinned `~4.0.3`. Local libs must be built before Angular app.
 
 ### Key service wiring
-- `ProvenanceVisualizationComponent` registers itself on `provenance.tree` in `ngOnInit` — service calls `this.tree.rewire(traverser)` on graph reset (no window globals).
-- `ProvenanceSlidesComponent` assigns `provenance.deck` + `provenance.slideDeck` after constructing them — `saveStory` reads from service fields directly.
-- `SessionStateService` — dataset/slice/W-L bus between canvas and AI service.
+- `ProvenanceVisualizationComponent` registers itself on `provenance.tree` in `ngOnInit` — service calls `this.tree.rewire(traverser)` on graph reset.
+- `ProvenanceSlidesComponent` assigns `provenance.deck` + `provenance.slideDeck` + `storyVisBridge.slideDeck` after constructing deck.
+- `ProvenanceService.init()` sets `storyVisBridge.provenance = this` — lib calls Angular service methods via bridge (no window globals).
+- `SessionStateService` — dataset/slice/W-L reactive bus between canvas and AI service.
 - `BookmarkService` + `ReflectionService` — localStorage persisted (`storyvis_bookmarks`, `storyvis_reflections`).
+
+### storyVisBridge (lib ↔ Angular)
+`frontend/provenance-tree-visualization-grouping/src/bridge.ts` — typed module singleton.
+- `bridge.provenance` = `ProvenanceService` instance (set in `init()`)
+- `bridge.slideDeck` = `SlideDeckVisualization` instance (set in `ProvenanceSlidesComponent._initDeck()`)
+- Used by lib to call `generation/fission/splitting/transferring/merging/copying/saveGraph/saveStory` and `slideDeck.onAdd/onDelete`
+- **No window globals anywhere in app or lib.**
 
 ### Frontend app structure (`frontend/storyvis/src/app/`)
 ```
@@ -89,8 +97,9 @@ shared/_services/
 
 ## Feature Status
 - **Auth**: Removed. UUID sessions. — ✅
-- **Provenance tree**: Empty state; nodeAdded CD; rewire on graph reset; no window globals. — ✅
-- **Story deck**: No window globals; proper service wiring; ViewChild DOM. — ✅
+- **Provenance tree**: Empty state; nodeAdded CD; rewire on graph reset. — ✅
+- **Story deck**: Proper service wiring; ViewChild DOM. — ✅
+- **SPA refactor**: All window globals removed; lib↔Angular via `storyVisBridge` singleton. — ✅
 - **Undo/Redo**: `undoStep`/`redoStep` on canvas via `traverser.toStateNode`. — ✅
 - **AI assistant**: 30s timeout; session context (dataset/slices/W-L). — ✅
 - **Bookmarks + Reflections**: Material dialogs; localStorage persisted. — ✅
@@ -104,11 +113,10 @@ shared/_services/
 - `.env` for production: Atlas URI with real password; never commit password to repo
 
 ## Session Log
-Last session: `.claude/sessions/2026-07-01.md`
+Last session: `.claude/sessions/2026-07-01b.md`
 
 ## Next Steps
-1. Set Atlas password + Render secret env vars (`JWT_SECRET`, `MONGODB_URI`) in dashboards
-2. Set Netlify env vars (`API_URL`, `DEBUG`) and verify build succeeds
-3. End-to-end test: Docker stack locally (MongoDB + backend + frontend)
-4. Test story deck: add slides, save story, reload — verify save/restore flow
-5. Consider lazy-loading AMI.js / Three.js (reduce 2.8MB bundle)
+1. End-to-end test with Docker stack — verify provenance tree contextmenu, keyboard shortcuts, save buttons
+2. Set Atlas password + Render/Netlify env vars for cloud deployment
+3. Test story deck: add slides, save story, reload — verify save/restore flow
+4. Consider lazy-loading AMI.js / Three.js (reduce 2.8MB bundle)
