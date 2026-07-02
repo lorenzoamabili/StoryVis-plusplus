@@ -223,7 +223,7 @@ export class ProvenanceService {
       // graphReset$ fires synchronously → _initDeck() ran → deck + slideDeck are fresh
       if (this.deck && this.slideDeck && storyInput.story) {
         const dataStory = JSON.parse(storyInput.story);
-        const restoredDeck = this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.graph.application);
+        const restoredDeck = this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.graph.application) as ProvenanceSlidedeck;
         this.deck = restoredDeck;
         this.slideDeck.setDeck(restoredDeck);
         this.slideDeck.update();
