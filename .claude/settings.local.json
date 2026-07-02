@@ -22,7 +22,8 @@
       "Bash(npx playwright *)",
       "Bash(mkdir -p C:\\\\dev\\\\StoryVis\\\\playwright-verify)",
       "Bash(npm init *)",
-      "Bash(npm pkg *)"
+      "Bash(npm pkg *)",
+      "PowerShell(Set-Location \"C:\\\\dev\\\\StoryVis\\\\frontend\\\\storyvis\"; $env:NODE_OPTIONS=\"--openssl-legacy-provider\"; npx ng build --configuration=production 2>&1 | Select-Object -Last 15)"
     ]
   }
 }
