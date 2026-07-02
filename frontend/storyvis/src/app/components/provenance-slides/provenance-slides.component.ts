@@ -41,6 +41,8 @@ export class ProvenanceSlidesComponent implements OnInit, OnDestroy {
     }
     this._deck = new ProvenanceSlidedeck(g.application, this.provenance.traverser);
     this._deckViz = new SlideDeckVisualization(this._deck, this.deckRoot.nativeElement);
+    this._deckViz.navigateTo = (node) => { try { this.provenance.traverser?.toStateNode(node.id, 250); } catch (_) {} };
+    this._deckViz.refreshTree = () => (this.provenance.tree as any)?._viz?.update?.();
     this.provenance.deck = this._deck;
     this.provenance.slideDeck = this._deckViz;
     storyVisBridge.slideDeck = this._deckViz;

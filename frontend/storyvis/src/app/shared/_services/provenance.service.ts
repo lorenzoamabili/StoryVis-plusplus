@@ -68,7 +68,11 @@ export class ProvenanceService {
 
 
   public saveGraph(IDcreator: string | number = this.creatorId) {
-    if (this.tracker) {
+    if (!this.tracker) {
+      this.snackBar.open('Nothing to save yet', '', { duration: 2500 });
+      return;
+    }
+    {
       const sJson = JSON.stringify(this.tracker.getGraph());
       this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
         {
@@ -90,6 +94,10 @@ export class ProvenanceService {
   }
 
   public saveStory(IDcreator: string | number = this.creatorId) {
+    if (!this.deck || !this.tracker) {
+      this.snackBar.open('No story to save — add slides first', '', { duration: 3000 });
+      return;
+    }
     if (this.deck && this.tracker) {
       const sJson = JSON.stringify(this.deck.serializeSelf());
       const sJsonGraph = JSON.stringify(this.tracker.getGraph());

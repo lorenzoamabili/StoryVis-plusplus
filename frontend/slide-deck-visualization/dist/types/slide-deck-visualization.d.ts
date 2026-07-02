@@ -1,5 +1,5 @@
 import "./style.css";
-import { IProvenanceSlide, IProvenanceSlidedeck, StateNode } from "@visualstorytelling/provenance-core";
+import { IProvenanceSlide, IProvenanceSlidedeck, ProvenanceNode, StateNode } from "@visualstorytelling/provenance-core";
 export declare class SlideDeckVisualization {
     private _slideDeck;
     private _root;
@@ -30,6 +30,10 @@ export declare class SlideDeckVisualization {
     private _gridSnap;
     private _playingID;
     _slidesInDeck: number;
+    /** Set by the Angular host to navigate the provenance graph to a node. */
+    navigateTo: ((node: ProvenanceNode) => void) | null;
+    /** Set by the Angular host to refresh the provenance tree D3 visualization. */
+    refreshTree: (() => void) | null;
     constructor(slideDeck: IProvenanceSlidedeck, elm: HTMLDivElement);
     onDelete: (slide?: IProvenanceSlide | undefined, node?: import("@visualstorytelling/provenance-core").RootNode | StateNode | undefined) => void;
     private onSelect;

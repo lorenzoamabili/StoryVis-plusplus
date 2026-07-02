@@ -77,6 +77,14 @@ function __generator(thisArg, body) {
     }
 }
 
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
 function generateUUID() {
     // Public Domain/MIT
     var d = new Date().getTime();
@@ -296,7 +304,6 @@ function serializeProvenanceGraph(graph) {
 }
 
 var nodeCounter = 0;
-var allArtifacts = [];
 /**
  * Provenance Graph Tracker implementation
  *
@@ -330,7 +337,7 @@ var ProvenanceTracker = /** @class */ (function () {
     ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall, artifacts, option, newRoot) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var label, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
+            var label, nodeArtifacts, createNewStateNode, newNode, currentNode, parentNode, functionNameToExecute, funcWithThis, actionResult;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -345,13 +352,13 @@ var ProvenanceTracker = /** @class */ (function () {
                         else {
                             label = action.do;
                         }
-                        if (artifacts) {
-                            artifacts.length === 1 ? allArtifacts.push(artifacts) : allArtifacts.push.apply(allArtifacts, artifacts);
-                        }
+                        nodeArtifacts = artifacts
+                            ? Array.isArray(artifacts) ? __spreadArrays(artifacts) : [artifacts]
+                            : [];
                         createNewStateNode = function (parentNode, actionResult) { return ({
                             id: generateUUID(),
                             label: label,
-                            artifacts: artifacts ? allArtifacts : [],
+                            artifacts: nodeArtifacts,
                             metadata: {
                                 option: option ? option : '',
                                 mainbranch: false,
@@ -444,8 +451,6 @@ var ProvenanceTracker = /** @class */ (function () {
         return this.graph.getSelf();
     };
     ProvenanceTracker.prototype.restoreGraph = function (sgraph) {
-        Object.setPrototypeOf(sgraph, serializeProvenanceGraph.prototype);
-        alert(JSON.stringify(sgraph));
         this.graph = this.graph.restoreSelf(sgraph);
     };
     return ProvenanceTracker;
@@ -738,11 +743,16 @@ var ProvenanceSlidedeck = /** @class */ (function () {
             return this._selectedSlide;
         },
         set: function (slide) {
-            if (slide && slide.node) {
-                this._traverser.toStateNode(slide.node.id, slide.transitionTime);
-            }
+            var _this = this;
             this._selectedSlide = slide;
-            this._mitt.emit('slideSelected', slide);
+            if (slide && slide.node) {
+                this._traverser.toStateNode(slide.node.id, slide.transitionTime)
+                    .then(function () { return _this._mitt.emit('slideSelected', slide); })
+                    .catch(function () { return _this._mitt.emit('slideSelected', slide); });
+            }
+            else {
+                this._mitt.emit('slideSelected', slide);
+            }
         },
         enumerable: false,
         configurable: true
@@ -1003,9 +1013,14 @@ class SlideDeckVisualization {
         this._playingID = -1;
         // private _annotationContainer = new AnnotationDisplayContainer();
         this._slidesInDeck = 0;
+        /** Set by the Angular host to navigate the provenance graph to a node. */
+        this.navigateTo = null;
+        /** Set by the Angular host to refresh the provenance tree D3 visualization. */
+        this.refreshTree = null;
         this.onDelete = (slide, node) => {
+            var _a;
             this._slideDeck.graph.current.metadata.bookmarked = false;
-            window.tree._viz.update();
+            (_a = this.refreshTree) === null || _a === void 0 ? void 0 : _a.call(this);
             if (slide) {
                 this._slideDeck.removeSlide(slide);
             }
@@ -1019,6 +1034,7 @@ class SlideDeckVisualization {
             this.selectSlide(slide);
         };
         this.selectSlide = (slide) => {
+            var _a, _b;
             if (slide === null) {
                 return;
             }
@@ -1035,21 +1051,27 @@ class SlideDeckVisualization {
             slide.transitionTime = artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
             this._slideDeck.selectedSlide = slide;
             slide.transitionTime = originalSlideTransitionTime;
-            window.prov.graph.current = slide.node;
-            window.tree._viz.update();
+            if (slide.node) {
+                (_a = this.navigateTo) === null || _a === void 0 ? void 0 : _a.call(this, slide.node);
+            }
+            (_b = this.refreshTree) === null || _b === void 0 ? void 0 : _b.call(this);
             this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
             this.update();
         };
         this.onAdd = (node) => {
+            var _a;
             let slideDeck = this._slideDeck;
             let nodeSlide = node ? node : slideDeck.graph.current;
+            if (!nodeSlide) {
+                return;
+            }
             const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, [], nodeSlide);
             slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
             slideDeck.addSlide(slide, slideDeck.slides.length);
             slideCreationOrder = slideCreationOrder + 1;
             nodeSlide.metadata.slideCreationOrder = slideCreationOrder;
             slideDeck.graph.current.metadata.bookmarked = true;
-            window.tree._viz.update();
+            (_a = this.refreshTree) === null || _a === void 0 ? void 0 : _a.call(this);
             this.selectSlide(slide);
             this._slidesInDeck += 1;
         };
@@ -1896,18 +1918,14 @@ class SlideDeckVisualization {
         }
     }
     createStoryFromDerivationNodes() {
-        let nodes = window.prov.graph.getNodes();
-        var arrayNodes = [];
-        for (const nodeId of Object.keys(nodes)) {
-            let node = nodes[nodeId];
-            arrayNodes.push(node);
-        }
-        arrayNodes.shift();
-        for (const node of arrayNodes.filter((node) => node.action.metadata.userIntent === ('derivation' ))) {
+        var _a;
+        const nodes = this._slideDeck.graph.getNodes();
+        const arrayNodes = Object.values(nodes).slice(1);
+        for (const node of arrayNodes.filter((node) => { var _a, _b; return ((_b = (_a = node.action) === null || _a === void 0 ? void 0 : _a.metadata) === null || _b === void 0 ? void 0 : _b.userIntent) === ('derivation' ); })) {
             node.metadata.story = true;
-            window.slideDeck.onAdd(node);
+            this.onAdd(node);
         }
-        window.tree._viz.update();
+        (_a = this.refreshTree) === null || _a === void 0 ? void 0 : _a.call(this);
     }
     setDeck(deck) {
         this._slideDeck = deck;

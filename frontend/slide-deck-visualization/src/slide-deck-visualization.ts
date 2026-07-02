@@ -58,6 +58,11 @@ export class SlideDeckVisualization {
     // private _annotationContainer = new AnnotationDisplayContainer();
     public _slidesInDeck: number = 0;
 
+    /** Set by the Angular host to navigate the provenance graph to a node. */
+    public navigateTo: ((node: ProvenanceNode) => void) | null = null;
+    /** Set by the Angular host to refresh the provenance tree D3 visualization. */
+    public refreshTree: (() => void) | null = null;
+
     constructor(slideDeck: IProvenanceSlidedeck, elm: HTMLDivElement) {
         this._tableWidth = this._originPosition + this._placeholderWidth;
         window.addEventListener("resize", this.resizeTable);
@@ -453,7 +458,7 @@ export class SlideDeckVisualization {
     }
     public onDelete = (slide?: IProvenanceSlide, node?: ProvenanceNode) => {
         (this._slideDeck.graph.current as StateNode).metadata.bookmarked = false;
-        (window as any).tree._viz.update();
+        this.refreshTree?.();
         if (slide) {
             this._slideDeck.removeSlide(slide);
         } else if (node) {
@@ -485,8 +490,8 @@ export class SlideDeckVisualization {
         slide.transitionTime = artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
         this._slideDeck.selectedSlide = slide;
         slide.transitionTime = originalSlideTransitionTime;
-        (window as any).prov.graph.current = slide.node;
-        (window as any).tree._viz.update();
+        if (slide.node) { this.navigateTo?.(slide.node); }
+        this.refreshTree?.();
 
         this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation);
         this.update();
@@ -495,13 +500,14 @@ export class SlideDeckVisualization {
     public onAdd = (node?: ProvenanceNode) => {
         let slideDeck = this._slideDeck;
         let nodeSlide = node ? node : slideDeck.graph.current;
+        if (!nodeSlide) { return; }
         const slide = new ProvenanceSlide(nodeSlide.label, 5000, 0, 0, [], nodeSlide);
         slide.nodeCreationOrder = nodeSlide.metadata.creationOrder;
         slideDeck.addSlide(slide, slideDeck.slides.length);
         slideCreationOrder = slideCreationOrder + 1;
         nodeSlide.metadata.slideCreationOrder = slideCreationOrder;
         (slideDeck.graph.current as StateNode).metadata.bookmarked = true;
-        (window as any).tree._viz.update();
+        this.refreshTree?.();
         this.selectSlide(slide);
         this._slidesInDeck += 1;
     }
@@ -1128,20 +1134,14 @@ export class SlideDeckVisualization {
     }
 
     public createStoryFromDerivationNodes() {
-        let nodes = (window as any).prov.graph.getNodes();
-        var arrayNodes: any[] = [];
+        const nodes = this._slideDeck.graph.getNodes();
+        const arrayNodes: any[] = Object.values(nodes).slice(1);
 
-        for (const nodeId of Object.keys(nodes)) {
-            let node = nodes[nodeId];
-            arrayNodes.push(node);
-        }
-        arrayNodes.shift();
-
-        for (const node of (arrayNodes as any).filter((node: any) => node.action.metadata.userIntent === ('derivation' || 'annotation'))) {
+        for (const node of (arrayNodes as any).filter((node: any) => node.action?.metadata?.userIntent === ('derivation' || 'annotation'))) {
             node.metadata.story = true;
-            (window as any).slideDeck.onAdd(node);
+            this.onAdd(node);
         }
-        (window as any).tree._viz.update();
+        this.refreshTree?.();
     }
 
     public setDeck(deck: IProvenanceSlidedeck) {
