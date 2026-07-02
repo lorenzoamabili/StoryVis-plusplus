@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Application, StateNode } from '../../../../../provenance-core/src/api';
 import {
@@ -78,11 +79,11 @@ export class ProvenanceService {
           timeEnd: new Date().getTime()
         })
         .subscribe(
-          data => {
-            console.log("POST Request is successful", data);
+          _data => {
+            this.snackBar.open('Analysis history saved', '', { duration: 2500, panelClass: 'sv-snack-ok' });
           },
-          error => {
-            console.log("Error", error);
+          _err => {
+            this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
           }
         );
     }
@@ -99,11 +100,11 @@ export class ProvenanceService {
           IDcreator: IDcreator
         })
         .subscribe(
-          data => {
-            console.log("POST Request is successful", data);
+          _data => {
+            this.snackBar.open('Story saved', '', { duration: 2500, panelClass: 'sv-snack-ok' });
           },
-          error => {
-            console.log("Error", error);
+          _err => {
+            this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
           }
         );
     }
@@ -114,8 +115,12 @@ export class ProvenanceService {
     this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
       { textReport: this.textReport, IDcreator })
       .subscribe(
-        data => { console.log("POST Request is successful", data); },
-        error => { console.log("Error", error); }
+        _data => {
+          this.snackBar.open('Report saved', '', { duration: 2500, panelClass: 'sv-snack-ok' });
+        },
+        _err => {
+          this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
+        }
       );
   }
 
@@ -202,8 +207,10 @@ export class ProvenanceService {
       const dataGraph = JSON.parse(graphInput.serializedGraph);
       this.graph = restoreProvenanceGraph(dataGraph) as any;
       this.newProvenanceGraph(this.graph);
+      this.snackBar.open('Analysis history loaded', '', { duration: 2500, panelClass: 'sv-snack-ok' });
     } catch (e) {
       console.error('loadGraph: failed to parse graph', e);
+      this.snackBar.open('Load failed — invalid data', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
     }
   }
 
@@ -228,8 +235,10 @@ export class ProvenanceService {
         this.slideDeck.setDeck(restoredDeck);
         this.slideDeck.update();
       }
+      this.snackBar.open('Story loaded', '', { duration: 2500, panelClass: 'sv-snack-ok' });
     } catch (e) {
       console.error('loadStory: failed', e);
+      this.snackBar.open('Load failed — invalid data', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
     }
   }
 
@@ -407,7 +416,7 @@ export class ProvenanceService {
     storyVisBridge.provenance = this;
   }
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) {
     this.init().then(() => this.initialized = true);
   }
 }

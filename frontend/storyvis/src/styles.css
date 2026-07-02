@@ -546,3 +546,8 @@ template {
 [hidden] {
   display: none;
 }
+
+/* ── Snackbar feedback ───────────────────────────────────────────────────── */
+.sv-snack-ok .mat-simple-snackbar { color: #a8f0b8; }
+.sv-snack-err .mat-simple-snackbar { color: #ffb3b3; }
+.sv-snack-err .mat-simple-snackbar-action { color: #ff8a80; }

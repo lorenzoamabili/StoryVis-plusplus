@@ -401,6 +401,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     });
   }
 
+  captureFrame(panelId: string) {
+    if (storyVisBridge.slideDeck) {
+      storyVisBridge.slideDeck.onAdd(this.provenance.graph?.current);
+    } else {
+      this.addFrame('datacomics', panelId);
+    }
+  }
+
   @HostListener('click', ['$event'])
   onHostClick(event: MouseEvent) {
     if (!event.altKey || !this.datacomicsOpen) { return; }
@@ -409,11 +417,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     if (panel) {
       event.preventDefault();
       event.stopPropagation();
-      if (storyVisBridge.slideDeck) {
-        storyVisBridge.slideDeck.onAdd(this.provenance.graph?.current);
-      } else {
-        this.addFrame('datacomics', panel.id);
-      }
+      this.captureFrame(panel.id);
     }
   }
 

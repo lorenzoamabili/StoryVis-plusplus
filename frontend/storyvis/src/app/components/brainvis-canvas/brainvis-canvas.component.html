@@ -13,8 +13,8 @@
             Slice {{ getIndex(_axialRenderer) }}
         </button>
         <div *ngIf="settings.isAdvancedMode">
-            <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r0');"
-                matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
+            <button mat-icon-button class="datacomics" (click)="captureFrame('r0')"
+                matTooltip="Add this panel to the story deck (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
@@ -81,8 +81,8 @@
             <mat-icon>fullscreen_exit</mat-icon>
         </button>
         <div *ngIf="settings.isAdvancedMode">
-            <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r1');"
-                matTooltip="Capture this 3D view as a data-comics frame (Alt+click also works)">
+            <button mat-icon-button class="datacomics" (click)="captureFrame('r1')"
+                matTooltip="Add this 3D view to the story deck (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
         </div>
@@ -102,8 +102,8 @@
             Slice {{ getIndex(_coronalRenderer) }}
         </button>
         <div *ngIf="settings.isAdvancedMode">
-            <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r2');"
-                matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
+            <button mat-icon-button class="datacomics" (click)="captureFrame('r2')"
+                matTooltip="Add this panel to the story deck (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
@@ -172,8 +172,8 @@
             Slice {{ getIndex(_sagittalRenderer) }}
         </button>
         <div *ngIf="settings.isAdvancedMode">
-            <button mat-icon-button class="datacomics" (click)="addFrame('datacomics', 'r3');"
-                matTooltip="Capture this panel as a data-comics frame (Alt+click also works)">
+            <button mat-icon-button class="datacomics" (click)="captureFrame('r3')"
+                matTooltip="Add this panel to the story deck (Alt+click also works)">
                 <mat-icon>grid_on</mat-icon>
             </button>
             <button *ngIf="settings.isOneView" mat-icon-button class="navigation-up"
