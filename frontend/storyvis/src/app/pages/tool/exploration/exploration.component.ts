@@ -2,6 +2,7 @@ import { Component, ViewChild, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProvenanceService, SessionService } from '../../../shared/_services';
 import { AiAssistantPanelComponent } from '../../../components/ai-assistant-panel/ai-assistant-panel.component';
+import { BrainvisCanvasComponent } from '../../../components/brainvis-canvas/brainvis-canvas.component';
 import { ProvenanceVisualizationComponent } from '../../../components/provenance-visualization/provenance-visualization.component';
 import { Settings } from '../../../components/brainvis-canvas/utils/settings';
 
@@ -11,6 +12,7 @@ const LS_BOTTOM_HEIGHT = 'storyvis_bottom_height';
 export class ExplorationComponent {
     @ViewChild('aiPanel') aiPanel: AiAssistantPanelComponent;
     @ViewChild('provViz') provViz: ProvenanceVisualizationComponent;
+    @ViewChild('canvas') canvas: BrainvisCanvasComponent;
 
     studyStarted = true;
     IDcreator: string;
@@ -25,7 +27,12 @@ export class ExplorationComponent {
     rightOpen = false;
     activePanel: 'prov' | 'bm' | 'ref' | 'ai' = 'prov';
 
-    bottomOpen = false;
+    private _bottomOpen = false;
+    get bottomOpen() { return this._bottomOpen; }
+    set bottomOpen(v: boolean) {
+        this._bottomOpen = v;
+        if (this.settings) { this.settings.datacomicsMode = v; }
+    }
     bottomHeight: number = +(localStorage.getItem(LS_BOTTOM_HEIGHT) ?? 220);
 
     private _resizing = false;

@@ -15,7 +15,7 @@
       - key: MONGODB_URI
         sync: false
       - key: CORS_ORIGIN
-        value: https://storyvis.netlify.app
+        value: https://storyvis.netlify.app,http://localhost:4200
       - key: OLLAMA_HOST
         sync: false
       - key: OLLAMA_MODEL

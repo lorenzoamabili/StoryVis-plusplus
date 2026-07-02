@@ -29,8 +29,9 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: '10mb' }));
 
-const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:4200';
-app.use(cors({ origin: allowedOrigin }));
+const rawOrigins = (process.env.CORS_ORIGIN || 'http://localhost:4200').split(',').map(s => s.trim());
+const allowedOrigins = rawOrigins.length === 1 ? rawOrigins[0] : rawOrigins;
+app.use(cors({ origin: allowedOrigins }));
 
 // rate limiting on auth endpoints
 const authLimiter = rateLimit({

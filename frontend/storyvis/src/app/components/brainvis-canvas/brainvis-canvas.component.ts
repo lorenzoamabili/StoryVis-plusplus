@@ -27,6 +27,7 @@ import { ReflectionService } from '../../shared/_services/reflection.service';
 import { QuickReflectionDialogComponent } from '../quick-reflection-dialog/quick-reflection-dialog.component';
 import { AnnotationDialogComponent } from '../annotation-dialog/annotation-dialog.component';
 import { KeyboardShortcutsDialogComponent } from '../keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
+import { storyVisBridge } from '@visualstorytelling/provenance-tree-visualization';
 
 export enum VIEWS {
   AXIAL = 'axial',
@@ -408,7 +409,11 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     if (panel) {
       event.preventDefault();
       event.stopPropagation();
-      this.addFrame('datacomics', panel.id);
+      if (storyVisBridge.slideDeck) {
+        storyVisBridge.slideDeck.onAdd(this.provenance.graph?.current);
+      } else {
+        this.addFrame('datacomics', panel.id);
+      }
     }
   }
 

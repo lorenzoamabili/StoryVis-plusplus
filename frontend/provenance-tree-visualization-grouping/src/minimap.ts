@@ -143,6 +143,7 @@ export class ProvenanceMinimap {
      */
     public updateBrush(): void {
         if (!this.canvasRect || !this.targetRect) { return; }
+        if (this.canvasRect.width === 0 || this.canvasRect.height === 0) { return; }
 
         const canvas = this.canvasRect;
 

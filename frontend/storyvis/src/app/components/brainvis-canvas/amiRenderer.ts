@@ -4,6 +4,7 @@ import * as AMI from 'ami.js';
 import * as THREE from 'three';
 import { EventEmitter } from '@angular/core';
 import { Settings } from './utils/settings';
+import { storyVisBridge } from '@visualstorytelling/provenance-tree-visualization';
 
 export class AMIRenderer {
     protected _initialized = false;
@@ -107,7 +108,11 @@ export class AMIRenderer {
     protected onAltClick(event) {
         if (event.altKey) {
             if (this._initialized) {
-                this._canvas.addFrame('datacomics', this._domID);
+                if (storyVisBridge.slideDeck) {
+                    storyVisBridge.slideDeck.onAdd(this._canvas.provenance?.graph?.current);
+                } else {
+                    this._canvas.addFrame('datacomics', this._domID);
+                }
             }
         }
     }

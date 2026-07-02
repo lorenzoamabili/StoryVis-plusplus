@@ -495,6 +495,7 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
       this.click = true;
     } else if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
       if (!this._canvas.settings.rulerMode && !this._canvas.settings.angleMode && !this._canvas.settings.voxelprobeMode && !this._canvas.settings.annotationMode) {
+        if (!this.oldSlicePosition) { return; }
         if ((Math.abs(this.oldSlicePosition.position[0] - this.getSlicePosition().position[0]) > 0 ||
           Math.abs(this.oldSlicePosition.position[1] - this.getSlicePosition().position[1]) > 0 ||
           Math.abs(this.oldSlicePosition.position[2] - this.getSlicePosition().position[2]) > 0) || this.oldCameraZoom !== this._camera.zoom) {
