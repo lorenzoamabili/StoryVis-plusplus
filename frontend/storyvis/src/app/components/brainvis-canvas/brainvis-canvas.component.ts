@@ -491,14 +491,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this._zone.run(() => this._updateCoverageSegs());
     });
 
-    // Record coverage on every live slice scroll (provenance uses skipFirstDoFunctionCall=true
-    // so the action function never runs during live interaction — coverage must be recorded here).
-    this.addEventListener('sliceIndexChanged', (e: any) => {
-      const { sliceOrientation, newIndex } = e.changes ?? {};
-      if (sliceOrientation && newIndex !== undefined) {
-        this.coverage.recordVisit(sliceOrientation, newIndex);
-      }
-    });
 
     addListeners(this.provenance.tracker);
   }
@@ -1332,16 +1324,22 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     if (this.contourHelper) {
       this.contourHelper.geometry = this._axialRenderer.stackHelper.slice.geometry;
     }
+    const idx = this._axialRenderer?.stackHelper?.index;
+    if (idx != null) { this._zone.run(() => this.coverage.recordVisit('axial', idx)); }
   }
 
   onCoronalChanged() {
     this._coronalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
     this._coronalRenderer.updateClipPlane(this.clipPlaneCoronal);
+    const idx = this._coronalRenderer?.stackHelper?.index;
+    if (idx != null) { this._zone.run(() => this.coverage.recordVisit('coronal', idx)); }
   }
 
   onSagittalChanged() {
     this._sagittalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._coronalRenderer.localizerHelper]);
     this._sagittalRenderer.updateClipPlane(this.clipPlaneSagittal);
+    const idx = this._sagittalRenderer?.stackHelper?.index;
+    if (idx != null) { this._zone.run(() => this.coverage.recordVisit('sagittal', idx)); }
   }
 
   onMulti1Changed() {
