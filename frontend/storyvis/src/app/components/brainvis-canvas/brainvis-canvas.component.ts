@@ -78,6 +78,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private _rafId: number = 0;
   private _destroy$ = new Subject<void>();
   private _wheelHandler: ((e: WheelEvent) => void) | null = null;
+  private _syncSliceTimer: any = null;
 
   private framesCounter: number = 0;
   private frames: HTMLDivElement[] = [];
@@ -367,7 +368,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   trackByIdx(i: number) { return i; }
 
   private _syncSessionSlices() {
-    setTimeout(() => {
+    clearTimeout(this._syncSliceTimer);
+    this._syncSliceTimer = setTimeout(() => {
       this._sessionState.setSlices({
         axial:    (this._axialRenderer as any)?.stackHelper?.index,
         coronal:  (this._coronalRenderer as any)?.stackHelper?.index,
@@ -629,6 +631,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this._wheelHandler = null;
     }
     if (this._cineTimer) { clearInterval(this._cineTimer); this._cineTimer = null; }
+    clearTimeout(this._syncSliceTimer);
     this.renderers.forEach(r => r.removeEventListeners());
   }
 
@@ -943,7 +946,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     const wl = this._axialRenderer?.stackHelper?.slice?._stack?._windowCenter;
     const captureN = this.framesCounter;
 
-    html2canvas(document.getElementById(elmId) as any).then(canvas => {
+    const captureEl = document.getElementById(elmId);
+    if (!captureEl) {
+      this._snack.open(`Capture failed — panel "${elmId}" not found`, '', { duration: 3000 });
+      return;
+    }
+    html2canvas(captureEl as any).then(canvas => {
       canvas.className = 'canvas';
       canvas.id = 'canvas' + captureN;
       this.canvases.push(canvas);
@@ -961,6 +969,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       // Sequence controls: ← [N] →
       this._addFrameSeqControls(frame, dashboard);
       this._refreshSeqBadges(dashboard);
+    }).catch(err => {
+      console.error('html2canvas capture failed:', err);
+      this._snack.open('Capture failed — could not render panel', '', { duration: 3000 });
     });
   }
 
@@ -978,8 +989,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       if (i > 0) {
         [this.frames[i - 1], this.frames[i]] = [this.frames[i], this.frames[i - 1]];
         const container = document.getElementById(dashboard);
-        const before = this.frames[i - 1];
-        container.insertBefore(frame, before);
+        if (!container) { return; }
+        container.insertBefore(frame, this.frames[i - 1]);
         this._refreshSeqBadges(dashboard);
       }
     });
@@ -998,6 +1009,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       if (i < this.frames.length - 1) {
         [this.frames[i], this.frames[i + 1]] = [this.frames[i + 1], this.frames[i]];
         const container = document.getElementById(dashboard);
+        if (!container) { return; }
         const after = this.frames[i + 1];
         if (after.nextSibling) {
           container.insertBefore(frame, after.nextSibling);
@@ -1032,11 +1044,11 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   downloadDashboard() {
     if (this.settings.datacomicsMode) {
-      var doc = new jsPDF();
-      doc.html(document.getElementById("datacomics") as HTMLElement, {
-        callback: function (doc) {
-          doc.save();
-        },
+      const el = document.getElementById('datacomics');
+      if (!el) { return; }
+      const doc = new jsPDF();
+      doc.html(el, {
+        callback: d => d.save(),
         width: 100,
         windowWidth: this.screenWidth / 2
       });
@@ -1070,8 +1082,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   displayDatacomics() {
     if (this.datacomicsOpen) {
-      document.getElementById('main').setAttribute('style', 'display: none;');
-      document.getElementById('datacomics').setAttribute('style', 'display: block;')
+      document.getElementById('main')?.setAttribute('style', 'display: none;');
+      document.getElementById('datacomics')?.setAttribute('style', 'display: block;')
       this.frames.forEach((frame: any) => frame.setAttribute('style', 'display: block;'));
       const gridFactorX =
         (this.framesCounter < 5) ? 2 :
@@ -1104,7 +1116,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     textArea.setAttribute('placeholder', 'Add some text to the frame here.');
 
     if (this.datacomicsOpen) {
-      document.getElementById('datacomics').appendChild(textArea);
+      document.getElementById('datacomics')?.appendChild(textArea);
     }
 
     const offset = this.textAreas.length * 24;
@@ -1114,13 +1126,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   switchToMainView() {
-    document.getElementById('main').setAttribute('style', 'display: flex;');
-    document.getElementById('datacomics').setAttribute('style', 'display: none;');
+    document.getElementById('main')?.setAttribute('style', 'display: flex;');
+    document.getElementById('datacomics')?.setAttribute('style', 'display: none;');
   }
 
   clearDashboard() {
     if (this.datacomicsOpen) {
-      document.getElementById('datacomics').innerHTML = '';
+      const el = document.getElementById('datacomics');
+      if (el) { el.innerHTML = ''; }
     }
   }
 

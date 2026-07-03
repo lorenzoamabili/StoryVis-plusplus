@@ -121,6 +121,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   private _rfSub: Subscription;
   private _lastWidth = 0;
   private _svgObserveRetries = 0;
+  private _svgObserveTimer: any = null;
   private _boundGraph: any = null;
   private _nodeAddedHandler: (() => void) | null = null;
 
@@ -171,6 +172,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     this._rfSub?.unsubscribe();
     this._unbindListener();
     clearTimeout(this._hideTimer);
+    clearTimeout(this._svgObserveTimer);
     if (this.provenance.tree === this) { this.provenance.tree = null; }
   }
 
@@ -225,13 +227,14 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   }
 
   private _tryObserveSvg() {
+    clearTimeout(this._svgObserveTimer);
     const host = this.elementRef.nativeElement as HTMLElement;
     const svg = host.querySelector('svg');
     if (svg) {
       this._observer.observe(svg, { childList: true, subtree: true });
     } else if (this._svgObserveRetries < 20) {
       this._svgObserveRetries++;
-      setTimeout(() => this._tryObserveSvg(), 200);
+      this._svgObserveTimer = setTimeout(() => this._tryObserveSvg(), 200);
     }
   }
 

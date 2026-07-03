@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Application, StateNode } from '../../../../../provenance-core/src/api';
@@ -68,7 +69,7 @@ export class ProvenanceService {
 
 
   private _save<T>(endpoint: string, body: object, okMsg: string | null): void {
-    this.http.post<T>(`${environment.apiUrl}/${endpoint}`, body).subscribe(
+    this.http.post<T>(`${environment.apiUrl}/${endpoint}`, body).pipe(take(1)).subscribe(
       _data => { if (okMsg) { this.snackBar.open(okMsg, '', { duration: 2500, panelClass: 'sv-snack-ok' }); } },
       _err  => { if (okMsg) { this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' }); } }
     );
