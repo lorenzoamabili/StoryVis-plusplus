@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject, ReplaySubject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Application, StateNode } from '../../../../../provenance-core/src/api';
@@ -9,7 +9,7 @@ import {
   ProvenanceGraphTraverser,
   ActionFunctionRegistry,
   ProvenanceSlidedeck
-} from '../../../../../node_modules/@visualstorytelling/provenance-core';
+} from '@visualstorytelling/provenance-core';
 
 import { HttpClient } from '@angular/common/http';
 
@@ -67,30 +67,23 @@ export class ProvenanceService {
   public settings = Settings.getInstance(this);
 
 
+  private _save<T>(endpoint: string, body: object, okMsg: string | null): void {
+    this.http.post<T>(`${environment.apiUrl}/${endpoint}`, body).subscribe(
+      _data => { if (okMsg) { this.snackBar.open(okMsg, '', { duration: 2500, panelClass: 'sv-snack-ok' }); } },
+      _err  => { if (okMsg) { this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' }); } }
+    );
+  }
+
   public saveGraph(IDcreator: string | number = this.creatorId) {
     if (!this.tracker) {
       this.snackBar.open('Nothing to save yet', '', { duration: 2500 });
       return;
     }
-    {
-      const sJson = JSON.stringify(this.tracker.getGraph());
-      this.http.post<Provenance>(`${environment.apiUrl}/provGraphs/provenance`,
-        {
-          serializedGraph: sJson,
-          IDcreator: IDcreator,
-          findingsCoord: this.findingsCoord,
-          timeStart: this.timeStart,
-          timeEnd: new Date().getTime()
-        })
-        .subscribe(
-          _data => {
-            this.snackBar.open('Analysis history saved', '', { duration: 2500, panelClass: 'sv-snack-ok' });
-          },
-          _err => {
-            this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
-          }
-        );
-    }
+    this._save<Provenance>('provGraphs/provenance', {
+      serializedGraph: JSON.stringify(this.tracker.getGraph()),
+      IDcreator, findingsCoord: this.findingsCoord,
+      timeStart: this.timeStart, timeEnd: new Date().getTime()
+    }, 'Analysis history saved');
   }
 
   public saveStory(IDcreator: string | number = this.creatorId) {
@@ -98,92 +91,39 @@ export class ProvenanceService {
       this.snackBar.open('No story to save — add slides first', '', { duration: 3000 });
       return;
     }
-    if (this.deck && this.tracker) {
-      const sJson = JSON.stringify(this.deck.serializeSelf());
-      const sJsonGraph = JSON.stringify(this.tracker.getGraph());
-      this.http.post<Story>(`${environment.apiUrl}/stories/story`,
-        {
-          story: sJson,
-          graph: sJsonGraph,
-          IDcreator: IDcreator
-        })
-        .subscribe(
-          _data => {
-            this.snackBar.open('Story saved', '', { duration: 2500, panelClass: 'sv-snack-ok' });
-          },
-          _err => {
-            this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
-          }
-        );
-    }
+    this._save<Story>('stories/story', {
+      story: JSON.stringify(this.deck.serializeSelf()),
+      graph: JSON.stringify(this.tracker.getGraph()),
+      IDcreator
+    }, 'Story saved');
   }
 
   public saveTextReport(IDcreator: string | number) {
     if (!this.textReport) { return; }
-    this.http.post<TextReport>(`${environment.apiUrl}/textReports/textReport`,
-      { textReport: this.textReport, IDcreator })
-      .subscribe(
-        _data => {
-          this.snackBar.open('Report saved', '', { duration: 2500, panelClass: 'sv-snack-ok' });
-        },
-        _err => {
-          this.snackBar.open('Save failed — server unreachable', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
-        }
-      );
+    this._save<TextReport>('textReports/textReport', { textReport: this.textReport, IDcreator }, 'Report saved');
   }
 
-
   public saveGraphStudy(IDcreator: string | number) {
-    if (this.tracker) {
-      const sJson = JSON.stringify(this.tracker.getGraph());
-      this.http.post<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/provenance`,
-        {
-          serializedGraph: sJson,
-          IDcreator: IDcreator,
-          findingsCoord: this.findingsCoord,
-          timeStart: this.timeStart,
-          timeEnd: new Date().getTime()
-        })
-        .subscribe(
-          data => {
-            console.log("POST Request is successful", data);
-          },
-          error => {
-            console.log("Error", error);
-          }
-        );
-    }
+    if (!this.tracker) { return; }
+    this._save<ProvenanceStudy>('provGraphsStudy/provenance', {
+      serializedGraph: JSON.stringify(this.tracker.getGraph()),
+      IDcreator, findingsCoord: this.findingsCoord,
+      timeStart: this.timeStart, timeEnd: new Date().getTime()
+    }, null);
   }
 
   public saveStoryStudy(IDcreator: string | number) {
-    if (this.deck && this.tracker) {
-      const sJson = JSON.stringify(this.deck.serializeSelf());
-      const sJsonGraph = JSON.stringify(this.tracker.getGraph());
-      this.http.post<StoryStudy>(`${environment.apiUrl}/storiesStudy/story`,
-        {
-          story: sJson,
-          graph: sJsonGraph,
-          IDcreator: IDcreator
-        })
-        .subscribe(
-          data => {
-            console.log("POST Request is successful", data);
-          },
-          error => {
-            console.log("Error", error);
-          }
-        );
-    }
+    if (!this.deck || !this.tracker) { return; }
+    this._save<StoryStudy>('storiesStudy/story', {
+      story: JSON.stringify(this.deck.serializeSelf()),
+      graph: JSON.stringify(this.tracker.getGraph()),
+      IDcreator
+    }, null);
   }
 
   public saveTextReportStudy(IDcreator: string | number) {
     if (!this.textReport) { return; }
-    this.http.post<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/textReport`,
-      { textReport: this.textReport, IDcreator })
-      .subscribe(
-        data => { console.log("POST Request is successful", data); },
-        error => { console.log("Error", error); }
-      );
+    this._save<TextReportStudy>('textReportsStudy/textReport', { textReport: this.textReport, IDcreator }, null);
   }
 
 

@@ -9,97 +9,39 @@ export class UserService {
 
     constructor(private http: HttpClient) { }
 
-    getAll() {
-        return this.http.get<User[]>(`${environment.apiUrl}/users`);
+    private _url(resource: string, idOrCreator?: string, byCreator = false): string {
+        if (!idOrCreator) { return `${environment.apiUrl}/${resource}`; }
+        return byCreator
+            ? `${environment.apiUrl}/${resource}?IDcreator=${encodeURIComponent(idOrCreator)}`
+            : `${environment.apiUrl}/${resource}/${idOrCreator}`;
     }
 
-    getById(id: string) {
-        return this.http.get<User>(`${environment.apiUrl}/users/${id}`);
-    }
+    getAll()                  { return this.http.get<User[]>(`${environment.apiUrl}/users`); }
+    getById(id: string)       { return this.http.get<User>(this._url('users', id)); }
+    register(user: User)      { return this.http.post<User>(`${environment.apiUrl}/users/register`, user); }
+    delete(id: string)        { return this.http.delete<User>(this._url('users', id)); }
 
-    register(user: User) {
-        return this.http.post<User>(`${environment.apiUrl}/users/register`, user);
-    }
+    getAllGraphs(IDcreator?: string)       { return this.http.get<Provenance[]>(this._url('provGraphs', IDcreator, true)); }
+    getByIdGraphs(id: string)             { return this.http.get<Provenance>(this._url('provGraphs', id)); }
+    deleteGraphs(id: string)              { return this.http.delete<Provenance>(this._url('provGraphs', id)); }
 
-    delete(id: string) {
-        return this.http.delete<User>(`${environment.apiUrl}/users/${id}`);
-    }
+    getAllStories(IDcreator?: string)      { return this.http.get<Story[]>(this._url('stories', IDcreator, true)); }
+    getByIdStories(id: string)            { return this.http.get<Story>(this._url('stories', id)); }
+    deleteStories(id: string)             { return this.http.delete<Story>(this._url('stories', id)); }
 
-    getAllGraphs(IDcreator?: string) {
-        const params = IDcreator ? `?IDcreator=${encodeURIComponent(IDcreator)}` : '';
-        return this.http.get<Provenance[]>(`${environment.apiUrl}/provGraphs${params}`);
-    }
+    getAllGraphsStudy(IDcreator?: string)  { return this.http.get<ProvenanceStudy[]>(this._url('provGraphsStudy', IDcreator, true)); }
+    getByIdGraphsStudy(id: string)        { return this.http.get<ProvenanceStudy>(this._url('provGraphsStudy', id)); }
+    deleteGraphsStudy(id: string)         { return this.http.delete<ProvenanceStudy>(this._url('provGraphsStudy', id)); }
 
-    getByIdGraphs(id: string) {
-        return this.http.get<Provenance>(`${environment.apiUrl}/provGraphs/${id}`);
-    }
+    getAllStoriesStudy(IDcreator?: string) { return this.http.get<StoryStudy[]>(this._url('storiesStudy', IDcreator, true)); }
+    getByIdStoriesStudy(id: string)       { return this.http.get<StoryStudy>(this._url('storiesStudy', id)); }
+    deleteStoriesStudy(id: string)        { return this.http.delete<StoryStudy>(this._url('storiesStudy', id)); }
 
-    deleteGraphs(id: string) {
-        return this.http.delete<Provenance>(`${environment.apiUrl}/provGraphs/${id}`);
-    }
+    getAllTextReports(IDcreator?: string)  { return this.http.get<TextReport[]>(this._url('textReports', IDcreator, true)); }
+    getByIdTextReports(id: string)        { return this.http.get<TextReport>(this._url('textReports', id)); }
+    deleteTextReports(id: string)         { return this.http.delete<TextReport>(this._url('textReports', id)); }
 
-    getAllStories(IDcreator?: string) {
-        const params = IDcreator ? `?IDcreator=${encodeURIComponent(IDcreator)}` : '';
-        return this.http.get<Story[]>(`${environment.apiUrl}/stories${params}`);
-    }
-
-    getByIdStories(id: string) {
-        return this.http.get<Story>(`${environment.apiUrl}/stories/${id}`);
-    }
-
-    deleteStories(id: string) {
-        return this.http.delete<Story>(`${environment.apiUrl}/stories/${id}`);
-    }
-
-    getAllGraphsStudy(IDcreator?: string) {
-        const params = IDcreator ? `?IDcreator=${encodeURIComponent(IDcreator)}` : '';
-        return this.http.get<ProvenanceStudy[]>(`${environment.apiUrl}/provGraphsStudy${params}`);
-    }
-
-    getByIdGraphsStudy(id: string) {
-        return this.http.get<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/${id}`);
-    }
-
-    deleteGraphsStudy(id: string) {
-        return this.http.delete<ProvenanceStudy>(`${environment.apiUrl}/provGraphsStudy/${id}`);
-    }
-
-    getAllStoriesStudy(IDcreator?: string) {
-        const params = IDcreator ? `?IDcreator=${encodeURIComponent(IDcreator)}` : '';
-        return this.http.get<StoryStudy[]>(`${environment.apiUrl}/storiesStudy${params}`);
-    }
-
-    getByIdStoriesStudy(id: string) {
-        return this.http.get<StoryStudy>(`${environment.apiUrl}/storiesStudy/${id}`);
-    }
-
-    deleteStoriesStudy(id: string) {
-        return this.http.delete<StoryStudy>(`${environment.apiUrl}/storiesStudy/${id}`);
-    }
-
-    getAllTextReports(IDcreator?: string) {
-        const params = IDcreator ? `?IDcreator=${encodeURIComponent(IDcreator)}` : '';
-        return this.http.get<TextReport[]>(`${environment.apiUrl}/textReports${params}`);
-    }
-
-    getByIdTextReports(id: string) {
-        return this.http.get<TextReport>(`${environment.apiUrl}/textReports/${id}`);
-    }
-
-    deleteTextReports(id: string) {
-        return this.http.delete<TextReport>(`${environment.apiUrl}/textReports/${id}`);
-    }
-
-    getAllTextReportsStudy(IDcreator?: string) {
-        const params = IDcreator ? `?IDcreator=${encodeURIComponent(IDcreator)}` : '';
-        return this.http.get<TextReportStudy[]>(`${environment.apiUrl}/textReportsStudy${params}`);
-    }
-
-    getByIdTextReportsStudy(id: string) {
-        return this.http.get<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/${id}`);
-    }
-
-    deleteTextReportsStudy(id: string) {
-        return this.http.delete<TextReportStudy>(`${environment.apiUrl}/textReportsStudy/${id}`);
-    }
+    getAllTextReportsStudy(IDcreator?: string) { return this.http.get<TextReportStudy[]>(this._url('textReportsStudy', IDcreator, true)); }
+    getByIdTextReportsStudy(id: string)       { return this.http.get<TextReportStudy>(this._url('textReportsStudy', id)); }
+    deleteTextReportsStudy(id: string)        { return this.http.delete<TextReportStudy>(this._url('textReportsStudy', id)); }
 }

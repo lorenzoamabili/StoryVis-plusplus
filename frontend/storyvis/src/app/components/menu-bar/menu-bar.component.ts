@@ -53,6 +53,10 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private sessionState: SessionStateService,
   ) {
+    this._loadSavedData();
+  }
+
+  private _loadSavedData() {
     const id = this.sessionService.getId();
     this.userService.getAllGraphs(id).pipe(first()).subscribe(
       graphs => { this.graphs = graphs; },
@@ -68,17 +72,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  load() {
-    const id = this.sessionService.getId();
-    this.userService.getAllGraphs(id).pipe(first()).subscribe(
-      graphs => { this.graphs = graphs; },
-      err => { console.warn('getAllGraphs failed', err); }
-    );
-    this.userService.getAllStories(id).pipe(first()).subscribe(
-      stories => { this.stories = stories; },
-      err => { console.warn('getAllStories failed', err); }
-    );
-  }
+  load() { this._loadSavedData(); }
 
   loadGraph(graph: any) { this.provenance.loadGraph(graph); }
   loadStory(story: any) { this.provenance.loadStory(story); }
@@ -102,40 +96,38 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     }).afterClosed();
   }
 
-  onDataSourceChange(change: MatSelectChange) {
-    const url: string = change.value;
-    if (url === '__custom__') {
-      this.showCustomInput = true;
-      return;
-    }
-    this.showCustomInput = false;
+  private _hasHistory(): boolean {
     const graph = this.provenance.graph;
-    const hasHistory = graph && Object.keys((graph as any).nodes || {}).length > 1;
-    if (hasHistory) {
-      const prevPresetUrl = this._lastPresetUrl;
+    return graph && Object.keys((graph as any).nodes || {}).length > 1;
+  }
+
+  private _loadWithConfirm(url: string, onConfirm: () => void, onRevert?: () => void) {
+    if (this._hasHistory()) {
       this._confirmSwitchDialog().subscribe(ok => {
-        if (ok) { this._doLoad(url); this._lastPresetUrl = url; }
-        else { this.selectedDataUrl = prevPresetUrl; }
+        if (ok) { this._doLoad(url); onConfirm(); }
+        else if (onRevert) { onRevert(); }
       });
     } else {
       this._doLoad(url);
-      this._lastPresetUrl = url;
+      onConfirm();
     }
+  }
+
+  onDataSourceChange(change: MatSelectChange) {
+    const url: string = change.value;
+    if (url === '__custom__') { this.showCustomInput = true; return; }
+    this.showCustomInput = false;
+    const prevPresetUrl = this._lastPresetUrl;
+    this._loadWithConfirm(url,
+      () => { this._lastPresetUrl = url; },
+      () => { this.selectedDataUrl = prevPresetUrl; }
+    );
   }
 
   loadCustomUrl() {
     const url = this.customUrl.trim();
     if (!url) { return; }
-    const graph = this.provenance.graph;
-    const hasHistory = graph && Object.keys((graph as any).nodes || {}).length > 1;
-    if (hasHistory) {
-      this._confirmSwitchDialog().subscribe(ok => {
-        if (ok) { this._doLoad(url); this.showCustomInput = false; }
-      });
-    } else {
-      this._doLoad(url);
-      this.showCustomInput = false;
-    }
+    this._loadWithConfirm(url, () => { this.showCustomInput = false; });
   }
 
   public wlSettings = [
