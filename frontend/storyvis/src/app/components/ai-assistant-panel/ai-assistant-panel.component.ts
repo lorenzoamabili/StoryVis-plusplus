@@ -28,13 +28,15 @@ export class AiAssistantPanelComponent implements OnInit, OnDestroy {
 
   private _historySub: Subscription;
   private _loadingSub: Subscription;
+  private _subs: Subscription[] = [];
+  private _scrollTimer: any;
 
   constructor(public ai: AiAssistantService) {}
 
   ngOnInit() {
     this._historySub = this.ai.history$.subscribe(h => {
       this.history = h;
-      setTimeout(() => this.chatEnd?.nativeElement?.scrollIntoView({ behavior: 'smooth' }), 50);
+      this._scrollTimer = setTimeout(() => this.chatEnd?.nativeElement?.scrollIntoView({ behavior: 'smooth' }), 50);
     });
     this._loadingSub = this.ai.loading$.subscribe(v => this.loading = v);
   }
@@ -42,25 +44,30 @@ export class AiAssistantPanelComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this._historySub?.unsubscribe();
     this._loadingSub?.unsubscribe();
+    this._subs.forEach(s => s.unsubscribe());
+    clearTimeout(this._scrollTimer);
   }
 
   // ── Quick actions ─────────────────────────────────────────────────────────
 
   analyzeSession() {
     this.activeTab = 'session';
-    this.ai.analyzeSession().subscribe();
+    const s = this.ai.analyzeSession().subscribe();
+    this._subs.push(s);
   }
 
   generateReport() {
     this.activeTab = 'report';
     const frames = this._getFramesMeta();
-    this.ai.suggestReport(frames).subscribe();
+    const s = this.ai.suggestReport(frames).subscribe();
+    this._subs.push(s);
   }
 
   suggestStory() {
     this.activeTab = 'story';
     const slides = this._getSlidesMeta();
-    this.ai.suggestStorySlides(slides).subscribe();
+    const s = this.ai.suggestStorySlides(slides).subscribe();
+    this._subs.push(s);
   }
 
   // ── Chat ──────────────────────────────────────────────────────────────────
@@ -69,7 +76,8 @@ export class AiAssistantPanelComponent implements OnInit, OnDestroy {
     const text = this.userInput.trim();
     if (!text || this.loading) { return; }
     this.userInput = '';
-    this.ai.send(text).subscribe();
+    const s = this.ai.send(text).subscribe();
+    this._subs.push(s);
   }
 
   clearChat() { this.ai.clearHistory(); }

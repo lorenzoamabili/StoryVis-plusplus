@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, ReplaySubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Application, StateNode } from '../../../../../provenance-core/src/api';
@@ -58,7 +58,7 @@ export class ProvenanceService {
   public creatorId: string = '';
   public initialized = false;
   /** Emits whenever newProvenanceGraph() creates a fresh graph+traverser. */
-  readonly graphReset$ = new Subject<void>();
+  readonly graphReset$ = new ReplaySubject<void>(1);
   public findingsCoord: any[] = [];
   public timeStart: number = 0;
   public comparison: number = null;
@@ -239,6 +239,7 @@ export class ProvenanceService {
       if (this.deck && this.slideDeck && storyInput.story) {
         const dataStory = JSON.parse(storyInput.story);
         const restoredDeck = this.deck.restoreSelf(dataStory, this.traverser, this.graph, this.graph.application) as ProvenanceSlidedeck;
+        if (!restoredDeck) { throw new Error('restoreSelf returned null'); }
         this.deck = restoredDeck;
         this.slideDeck.setDeck(restoredDeck);
         this.slideDeck.update();
@@ -376,10 +377,9 @@ export class ProvenanceService {
     this.deckComparison = new ProvenanceSlidedeck(this.application, this.traverserComparison);
 
     if (this.treeComparison) { this.treeComparison.rewire(this.traverserComparison); }
-    
-    // if(!this.settings.isEducationMode){
-    //   setNewAddListeners(this.registryComparison, this.trackerComparison);
-    // }
+    if (this.settings.canvas) {
+      setNewAddListeners(this.registryComparison, this.trackerComparison);
+    }
   }
 
   newGraphEducation(graph?: ProvenanceGraph) {
@@ -425,6 +425,6 @@ export class ProvenanceService {
   }
 
   constructor(private http: HttpClient, private snackBar: MatSnackBar) {
-    this.init().then(() => this.initialized = true);
+    this.init().then(() => this.initialized = true).catch(err => console.error('ProvenanceService.init failed:', err));
   }
 }

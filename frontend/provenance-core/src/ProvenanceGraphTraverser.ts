@@ -101,12 +101,16 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
       let promise: any;
       if (this.tracker && this.tracker.acceptActions && !this.trackingWhenTraversing) {
         this.tracker.acceptActions = false;
-        promise = funcWithThis.func.apply(funcWithThis.thisArg, argumentsToDo[i]);
-        this.tracker.acceptActions = true;
+        try {
+          promise = funcWithThis.func.apply(funcWithThis.thisArg, argumentsToDo[i]);
+          result = await promise;
+        } finally {
+          this.tracker.acceptActions = true;
+        }
       } else {
         promise = funcWithThis.func.apply(funcWithThis.thisArg, argumentsToDo[i]);
+        result = await promise;
       }
-      result = await promise;
     }
     return result;
   }
@@ -254,7 +258,12 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
           if (!isReversibleAction(thisNode.action)) {
             throw new IrreversibleError('trying to undo an Irreversible action');
           }
-          const undoFunc = this.registry.getFunctionByName(thisNode.action.undo);
+          let undoFunc: ActionFunctionWithThis;
+          try {
+            undoFunc = this.registry.getFunctionByName(thisNode.action.undo);
+          } catch (e) {
+            throw new IrreversibleError(`Unknown undo action: ${thisNode.action.undo}`);
+          }
           functionsToDo.push(undoFunc);
           if (thisNode.action.undo === "setPerspectiveCameraZoomLevel" ||
             thisNode.action.undo === "setPerspectiveCameraOrientation" ||
@@ -279,7 +288,12 @@ export class ProvenanceGraphTraverser implements IProvenanceGraphTraverser {
       } else {
         /* istanbul ignore else */
         if (isStateNode(nextNode)) {
-          const doFunc = this.registry.getFunctionByName(nextNode.action.do);
+          let doFunc: ActionFunctionWithThis;
+          try {
+            doFunc = this.registry.getFunctionByName(nextNode.action.do);
+          } catch (e) {
+            throw new IrreversibleError(`Unknown do action: ${nextNode.action.do}`);
+          }
           functionsToDo.push(doFunc);
           if (nextNode.action.do === "setPerspectiveCameraZoomLevel" ||
             nextNode.action.do === "setPerspectiveCameraOrientation" ||

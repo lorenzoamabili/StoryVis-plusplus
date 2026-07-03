@@ -19,6 +19,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import { ComparisonComponent } from './comparison.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CoverageService } from '../../shared/_services/coverage.service';
 import { SessionStateService } from '../../shared/_services/session-state.service';
 import { DebriefModalComponent } from '../debrief-modal/debrief-modal.component';
@@ -271,6 +272,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   public cineSpeed: number = 200; // ms per frame (default ~5 fps)
   /** Which plane the Cine should scroll — chosen explicitly by the user. */
   public cinePlaneChoice: 'axial' | 'coronal' | 'sagittal' = 'axial';
+  public cineLoop: boolean = true;
   get cineActive(): boolean { return !!this._cineTimer; }
 
 
@@ -289,6 +291,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     public reflections: ReflectionService,
     private _zone: NgZone,
     private _sessionState: SessionStateService,
+    private _snack: MatSnackBar,
   ) {
     super();
 
@@ -363,16 +366,41 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   trackByIdx(i: number) { return i; }
 
+  private _syncSessionSlices() {
+    setTimeout(() => {
+      this._sessionState.setSlices({
+        axial:    (this._axialRenderer as any)?.stackHelper?.index,
+        coronal:  (this._coronalRenderer as any)?.stackHelper?.index,
+        sagittal: (this._sagittalRenderer as any)?.stackHelper?.index,
+      });
+    }, 300);
+  }
+
   undoStep() {
+    if (!this.provenance.traverser) { return; }
     const current: any = this.provenance.graph?.current;
-    if (!current || !current.parent) { return; }
+    if (!current || !current.parent) {
+      this._snack.open('Nothing to undo', '', { duration: 1500 });
+      return;
+    }
+    const label = current.label || current.action?.do || 'action';
     this.provenance.traverser.toStateNode(current.parent.id, 0);
+    this._snack.open(`Undid: ${label}`, '', { duration: 2000 });
+    this._syncSessionSlices();
   }
 
   redoStep() {
+    if (!this.provenance.traverser) { return; }
     const current: any = this.provenance.graph?.current;
-    if (!current || !current.children || current.children.length === 0) { return; }
-    this.provenance.traverser.toStateNode(current.children[0].id, 0);
+    if (!current || !current.children || current.children.length === 0) {
+      this._snack.open('Nothing to redo', '', { duration: 1500 });
+      return;
+    }
+    const next: any = current.children[0];
+    const label = next.label || next.action?.do || 'action';
+    this.provenance.traverser.toStateNode(next.id, 0);
+    this._snack.open(`Redid: ${label}`, '', { duration: 2000 });
+    this._syncSessionSlices();
   }
 
   private _quickBookmark() {
@@ -478,6 +506,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   async loadData(url: string) {
+    if (this.cineActive) { this.toggleCine(); }
     let loader = new AMI.VolumeLoader();
 
     this.removeScene();
@@ -623,7 +652,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         if (!renderer?.stackHelper) { return; }
         const max = renderer.stackHelper._orientationMaxIndex - 1;
         let next = renderer.stackHelper.index + 1;
-        if (next >= max) { next = 1; }
+        if (next >= max) {
+          if (!this.cineLoop) {
+            this.toggleCine();
+            return;
+          }
+          next = 1;
+        }
         renderer.stackHelper.index = next;
         this._zone.run(() => {
           this.coverage.recordVisit(covKey, next);
@@ -1110,9 +1145,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     });
 
     function dragMouseDown(e) {
-      var evtobj = window.event ? event : e;
-
-      if (evtobj.ctrlKey) {
+      if (e.ctrlKey) {
         const mouseMoveHandler = function (e) {
           // How far the mouse has been moved
           const dx = e.clientX - x;
@@ -1509,7 +1542,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     }
 
 
-    this.renderers2D.forEach(renderer => renderer.stackHelper.index = renderer.stackHelper.index);
 
     if (this.settings.isComparisonMode && this.settings.canvasComparison && this.settings.canvasComparison._comparisonRenderer2D2) {
       this.settings.canvasComparison._comparisonRenderer2D2.stackHelper.slice._stack._windowWidth = this._axialRenderer.stackHelper.slice._stack._windowWidth;

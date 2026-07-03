@@ -138,25 +138,33 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         i = 0;
                         _a.label = 1;
                     case 1:
-                        if (!(i < functionsToDo.length)) return [3 /*break*/, 4];
+                        if (!(i < functionsToDo.length)) return [3 /*break*/, 9];
                         funcWithThis = functionsToDo[i];
                         promise = void 0;
-                        if (this.tracker && this.tracker.acceptActions && !this.trackingWhenTraversing) {
-                            this.tracker.acceptActions = false;
-                            promise = funcWithThis.func.apply(funcWithThis.thisArg, argumentsToDo[i]);
-                            this.tracker.acceptActions = true;
-                        }
-                        else {
-                            promise = funcWithThis.func.apply(funcWithThis.thisArg, argumentsToDo[i]);
-                        }
-                        return [4 /*yield*/, promise];
+                        if (!(this.tracker && this.tracker.acceptActions && !this.trackingWhenTraversing)) return [3 /*break*/, 6];
+                        this.tracker.acceptActions = false;
+                        _a.label = 2;
                     case 2:
-                        result = _a.sent();
-                        _a.label = 3;
+                        _a.trys.push([2, , 4, 5]);
+                        promise = funcWithThis.func.apply(funcWithThis.thisArg, argumentsToDo[i]);
+                        return [4 /*yield*/, promise];
                     case 3:
+                        result = _a.sent();
+                        return [3 /*break*/, 5];
+                    case 4:
+                        this.tracker.acceptActions = true;
+                        return [7 /*endfinally*/];
+                    case 5: return [3 /*break*/, 8];
+                    case 6:
+                        promise = funcWithThis.func.apply(funcWithThis.thisArg, argumentsToDo[i]);
+                        return [4 /*yield*/, promise];
+                    case 7:
+                        result = _a.sent();
+                        _a.label = 8;
+                    case 8:
                         i++;
                         return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/, result];
+                    case 9: return [2 /*return*/, result];
                 }
             });
         });
@@ -290,7 +298,13 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                     if (!utils_1.isReversibleAction(thisNode.action)) {
                         throw new IrreversibleError('trying to undo an Irreversible action');
                     }
-                    var undoFunc = this.registry.getFunctionByName(thisNode.action.undo);
+                    var undoFunc = void 0;
+                    try {
+                        undoFunc = this.registry.getFunctionByName(thisNode.action.undo);
+                    }
+                    catch (e) {
+                        throw new IrreversibleError("Unknown undo action: " + thisNode.action.undo);
+                    }
                     functionsToDo.push(undoFunc);
                     if (thisNode.action.undo === "setPerspectiveCameraZoomLevel" ||
                         thisNode.action.undo === "setPerspectiveCameraOrientation" ||
@@ -317,7 +331,13 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
             else {
                 /* istanbul ignore else */
                 if (utils_1.isStateNode(nextNode)) {
-                    var doFunc = this.registry.getFunctionByName(nextNode.action.do);
+                    var doFunc = void 0;
+                    try {
+                        doFunc = this.registry.getFunctionByName(nextNode.action.do);
+                    }
+                    catch (e) {
+                        throw new IrreversibleError("Unknown do action: " + nextNode.action.do);
+                    }
                     functionsToDo.push(doFunc);
                     if (nextNode.action.do === "setPerspectiveCameraZoomLevel" ||
                         nextNode.action.do === "setPerspectiveCameraOrientation" ||

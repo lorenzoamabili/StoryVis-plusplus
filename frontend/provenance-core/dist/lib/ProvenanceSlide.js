@@ -150,6 +150,7 @@ function restoreSlide(serialized, graph) {
         var node = graph.getNodes()[serialized.node];
         slide.node = node;
     }
+    slide.mainAnnotation = serialized.mainAnnotation;
     return slide;
 }
 exports.restoreSlide = restoreSlide;

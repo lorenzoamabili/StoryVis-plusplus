@@ -657,6 +657,7 @@
           var node = graph.getNodes()[serialized.node];
           slide.node = node;
       }
+      slide.mainAnnotation = serialized.mainAnnotation;
       return slide;
   }
   function serializeSlide(slide) {
@@ -1933,6 +1934,10 @@
       }
       setDeck(deck) {
           this._slideDeck = deck;
+          deck.on('slideAdded', () => this.update());
+          deck.on('slideRemoved', () => this.update());
+          deck.on('slidesMoved', () => this.update());
+          deck.on('slideSelected', () => this.update());
       }
       getDeck() {
           return this._slideDeck;

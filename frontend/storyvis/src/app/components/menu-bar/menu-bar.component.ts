@@ -11,6 +11,7 @@ import { BookmarkService } from '../../shared/_services/bookmark.service';
 import { BookmarkLabelDialogComponent } from '../bookmark-label-dialog/bookmark-label-dialog.component';
 import { SessionStateService } from '../../shared/_services/session-state.service';
 import { KeyboardShortcutsDialogComponent } from '../keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-menu-bar',
@@ -37,6 +38,8 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   ];
 
   public selectedDataUrl: string = this.dataSources[0].url;
+  private _lastLoadedUrl: string = this.dataSources[0].url;
+  private _lastPresetUrl: string = this.dataSources[0].url;
   public customUrl: string = '';
   public showCustomInput: boolean = false;
   public saving = false;
@@ -80,22 +83,57 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   loadGraph(graph: any) { this.provenance.loadGraph(graph); }
   loadStory(story: any) { this.provenance.loadStory(story); }
 
+  private _doLoad(url: string) {
+    const ds = this.dataSources.find(d => d.url === url);
+    if (ds) { this.sessionState.setDataset(ds.name); }
+    if (this.canvas) { this.canvas.loadData(url); }
+    this._lastLoadedUrl = url;
+  }
+
+  private _confirmSwitchDialog(): import('rxjs').Observable<any> {
+    return this.dialog.open(ConfirmDialogComponent, {
+      width: '380px',
+      data: {
+        title: 'Switch dataset?',
+        message: 'Switching dataset will reset the analysis history and story deck. This cannot be undone.',
+        confirm: 'Switch',
+        cancel: 'Cancel',
+      }
+    }).afterClosed();
+  }
+
   onDataSourceChange(change: MatSelectChange) {
     const url: string = change.value;
     if (url === '__custom__') {
       this.showCustomInput = true;
+      return;
+    }
+    this.showCustomInput = false;
+    const graph = this.provenance.graph;
+    const hasHistory = graph && Object.keys((graph as any).nodes || {}).length > 1;
+    if (hasHistory) {
+      const prevPresetUrl = this._lastPresetUrl;
+      this._confirmSwitchDialog().subscribe(ok => {
+        if (ok) { this._doLoad(url); this._lastPresetUrl = url; }
+        else { this.selectedDataUrl = prevPresetUrl; }
+      });
     } else {
-      this.showCustomInput = false;
-      const ds = this.dataSources.find(d => d.url === url);
-      if (ds) { this.sessionState.setDataset(ds.name); }
-      if (this.canvas) { this.canvas.loadData(url); }
+      this._doLoad(url);
+      this._lastPresetUrl = url;
     }
   }
 
   loadCustomUrl() {
     const url = this.customUrl.trim();
-    if (url && this.canvas) {
-      this.canvas.loadData(url);
+    if (!url) { return; }
+    const graph = this.provenance.graph;
+    const hasHistory = graph && Object.keys((graph as any).nodes || {}).length > 1;
+    if (hasHistory) {
+      this._confirmSwitchDialog().subscribe(ok => {
+        if (ok) { this._doLoad(url); this.showCustomInput = false; }
+      });
+    } else {
+      this._doLoad(url);
       this.showCustomInput = false;
     }
   }
@@ -118,7 +156,9 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     // Sync selector to whichever URL canvas auto-loads based on studyStarted
     this.selectedDataUrl = this.studyStarted
       ? this.dataSources[0].url   // Chest CT 1 (study mode)
-      : this.dataSources[1].url;  // Brain MRI  (practice/exploration mode)
+      : (this.dataSources.length > 1 ? this.dataSources[1].url : this.dataSources[0].url);
+    this._lastLoadedUrl = this.selectedDataUrl;
+    this._lastPresetUrl = this.selectedDataUrl;
 
     const numFormat = (i: number) => ('0' + i).slice(-2);
     this._clockInterval = setInterval(() => {

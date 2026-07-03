@@ -29,7 +29,7 @@
     <mat-form-field id="tutorial-wl-preset" class="toolbar-select wl-preset-select"
       matTooltip="Apply a preset window/level for common tissue types.">
       <mat-label>W/L</mat-label>
-      <mat-select (selectionChange)="canvas.presetWindowLevel($event)">
+      <mat-select (selectionChange)="canvas?.presetWindowLevel($event)">
         <mat-option *ngFor="let wl of wlSettings" [value]="wl">{{ wl.name }}</mat-option>
       </mat-select>
     </mat-form-field>
@@ -117,6 +117,10 @@
       <button mat-menu-item [matMenuTriggerFor]="cineSpeedMenu">
         <mat-icon>speed</mat-icon><span>Cine speed</span>
       </button>
+      <button mat-menu-item (click)="canvas.cineLoop = !canvas.cineLoop">
+        <mat-icon>{{ canvas.cineLoop ? 'loop' : 'trending_flat' }}</mat-icon>
+        <span>{{ canvas.cineLoop ? 'Loop: On' : 'Loop: Off' }}</span>
+      </button>
       <button mat-menu-item [matMenuTriggerFor]="cinePlaneMenu">
         <mat-icon>flip</mat-icon>
         <span>Plane — {{ canvas.cinePlaneChoice | titlecase }}</span>
@@ -144,6 +148,15 @@
       </button>
 
       <mat-divider></mat-divider>
+      <button mat-menu-item disabled class="more-section-label">Load</button>
+      <button mat-menu-item [matMenuTriggerFor]="loadAnalysisMenu" (menuOpened)="load()">
+        <mat-icon>folder_open</mat-icon><span>Load Saved Analysis</span>
+      </button>
+      <button mat-menu-item [matMenuTriggerFor]="loadStoryMenu" (menuOpened)="load()">
+        <mat-icon>auto_stories</mat-icon><span>Load Saved Story</span>
+      </button>
+
+      <mat-divider></mat-divider>
       <button mat-menu-item disabled class="more-section-label">Advanced</button>
       <button mat-menu-item (click)="settings.isAdvancedMode = !settings.isAdvancedMode">
         <mat-icon>{{ settings.isAdvancedMode ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
@@ -155,12 +168,6 @@
         </button>
         <button mat-menu-item [matMenuTriggerFor]="compareMenu">
           <mat-icon>compare_arrows</mat-icon><span>Comparison Mode</span>
-        </button>
-        <button mat-menu-item [matMenuTriggerFor]="loadAnalysisMenu" (menuOpened)="load()">
-          <mat-icon>folder_open</mat-icon><span>Load Saved Analysis</span>
-        </button>
-        <button mat-menu-item [matMenuTriggerFor]="loadStoryMenu" (menuOpened)="load()">
-          <mat-icon>auto_stories</mat-icon><span>Load Saved Story</span>
         </button>
       </ng-container>
 
@@ -203,8 +210,8 @@
     <!-- Load story sub-menu -->
     <mat-menu #loadStoryMenu="matMenu">
       <ng-container *ngIf="stories.length; else noStories">
-        <button mat-menu-item *ngFor="let s of stories" (click)="loadStory(s)">
-          {{ s.IDcreator }} — {{ s._id }}
+        <button mat-menu-item *ngFor="let s of stories; let i = index" (click)="loadStory(s)">
+          Story {{ i + 1 }}
         </button>
       </ng-container>
       <ng-template #noStories>

@@ -13,7 +13,7 @@
     <app-brainvis-canvas-comparison
       [ngClass]="!settings.isComparisonMode ? 'normal' : 'comparison'"
       #canvasComparison [studyStarted]="studyStarted"
-      (aiCaptions)="aiPanel.generateReport()">
+      (aiCaptions)="aiPanel?.generateReport()">
     </app-brainvis-canvas-comparison>
 
     <!-- Story deck toggle handle at bottom edge of canvas -->

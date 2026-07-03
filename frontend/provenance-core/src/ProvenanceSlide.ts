@@ -144,6 +144,7 @@ export function restoreSlide(serialized: SerializedProvenanceSlide, graph: Prove
     const node = graph.getNodes()[serialized.node];
     slide.node = node;
   }
+  slide.mainAnnotation = serialized.mainAnnotation;
   return slide;
 }
 

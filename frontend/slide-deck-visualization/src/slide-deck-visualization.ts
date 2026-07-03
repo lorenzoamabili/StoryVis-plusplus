@@ -1146,6 +1146,10 @@ export class SlideDeckVisualization {
 
     public setDeck(deck: IProvenanceSlidedeck) {
         this._slideDeck = deck;
+        deck.on('slideAdded', () => this.update());
+        deck.on('slideRemoved', () => this.update());
+        deck.on('slidesMoved', () => this.update());
+        deck.on('slideSelected', () => this.update());
     }
 
     public getDeck(): IProvenanceSlidedeck {

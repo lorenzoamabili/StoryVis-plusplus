@@ -83,10 +83,21 @@ export class AiAssistantService {
     const reflections = this.reflectionService.getAll();
     const { dataset, slices, windowLevel } = this.sessionState.snapshot;
 
+    const currentNode: any = this.provenance.graph?.current;
+    const currentNodeLabel = currentNode?.label
+      || currentNode?.action?.metadata?.label
+      || currentNode?.action?.do
+      || undefined;
+    const nodeCount = Object.keys((this.provenance.graph as any)?.nodes || {}).length;
+    const slideCount = (this.provenance.deck as any)?.slides?.length ?? 0;
+
     return {
       dataset,
       currentSlices: slices,
       windowLevel,
+      currentNode: currentNodeLabel,
+      nodeCount,
+      slideCount,
       coverage: {
         axial:    this.coverageService.getCoveragePercent('axial'),
         coronal:  this.coverageService.getCoveragePercent('coronal'),
@@ -174,4 +185,7 @@ interface SessionContext {
   frames?: FrameMeta[];
   slides?: SlideMeta[];
   provenancePath?: string[];
+  currentNode?: string;
+  nodeCount?: number;
+  slideCount?: number;
 }

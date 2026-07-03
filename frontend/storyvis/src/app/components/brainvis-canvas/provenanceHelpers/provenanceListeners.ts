@@ -225,9 +225,9 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
           label: label,
           renderer: 'r1'
         },
-        do: 'setPerspectiveCameraZoomLevel',
+        do: 'setPerspectiveCameraOrientation',
         doArguments: { args: [event.orientation] },
-        undo: 'setPerspectiveCameraZoomLevel',
+        undo: 'setPerspectiveCameraOrientation',
         undoArguments: { args: [startEvent.orientation] }
       }, true);
     }, 500, { trailing: true });
@@ -400,7 +400,7 @@ export const addListeners = (tracker: ProvenanceTracker, thisCanvasComparison?: 
     }
   });
 
-  const _navVolumeSub = canvas.navigationVolumeCreated.subscribe((sliceOrientation, index) => {
+  const _navVolumeSub = canvas.navigationVolumeCreated.subscribe(({ sliceOrientation, index }: any) => {
     const action = {
       metadata: {
         userIntent: 'selection',

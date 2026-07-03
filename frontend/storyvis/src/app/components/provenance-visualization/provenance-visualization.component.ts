@@ -121,8 +121,8 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   private _rfSub: Subscription;
   private _lastWidth = 0;
   private _svgObserveRetries = 0;
-  private _nodeAddedUnlisten: (() => void) | null = null;
   private _boundGraph: any = null;
+  private _nodeAddedHandler: (() => void) | null = null;
 
   constructor(
     private elementRef: ElementRef,
@@ -169,14 +169,14 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     this._resizeObserver?.disconnect();
     this._bmSub?.unsubscribe();
     this._rfSub?.unsubscribe();
-    this._nodeAddedUnlisten?.();
+    this._unbindListener();
     clearTimeout(this._hideTimer);
     if (this.provenance.tree === this) { this.provenance.tree = null; }
   }
 
   /** Called by ProvenanceService.newProvenanceGraph() to rewire after graph reset. */
   rewire(traverser: ProvenanceGraphTraverser) {
-    this._nodeAddedUnlisten?.();
+    this._unbindListener();
     try { (this._viz as any)?.free?.(); } catch (_) {}
     this._viz = this._createViz(traverser);
     this._bindListener();
@@ -206,16 +206,22 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     );
   }
 
+  private _unbindListener() {
+    if (this._boundGraph && this._nodeAddedHandler) {
+      this._boundGraph.off('nodeAdded', this._nodeAddedHandler);
+    }
+    this._boundGraph = null;
+    this._nodeAddedHandler = null;
+  }
+
   /** Bind the nodeAdded handler to the current graph. Skip if already bound to this graph. */
   private _bindListener() {
-    this._nodeAddedUnlisten?.();
+    this._unbindListener();
     const g = this.provenance.graph;
-    if (!g || g === this._boundGraph) { return; }
+    if (!g) { return; }
     this._boundGraph = g;
-    const handler = () => this.cdr.detectChanges();
-    g.on('nodeAdded', handler);
-    // mitt has no off(); unlisten clears _boundGraph so next bind on same graph is allowed
-    this._nodeAddedUnlisten = () => { this._boundGraph = null; };
+    this._nodeAddedHandler = () => this.cdr.detectChanges();
+    g.on('nodeAdded', this._nodeAddedHandler);
   }
 
   private _tryObserveSvg() {

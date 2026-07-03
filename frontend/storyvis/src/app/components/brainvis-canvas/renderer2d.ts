@@ -11,9 +11,8 @@ import Voxelprobe from "./voxelprobe";
 import Annotation from "./annotation";
 import { Artifact } from "@visualstorytelling/provenance-core/src/api";
 
-var artifactID: number = -1;
-
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
+  private _artifactID: number = -1;
   public _measurement: Ruler | Angle | Voxelprobe | Annotation | null = null;   // Freehand |
   public _measurements: (Ruler | Angle | Voxelprobe | Annotation | null)[] = [];     // Freehand | 
 
@@ -834,10 +833,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._measurements.push(this._measurement);
     this._domElement.removeEventListener("mousedown", this.startRuler);
 
-    artifactID = artifactID + 1;
+    this._artifactID = this._artifactID + 1;
     this._measurement.artifact = {
       displayed: true,
-      id: artifactID,
+      id: this._artifactID,
       measurementType: "Distance",
       sliceIndexStart: this._stackHelper.index,
       sliceIndexEnd: this._stackHelper.index,
@@ -872,10 +871,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._measurements.push(this._measurement);
     this._domElement.removeEventListener("mousedown", this.startAngle);
 
-    artifactID = artifactID + 1;
+    this._artifactID = this._artifactID + 1;
     this._measurement.artifact = {
       displayed: true,
-      id: artifactID,
+      id: this._artifactID,
       measurementType: "Angle",
       sliceIndexStart: this._stackHelper.index,
       sliceIndexEnd: this._stackHelper.index,
@@ -955,10 +954,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._measurements.push(this._measurement);
     this._domElement.removeEventListener("mousedown", this.startVoxelprobe);
 
-    artifactID = artifactID + 1;
+    this._artifactID = this._artifactID + 1;
     this._measurement.artifact = {
       displayed: true,
-      id: artifactID,
+      id: this._artifactID,
       measurementType: "Density",
       sliceIndexStart: this._stackHelper.index,
       sliceIndexEnd: this._stackHelper.index,
@@ -999,10 +998,10 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     this._measurement.widget._label.id = 'textBox ' + this.annotationCounter;
 
-    artifactID = artifactID + 1;
+    this._artifactID = this._artifactID + 1;
     this._measurement.artifact = {
       displayed: true,
-      id: artifactID,
+      id: this._artifactID,
       measurementType: "Annotation",
       sliceIndexStart: this._stackHelper.index,
       sliceIndexEnd: this._stackHelper.index,
