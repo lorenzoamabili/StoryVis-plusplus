@@ -89,7 +89,7 @@ app-brainvis-canvas-comparison.comparison { width: 50%; }
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -119,7 +119,7 @@ app-brainvis-canvas-comparison.comparison { width: 50%; }
 }
 
 .strip-label {
-  font-size: 9px;
+  font-size: 11px;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: 0.3px;
   text-transform: uppercase;
@@ -175,7 +175,7 @@ app-brainvis-canvas-comparison.comparison { width: 50%; }
   width: 28px !important;
   height: 28px !important;
   line-height: 28px !important;
-  color: rgba(255, 255, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .rp-close-btn:hover {

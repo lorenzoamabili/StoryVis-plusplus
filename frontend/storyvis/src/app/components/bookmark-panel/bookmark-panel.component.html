@@ -30,7 +30,8 @@
       <span class="bm-here-dot" *ngIf="bm.nodeId === currentNodeId"
             matTooltip="You are currently at this state"></span>
 
-      <mat-icon class="bm-type-icon" [class.phase-icon]="bm.isPhase">
+      <mat-icon class="bm-type-icon" [class.phase-icon]="bm.isPhase"
+                [matTooltip]="bm.isPhase ? 'Marks the start of a named analysis phase' : null">
         {{ bm.isPhase ? 'flag' : 'bookmark' }}
       </mat-icon>
 
@@ -48,15 +49,15 @@
 
       <!-- Actions -->
       <button mat-icon-button class="bm-action" (click)="navigateTo(bm)"
-              matTooltip="Jump to this state in the provenance graph">
+              matTooltip="Jump to this state in the provenance graph" aria-label="Jump to this state in the provenance graph">
         <mat-icon>arrow_forward</mat-icon>
       </button>
       <button mat-icon-button class="bm-action" (click)="startEdit(bm)"
-              matTooltip="Rename">
+              matTooltip="Rename" aria-label="Rename bookmark">
         <mat-icon>edit</mat-icon>
       </button>
       <button mat-icon-button class="bm-action bm-delete" (click)="remove(bm)"
-              matTooltip="Remove bookmark">
+              matTooltip="Remove bookmark" aria-label="Remove bookmark">
         <mat-icon>close</mat-icon>
       </button>
     </div>

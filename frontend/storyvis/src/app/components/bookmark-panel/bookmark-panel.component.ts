@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { BookmarkService, Bookmark } from '../../shared/_services/bookmark.service';
 import { ProvenanceService } from '../../shared/_services/provenance.service';
 
@@ -21,7 +22,11 @@ export class BookmarkPanelComponent implements OnInit, OnDestroy {
 
   private _sub: Subscription;
 
-  constructor(public bookmarkService: BookmarkService, private provenance: ProvenanceService) {}
+  constructor(
+    public bookmarkService: BookmarkService,
+    private provenance: ProvenanceService,
+    private snackBar: MatSnackBar,
+  ) {}
 
   ngOnInit() {
     this._sub = this.bookmarkService.bookmarks$.subscribe(bms => {
@@ -38,6 +43,7 @@ export class BookmarkPanelComponent implements OnInit, OnDestroy {
       this.provenance.traverser.toStateNode(bm.nodeId, 0);
     } catch (e) {
       console.warn('Bookmark navigation failed:', e);
+      this.snackBar.open('This state no longer exists in the current analysis', 'Dismiss', { duration: 4000, panelClass: 'sv-snack-err' });
     }
   }
 

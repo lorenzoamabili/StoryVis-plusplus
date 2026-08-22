@@ -230,6 +230,15 @@
     </div>
 </div>
 
+<div class="volume-loading-overlay" *ngIf="isLoadingVolume">
+    <mat-spinner diameter="48"></mat-spinner>
+    <span>Loading dataset…</span>
+</div>
+
+<div class="shortcuts-hint" matTooltip="B = bookmark, R = reflection — press ? any time for the full list">
+    Press <kbd>?</kbd> for keyboard shortcuts
+</div>
+
 <div id="datacomics" class="storytelling-container" style="display: none;"></div>
 
 

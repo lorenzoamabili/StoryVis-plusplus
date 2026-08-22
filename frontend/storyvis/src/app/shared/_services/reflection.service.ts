@@ -13,9 +13,10 @@ export interface Reflection {
 
 export const REFLECTION_META: Record<ReflectionType, { label: string; color: string; icon: string; prompt: string }> = {
   observation: { label: 'Observation',  color: '#4fc3f7', icon: 'visibility',     prompt: 'What do you notice at this state?' },
-  question:    { label: 'Question',     color: '#ffb74d', icon: 'help_outline',   prompt: 'What are you unsure about here?' },
+  question:    { label: 'Question',     color: '#b39ddb', icon: 'help_outline',   prompt: 'What are you unsure about here?' },
   hypothesis:  { label: 'Hypothesis',   color: '#81c784', icon: 'lightbulb',      prompt: 'What might this finding mean?' },
-  uncertainty: { label: 'Uncertainty',  color: '#ef9a9a', icon: 'warning_amber',  prompt: 'What is still unclear to you?' },
+  // Neutral blue-grey, not red/orange — "uncertainty" is a benign journaling category, not a warning/error.
+  uncertainty: { label: 'Uncertainty',  color: '#90a4ae', icon: 'warning_amber',  prompt: 'What is still unclear to you?' },
 };
 
 const LS_KEY = 'storyvis_reflections';

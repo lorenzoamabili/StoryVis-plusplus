@@ -58,6 +58,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   @Output() navigationVolumeCreated = new EventEmitter<{ sliceOrientation: String, oldIndex: any }>();
 
   public _initialized = false;
+  public isLoadingVolume = false;
   public settings = Settings.getInstance(this);
 
   /** Precomputed 20-segment heatmap arrays, refreshed on every coverage change. */
@@ -504,6 +505,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     let loader = new AMI.VolumeLoader();
 
     this.removeScene();
+    this.isLoadingVolume = true;
 
     try {
       await loader.load(url);
@@ -547,6 +549,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     } catch (error) {
       window.console.log('oops... something went wrong...');
       window.console.log(error);
+      this._snack.open('Failed to load dataset — check the URL and try again', 'Dismiss', { duration: 5000, panelClass: 'sv-snack-err' });
+    } finally {
+      this.isLoadingVolume = false;
     }
   }
 

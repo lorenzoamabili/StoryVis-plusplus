@@ -110,4 +110,8 @@ export class AiAssistantPanelComponent implements OnInit, OnDestroy {
   }
 
   trackByIdx(i: number) { return i; }
+
+  tagLabel(tag: NonNullable<ChatMessage['tag']>): string {
+    return { session: 'Session Analysis', report: 'Report', story: 'Story Suggestions' }[tag];
+  }
 }

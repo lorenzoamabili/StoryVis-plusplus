@@ -9,6 +9,37 @@
   padding: 0;
 }
 
+.app-toolbar {
+  position: relative;
+}
+
+/* Edge fades hint that the toolbar scrolls horizontally when controls overflow.
+   Only shown while there's actually more content in that direction (see
+   canScrollLeft/canScrollRight in the component), so they never dim controls
+   when the toolbar already fits. */
+.app-toolbar::before,
+.app-toolbar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.app-toolbar::before {
+  left: 0;
+  background: linear-gradient(to right, #23273a, transparent);
+}
+.app-toolbar::after {
+  right: 0;
+  background: linear-gradient(to left, #23273a, transparent);
+}
+.app-toolbar.can-scroll-left::before { opacity: 1; }
+.app-toolbar.can-scroll-right::after { opacity: 1; }
+
 .toolbar-row {
   height: 44px !important;
   padding: 0 8px !important;
@@ -159,7 +190,7 @@ mat-form-field {
 }
 .toolbar-select .mat-form-field-label,
 .wl-preset-select .mat-form-field-label {
-  font-size: 10px !important;
+  font-size: 11px !important;
 }
 
 /* ── Custom URL input ─────────────────────────────────────────────────────── */
@@ -175,7 +206,7 @@ mat-form-field {
   outline: none;
   flex-shrink: 0;
 }
-.custom-url-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+.custom-url-input::placeholder { color: rgba(255, 255, 255, 0.6); }
 
 /* ── Clock ────────────────────────────────────────────────────────────────── */
 .toolbar-clock {

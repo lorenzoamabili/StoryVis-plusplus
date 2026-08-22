@@ -53,15 +53,15 @@
       <!-- Actions -->
       <div class="rp-actions">
         <button mat-icon-button class="rp-action" (click)="navigateTo(r)"
-                matTooltip="Jump to this provenance state">
+                matTooltip="Jump to this provenance state" aria-label="Jump to this provenance state">
           <mat-icon>arrow_forward</mat-icon>
         </button>
         <button mat-icon-button class="rp-action" (click)="startEdit(r)"
-                matTooltip="Edit reflection">
+                matTooltip="Edit reflection" aria-label="Edit reflection">
           <mat-icon>edit</mat-icon>
         </button>
         <button mat-icon-button class="rp-action rp-delete" (click)="remove(r)"
-                matTooltip="Delete reflection">
+                matTooltip="Delete reflection" aria-label="Delete reflection">
           <mat-icon>close</mat-icon>
         </button>
       </div>

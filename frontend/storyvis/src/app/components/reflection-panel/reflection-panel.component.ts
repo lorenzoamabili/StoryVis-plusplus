@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Reflection, ReflectionService, ReflectionType, REFLECTION_META } from '../../shared/_services/reflection.service';
 import { ProvenanceService } from '../../shared/_services/provenance.service';
 
@@ -21,6 +22,7 @@ export class ReflectionPanelComponent implements OnInit, OnDestroy {
   constructor(
     public reflectionService: ReflectionService,
     private provenance: ProvenanceService,
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit() {
@@ -32,7 +34,12 @@ export class ReflectionPanelComponent implements OnInit, OnDestroy {
   ngOnDestroy() { this._sub?.unsubscribe(); }
 
   navigateTo(r: Reflection) {
-    try { this.provenance.traverser.toStateNode(r.nodeId, 0); } catch (e) {}
+    try {
+      this.provenance.traverser.toStateNode(r.nodeId, 0);
+    } catch (e) {
+      console.warn('Reflection navigation failed:', e);
+      this.snackBar.open('This state no longer exists in the current analysis', 'Dismiss', { duration: 4000, panelClass: 'sv-snack-err' });
+    }
   }
 
   startEdit(r: Reflection) {

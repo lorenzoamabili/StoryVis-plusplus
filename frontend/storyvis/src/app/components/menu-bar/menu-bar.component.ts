@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
 import { ProvenanceService, UserService, SessionService } from '../../shared/_services';
@@ -18,14 +18,17 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
   templateUrl: './menu-bar.component.html',
   styleUrls: ['./menu-bar.component.css']
 })
-export class MenuBarComponent implements OnInit, OnDestroy {
+export class MenuBarComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() canvas: BrainvisCanvasComponent;
   @Input() canvasComparison: any;
   @Input() IDcreator: string;
   @Input() studyStarted: boolean;
+  @ViewChild('toolbarRow') toolbarRow: ElementRef<HTMLElement>;
   public now: string;
   public settings = Settings.getInstance(this);
   private _clockInterval: any;
+  public canScrollLeft = false;
+  public canScrollRight = false;
 
   graphs: Provenance[] = [];
   stories: Story[] = [];
@@ -118,9 +121,13 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     if (url === '__custom__') { this.showCustomInput = true; return; }
     this.showCustomInput = false;
     const prevPresetUrl = this._lastPresetUrl;
+    // Revert the select's displayed value synchronously, in the same tick as the
+    // click, so it never visibly commits to the new dataset before the switch is
+    // confirmed — only re-applied in the onConfirm callback below.
+    this.selectedDataUrl = prevPresetUrl;
     this._loadWithConfirm(url,
-      () => { this._lastPresetUrl = url; },
-      () => { this.selectedDataUrl = prevPresetUrl; }
+      () => { this._lastPresetUrl = url; this.selectedDataUrl = url; },
+      () => {}
     );
   }
 
@@ -157,6 +164,26 @@ export class MenuBarComponent implements OnInit, OnDestroy {
       const date = new Date();
       this.now = `${numFormat(date.getHours())}:${numFormat(date.getMinutes())}`;
     }, 1000);
+  }
+
+  ngAfterViewInit() {
+    this._updateScrollFades();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize() {
+    this._updateScrollFades();
+  }
+
+  onToolbarScroll() {
+    this._updateScrollFades();
+  }
+
+  private _updateScrollFades() {
+    const el = this.toolbarRow?.nativeElement;
+    if (!el) { return; }
+    this.canScrollLeft = el.scrollLeft > 1;
+    this.canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
   }
 
   ngOnDestroy() {

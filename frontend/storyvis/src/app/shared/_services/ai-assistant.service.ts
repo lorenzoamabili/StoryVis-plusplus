@@ -12,6 +12,8 @@ import { SessionStateService } from './session-state.service';
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  /** Which quick-action produced this message, if any — used to label it in the transcript. */
+  tag?: 'session' | 'report' | 'story';
 }
 
 export interface FrameMeta {
@@ -45,8 +47,8 @@ export class AiAssistantService {
   // ── Public API ────────────────────────────────────────────────────────────
 
   /** Send a message, appending it to the history. Returns the assistant reply. */
-  send(userText: string, extraContext: Partial<SessionContext> = {}): Observable<string> {
-    const userMsg: ChatMessage = { role: 'user', content: userText };
+  send(userText: string, extraContext: Partial<SessionContext> = {}, tag?: ChatMessage['tag']): Observable<string> {
+    const userMsg: ChatMessage = tag ? { role: 'user', content: userText, tag } : { role: 'user', content: userText };
     const current = this.history$.value;
     this.history$.next([...current, userMsg]);
     this.loading$.next(true);
@@ -63,9 +65,10 @@ export class AiAssistantService {
         return res.content;
       }),
       catchError(err => {
+        console.error('[AiAssistantService] chat request failed:', err);
         const msg = err.name === 'TimeoutError'
-          ? 'Request timed out (30s). Check that Ollama is running and try again.'
-          : (err.error?.error || err.message || 'AI service unavailable.');
+          ? "The AI assistant isn't responding right now — try again in a moment."
+          : 'Something went wrong generating a response. Please try again.';
         const errReply: ChatMessage = { role: 'assistant', content: `⚠ ${msg}` };
         this.history$.next([...this.history$.value, errReply]);
         this.loading$.next(false);
@@ -142,7 +145,9 @@ export class AiAssistantService {
 
   analyzeSession(): Observable<string> {
     return this.send(
-      'Analyse my exploration session so far. Summarise what I examined, highlight any coverage blind spots, and identify patterns in my reflections. Be brief and educational.'
+      'Analyse my exploration session so far. Summarise what I examined, highlight any coverage blind spots, and identify patterns in my reflections. Be brief and educational.',
+      {},
+      'session'
     );
   }
 
@@ -152,7 +157,8 @@ export class AiAssistantService {
       : '(no frames captured yet)';
     return this.send(
       `Based on my session, generate a structured visual report for the Data-Comics editor.\n\nCaptured frames:\n${frameList}\n\nProvide:\n1. A concise caption for each frame (format: "Frame N – [panel] – [description]")\n2. A one-paragraph Findings summary\n3. A one-sentence Impression`,
-      { frames }
+      { frames },
+      'report'
     );
   }
 
@@ -162,7 +168,8 @@ export class AiAssistantService {
       : '(no slides in story deck yet)';
     return this.send(
       `Help me improve the narrative for my story deck.\n\nCurrent slides:\n${slideList}\n\nSuggest concise, clinically-oriented titles and short annotations for each slide. Also propose a logical ordering if the current sequence could be improved.`,
-      { slides }
+      { slides },
+      'story'
     );
   }
 

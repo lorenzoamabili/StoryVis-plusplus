@@ -4,6 +4,9 @@
 </h2>
 
 <mat-dialog-content>
+  <p class="bld-hint" *ngIf="data.isPhase">
+    Phases mark the start of a named stage in your analysis (e.g. "Initial review", "Follow-up"), letting you group bookmarks into a timeline.
+  </p>
   <mat-form-field appearance="outline" class="bld-field">
     <mat-label>{{ data.isPhase ? 'Phase name' : 'Bookmark label' }}</mat-label>
     <input matInput [(ngModel)]="label" (keydown.enter)="submit()" cdkFocusInitial />

@@ -1,5 +1,6 @@
-<mat-toolbar class="app-toolbar" color="primary">
-  <mat-toolbar-row class="toolbar-row">
+<mat-toolbar class="app-toolbar" color="primary"
+  [class.can-scroll-left]="canScrollLeft" [class.can-scroll-right]="canScrollRight">
+  <mat-toolbar-row class="toolbar-row" #toolbarRow (scroll)="onToolbarScroll()">
 
     <!-- ── Dataset ──────────────────────────────────────────────────────── -->
     <mat-form-field class="toolbar-select dataset-select"
@@ -30,7 +31,7 @@
       matTooltip="Apply a preset window/level for common tissue types.">
       <mat-label>W/L</mat-label>
       <mat-select (selectionChange)="canvas?.presetWindowLevel($event)">
-        <mat-option *ngFor="let wl of wlSettings" [value]="wl">{{ wl.name }}</mat-option>
+        <mat-option *ngFor="let wl of wlSettings" [value]="wl">{{ wl.name }} (W{{ wl.width }}/L{{ wl.center }})</mat-option>
       </mat-select>
     </mat-form-field>
 

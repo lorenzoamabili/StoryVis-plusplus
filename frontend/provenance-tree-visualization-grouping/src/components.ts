@@ -968,7 +968,7 @@ export function addAggregationButtons(
     .style("border-width", "1px")
     .style("border-radius", "5px")
     .style("padding", "5px").style("visibility", "hidden")
-    .text("Derivation");
+    .text("Derivation — measurements added (ruler, angle, voxel probe)");
 
 
   d3.select("#derivation-trigger")
@@ -1047,7 +1047,7 @@ export function addAggregationButtons(
     .style("border-width", "1px")
     .style("border-radius", "5px")
     .style("padding", "5px").style("visibility", "hidden")
-    .text("Exploration");
+    .text("Exploration — scrolling, panning, or zooming");
 
 
   d3.select("#exploration-trigger")
@@ -1124,7 +1124,7 @@ export function addAggregationButtons(
     .style("border-width", "1px")
     .style("border-radius", "5px")
     .style("padding", "5px").style("visibility", "hidden")
-    .text("Configuration");
+    .text("Configuration — window/level or layout changes");
 
 
   d3.select("#configuration-trigger")
@@ -1204,7 +1204,7 @@ export function addAggregationButtons(
     .style("border-width", "1px")
     .style("border-radius", "5px")
     .style("padding", "5px").style("visibility", "hidden")
-    .text("Selection");
+    .text("Selection — jumped directly to a slice or region");
 
 
   d3.select("#selection-trigger")
@@ -1289,7 +1289,7 @@ export function addAggregationButtons(
     .style("border-width", "1px")
     .style("border-radius", "5px")
     .style("padding", "5px").style("visibility", "hidden")
-    .text("Annotation");
+    .text("Annotation — text notes added");
 
 
   d3.select("#annotation-trigger")
@@ -1371,7 +1371,7 @@ export function addAggregationButtons(
     .style("border-width", "1px")
     .style("border-radius", "5px")
     .style("padding", "5px").style("visibility", "hidden")
-    .text("Provenance");
+    .text("Provenance — a new branch was started");
 
 
   d3.select("#provenance-trigger")

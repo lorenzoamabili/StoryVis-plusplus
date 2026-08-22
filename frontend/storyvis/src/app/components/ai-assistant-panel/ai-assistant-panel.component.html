@@ -5,26 +5,31 @@
     <mat-icon class="ai-icon">auto_awesome</mat-icon>
     <span class="ai-title">AI Assistant</span>
     <button mat-icon-button class="ai-clear-btn" (click)="clearChat()"
-            matTooltip="Clear conversation">
+            matTooltip="Clear conversation" aria-label="Clear conversation">
       <mat-icon>delete_sweep</mat-icon>
     </button>
   </div>
 
-  <!-- ── Quick-action tabs ────────────────────────────────────────────────── -->
+  <!-- ── Quick actions ─────────────────────────────────────────────────────── -->
+  <!-- These are one-shot prompts into the shared chat below, not persistent views —
+       the "pending" state only reflects the specific action currently in flight. -->
   <div class="ai-tabs">
-    <button class="ai-tab" [class.active]="activeTab === 'session'" (click)="analyzeSession()"
+    <button class="ai-tab" [class.pending]="loading && activeTab === 'session'" (click)="analyzeSession()"
             [disabled]="loading"
-            matTooltip="Analyse your exploration session — coverage gaps, reflection patterns, blind spots">
+            matTooltip="Analyse your exploration session — coverage gaps, reflection patterns, blind spots"
+            aria-label="Analyse your exploration session">
       <mat-icon>analytics</mat-icon><span>Session</span>
     </button>
-    <button class="ai-tab" [class.active]="activeTab === 'report'" (click)="generateReport()"
+    <button class="ai-tab" [class.pending]="loading && activeTab === 'report'" (click)="generateReport()"
             [disabled]="loading"
-            matTooltip="Generate captions and a structured written report from your Data-Comics frames">
+            matTooltip="Generate captions and a structured written report from your Data-Comics frames"
+            aria-label="Generate a written report from your Data-Comics frames">
       <mat-icon>article</mat-icon><span>Report</span>
     </button>
-    <button class="ai-tab" [class.active]="activeTab === 'story'" (click)="suggestStory()"
+    <button class="ai-tab" [class.pending]="loading && activeTab === 'story'" (click)="suggestStory()"
             [disabled]="loading"
-            matTooltip="Suggest improved titles and annotations for your Story Deck slides">
+            matTooltip="Suggest improved titles and annotations for your Story Deck slides"
+            aria-label="Suggest titles and annotations for your Story Deck slides">
       <mat-icon>auto_stories</mat-icon><span>Story</span>
     </button>
   </div>
@@ -44,15 +49,17 @@
     </div>
 
     <!-- Messages -->
-    <div *ngFor="let msg of history; trackBy: trackByIdx"
-         class="ai-msg"
-         [class.user]="msg.role === 'user'"
-         [class.assistant]="msg.role === 'assistant'">
-      <mat-icon class="ai-msg-icon">
-        {{ msg.role === 'user' ? 'person' : 'auto_awesome' }}
-      </mat-icon>
-      <div class="ai-msg-bubble">
-        <pre class="ai-msg-text">{{ msg.content }}</pre>
+    <div *ngFor="let msg of history; trackBy: trackByIdx" class="ai-msg-wrap">
+      <div class="ai-msg-tag" *ngIf="msg.tag">— {{ tagLabel(msg.tag) }} —</div>
+      <div class="ai-msg"
+           [class.user]="msg.role === 'user'"
+           [class.assistant]="msg.role === 'assistant'">
+        <mat-icon class="ai-msg-icon">
+          {{ msg.role === 'user' ? 'person' : 'auto_awesome' }}
+        </mat-icon>
+        <div class="ai-msg-bubble">
+          <pre class="ai-msg-text">{{ msg.content }}</pre>
+        </div>
       </div>
     </div>
 
@@ -82,7 +89,7 @@
            [disabled]="loading" />
     <button mat-icon-button class="ai-send-btn" (click)="send()"
             [disabled]="loading || !userInput.trim()"
-            matTooltip="Send">
+            matTooltip="Send" aria-label="Send message">
       <mat-icon>send</mat-icon>
     </button>
   </div>

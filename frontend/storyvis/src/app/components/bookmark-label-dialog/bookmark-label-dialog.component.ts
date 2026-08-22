@@ -13,6 +13,7 @@ export interface BookmarkLabelData {
     .bld-title { display: flex; align-items: center; gap: 8px; color: #e0e0e0; font-size: 16px; margin: 0 0 4px; }
     .bld-icon { color: rgb(255,200,100); font-size: 20px; width: 20px; height: 20px; line-height: 20px; }
     .bld-field { width: 100%; min-width: min(320px, 85vw); }
+    .bld-hint { font-size: 12px; color: rgba(224,224,224,0.75); margin: 0 0 12px; line-height: 1.5; }
     mat-dialog-content { padding-top: 8px !important; }
   `]
 })
