@@ -793,7 +793,7 @@ export class SlideDeckVisualization {
         this.update();
     }
 
-    private resizeTable() {
+    private resizeTable = () => {
         this._tableWidth = this._tableWidth / 2;
         d3.select(".slide__table").attr("width", this._tableWidth);
     }
@@ -1154,5 +1154,10 @@ export class SlideDeckVisualization {
 
     public getDeck(): IProvenanceSlidedeck {
         return this._slideDeck;
+    }
+
+    /** Remove the window listener registered in the constructor. Call before discarding an instance. */
+    public destroy() {
+        window.removeEventListener("resize", this.resizeTable);
     }
 }

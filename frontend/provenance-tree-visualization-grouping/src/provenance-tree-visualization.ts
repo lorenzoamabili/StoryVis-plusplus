@@ -120,7 +120,7 @@ export class ProvenanceTreeVisualization {
   public transferringEnabled: boolean = false;
   public copyingEnabled: boolean = false;
 
-  constructor(traverser: ProvenanceGraphTraverser, elm: HTMLDivElement, aggreg: string) {
+  constructor(traverser: ProvenanceGraphTraverser, elm: HTMLDivElement, aggreg: string, bindGlobalControls: boolean = true) {
     this.elm = elm;
     this.traverser = traverser;
     this.colorScheme = d3.scaleOrdinal(d3.schemeAccent);
@@ -186,7 +186,7 @@ export class ProvenanceTreeVisualization {
 
     this.minimap = new ProvenanceMinimap(this, this.elm, 1 / 2);
 
-    provGraphControls(this);
+    if (bindGlobalControls) { provGraphControls(this); }
 
     this.wasManuallyZoomed = false;
 

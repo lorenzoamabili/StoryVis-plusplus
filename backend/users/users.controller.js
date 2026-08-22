@@ -17,7 +17,11 @@ routerUsers.delete('/:id', authorize('Admin'), _delete);
 module.exports = routerUsers;
 
 function authenticate(req, res, next) {
-    userService.authenticate(req.body)
+    const { username, password } = req.body;
+    if (typeof username !== 'string' || typeof password !== 'string') {
+        return res.status(400).json({ message: 'Username or password is incorrect' });
+    }
+    userService.authenticate({ username, password })
         .then(user => user ? res.json(user) : res.status(400).json({ message: 'Username or password is incorrect' }))
         .catch(err => next(err));
 }
@@ -43,16 +47,10 @@ function register(req, res, next) {
 }
 
 function getAll(req, res, next) {
-    const limit = Math.min(parseInt(req.query.limit) || 200, 1000);
-    const skip = parseInt(req.query.skip) || 0;
+    const limit = Math.max(Math.min(parseInt(req.query.limit) || 200, 1000), 0);
+    const skip = Math.max(parseInt(req.query.skip) || 0, 0);
     userService.getAll({ limit, skip })
         .then(users => res.json(users))
-        .catch(err => next(err));
-}
-
-function getCurrent(req, res, next) {
-    userService.getById(req.user.sub)
-        .then(user => user ? res.json(user) : res.sendStatus(404))
         .catch(err => next(err));
 }
 

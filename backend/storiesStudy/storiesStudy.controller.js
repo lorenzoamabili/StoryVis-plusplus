@@ -14,9 +14,9 @@ function saveStory(req, res, next) {
 }
 
 function getAllStories(req, res, next) {
-    const limit = Math.min(parseInt(req.query.limit) || 100, 500);
-    const skip = parseInt(req.query.skip) || 0;
-    const IDcreator = req.query.IDcreator || null;
+    const limit = Math.max(Math.min(parseInt(req.query.limit) || 100, 500), 0);
+    const skip = Math.max(parseInt(req.query.skip) || 0, 0);
+    const IDcreator = typeof req.query.IDcreator === 'string' ? req.query.IDcreator : null;
     storyService.getAll({ limit, skip, IDcreator }).then(s => res.json(s)).catch(err => next(err));
 }
 

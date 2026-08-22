@@ -36,10 +36,13 @@ export class ProvenanceVisualizationComparisonComponent implements OnInit, OnDes
   }
 
   createTree(traverser: ProvenanceGraphTraverser): ProvenanceTreeVisualization {
+    // bindGlobalControls=false — this is a secondary (comparison/education) tree;
+    // the global Alt+key shortcuts must stay bound to the main provenance tree only.
     return this._viz = new ProvenanceTreeVisualization(
       traverser,
       this.elementRef.nativeElement,
       'ProvGraph',
+      false,
     );
   }
 

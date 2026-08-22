@@ -14,6 +14,11 @@ function errorHandler(err, req, res, next) {
         return res.status(404).json({ message: 'Resource not found' });
     }
 
+    // Any other bad field value (e.g. a non-numeric string for a Number field, or a negative skip/limit)
+    if (err.name === 'CastError') {
+        return res.status(400).json({ message: `Invalid value for field '${err.path}'` });
+    }
+
     // Mongoose validation error
     if (err.name === 'ValidationError') {
         const messages = Object.values(err.errors).map(e => e.message);

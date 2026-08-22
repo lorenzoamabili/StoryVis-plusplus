@@ -5,6 +5,13 @@ import { storyVisBridge } from './bridge';
 
 let _keyPressListener: ((e: any) => void) | null = null;
 
+// Registered once at module load — blocking the context menu doesn't depend on
+// any tree instance, so re-adding it on every provGraphControls() call (every
+// dataset switch / graph load / rewire) would leak one listener per call.
+if (typeof window !== 'undefined') {
+    window.addEventListener('contextmenu', (evt: any) => evt.preventDefault());
+}
+
 export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVisualization) {
     var graph = provenanceTreeVisualization.traverser.graph;
     var traverser = provenanceTreeVisualization.traverser;
@@ -91,14 +98,4 @@ export function provGraphControls(provenanceTreeVisualization: ProvenanceTreeVis
     // ngAfterViewChecked() {
     //   this._viz.setZoomExtent();
     // }
-
-    (function () {
-        var blockContextMenu;
-
-        blockContextMenu = function (evt: any) {
-            evt.preventDefault();
-        };
-
-        window.addEventListener('contextmenu', blockContextMenu);;
-    })();
-} 
+}

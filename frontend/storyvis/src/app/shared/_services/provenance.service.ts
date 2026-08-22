@@ -20,6 +20,8 @@ import {
 } from '../_models';
 import { environment } from '../../../environments/environment';
 import { UserService } from './user.service';
+import { BookmarkService } from './bookmark.service';
+import { ReflectionService } from './reflection.service';
 import { ProvenanceVisualizationComponent } from '../../components/provenance-visualization/provenance-visualization.component';
 import { setNewAddListeners } from '../../components/brainvis-canvas/provenanceHelpers/provenanceListeners';
 import { Settings } from 'src/app/components/brainvis-canvas/utils/settings';
@@ -346,6 +348,10 @@ export class ProvenanceService {
 
     if (this.tree) { this.tree.rewire(this.traverser); }
     setNewAddListeners(this.registry, this.tracker);
+    // Bookmarks/reflections are keyed by node id, which is only valid within the
+    // graph instance that created it — any new graph invalidates them.
+    this.bookmarkService.reset();
+    this.reflectionService.reset();
     this.graphReset$.next();
   }
 
@@ -365,7 +371,12 @@ export class ProvenanceService {
     storyVisBridge.provenance = this;
   }
 
-  constructor(private http: HttpClient, private snackBar: MatSnackBar) {
+  constructor(
+    private http: HttpClient,
+    private snackBar: MatSnackBar,
+    private bookmarkService: BookmarkService,
+    private reflectionService: ReflectionService,
+  ) {
     this.init().then(() => this.initialized = true).catch(err => console.error('ProvenanceService.init failed:', err));
   }
 }

@@ -30,11 +30,14 @@ export class ProvenanceSlidesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._resetSub?.unsubscribe();
+    this._deckViz?.destroy();
   }
 
   private _initDeck() {
     const g = this.provenance.graph;
     if (!g) { return; }
+    // Tear down the previous instance's window listener before discarding it
+    this._deckViz?.destroy();
     // Clear previous deck visualization from DOM
     if (this.deckRoot?.nativeElement) {
       this.deckRoot.nativeElement.innerHTML = '';

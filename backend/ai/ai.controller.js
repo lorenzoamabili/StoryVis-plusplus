@@ -3,7 +3,7 @@ const router = express.Router();
 const { Ollama } = require('ollama');
 
 // Default to localhost; override with OLLAMA_HOST env var for remote setups
-const ollama = new Ollama({ host: process.env.OLLAMA_HOST || 'http://localhost:11434' });
+const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
 
 // Model to use — override with OLLAMA_MODEL env var.
 // 'llama3.2' is a good default (lightweight, capable, free).
@@ -59,24 +59,46 @@ router.post('/chat', async (req, res) => {
       i === 0 ? { ...m, content: contextBlock + m.content } : m
     );
 
-    const chatPromise = ollama.chat({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...augmented,
-      ],
-      stream: false,
-      options: {
-        temperature: 0.7,
-        num_predict: 1024,
-      },
-    });
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Ollama request timed out')), 60_000)
-    );
-    const response = await Promise.race([chatPromise, timeoutPromise]);
+    // A fresh client per request so an abort() on timeout only cancels this
+    // request's own in-flight call, not other concurrent users' chats.
+    const client = new Ollama({ host: OLLAMA_HOST });
 
-    res.json({ content: response.message.content });
+    const chatPromise = (async () => {
+      const stream = await client.chat({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...augmented,
+        ],
+        stream: true,
+        options: {
+          temperature: 0.7,
+          num_predict: 1024,
+        },
+      });
+      let content = '';
+      for await (const part of stream) {
+        content += part.message.content;
+      }
+      return content;
+    })();
+
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        client.abort();
+        reject(new Error('Ollama request timed out'));
+      }, 60_000);
+    });
+
+    let content;
+    try {
+      content = await Promise.race([chatPromise, timeoutPromise]);
+    } finally {
+      clearTimeout(timeoutHandle);
+    }
+
+    res.json({ content });
   } catch (err) {
     console.error('[AI] chat error:', err.message);
 
