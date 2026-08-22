@@ -124,6 +124,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
   private _svgObserveTimer: any = null;
   private _boundGraph: any = null;
   private _nodeAddedHandler: (() => void) | null = null;
+  private _hasAutoFit = false;
 
   constructor(
     private elementRef: ElementRef,
@@ -159,6 +160,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
       const w = entries[0]?.contentRect.width ?? 0;
       if (w > 0 && w !== this._lastWidth) {
         this._forceTreeRedraw();
+        if (!this._hasAutoFit) { this._hasAutoFit = this._tryAutoFit(); }
       }
       this._lastWidth = w;
     });
@@ -187,6 +189,7 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     this._svgObserveRetries = 0;
     this._tryObserveSvg();
     try { (this._viz as any).update(); } catch (_) {}
+    this._hasAutoFit = this._tryAutoFit();
   }
 
   refresh() { this._forceTreeRedraw(); }
@@ -238,6 +241,15 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
     }
   }
 
+  /** Re-center/re-fit the tree once the host has real dimensions (constructor-time scaleToFit() runs before layout, landing the graph at the top-left). */
+  private _tryAutoFit(): boolean {
+    const host = this.elementRef.nativeElement as HTMLElement;
+    if (host.offsetWidth > 0 && host.offsetHeight > 0 && this._viz) {
+      try { (this._viz as any).scaleToFit(); return true; } catch (_) {}
+    }
+    return false;
+  }
+
   private _forceTreeRedraw() {
     const host = this.elementRef.nativeElement as HTMLElement;
     const w = host.offsetWidth;
@@ -245,7 +257,6 @@ export class ProvenanceVisualizationComponent implements OnInit, AfterViewInit, 
 
     if (this._viz) {
       try { (this._viz as any).update(); } catch (_) {}
-      try { (this._viz as any).resize(); } catch (_) {}
     }
 
     const svg = host.querySelector('svg');
