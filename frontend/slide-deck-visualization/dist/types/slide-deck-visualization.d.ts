@@ -84,4 +84,6 @@ export declare class SlideDeckVisualization {
     createStoryFromDerivationNodes(): void;
     setDeck(deck: IProvenanceSlidedeck): void;
     getDeck(): IProvenanceSlidedeck;
+    /** Remove the window listener registered in the constructor. Call before discarding an instance. */
+    destroy(): void;
 }

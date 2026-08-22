@@ -1267,6 +1267,10 @@
               this._currentTime = (d3.event.x + this._timelineShift - this._originPosition) / this._barWidthTimeMultiplier;
               this.update();
           };
+          this.resizeTable = () => {
+              this._tableWidth = this._tableWidth / 2;
+              d3.select(".slide__table").attr("width", this._tableWidth);
+          };
           /**
            * Displays the annotation text on the screen. The annotaion text is displayed in lines, each of them with a predetermined max width
            * @param annotation: The annotation text
@@ -1707,10 +1711,6 @@
               this.update();
           }, intervalStepMS);
       }
-      resizeTable() {
-          this._tableWidth = this._tableWidth / 2;
-          d3.select(".slide__table").attr("width", this._tableWidth);
-      }
       update() {
           this.updateTimeIndices(this._slideDeck);
           if (this._timelineShift < 0) {
@@ -1941,6 +1941,10 @@
       }
       getDeck() {
           return this._slideDeck;
+      }
+      /** Remove the window listener registered in the constructor. Call before discarding an instance. */
+      destroy() {
+          window.removeEventListener("resize", this.resizeTable);
       }
   }
 

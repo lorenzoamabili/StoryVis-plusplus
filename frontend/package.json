@@ -15,6 +15,10 @@
       "**/@ngtools*/**"
     ]
   },
+  "scripts": {
+    "build:libs": "cd provenance-core && npm run build && cd ../provenance-tree-visualization-grouping && npm run build && cd ../slide-deck-visualization && npm run build",
+    "postinstall": "npm run build:libs"
+  },
   "dependencies": {
     "@angular/animations": "^10.1.5",
     "@angular/cdk": "^10.2.4",
